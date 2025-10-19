@@ -4,7 +4,7 @@
  */
 package model;
 
-import java.time.LocalDateTime;
+import java.sql.Date;
 
 /**
  *
@@ -17,13 +17,13 @@ public class TaiKhoanDTO {
     private String email;
     private String role;
     private boolean tranThaiTaiKhoan;
-    private LocalDateTime taoTaiKhoan;
-    private LocalDateTime capNhatTaiKhoan;
+    private Date taoTaiKhoan;
+    private Date capNhatTaiKhoan;
 
     public TaiKhoanDTO() {
     }
 
-    public TaiKhoanDTO(int taiKhoanId, String tenDangNhap, String matKhau, String email, String role, boolean tranThaiTaiKhoan, LocalDateTime taoTaiKhoan, LocalDateTime capNhatTaiKhoan) {
+    public TaiKhoanDTO(int taiKhoanId, String tenDangNhap, String matKhau, String email, String role, boolean tranThaiTaiKhoan, Date taoTaiKhoan, Date capNhatTaiKhoan) {
         this.taiKhoanId = taiKhoanId;
         this.tenDangNhap = tenDangNhap;
         this.matKhau = matKhau;
@@ -82,19 +82,19 @@ public class TaiKhoanDTO {
         this.tranThaiTaiKhoan = tranThaiTaiKhoan;
     }
 
-    public LocalDateTime getTaoTaiKhoan() {
+    public Date getTaoTaiKhoan() {
         return taoTaiKhoan;
     }
 
-    public void setTaoTaiKhoan(LocalDateTime taoTaiKhoan) {
+    public void setTaoTaiKhoan(Date taoTaiKhoan) {
         this.taoTaiKhoan = taoTaiKhoan;
     }
 
-    public LocalDateTime getCapNhatTaiKhoan() {
+    public Date getCapNhatTaiKhoan() {
         return capNhatTaiKhoan;
     }
 
-    public void setCapNhatTaiKhoan(LocalDateTime capNhatTaiKhoan) {
+    public void setCapNhatTaiKhoan(Date capNhatTaiKhoan) {
         this.capNhatTaiKhoan = capNhatTaiKhoan;
     }
     
