@@ -10,7 +10,7 @@ package model;
  */
 public class ChiDinhDichVuDTO {
 
-    private int id;
+    private int chiDinhDichVuId;
     private String ketQua;
     private String trangThai;
     private int phieuKhamId;
@@ -21,7 +21,7 @@ public class ChiDinhDichVuDTO {
     }
 
     public ChiDinhDichVuDTO(int id, String ketQua, String trangThai, int phieuKhamId, int dichVuId) {
-        this.id = id;
+        this.chiDinhDichVuId = id;
         this.ketQua = ketQua;
         this.trangThai = trangThai;
         this.phieuKhamId = phieuKhamId;
@@ -29,12 +29,12 @@ public class ChiDinhDichVuDTO {
     }
 
     // Getters and Setters
-    public int getId() {
-        return id;
+    public int getChiDinhDichVuId() {
+        return chiDinhDichVuId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setChiDinhDichVuId(int chiDinhDichVuId) {
+        this.chiDinhDichVuId = chiDinhDichVuId;
     }
 
     public String getKetQua() {
