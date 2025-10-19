@@ -4,10 +4,28 @@
  */
 package model;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author SunnyU
  */
 public class DichVuDAO {
-    
+
+    public DichVuDTO createService(DichVuDTO thongTin) {
+        return new DichVuDTO();
+    }
+
+    public boolean updateServiceInfo(int serviceId, DichVuDTO thongTinMoi) {
+        return true;
+    }
+
+    public ArrayList<DichVuDTO> listAllServices() {
+        ArrayList<DichVuDTO> list = new ArrayList<>();
+        return list;
+    }
+
+    public DichVuDTO findServiceById(int serviceId) {
+        return new DichVuDTO();
+    }
 }
