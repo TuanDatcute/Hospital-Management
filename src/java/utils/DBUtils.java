@@ -10,7 +10,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DBUtils {
-
+////tạo file db.properties bằng netbeans New -> Other >File Types > Properties File 
+    //thêm các câu dưới đây vào file vừa tạo
+//db.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+//db.url=jdbc:sqlserver://localhost:1433;databaseName=[NHAP DATA BASE NAME]
+//db.username=[NHAP NAME]
+//db.password[NHAP PASS]
     public static Connection getConnection() {
         Connection conn = null;
         try {
