@@ -29,3 +29,5 @@ nbproject/
 build/
 dist/
 
+
+db.properties
