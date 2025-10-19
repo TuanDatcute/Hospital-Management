@@ -4,10 +4,27 @@
  */
 package model;
 
+import java.math.BigDecimal;
+
 /**
  *
  * @author SunnyU
  */
 public class PhieuKhamBenhDAO {
     
+    public PhieuKhamBenhDTO createEncounter(PhieuKhamBenhDTO thongTinKham){
+        return thongTinKham;
+    }
+    
+    public boolean updateEncounterDetails(int phieuKhamId,PhieuKhamBenhDTO thongTinCapNhat){
+        return false;
+    }
+    
+    public PhieuKhamBenhDTO getEncounterDetails(int phieuKhamId){
+        return new PhieuKhamBenhDTO();
+    }
+    
+    public boolean addVitals(int phieuKhamId,BigDecimal nhietDo, String huyetAp, Integer nhipTim, Integer nhipTho){
+        return true;
+    }
 }
