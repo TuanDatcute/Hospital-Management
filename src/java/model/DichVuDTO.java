@@ -12,7 +12,7 @@ import java.math.BigDecimal;
  */
 public class DichVuDTO {
 
-    private int id;
+    private int dichVuId;
     private String tenDichVu;
     private String moTa;
     private BigDecimal donGia;
@@ -22,19 +22,19 @@ public class DichVuDTO {
     }
 
     public DichVuDTO(int id, String tenDichVu, String moTa, BigDecimal donGia) {
-        this.id = id;
+        this.dichVuId = id;
         this.tenDichVu = tenDichVu;
         this.moTa = moTa;
         this.donGia = donGia;
     }
 
     // Getters and Setters
-    public int getId() {
-        return id;
+    public int getDichVuId() {
+        return dichVuId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setDichVuId(int dichVuId) {
+        this.dichVuId = dichVuId;
     }
 
     public String getTenDichVu() {

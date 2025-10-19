@@ -12,7 +12,7 @@ import java.math.BigDecimal;
  */
 public class ThuocDTO {
 
-    private int id;
+    private int thuocId;
     private String tenThuoc;
     private String hoatChat;
     private String donViTinh;
@@ -23,8 +23,17 @@ public class ThuocDTO {
     public ThuocDTO() {
     }
 
+    public ThuocDTO(String tenThuoc, String hoatChat, String donViTinh, BigDecimal donGia, int soLuongTonKho) {
+        this.tenThuoc = tenThuoc;
+        this.hoatChat = hoatChat;
+        this.donViTinh = donViTinh;
+        this.donGia = donGia;
+        this.soLuongTonKho = soLuongTonKho;
+    }
+
+    
     public ThuocDTO(int id, String tenThuoc, String hoatChat, String donViTinh, BigDecimal donGia, int soLuongTonKho) {
-        this.id = id;
+        this.thuocId = id;
         this.tenThuoc = tenThuoc;
         this.hoatChat = hoatChat;
         this.donViTinh = donViTinh;
@@ -33,12 +42,12 @@ public class ThuocDTO {
     }
 
     // Getters and Setters
-    public int getId() {
-        return id;
+    public int getThuocId() {
+        return thuocId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setThuocId(int thuocId) {
+        this.thuocId = thuocId;
     }
 
     public String getTenThuoc() {

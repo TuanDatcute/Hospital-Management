@@ -9,5 +9,13 @@ package model;
  * @author SunnyU
  */
 public class DonThuocDAO {
+    //Tạo một đơn thuốc hoàn chỉnh (bao gồm cả các thuốc chi tiết)
+    public DonThuocDTO createPrescription(int phieuKhamId, String loiDan, ChiTietDonThuocDTO chiTietDonThuoc){
+        return new DonThuocDTO();
+    }
     
+    // Xem chi tiết một đơn thuốc
+    public DonThuocDTO getPrescriptionDetails(int donThuocId){
+        return new DonThuocDTO();
+    }
 }

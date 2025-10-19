@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class PhieuKhamBenhDTO {
 
-    private int id;
+    private int phieuKhamBenhId;
     private String maPhieuKham;
     private Date thoiGianKham;
     private String trieuChung;
@@ -31,8 +31,16 @@ public class PhieuKhamBenhDTO {
     public PhieuKhamBenhDTO() {
     }
 
+    public PhieuKhamBenhDTO(BigDecimal nhietDo, String huyetAp, int nhipTim, int nhipTho) {
+        this.nhietDo = nhietDo;
+        this.huyetAp = huyetAp;
+        this.nhipTim = nhipTim;
+        this.nhipTho = nhipTho;
+    }
+    
+
     public PhieuKhamBenhDTO(int id, String maPhieuKham, Date thoiGianKham, String trieuChung, BigDecimal nhietDo, String huyetAp, int nhipTim, int nhipTho, String chanDoan, String ketLuan, int benhNhanId, int nhanVienId, Integer lichHenId) {
-        this.id = id;
+        this.phieuKhamBenhId = id;
         this.maPhieuKham = maPhieuKham;
         this.thoiGianKham = thoiGianKham;
         this.trieuChung = trieuChung;
@@ -48,12 +56,12 @@ public class PhieuKhamBenhDTO {
     }
 
     // Getters and Setters
-    public int getId() {
-        return id;
+    public int getPhieuKhamBenhId() {
+        return phieuKhamBenhId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setPhieuKhamBenhId(int phieuKhamBenhId) {
+        this.phieuKhamBenhId = phieuKhamBenhId;
     }
 
     public String getMaPhieuKham() {

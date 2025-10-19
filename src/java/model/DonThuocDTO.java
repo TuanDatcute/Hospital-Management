@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class DonThuocDTO {
 
-    private int id;
+    private int donThuocId;
     private Date ngayKeDon;
     private String loiDan;
     private int phieuKhamId;
@@ -26,19 +26,19 @@ public class DonThuocDTO {
     }
 
     public DonThuocDTO(int id, Date ngayKeDon, String loiDan, int phieuKhamId) {
-        this.id = id;
+        this.donThuocId = id;
         this.ngayKeDon = ngayKeDon;
         this.loiDan = loiDan;
         this.phieuKhamId = phieuKhamId;
     }
 
     // Getters and Setters
-    public int getId() {
-        return id;
+    public int getDonThuocId() {
+        return donThuocId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setDonThuocId(int donThuocId) {
+        this.donThuocId = donThuocId;
     }
 
     public Date getNgayKeDon() {
