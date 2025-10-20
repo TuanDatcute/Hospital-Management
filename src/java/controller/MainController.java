@@ -5,7 +5,7 @@
 package controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.Arrays;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -14,10 +14,15 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author SunnyU
+ * @author tungi (đã chỉnh sửa)
  */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 public class MainController extends HttpServlet {
+
+    // Đặt tên các trang và controller ở đây để dễ quản lý
+    private static final String LOGIN_PAGE = "login.jsp";
+    private static final String USER_CONTROLLER = "UserController";
+    private static final String NOTIFICATION_CONTROLLER = "ThongBaoController"; // Controller mới cho thông báo
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -31,18 +36,28 @@ public class MainController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet MainController</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet MainController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+        
+        // 1. Lấy action từ request
+        String action = request.getParameter("action");
+        String url = LOGIN_PAGE; // Mặc định chuyển về trang login nếu action không hợp lệ
+
+        // 2. Nhóm các action cho từng controller
+        String[] userActions = {"login", "logout", "searchUser"};
+        // **Thêm nhóm action cho chức năng Thông Báo của bạn**
+        String[] notificationActions = {"listNotifications", "markNotificationAsRead", "createNotification"};
+
+        // 3. Điều hướng dựa trên action
+        if (action == null) {
+            url = LOGIN_PAGE;
+        } else if (Arrays.asList(userActions).contains(action)) {
+            url = USER_CONTROLLER;
+        } else if (Arrays.asList(notificationActions).contains(action)) {
+            // **Nếu action thuộc nhóm thông báo, chuyển đến ThongBaoController**
+            url = NOTIFICATION_CONTROLLER;
         }
+        
+        // 4. Forward đến controller tương ứng
+        request.getRequestDispatcher(url).forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

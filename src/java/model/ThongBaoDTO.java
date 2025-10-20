@@ -4,7 +4,7 @@
  */
 package model;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -15,13 +15,13 @@ public class ThongBaoDTO {
     private String tieuDe;
     private String noiDung;
     private boolean daDoc;
-    private Date thoiGianGui;
+    private Timestamp thoiGianGui;
     private int taiKhoanId;
 
     public ThongBaoDTO() {
     }
 
-    public ThongBaoDTO(int thongBaoID, String tieuDe, String noiDung, boolean daDoc, Date thoiGianGui, int taiKhoanID) {
+    public ThongBaoDTO(int thongBaoID, String tieuDe, String noiDung, boolean daDoc, Timestamp thoiGianGui, int taiKhoanID) {
         this.thongBaoId = thongBaoID;
         this.tieuDe = tieuDe;
         this.noiDung = noiDung;
@@ -30,11 +30,11 @@ public class ThongBaoDTO {
         this.taiKhoanId = taiKhoanID;
     }
 
-    public int getThongBaoID() {
+    public int getThongBaoId() {
         return thongBaoId;
     }
 
-    public void setThongBaoID(int thongBaoID) {
+    public void setThongBaoId(int thongBaoID) {
         this.thongBaoId = thongBaoID;
     }
 
@@ -62,19 +62,19 @@ public class ThongBaoDTO {
         this.daDoc = daDoc;
     }
 
-    public Date getThoiGianGui() {
+    public Timestamp getThoiGianGui() {
         return thoiGianGui;
     }
 
-    public void setThoiGianGui(Date thoiGianGui) {
+    public void setThoiGianGui(Timestamp thoiGianGui) {
         this.thoiGianGui = thoiGianGui;
     }
 
-    public int getTaiKhoanID() {
+    public int getTaiKhoanId() {
         return taiKhoanId;
     }
 
-    public void setTaiKhoanID(int taiKhoanID) {
+    public void setTaiKhoanId(int taiKhoanID) {
         this.taiKhoanId = taiKhoanID;
     }
     
