@@ -5,7 +5,7 @@
 package model;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -15,7 +15,7 @@ public class PhieuKhamBenhDTO {
 
     private int phieuKhamBenhId;
     private String maPhieuKham;
-    private Date thoiGianKham;
+    private Timestamp thoiGianKham;
     private String trieuChung;
     private BigDecimal nhietDo;
     private String huyetAp;
@@ -23,6 +23,8 @@ public class PhieuKhamBenhDTO {
     private int nhipTho;
     private String chanDoan;
     private String ketLuan;
+    private Timestamp ngayTaiKham; // Ngày hẹn tái khám
+    
     private int benhNhanId;
     private int nhanVienId;
     private Integer lichHenId; // Dùng Integer vì có thể null
@@ -31,16 +33,8 @@ public class PhieuKhamBenhDTO {
     public PhieuKhamBenhDTO() {
     }
 
-    public PhieuKhamBenhDTO(BigDecimal nhietDo, String huyetAp, int nhipTim, int nhipTho) {
-        this.nhietDo = nhietDo;
-        this.huyetAp = huyetAp;
-        this.nhipTim = nhipTim;
-        this.nhipTho = nhipTho;
-    }
-    
-
-    public PhieuKhamBenhDTO(int id, String maPhieuKham, Date thoiGianKham, String trieuChung, BigDecimal nhietDo, String huyetAp, int nhipTim, int nhipTho, String chanDoan, String ketLuan, int benhNhanId, int nhanVienId, Integer lichHenId) {
-        this.phieuKhamBenhId = id;
+    public PhieuKhamBenhDTO(int phieuKhamBenhId, String maPhieuKham, Timestamp thoiGianKham, String trieuChung, BigDecimal nhietDo, String huyetAp, int nhipTim, int nhipTho, String chanDoan, String ketLuan, Timestamp ngayTaiKham, int benhNhanId, int nhanVienId, Integer lichHenId) {
+        this.phieuKhamBenhId = phieuKhamBenhId;
         this.maPhieuKham = maPhieuKham;
         this.thoiGianKham = thoiGianKham;
         this.trieuChung = trieuChung;
@@ -50,12 +44,12 @@ public class PhieuKhamBenhDTO {
         this.nhipTho = nhipTho;
         this.chanDoan = chanDoan;
         this.ketLuan = ketLuan;
+        this.ngayTaiKham = ngayTaiKham;
         this.benhNhanId = benhNhanId;
         this.nhanVienId = nhanVienId;
         this.lichHenId = lichHenId;
     }
 
-    // Getters and Setters
     public int getPhieuKhamBenhId() {
         return phieuKhamBenhId;
     }
@@ -72,11 +66,11 @@ public class PhieuKhamBenhDTO {
         this.maPhieuKham = maPhieuKham;
     }
 
-    public Date getThoiGianKham() {
+    public Timestamp getThoiGianKham() {
         return thoiGianKham;
     }
 
-    public void setThoiGianKham(Date thoiGianKham) {
+    public void setThoiGianKham(Timestamp thoiGianKham) {
         this.thoiGianKham = thoiGianKham;
     }
 
@@ -136,6 +130,14 @@ public class PhieuKhamBenhDTO {
         this.ketLuan = ketLuan;
     }
 
+    public Timestamp getNgayTaiKham() {
+        return ngayTaiKham;
+    }
+
+    public void setNgayTaiKham(Timestamp ngayTaiKham) {
+        this.ngayTaiKham = ngayTaiKham;
+    }
+
     public int getBenhNhanId() {
         return benhNhanId;
     }
@@ -159,4 +161,6 @@ public class PhieuKhamBenhDTO {
     public void setLichHenId(Integer lichHenId) {
         this.lichHenId = lichHenId;
     }
+
+  
 }
