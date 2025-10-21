@@ -5,16 +5,27 @@
 package model;
 
 import java.math.BigDecimal;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  *
  * @author SunnyU
  */
+@Entity
 public class DichVuDTO {
 
+    @Id
     private int dichVuId;
+
+    @Column(name = "ten_dich_vu")
     private String tenDichVu;
+
+    @Column(name = "mo_ta")
     private String moTa;
+
+    @Column(name = "don_gia")
     private BigDecimal donGia;
 
     // Constructors

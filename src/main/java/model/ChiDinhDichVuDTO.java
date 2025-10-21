@@ -4,23 +4,41 @@
  */
 package model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 /**
  *
  * @author SunnyU
  */
+@Entity
 public class ChiDinhDichVuDTO {
 
+    @Id
     private int chiDinhDichVuId;
+
+    @Column(name = "ket_qua")
     private String ketQua;
+
+    @Column(name = "trang_thai")
     private String trangThai;
-    private int phieuKhamId;
-    private int dichVuId;
+
+    @ManyToOne
+    @JoinColumn(name = "phieu_kham_id")
+    private PhieuKhamBenhDTO phieuKhamId;
+
+    @ManyToOne
+    @JoinColumn(name = "dich_vu_id")
+    private DichVuDTO dichVuId;
 
     // Constructors
     public ChiDinhDichVuDTO() {
     }
 
-    public ChiDinhDichVuDTO(int id, String ketQua, String trangThai, int phieuKhamId, int dichVuId) {
+    public ChiDinhDichVuDTO(int id, String ketQua, String trangThai, PhieuKhamBenhDTO phieuKhamId, DichVuDTO dichVuId) {
         this.chiDinhDichVuId = id;
         this.ketQua = ketQua;
         this.trangThai = trangThai;
@@ -53,19 +71,19 @@ public class ChiDinhDichVuDTO {
         this.trangThai = trangThai;
     }
 
-    public int getPhieuKhamId() {
+    public PhieuKhamBenhDTO getPhieuKhamId() {
         return phieuKhamId;
     }
 
-    public void setPhieuKhamId(int phieuKhamId) {
+    public void setPhieuKhamId(PhieuKhamBenhDTO phieuKhamId) {
         this.phieuKhamId = phieuKhamId;
     }
 
-    public int getDichVuId() {
+    public DichVuDTO getDichVuId() {
         return dichVuId;
     }
 
-    public void setDichVuId(int dichVuId) {
+    public void setDichVuId(DichVuDTO dichVuId) {
         this.dichVuId = dichVuId;
     }
 }

@@ -5,35 +5,74 @@
 package model;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 /**
  *
  * @author SunnyU
  */
+@Entity
 public class PhieuKhamBenhDTO {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int phieuKhamBenhId;
+
+    @Column(name = "ma_phieu_kham")
     private String maPhieuKham;
-    private Timestamp thoiGianKham;
+
+    @Column(name = "thoi_gian_kham")
+    private LocalDateTime thoiGianKham;
+
+    @Column(name = "trieu_chung")
     private String trieuChung;
+
+    @Column(name = "nhiet_do")
     private BigDecimal nhietDo;
+
+    @Column(name = "huyet_ap")
     private String huyetAp;
+
+    @Column(name = "nhip_tim")
     private int nhipTim;
+
+    @Column(name = "nhip_tho")
     private int nhipTho;
+
+    @Column(name = "chan_doan")
     private String chanDoan;
-    private String ketLuan;
-    private Timestamp ngayTaiKham; // Ngày hẹn tái khám
     
-    private int benhNhanId;
-    private int nhanVienId;
-    private Integer lichHenId; // Dùng Integer vì có thể null
+    @Column(name = "ket_luan")
+    private String ketLuan;
+    
+    @Column(name = "ngay_tai_kham")
+    private LocalDateTime ngayTaiKham; // Ngày hẹn tái khám
+
+    @OneToOne
+    @JoinColumn(name = "benh_nhan_id")
+    private BenhNhanDTO benhNhanId;
+    
+    @ManyToOne 
+    @JoinColumn(name = "nhan_vien_id")
+    private NhanVienDTO nhanVienId;
+    
+    @OneToOne
+    @JoinColumn(name = "lich_hen_id")
+    private LichHenDTO lichHenId; 
 
     // Constructors
     public PhieuKhamBenhDTO() {
     }
 
-    public PhieuKhamBenhDTO(int phieuKhamBenhId, String maPhieuKham, Timestamp thoiGianKham, String trieuChung, BigDecimal nhietDo, String huyetAp, int nhipTim, int nhipTho, String chanDoan, String ketLuan, Timestamp ngayTaiKham, int benhNhanId, int nhanVienId, Integer lichHenId) {
+    public PhieuKhamBenhDTO(int phieuKhamBenhId, String maPhieuKham, LocalDateTime thoiGianKham, String trieuChung, BigDecimal nhietDo, String huyetAp, int nhipTim, int nhipTho, String chanDoan, String ketLuan, LocalDateTime ngayTaiKham, BenhNhanDTO benhNhanId, NhanVienDTO nhanVienId, LichHenDTO lichHenId) {
         this.phieuKhamBenhId = phieuKhamBenhId;
         this.maPhieuKham = maPhieuKham;
         this.thoiGianKham = thoiGianKham;
@@ -66,11 +105,11 @@ public class PhieuKhamBenhDTO {
         this.maPhieuKham = maPhieuKham;
     }
 
-    public Timestamp getThoiGianKham() {
+    public LocalDateTime getThoiGianKham() {
         return thoiGianKham;
     }
 
-    public void setThoiGianKham(Timestamp thoiGianKham) {
+    public void setThoiGianKham(LocalDateTime thoiGianKham) {
         this.thoiGianKham = thoiGianKham;
     }
 
@@ -130,37 +169,36 @@ public class PhieuKhamBenhDTO {
         this.ketLuan = ketLuan;
     }
 
-    public Timestamp getNgayTaiKham() {
+    public LocalDateTime getNgayTaiKham() {
         return ngayTaiKham;
     }
 
-    public void setNgayTaiKham(Timestamp ngayTaiKham) {
+    public void setNgayTaiKham(LocalDateTime ngayTaiKham) {
         this.ngayTaiKham = ngayTaiKham;
     }
 
-    public int getBenhNhanId() {
+    public BenhNhanDTO getBenhNhanId() {
         return benhNhanId;
     }
 
-    public void setBenhNhanId(int benhNhanId) {
+    public void setBenhNhanId(BenhNhanDTO benhNhanId) {
         this.benhNhanId = benhNhanId;
     }
 
-    public int getNhanVienId() {
+    public NhanVienDTO getNhanVienId() {
         return nhanVienId;
     }
 
-    public void setNhanVienId(int nhanVienId) {
+    public void setNhanVienId(NhanVienDTO nhanVienId) {
         this.nhanVienId = nhanVienId;
     }
 
-    public Integer getLichHenId() {
+    public LichHenDTO getLichHenId() {
         return lichHenId;
     }
 
-    public void setLichHenId(Integer lichHenId) {
+    public void setLichHenId(LichHenDTO lichHenId) {
         this.lichHenId = lichHenId;
-    }
+    };
 
-  
 }

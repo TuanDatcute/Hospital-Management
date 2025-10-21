@@ -5,18 +5,33 @@
 package model;
 
 import java.math.BigDecimal;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  *
  * @author SunnyU
  */
+@Entity
 public class ThuocDTO {
-
+    
+    @Id
     private int thuocId;
+    
+    @Column(name = "ten_thuoc")
     private String tenThuoc;
+    
+    @Column(name = "hoat_chat")
     private String hoatChat;
+    
+    @Column(name = "don_vi_tinh")
     private String donViTinh;
+    
+    @Column(name = "don_gia")
     private BigDecimal donGia;
+    
+    @Column(name = "so_luong_ton_kho")
     private int soLuongTonKho;
 
     // Constructors
@@ -31,7 +46,6 @@ public class ThuocDTO {
         this.soLuongTonKho = soLuongTonKho;
     }
 
-    
     public ThuocDTO(int id, String tenThuoc, String hoatChat, String donViTinh, BigDecimal donGia, int soLuongTonKho) {
         this.thuocId = id;
         this.tenThuoc = tenThuoc;

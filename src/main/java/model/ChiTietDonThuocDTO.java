@@ -4,23 +4,41 @@
  */
 package model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 /**
  *
  * @author SunnyU
  */
+@Entity
 public class ChiTietDonThuocDTO {
 
+    @Id
     private int id;
+
+    @Column(name = "so_luong")
     private int soLuong;
+
+    @Column(name = "lieu_dung")
     private String lieuDung;
-    private int donThuocId;
-    private int thuocId;
+
+    @ManyToOne
+    @JoinColumn(name = "don_thuoc_id")
+    private DonThuocDTO donThuocId;
+
+    @ManyToOne
+    @JoinColumn(name = "thuoc_id")
+    private ThuocDTO thuocId;
 
     // Constructors
     public ChiTietDonThuocDTO() {
     }
 
-    public ChiTietDonThuocDTO(int id, int soLuong, String lieuDung, int donThuocId, int thuocId) {
+    public ChiTietDonThuocDTO(int id, int soLuong, String lieuDung, DonThuocDTO donThuocId, ThuocDTO thuocId) {
         this.id = id;
         this.soLuong = soLuong;
         this.lieuDung = lieuDung;
@@ -53,19 +71,19 @@ public class ChiTietDonThuocDTO {
         this.lieuDung = lieuDung;
     }
 
-    public int getDonThuocId() {
+    public DonThuocDTO getDonThuocId() {
         return donThuocId;
     }
 
-    public void setDonThuocId(int donThuocId) {
+    public void setDonThuocId(DonThuocDTO donThuocId) {
         this.donThuocId = donThuocId;
     }
 
-    public int getThuocId() {
+    public ThuocDTO getThuocId() {
         return thuocId;
     }
 
-    public void setThuocId(int thuocId) {
+    public void setThuocId(ThuocDTO thuocId) {
         this.thuocId = thuocId;
     }
 }
