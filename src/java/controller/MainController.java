@@ -23,6 +23,8 @@ public class MainController extends HttpServlet {
     private static final String LOGIN_PAGE = "login.jsp";
     private static final String USER_CONTROLLER = "UserController";
     private static final String NOTIFICATION_CONTROLLER = "ThongBaoController"; // Controller mới cho thông báo
+    private static final String NOTIFICATION_CONTROLLER = "ThongBaoController";
+    private static final String EMRCORE_CONTROLLER = "EMRCoreController";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,6 +39,7 @@ public class MainController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
+
         // 1. Lấy action từ request
         String action = request.getParameter("action");
         String url = LOGIN_PAGE; // Mặc định chuyển về trang login nếu action không hợp lệ
@@ -46,16 +49,19 @@ public class MainController extends HttpServlet {
         // **Thêm nhóm action cho chức năng Thông Báo của bạn**
         String[] notificationActions = {"listNotifications", "markNotificationAsRead", "createNotification"};
 
+        String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "addVitals"};
+
         // 3. Điều hướng dựa trên action
         if (action == null) {
             url = LOGIN_PAGE;
         } else if (Arrays.asList(userActions).contains(action)) {
             url = USER_CONTROLLER;
-        } else if (Arrays.asList(notificationActions).contains(action)) {
-            // **Nếu action thuộc nhóm thông báo, chuyển đến ThongBaoController**
+        } else if (Arrays.asList(notificationActions).contains(action)) {        
             url = NOTIFICATION_CONTROLLER;
+        } else if (Arrays.asList(EMRCoreActions).contains(action)) {
+            url = EMRCORE_CONTROLLER;
         }
-        
+
         // 4. Forward đến controller tương ứng
         request.getRequestDispatcher(url).forward(request, response);
     }
