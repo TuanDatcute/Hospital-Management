@@ -1,13 +1,122 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+// path: com/dao/PhongBenhDAO.java
 package model.dao;
 
-/**
- *
- * @author quang
- */
+import model.Entity.PhongBenh;
+import util.HibernateUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+
+import java.util.Collections;
+import java.util.List;
+
 public class PhongBenhDAO {
+
+    // Thêm phòng bệnh mới
+    public void addPhongBenh(PhongBenh phongBenh) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.save(phongBenh);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+    }
+
+    // Cập nhật phòng bệnh
+    public void updatePhongBenh(PhongBenh phongBenh) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.update(phongBenh);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+    }
+
+    // Lấy phòng bệnh bằng ID
+    public PhongBenh getPhongBenhById(long id) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Dùng JOIN FETCH để tải thông tin Khoa ngay lập tức
+            Query<PhongBenh> query = session.createQuery(
+                "FROM PhongBenh pb JOIN FETCH pb.khoa WHERE pb.id = :id", 
+                PhongBenh.class
+            );
+            query.setParameter("id", id);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // Lấy phòng bệnh bằng Tên Phòng (duy nhất)
+    public PhongBenh getPhongBenhByTenPhong(String tenPhong) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<PhongBenh> query = session.createQuery(
+                "FROM PhongBenh pb JOIN FETCH pb.khoa WHERE pb.tenPhong = :tenPhong", 
+                PhongBenh.class
+            );
+            query.setParameter("tenPhong", tenPhong);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // Lấy tất cả phòng bệnh
+    public List<PhongBenh> getAllPhongBenh() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<PhongBenh> query = session.createQuery(
+                "FROM PhongBenh pb JOIN FETCH pb.khoa ORDER BY pb.tenPhong", 
+                PhongBenh.class
+            );
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList(); // Trả về danh sách rỗng
+        }
+    }
     
+    // Lấy tất cả phòng bệnh theo Khoa
+    public List<PhongBenh> getPhongBenhByKhoa(long khoaId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<PhongBenh> query = session.createQuery(
+                "FROM PhongBenh pb JOIN FETCH pb.khoa WHERE pb.khoa.id = :khoaId ORDER BY pb.tenPhong", 
+                PhongBenh.class
+            );
+            query.setParameter("khoaId", khoaId);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList(); // Trả về danh sách rỗng
+        }
+    }
+    
+    // (Tùy chọn) Xóa phòng bệnh
+    public void deletePhongBenh(long id) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            PhongBenh phongBenh = session.get(PhongBenh.class, id);
+            if (phongBenh != null) {
+                session.delete(phongBenh);
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+    }
 }

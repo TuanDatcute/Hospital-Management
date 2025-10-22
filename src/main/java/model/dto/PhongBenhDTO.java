@@ -1,4 +1,5 @@
-package model.dto; // Giữ nguyên package
+// path: com/dto/PhongBenhDTO.java
+package model.dto;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,49 +23,25 @@ import javax.persistence.Id;
 
 @Table(name = "PhongBenh") // Ánh xạ tới bảng PhongBenh
 public class PhongBenhDTO {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PhongBenhID")
-    private int phongBenhId;
-
-    @Column(name = "TenPhong", nullable = false, length = 100)
+    
+    private Long id;
     private String tenPhong;
-
-    @Column(name = "LoaiPhong", length = 50)
     private String loaiPhong;
-
-    @Column(name = "SucChua", nullable = false)
-    private int sucChua;
-
-    // --- Mối quan hệ (Relationship) ---
-    // Thay vì int khoaId, ta dùng đối tượng KhoaDTO
-    // Nhiều Phòng Bệnh (PhongBenh) thuộc về một Khoa (Khoa)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "KhoaID", nullable = false) // Tên cột khóa ngoại trong bảng PhongBenh
-    private KhoaDTO khoa; // Giả định Entity Khoa của bạn tên là KhoaDTO
+    private Integer sucChua;
+    private Long khoaId; // Chỉ lưu ID của Khoa
+    private String tenKhoa; // (Thêm) Thường hữu ích để hiển thị
 
     // --- Constructors ---
     public PhongBenhDTO() {
-        // Constructor rỗng bắt buộc cho Hibernate
-    }
-
-    // Constructor đã cập nhật để nhận đối tượng KhoaDTO
-    public PhongBenhDTO(String tenPhong, String loaiPhong, int sucChua, KhoaDTO khoa) {
-        this.tenPhong = tenPhong;
-        this.loaiPhong = loaiPhong;
-        this.sucChua = sucChua;
-        this.khoa = khoa;
     }
 
     // --- Getters and Setters ---
-    // (Getters/Setters đã được cập nhật cho đối tượng 'khoa')
-    public int getPhongBenhId() {
-        return phongBenhId;
+    public Long getId() {
+        return id;
     }
 
-    public void setPhongBenhId(int phongBenhId) {
-        this.phongBenhId = phongBenhId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTenPhong() {
@@ -83,19 +60,27 @@ public class PhongBenhDTO {
         this.loaiPhong = loaiPhong;
     }
 
-    public int getSucChua() {
+    public Integer getSucChua() {
         return sucChua;
     }
 
-    public void setSucChua(int sucChua) {
+    public void setSucChua(Integer sucChua) {
         this.sucChua = sucChua;
     }
 
-    public KhoaDTO getKhoa() {
-        return khoa;
+    public Long getKhoaId() {
+        return khoaId;
     }
 
-    public void setKhoa(KhoaDTO khoa) {
-        this.khoa = khoa;
+    public void setKhoaId(Long khoaId) {
+        this.khoaId = khoaId;
+    }
+
+    public String getTenKhoa() {
+        return tenKhoa;
+    }
+
+    public void setTenKhoa(String tenKhoa) {
+        this.tenKhoa = tenKhoa;
     }
 }
