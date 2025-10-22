@@ -33,7 +33,6 @@ public class PhieuKhamBenhService {
         if (savedEntity != null) {
             return toDTO(savedEntity);
         }
-
         return null;
     }
 
