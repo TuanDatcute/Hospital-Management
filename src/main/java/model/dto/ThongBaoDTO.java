@@ -1,73 +1,36 @@
-package model.dto; // Giữ nguyên package
+// path: com/dto/ThongBaoDTO.java
+package model.dto;
 
-import java.time.LocalDateTime; // Đã đổi từ Timestamp sang LocalDateTime
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import java.time.LocalDateTime;
 
-/**
- * Lớp này là một Entity, đại diện cho bảng 'ThongBao' trong cơ sở dữ liệu.
- * Tên lớp được giữ là DTO theo yêu cầu.
- *
- * @author quang
- */
-@Entity
-@Table(name = "ThongBao") // Ánh xạ tới bảng ThongBao
 public class ThongBaoDTO {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ThongBaoID")
-    private int thongBaoId;
-
-    @Column(name = "TieuDe", nullable = false, length = 255)
+    private Long id;
     private String tieuDe;
-
-    @Column(name = "NoiDung", columnDefinition = "NVARCHAR(MAX)") // Dùng cho SQL Server (hoặc dùng @Lob)
     private String noiDung;
-
-    @Column(name = "DaDoc", nullable = false)
     private boolean daDoc;
-
-    @Column(name = "ThoiGianGui", nullable = false)
-    private LocalDateTime thoiGianGui; // Đổi sang java.time.LocalDateTime
-
-    // --- Mối quan hệ (Relationship) ---
-    // Nhiều Thông Báo (ThongBao) thuộc về một Tài Khoản (TaiKhoan)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TaiKhoanID", nullable = false) // Tên cột khóa ngoại
-    private TaiKhoanDTO taiKhoan; // Thay thế cho int taiKhoanId
+    private LocalDateTime thoiGianGui;
+    private Long taiKhoanId; // Chỉ lưu ID của người nhận
 
     // --- Constructors ---
-    
     public ThongBaoDTO() {
-        // Constructor rỗng bắt buộc cho Hibernate
     }
 
-    // Constructor đã cập nhật
-    public ThongBaoDTO(String tieuDe, String noiDung, boolean daDoc, LocalDateTime thoiGianGui, TaiKhoanDTO taiKhoan) {
+    public ThongBaoDTO(Long id, String tieuDe, String noiDung, boolean daDoc, LocalDateTime thoiGianGui, Long taiKhoanId) {
+        this.id = id;
         this.tieuDe = tieuDe;
         this.noiDung = noiDung;
         this.daDoc = daDoc;
         this.thoiGianGui = thoiGianGui;
-        this.taiKhoan = taiKhoan;
+        this.taiKhoanId = taiKhoanId;
     }
 
     // --- Getters and Setters ---
-    // (Đã cập nhật getters/setters cho các trường quan hệ và thời gian)
-
-    public int getThongBaoId() {
-        return thongBaoId;
+    public Long getId() {
+        return id;
     }
 
-    public void setThongBaoId(int thongBaoId) {
-        this.thongBaoId = thongBaoId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTieuDe() {
@@ -102,11 +65,11 @@ public class ThongBaoDTO {
         this.thoiGianGui = thoiGianGui;
     }
 
-    public TaiKhoanDTO getTaiKhoan() {
-        return taiKhoan;
+    public Long getTaiKhoanId() {
+        return taiKhoanId;
     }
 
-    public void setTaiKhoan(TaiKhoanDTO taiKhoan) {
-        this.taiKhoan = taiKhoan;
+    public void setTaiKhoanId(Long taiKhoanId) {
+        this.taiKhoanId = taiKhoanId;
     }
 }
