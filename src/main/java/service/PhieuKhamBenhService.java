@@ -22,18 +22,17 @@ public class PhieuKhamBenhService {
             // Ném ra một ngoại lệ cụ thể để SePPrvlet có thể bắt
             throw new Exception("Mã phiếu khám '" + dto.getMaPhieuKham() + "' đã tồn tại. Vui lòng sử dụng mã khác.");
         }
-
-        
+        // Các logic kiểm tra khác...
         if (dto.getBenhNhanId() <= 0 || dto.getBacSiId() <= 0) {
             throw new Exception("ID Bệnh nhân hoặc Bác sĩ không hợp lệ.");
         }
 
+        // --- CÁC BƯỚC TIẾP THEO GIỮ NGUYÊN ---
         PhieuKhamBenh entity = toEntity(dto);
         PhieuKhamBenh savedEntity = dao.create(entity);
         if (savedEntity != null) {
             return toDTO(savedEntity);
         }
-
         return null;
     }
 

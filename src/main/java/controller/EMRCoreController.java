@@ -22,7 +22,7 @@ public class EMRCoreController extends HttpServlet {
     // Khai báo URL cho các trang JSP để dễ quản lý
     private static final String ERROR_PAGE = "error.jsp";
     private static final String SUCCESS_PAGE = "danhSachPhieuKham.jsp";
-    private static final String CREATE_ENCOUNTER_PAGE = "taoPhieuKham.jsp";
+    private static final String CREATE_ENCOUNTER_PAGE = "PhieuKhamBenh.jsp";
 
     // Khởi tạo Service ở cấp lớp để tái sử dụng trong các phương thức
     private final PhieuKhamBenhService phieuKhamService = new PhieuKhamBenhService();

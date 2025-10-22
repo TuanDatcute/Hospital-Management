@@ -1,4 +1,12 @@
+
 // path: com/dao/ThongBaoDAO.java
+
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+
 package model.dao;
 
 import model.Entity.ThongBao;
@@ -10,6 +18,7 @@ import org.hibernate.query.Query;
 import java.util.List;
 
 public class ThongBaoDAO {
+
 
     // Thêm một thông báo mới
     public void addThongBao(ThongBao thongBao) {
@@ -82,3 +91,5 @@ public class ThongBaoDAO {
         }
     }
 }
+
+

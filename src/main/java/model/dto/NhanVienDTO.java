@@ -5,13 +5,17 @@
 package model.dto;
 
 import java.time.LocalDate;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 
 /**
  *
  * @author ADMIN
  */
+@Entity
 public class NhanVienDTO {
+    @Id
     private int nhanVienId;
     private String hoTenNhanVien;
     private LocalDate ngaySinhNhanVien;
