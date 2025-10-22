@@ -4,11 +4,16 @@
  */
 package model.dto;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 /**
  *
  * @author quang
  */
+@Entity
 public class PhongBenhDTO {
+    @Id
     private int phongBenhId;
     private String tenPhong;
     private String loaiPhong;
