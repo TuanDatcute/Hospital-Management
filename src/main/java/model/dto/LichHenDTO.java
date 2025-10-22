@@ -1,52 +1,61 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model.dto;
 
-import java.sql.Date;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import java.time.OffsetDateTime;
 
 /**
  *
  * @author ADMIN
  */
-@Entity
+// Xóa @Entity và @Id
 public class LichHenDTO {
-    @Id
-    private int lichHenId;
-    private Date thoiGianHen;
+    
+    private int id;
+    private Integer stt;
+    private OffsetDateTime thoiGianHen; // Dùng kiểu hiện đại
     private String lyDoKham;
-    private boolean trangThaiLichHen;
+    private String trangThai; // Dùng String để khớp CSDL
+    private String ghiChu; // Thêm trường bị thiếu
+    
+    // Làm phẳng quan hệ
     private int benhNhanId;
-    private int nhanVienId;
+    private int bacSiId; // Đổi tên từ nhanVienId thành bacSiId cho khớp
 
     public LichHenDTO() {
     }
 
-    public LichHenDTO(int lichHenId, Date thoiGianHen, String lyDoKham, boolean trangThaiLichHen, int benhNhanId, int nhanVienId) {
-        this.lichHenId = lichHenId;
+    public LichHenDTO(int id, Integer stt, OffsetDateTime thoiGianHen, String lyDoKham, String trangThai, String ghiChu, int benhNhanId, int bacSiId) {
+        this.id = id;
+        this.stt = stt;
         this.thoiGianHen = thoiGianHen;
         this.lyDoKham = lyDoKham;
-        this.trangThaiLichHen = trangThaiLichHen;
+        this.trangThai = trangThai;
+        this.ghiChu = ghiChu;
         this.benhNhanId = benhNhanId;
-        this.nhanVienId = nhanVienId;
+        this.bacSiId = bacSiId;
     }
 
-    public int getLichHenId() {
-        return lichHenId;
+    // Getters and Setters
+    public int getId() {
+        return id;
     }
 
-    public void setLichHenId(int lichHenId) {
-        this.lichHenId = lichHenId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public Date getThoiGianHen() {
+    public Integer getStt() {
+        return stt;
+    }
+
+    public void setStt(Integer stt) {
+        this.stt = stt;
+    }
+
+    public OffsetDateTime getThoiGianHen() {
         return thoiGianHen;
     }
 
-    public void setThoiGianHen(Date thoiGianHen) {
+    public void setThoiGianHen(OffsetDateTime thoiGianHen) {
         this.thoiGianHen = thoiGianHen;
     }
 
@@ -58,12 +67,20 @@ public class LichHenDTO {
         this.lyDoKham = lyDoKham;
     }
 
-    public boolean isTrangThaiLichHen() {
-        return trangThaiLichHen;
+    public String getTrangThai() {
+        return trangThai;
     }
 
-    public void setTrangThaiLichHen(boolean trangThaiLichHen) {
-        this.trangThaiLichHen = trangThaiLichHen;
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
+    }
+
+    public String getGhiChu() {
+        return ghiChu;
+    }
+
+    public void setGhiChu(String ghiChu) {
+        this.ghiChu = ghiChu;
     }
 
     public int getBenhNhanId() {
@@ -74,13 +91,11 @@ public class LichHenDTO {
         this.benhNhanId = benhNhanId;
     }
 
-    public int getNhanVienId() {
-        return nhanVienId;
+    public int getBacSiId() {
+        return bacSiId;
     }
 
-    public void setNhanVienId(int nhanVienId) {
-        this.nhanVienId = nhanVienId;
+    public void setBacSiId(int bacSiId) {
+        this.bacSiId = bacSiId;
     }
-    
-    
 }
