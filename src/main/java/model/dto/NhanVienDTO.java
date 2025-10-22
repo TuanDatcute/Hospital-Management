@@ -1,70 +1,61 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model.dto;
 
-import java.time.LocalDate;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import java.time.LocalDateTime; 
 
-
-/**
- *
- * @author ADMIN
- */
-@Entity
 public class NhanVienDTO {
-    @Id
-    private int nhanVienId;
-    private String hoTenNhanVien;
-    private LocalDate ngaySinhNhanVien;
+
+    private int id;
+    private String hoTen;
+    private LocalDateTime ngaySinh; 
     private String gioiTinh;
-    private String diaChiNhanVien;
-    private String soDienThoaiNhanVien;
+    private String diaChi;
+    private String soDienThoai;
     private String chuyenMon;
     private String bangCap;
-    private String taiKhoanId;
-    private int khoaId;
+    
+    private int taiKhoanId;
+    private Integer khoaId; 
 
+    // Constructors
     public NhanVienDTO() {
     }
 
-    public NhanVienDTO(int nhanVienId, String hoTenNhanVien, LocalDate ngaySinhNhanVien, String gioiTinh, String diaChiNhanVien, String soDienThoaiNhanVien, String chuyenMon, String bangCap, String taiKhoanId, int khoaId) {
-        this.nhanVienId = nhanVienId;
-        this.hoTenNhanVien = hoTenNhanVien;
-        this.ngaySinhNhanVien = ngaySinhNhanVien;
+    public NhanVienDTO(int id, String hoTen, LocalDateTime ngaySinh, String gioiTinh, String diaChi, String soDienThoai, String chuyenMon, String bangCap, int taiKhoanId, Integer khoaId) { // <-- ĐÃ THAY ĐỔI
+        this.id = id;
+        this.hoTen = hoTen;
+        this.ngaySinh = ngaySinh;
         this.gioiTinh = gioiTinh;
-        this.diaChiNhanVien = diaChiNhanVien;
-        this.soDienThoaiNhanVien = soDienThoaiNhanVien;
+        this.diaChi = diaChi;
+        this.soDienThoai = soDienThoai;
         this.chuyenMon = chuyenMon;
         this.bangCap = bangCap;
         this.taiKhoanId = taiKhoanId;
         this.khoaId = khoaId;
     }
 
-    public int getNhanVienId() {
-        return nhanVienId;
+    // Getters and Setters
+    public int getId() {
+        return id;
     }
 
-    public void setNhanVienId(int nhanVienId) {
-        this.nhanVienId = nhanVienId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getHoTenNhanVien() {
-        return hoTenNhanVien;
+    public String getHoTen() {
+        return hoTen;
     }
 
-    public void setHoTenNhanVien(String hoTenNhanVien) {
-        this.hoTenNhanVien = hoTenNhanVien;
+    public void setHoTen(String hoTen) {
+        this.hoTen = hoTen;
     }
 
-    public LocalDate getNgaySinh() {
-        return ngaySinhNhanVien;
+    public LocalDateTime getNgaySinh() { 
+        return ngaySinh;
     }
 
-    public void setNgaySinh(LocalDate ngaySinhNhanVien) {
-        this.ngaySinhNhanVien = ngaySinhNhanVien;
+    public void setNgaySinh(LocalDateTime ngaySinh) { 
+        this.ngaySinh = ngaySinh;
     }
 
     public String getGioiTinh() {
@@ -76,19 +67,19 @@ public class NhanVienDTO {
     }
 
     public String getDiaChi() {
-        return diaChiNhanVien;
+        return diaChi;
     }
 
-    public void setDiaChi(String diaChiNhanVien) {
-        this.diaChiNhanVien = diaChiNhanVien;
+    public void setDiaChi(String diaChi) {
+        this.diaChi = diaChi;
     }
 
     public String getSoDienThoai() {
-        return soDienThoaiNhanVien;
+        return soDienThoai;
     }
 
-    public void setSoDienThoai(String soDienThoaiNhanVien) {
-        this.soDienThoaiNhanVien = soDienThoaiNhanVien;
+    public void setSoDienThoai(String soDienThoai) {
+        this.soDienThoai = soDienThoai;
     }
 
     public String getChuyenMon() {
@@ -107,21 +98,19 @@ public class NhanVienDTO {
         this.bangCap = bangCap;
     }
 
-    public String getTaiKhoanId() {
+    public int getTaiKhoanId() {
         return taiKhoanId;
     }
 
-    public void setTaiKhoanId(String taiKhoanId) {
+    public void setTaiKhoanId(int taiKhoanId) {
         this.taiKhoanId = taiKhoanId;
     }
 
-    public int getKhoaId() {
+    public Integer getKhoaId() {
         return khoaId;
     }
 
-    public void setKhoaId(int khoaId) {
+    public void setKhoaId(Integer khoaId) {
         this.khoaId = khoaId;
     }
-    
-    
 }

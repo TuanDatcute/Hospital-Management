@@ -1,26 +1,41 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model.dto;
 
-/**
- *
- * @author ADMIN
- */
 public class KhoaDTO {
-    private int KhoaId;
+    private int id; 
     private String tenKhoa;
     private String moTa;
 
     public KhoaDTO() {
     }
 
-    public KhoaDTO(int KhoaId, String tenKhoa, String moTa) {
-        this.KhoaId = KhoaId;
+    public KhoaDTO(int id, String tenKhoa, String moTa) {
+        this.id = id;
         this.tenKhoa = tenKhoa;
         this.moTa = moTa;
     }
-    
-    
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getTenKhoa() {
+        return tenKhoa;
+    }
+
+    public void setTenKhoa(String tenKhoa) {
+        this.tenKhoa = tenKhoa;
+    }
+
+    public String getMoTa() {
+        return moTa;
+    }
+
+    public void setMoTa(String moTa) {
+        this.moTa = moTa;
+    }
 }
