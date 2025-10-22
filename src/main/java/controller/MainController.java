@@ -22,7 +22,6 @@ public class MainController extends HttpServlet {
     // Đặt tên các trang và controller ở đây để dễ quản lý
     private static final String LOGIN_PAGE = "login.jsp";
     private static final String USER_CONTROLLER = "UserController";
-    private static final String NOTIFICATION_CONTROLLER = "ThongBaoController"; // Controller mới cho thông báo
     private static final String EMRCORE_CONTROLLER = "EMRCoreController";
 
     /**
@@ -45,8 +44,6 @@ public class MainController extends HttpServlet {
 
         // 2. Nhóm các action cho từng controller
         String[] userActions = {"login", "logout", "searchUser"};
-        // **Thêm nhóm action cho chức năng Thông Báo của bạn**
-        String[] notificationActions = {"listNotifications", "markNotificationAsRead", "createNotification"};
 
         String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "addVitals"};
 
@@ -55,8 +52,6 @@ public class MainController extends HttpServlet {
             url = LOGIN_PAGE;
         } else if (Arrays.asList(userActions).contains(action)) {
             url = USER_CONTROLLER;
-        } else if (Arrays.asList(notificationActions).contains(action)) {        
-            url = NOTIFICATION_CONTROLLER;
         } else if (Arrays.asList(EMRCoreActions).contains(action)) {
             url = EMRCORE_CONTROLLER;
         }
