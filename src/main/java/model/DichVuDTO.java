@@ -5,41 +5,51 @@
 package model;
 
 import java.math.BigDecimal;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  *
  * @author SunnyU
  */
 @Entity
+@Table(name = "DichVu")
 public class DichVuDTO {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int dichVuId;
 
-    @Column(name = "ten_dich_vu")
+    @Column(name = "ten_dich_vu", nullable = false, unique = true)
     private String tenDichVu;
 
+    @Lob
     @Column(name = "mo_ta")
     private String moTa;
 
-    @Column(name = "don_gia")
+    @Column(name = "don_gia", nullable = false)
     private BigDecimal donGia;
 
-    // Constructors
+    @OneToMany(mappedBy = "dichVu")
+    private Set<ChiDinhDichVuDTO> danhSachChiDinh;
+
     public DichVuDTO() {
     }
 
-    public DichVuDTO(int id, String tenDichVu, String moTa, BigDecimal donGia) {
-        this.dichVuId = id;
+    public DichVuDTO(int dichVuId, String tenDichVu, String moTa, BigDecimal donGia) {
+        this.dichVuId = dichVuId;
         this.tenDichVu = tenDichVu;
         this.moTa = moTa;
         this.donGia = donGia;
     }
 
-    // Getters and Setters
     public int getDichVuId() {
         return dichVuId;
     }
@@ -71,4 +81,14 @@ public class DichVuDTO {
     public void setDonGia(BigDecimal donGia) {
         this.donGia = donGia;
     }
+
+    public Set<ChiDinhDichVuDTO> getDanhSachChiDinh() {
+        return danhSachChiDinh;
+    }
+
+    public void setDanhSachChiDinh(Set<ChiDinhDichVuDTO> danhSachChiDinh) {
+        this.danhSachChiDinh = danhSachChiDinh;
+    }
+
+    
 }

@@ -5,40 +5,50 @@
 package model;
 
 import java.math.BigDecimal;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  *
  * @author SunnyU
  */
 @Entity
+@Table(name = "Thuoc")
 public class ThuocDTO {
-    
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int thuocId;
-    
-    @Column(name = "ten_thuoc")
+
+    @Column(name = "ten_thuoc", nullable = false, unique = true)
     private String tenThuoc;
-    
+
     @Column(name = "hoat_chat")
     private String hoatChat;
-    
-    @Column(name = "don_vi_tinh")
+
+    @Column(name = "don_vi_tinh", nullable = false)
     private String donViTinh;
-    
-    @Column(name = "don_gia")
+
+    @Column(name = "don_gia", nullable = false)
     private BigDecimal donGia;
-    
-    @Column(name = "so_luong_ton_kho")
+
+    @Column(name = "so_luong_ton_kho", nullable = false)
     private int soLuongTonKho;
 
-    // Constructors
+    @OneToMany(mappedBy = "thuoc")
+    private Set<ChiTietDonThuocDTO> danhSachChiTietDonThuoc;
+
     public ThuocDTO() {
     }
 
-    public ThuocDTO(String tenThuoc, String hoatChat, String donViTinh, BigDecimal donGia, int soLuongTonKho) {
+    public ThuocDTO(int thuocId, String tenThuoc, String hoatChat, String donViTinh, BigDecimal donGia, int soLuongTonKho) {
+        this.thuocId = thuocId;
         this.tenThuoc = tenThuoc;
         this.hoatChat = hoatChat;
         this.donViTinh = donViTinh;
@@ -46,16 +56,6 @@ public class ThuocDTO {
         this.soLuongTonKho = soLuongTonKho;
     }
 
-    public ThuocDTO(int id, String tenThuoc, String hoatChat, String donViTinh, BigDecimal donGia, int soLuongTonKho) {
-        this.thuocId = id;
-        this.tenThuoc = tenThuoc;
-        this.hoatChat = hoatChat;
-        this.donViTinh = donViTinh;
-        this.donGia = donGia;
-        this.soLuongTonKho = soLuongTonKho;
-    }
-
-    // Getters and Setters
     public int getThuocId() {
         return thuocId;
     }
@@ -103,4 +103,14 @@ public class ThuocDTO {
     public void setSoLuongTonKho(int soLuongTonKho) {
         this.soLuongTonKho = soLuongTonKho;
     }
+
+    public Set<ChiTietDonThuocDTO> getDanhSachChiTietDonThuoc() {
+        return danhSachChiTietDonThuoc;
+    }
+
+    public void setDanhSachChiTietDonThuoc(Set<ChiTietDonThuocDTO> danhSachChiTietDonThuoc) {
+        this.danhSachChiTietDonThuoc = danhSachChiTietDonThuoc;
+    }
+
+    
 }

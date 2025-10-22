@@ -6,30 +6,36 @@ package model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 /**
  *
  * @author SunnyU
  */
 @Entity
+@Table(name = "PhieuKhamBenh")
 public class PhieuKhamBenhDTO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int phieuKhamBenhId;
 
-    @Column(name = "ma_phieu_kham")
+    @Column(name = "ma_phieu_kham", nullable = false, unique = true)
     private String maPhieuKham;
 
-    @Column(name = "thoi_gian_kham")
+    @Column(name = "thoi_gian_kham", nullable = false)
     private LocalDateTime thoiGianKham;
 
     @Column(name = "trieu_chung")
@@ -56,23 +62,28 @@ public class PhieuKhamBenhDTO {
     @Column(name = "ngay_tai_kham")
     private LocalDateTime ngayTaiKham; // Ngày hẹn tái khám
 
-    @OneToOne
-    @JoinColumn(name = "benh_nhan_id")
-    private BenhNhanDTO benhNhanId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "benh_nhan_id", nullable = false)
+    private BenhNhanDTO benhNhan;
     
-    @ManyToOne 
-    @JoinColumn(name = "nhan_vien_id")
-    private NhanVienDTO nhanVienId;
+    @ManyToOne(fetch = FetchType.LAZY) 
+    @JoinColumn(name = "nhan_vien_id", nullable = false)
+    private NhanVienDTO bacSi;
     
     @OneToOne
     @JoinColumn(name = "lich_hen_id")
-    private LichHenDTO lichHenId; 
+    private LichHenDTO lichHen ; 
+    
+    @OneToOne(mappedBy = "phieuKham", cascade = CascadeType.ALL)
+    private DonThuocDTO donThuoc;
+    
+    @OneToMany(mappedBy = "phieuKham", cascade = CascadeType.ALL)
+    private Set<ChiDinhDichVuDTO> danhSachChiDinh;
 
-    // Constructors
     public PhieuKhamBenhDTO() {
     }
 
-    public PhieuKhamBenhDTO(int phieuKhamBenhId, String maPhieuKham, LocalDateTime thoiGianKham, String trieuChung, BigDecimal nhietDo, String huyetAp, int nhipTim, int nhipTho, String chanDoan, String ketLuan, LocalDateTime ngayTaiKham, BenhNhanDTO benhNhanId, NhanVienDTO nhanVienId, LichHenDTO lichHenId) {
+    public PhieuKhamBenhDTO(int phieuKhamBenhId, String maPhieuKham, LocalDateTime thoiGianKham, String trieuChung, BigDecimal nhietDo, String huyetAp, int nhipTim, int nhipTho, String chanDoan, String ketLuan, LocalDateTime ngayTaiKham, BenhNhanDTO benhNhan, NhanVienDTO bacSi, LichHenDTO lichHen) {
         this.phieuKhamBenhId = phieuKhamBenhId;
         this.maPhieuKham = maPhieuKham;
         this.thoiGianKham = thoiGianKham;
@@ -84,9 +95,9 @@ public class PhieuKhamBenhDTO {
         this.chanDoan = chanDoan;
         this.ketLuan = ketLuan;
         this.ngayTaiKham = ngayTaiKham;
-        this.benhNhanId = benhNhanId;
-        this.nhanVienId = nhanVienId;
-        this.lichHenId = lichHenId;
+        this.benhNhan = benhNhan;
+        this.bacSi = bacSi;
+        this.lichHen = lichHen;
     }
 
     public int getPhieuKhamBenhId() {
@@ -177,28 +188,45 @@ public class PhieuKhamBenhDTO {
         this.ngayTaiKham = ngayTaiKham;
     }
 
-    public BenhNhanDTO getBenhNhanId() {
-        return benhNhanId;
+    public BenhNhanDTO getBenhNhan() {
+        return benhNhan;
     }
 
-    public void setBenhNhanId(BenhNhanDTO benhNhanId) {
-        this.benhNhanId = benhNhanId;
+    public void setBenhNhan(BenhNhanDTO benhNhan) {
+        this.benhNhan = benhNhan;
     }
 
-    public NhanVienDTO getNhanVienId() {
-        return nhanVienId;
+    public NhanVienDTO getBacSi() {
+        return bacSi;
     }
 
-    public void setNhanVienId(NhanVienDTO nhanVienId) {
-        this.nhanVienId = nhanVienId;
+    public void setBacSi(NhanVienDTO bacSi) {
+        this.bacSi = bacSi;
     }
 
-    public LichHenDTO getLichHenId() {
-        return lichHenId;
+    public LichHenDTO getLichHen() {
+        return lichHen;
     }
 
-    public void setLichHenId(LichHenDTO lichHenId) {
-        this.lichHenId = lichHenId;
-    };
+    public void setLichHen(LichHenDTO lichHen) {
+        this.lichHen = lichHen;
+    }
 
+    public DonThuocDTO getDonThuoc() {
+        return donThuoc;
+    }
+
+    public void setDonThuoc(DonThuocDTO donThuoc) {
+        this.donThuoc = donThuoc;
+    }
+
+    public Set<ChiDinhDichVuDTO> getDanhSachChiDinh() {
+        return danhSachChiDinh;
+    }
+
+    public void setDanhSachChiDinh(Set<ChiDinhDichVuDTO> danhSachChiDinh) {
+        this.danhSachChiDinh = danhSachChiDinh;
+    }
+
+    
 }

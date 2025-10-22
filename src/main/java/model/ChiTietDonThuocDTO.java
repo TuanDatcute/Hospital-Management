@@ -6,52 +6,56 @@ package model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  *
  * @author SunnyU
  */
 @Entity
+@Table(name = "ChiTietDonThuoc")
 public class ChiTietDonThuocDTO {
 
     @Id
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @Column(name = "so_luong")
     private int soLuong;
 
-    @Column(name = "lieu_dung")
+    @Column(name = "lieu_dung",nullable = false)
     private String lieuDung;
 
-    @ManyToOne
-    @JoinColumn(name = "don_thuoc_id")
-    private DonThuocDTO donThuocId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "don_thuoc_id",nullable = false)
+    private DonThuocDTO donThuoc;
 
-    @ManyToOne
-    @JoinColumn(name = "thuoc_id")
-    private ThuocDTO thuocId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "thuoc_id", nullable = false)
+    private ThuocDTO thuoc;
 
-    // Constructors
     public ChiTietDonThuocDTO() {
     }
 
-    public ChiTietDonThuocDTO(int id, int soLuong, String lieuDung, DonThuocDTO donThuocId, ThuocDTO thuocId) {
+    public ChiTietDonThuocDTO(Integer id, int soLuong, String lieuDung, DonThuocDTO donThuoc, ThuocDTO thuoc) {
         this.id = id;
         this.soLuong = soLuong;
         this.lieuDung = lieuDung;
-        this.donThuocId = donThuocId;
-        this.thuocId = thuocId;
+        this.donThuoc = donThuoc;
+        this.thuoc = thuoc;
     }
 
-    // Getters and Setters
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -71,19 +75,21 @@ public class ChiTietDonThuocDTO {
         this.lieuDung = lieuDung;
     }
 
-    public DonThuocDTO getDonThuocId() {
-        return donThuocId;
+    public DonThuocDTO getDonThuoc() {
+        return donThuoc;
     }
 
-    public void setDonThuocId(DonThuocDTO donThuocId) {
-        this.donThuocId = donThuocId;
+    public void setDonThuoc(DonThuocDTO donThuoc) {
+        this.donThuoc = donThuoc;
     }
 
-    public ThuocDTO getThuocId() {
-        return thuocId;
+    public ThuocDTO getThuoc() {
+        return thuoc;
     }
 
-    public void setThuocId(ThuocDTO thuocId) {
-        this.thuocId = thuocId;
+    public void setThuoc(ThuocDTO thuoc) {
+        this.thuoc = thuoc;
     }
+
+     
 }

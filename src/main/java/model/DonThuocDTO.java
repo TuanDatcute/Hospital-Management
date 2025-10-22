@@ -6,50 +6,59 @@ package model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 /**
  *
  * @author SunnyU
  */
 @Entity
+@Table(name = "DonThuoc")
 public class DonThuocDTO {
-    
+
     @Id
-    private int donThuocId;
-    
-    @Column(name = "ngay_ke_don")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer donThuocId;
+
+    @Column(name = "ngay_ke_don", nullable = false)
     private LocalDateTime ngayKeDon;
-    
+
+    @Lob
     @Column(name = "loi_dan")
     private String loiDan;
-    
-    @OneToOne
-    private PhieuKhamBenhDTO phieuKhamId;
-    
-    // mở rộng: Có thể chứa danh sách các chi tiết đơn thuốc
-    private List<ChiTietDonThuocDTO> chiTietDonThuocList;
 
-    // Constructors
+    @OneToOne
+    @JoinColumn(name = "phieu_kham_id", nullable = false, unique = true)
+    private PhieuKhamBenhDTO phieuKham;
+
+    @OneToMany(mappedBy = "donThuoc", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChiTietDonThuocDTO> chiTietDonThuoc;
+
     public DonThuocDTO() {
     }
 
-    public DonThuocDTO(int id, LocalDateTime ngayKeDon, String loiDan, PhieuKhamBenhDTO phieuKhamId) {
-        this.donThuocId = id;
+    public DonThuocDTO(Integer donThuocId, LocalDateTime ngayKeDon, String loiDan, PhieuKhamBenhDTO phieuKham) {
+        this.donThuocId = donThuocId;
         this.ngayKeDon = ngayKeDon;
         this.loiDan = loiDan;
-        this.phieuKhamId = phieuKhamId;
+        this.phieuKham = phieuKham;
     }
-
-    // Getters and Setters
-    public int getDonThuocId() {
+ 
+    public Integer getDonThuocId() {
         return donThuocId;
     }
 
-    public void setDonThuocId(int donThuocId) {
+    public void setDonThuocId(Integer donThuocId) {
         this.donThuocId = donThuocId;
     }
 
@@ -69,19 +78,21 @@ public class DonThuocDTO {
         this.loiDan = loiDan;
     }
 
-    public PhieuKhamBenhDTO getPhieuKhamId() {
-        return phieuKhamId;
+    public PhieuKhamBenhDTO getPhieuKham() {
+        return phieuKham;
     }
 
-    public void setPhieuKhamId(PhieuKhamBenhDTO phieuKhamId) {
-        this.phieuKhamId = phieuKhamId;
+    public void setPhieuKham(PhieuKhamBenhDTO phieuKham) {
+        this.phieuKham = phieuKham;
     }
+
+    public List<ChiTietDonThuocDTO> getChiTietDonThuoc() {
+        return chiTietDonThuoc;
+    }
+
+    public void setChiTietDonThuoc(List<ChiTietDonThuocDTO> chiTietDonThuoc) {
+        this.chiTietDonThuoc = chiTietDonThuoc;
+    }
+
     
-    public List<ChiTietDonThuocDTO> getChiTietDonThuocList() {
-        return chiTietDonThuocList;
-    }
-
-    public void setChiTietDonThuocList(List<ChiTietDonThuocDTO> chiTietDonThuocList) {
-        this.chiTietDonThuocList = chiTietDonThuocList;
-    }
 }

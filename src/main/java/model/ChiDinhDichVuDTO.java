@@ -6,33 +6,41 @@ package model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  *
  * @author SunnyU
  */
 @Entity
+@Table(name = "ChiDinhDichVu")
 public class ChiDinhDichVuDTO {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int chiDinhDichVuId;
 
+    @Lob
     @Column(name = "ket_qua")
     private String ketQua;
 
-    @Column(name = "trang_thai")
+    @Column(name = "trang_thai", nullable = false)
     private String trangThai;
 
-    @ManyToOne
-    @JoinColumn(name = "phieu_kham_id")
-    private PhieuKhamBenhDTO phieuKhamId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "phieu_kham_id", nullable = false)
+    private PhieuKhamBenhDTO phieuKham;
 
-    @ManyToOne
-    @JoinColumn(name = "dich_vu_id")
-    private DichVuDTO dichVuId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dich_vu_id", nullable = false)
+    private DichVuDTO dichVu;
 
     // Constructors
     public ChiDinhDichVuDTO() {
@@ -42,11 +50,12 @@ public class ChiDinhDichVuDTO {
         this.chiDinhDichVuId = id;
         this.ketQua = ketQua;
         this.trangThai = trangThai;
-        this.phieuKhamId = phieuKhamId;
-        this.dichVuId = dichVuId;
+        this.phieuKham = phieuKhamId;
+        this.dichVu = dichVuId;
     }
 
     // Getters and Setters
+
     public int getChiDinhDichVuId() {
         return chiDinhDichVuId;
     }
@@ -71,19 +80,20 @@ public class ChiDinhDichVuDTO {
         this.trangThai = trangThai;
     }
 
-    public PhieuKhamBenhDTO getPhieuKhamId() {
-        return phieuKhamId;
+    public PhieuKhamBenhDTO getPhieuKham() {
+        return phieuKham;
     }
 
-    public void setPhieuKhamId(PhieuKhamBenhDTO phieuKhamId) {
-        this.phieuKhamId = phieuKhamId;
+    public void setPhieuKham(PhieuKhamBenhDTO phieuKham) {
+        this.phieuKham = phieuKham;
     }
 
-    public DichVuDTO getDichVuId() {
-        return dichVuId;
+    public DichVuDTO getDichVu() {
+        return dichVu;
     }
 
-    public void setDichVuId(DichVuDTO dichVuId) {
-        this.dichVuId = dichVuId;
+    public void setDichVu(DichVuDTO dichVu) {
+        this.dichVu = dichVu;
     }
+    
 }
