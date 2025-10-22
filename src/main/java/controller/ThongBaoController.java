@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import model.ThongBaoDAO;
-import model.ThongBaoDTO;
+import model.dao.ThongBaoDAO;
+import model.dto.ThongBaoDTO;
 
 @WebServlet(name = "ThongBaoController", urlPatterns = {"/ThongBaoController"})
 public class ThongBaoController extends HttpServlet {
