@@ -1,37 +1,68 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package model.dto;
+package model.dto; // Giữ nguyên package
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
+ * Lớp này là một Entity, đại diện cho bảng 'PhongBenh' trong cơ sở dữ liệu.
  *
  * @author quang
  */
+@Entity
+@Table(name = "PhongBenh") // Ánh xạ tới bảng PhongBenh
 public class PhongBenhDTO {
-    private int phongBenhId;
-    private String tenPhong;
-    private String loaiPhong;
-    private int sucChua;
-    private int khoaId;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "PhongBenhID")
+    private int phongBenhId;
+
+    @Column(name = "TenPhong", nullable = false, length = 100)
+    private String tenPhong;
+
+    @Column(name = "LoaiPhong", length = 50)
+    private String loaiPhong;
+
+    @Column(name = "SucChua", nullable = false)
+    private int sucChua;
+
+    // --- Mối quan hệ (Relationship) ---
+    // Thay vì int khoaId, ta dùng đối tượng KhoaDTO
+    // Nhiều Phòng Bệnh (PhongBenh) thuộc về một Khoa (Khoa)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "KhoaID", nullable = false) // Tên cột khóa ngoại trong bảng PhongBenh
+    private KhoaDTO khoa; // Giả định Entity Khoa của bạn tên là KhoaDTO
+
+    // --- Constructors ---
+    
     public PhongBenhDTO() {
+        // Constructor rỗng bắt buộc cho Hibernate
     }
 
-    public PhongBenhDTO(int phongBenhID, String tenPhong, String loaiPhong, int sucChua, int khoaID) {
-        this.phongBenhId = phongBenhID;
+    // Constructor đã cập nhật để nhận đối tượng KhoaDTO
+    public PhongBenhDTO(String tenPhong, String loaiPhong, int sucChua, KhoaDTO khoa) {
         this.tenPhong = tenPhong;
         this.loaiPhong = loaiPhong;
         this.sucChua = sucChua;
-        this.khoaId = khoaID;
+        this.khoa = khoa;
     }
 
-    public int getPhongBenhID() {
+    // --- Getters and Setters ---
+    // (Getters/Setters đã được cập nhật cho đối tượng 'khoa')
+
+    public int getPhongBenhId() {
         return phongBenhId;
     }
 
-    public void setPhongBenhID(int phongBenhID) {
-        this.phongBenhId = phongBenhID;
+    public void setPhongBenhId(int phongBenhId) {
+        this.phongBenhId = phongBenhId;
     }
 
     public String getTenPhong() {
@@ -58,13 +89,11 @@ public class PhongBenhDTO {
         this.sucChua = sucChua;
     }
 
-    public int getKhoaID() {
-        return khoaId;
+    public KhoaDTO getKhoa() {
+        return khoa;
     }
 
-    public void setKhoaID(int khoaID) {
-        this.khoaId = khoaID;
+    public void setKhoa(KhoaDTO khoa) {
+        this.khoa = khoa;
     }
-    
-    
 }

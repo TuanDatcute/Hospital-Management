@@ -1,41 +1,73 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package model.dto;
+package model.dto; // Giữ nguyên package
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime; // Đã đổi từ Timestamp sang LocalDateTime
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
+ * Lớp này là một Entity, đại diện cho bảng 'ThongBao' trong cơ sở dữ liệu.
+ * Tên lớp được giữ là DTO theo yêu cầu.
  *
  * @author quang
  */
+@Entity
+@Table(name = "ThongBao") // Ánh xạ tới bảng ThongBao
 public class ThongBaoDTO {
-    private int thongBaoId;
-    private String tieuDe;
-    private String noiDung;
-    private boolean daDoc;
-    private Timestamp thoiGianGui;
-    private int taiKhoanId;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ThongBaoID")
+    private int thongBaoId;
+
+    @Column(name = "TieuDe", nullable = false, length = 255)
+    private String tieuDe;
+
+    @Column(name = "NoiDung", columnDefinition = "NVARCHAR(MAX)") // Dùng cho SQL Server (hoặc dùng @Lob)
+    private String noiDung;
+
+    @Column(name = "DaDoc", nullable = false)
+    private boolean daDoc;
+
+    @Column(name = "ThoiGianGui", nullable = false)
+    private LocalDateTime thoiGianGui; // Đổi sang java.time.LocalDateTime
+
+    // --- Mối quan hệ (Relationship) ---
+    // Nhiều Thông Báo (ThongBao) thuộc về một Tài Khoản (TaiKhoan)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TaiKhoanID", nullable = false) // Tên cột khóa ngoại
+    private TaiKhoanDTO taiKhoan; // Thay thế cho int taiKhoanId
+
+    // --- Constructors ---
+    
     public ThongBaoDTO() {
+        // Constructor rỗng bắt buộc cho Hibernate
     }
 
-    public ThongBaoDTO(int thongBaoID, String tieuDe, String noiDung, boolean daDoc, Timestamp thoiGianGui, int taiKhoanID) {
-        this.thongBaoId = thongBaoID;
+    // Constructor đã cập nhật
+    public ThongBaoDTO(String tieuDe, String noiDung, boolean daDoc, LocalDateTime thoiGianGui, TaiKhoanDTO taiKhoan) {
         this.tieuDe = tieuDe;
         this.noiDung = noiDung;
         this.daDoc = daDoc;
         this.thoiGianGui = thoiGianGui;
-        this.taiKhoanId = taiKhoanID;
+        this.taiKhoan = taiKhoan;
     }
+
+    // --- Getters and Setters ---
+    // (Đã cập nhật getters/setters cho các trường quan hệ và thời gian)
 
     public int getThongBaoId() {
         return thongBaoId;
     }
 
-    public void setThongBaoId(int thongBaoID) {
-        this.thongBaoId = thongBaoID;
+    public void setThongBaoId(int thongBaoId) {
+        this.thongBaoId = thongBaoId;
     }
 
     public String getTieuDe() {
@@ -62,21 +94,19 @@ public class ThongBaoDTO {
         this.daDoc = daDoc;
     }
 
-    public Timestamp getThoiGianGui() {
+    public LocalDateTime getThoiGianGui() {
         return thoiGianGui;
     }
 
-    public void setThoiGianGui(Timestamp thoiGianGui) {
+    public void setThoiGianGui(LocalDateTime thoiGianGui) {
         this.thoiGianGui = thoiGianGui;
     }
 
-    public int getTaiKhoanId() {
-        return taiKhoanId;
+    public TaiKhoanDTO getTaiKhoan() {
+        return taiKhoan;
     }
 
-    public void setTaiKhoanId(int taiKhoanID) {
-        this.taiKhoanId = taiKhoanID;
+    public void setTaiKhoan(TaiKhoanDTO taiKhoan) {
+        this.taiKhoan = taiKhoan;
     }
-    
-    
 }
