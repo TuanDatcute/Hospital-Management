@@ -67,12 +67,12 @@ public class PhieuKhamBenhService {
         entity.setChanDoan(dto.getChanDoan());
         entity.setKetLuan(dto.getKetLuan());
         if (entity.getBenhNhan() != null) {
-            dto.setBenhNhanId(entity.getBenhNhan().getBenhNhanId());
-            dto.setTenBenhNhan(entity.getBenhNhan().getHoTenBenhNhan());
+            dto.setBenhNhanId(entity.getBenhNhan().getId());
+            dto.setTenBenhNhan(entity.getBenhNhan().getHoTen());
         }
         if (entity.getBacSi() != null) {
-            dto.setBacSiId(entity.getBacSi().getNhanVienId());
-            dto.setTenBacSi(entity.getBacSi().getHoTenNhanVien());
+            dto.setBacSiId(entity.getBacSi().getId());
+            dto.setTenBacSi(entity.getBacSi().getHoTen());
         }
         if (entity.getDonThuoc() != null) {
             dto.setDonThuoc(entity.getDonThuoc());

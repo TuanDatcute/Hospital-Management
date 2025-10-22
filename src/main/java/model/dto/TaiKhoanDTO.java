@@ -1,45 +1,37 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model.dto;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 
-/**
- *
- * @author ADMIN
- */
 public class TaiKhoanDTO {
-    private int taiKhoanId;
-    private String tenDangNhap;
-    private String matKhau;
-    private String email;
-    private String role;
-    private boolean tranThaiTaiKhoan;
-    private Date taoTaiKhoan;
-    private Date capNhatTaiKhoan;
 
+    private int id;
+    private String tenDangNhap;
+    // Không có matKhau
+    private String email;
+    private String vaiTro;
+    private String trangThai;
+    private LocalDateTime createdAt;
+
+    // Constructors
     public TaiKhoanDTO() {
     }
 
-    public TaiKhoanDTO(int taiKhoanId, String tenDangNhap, String matKhau, String email, String role, boolean tranThaiTaiKhoan, Date taoTaiKhoan, Date capNhatTaiKhoan) {
-        this.taiKhoanId = taiKhoanId;
+    public TaiKhoanDTO(int id, String tenDangNhap, String email, String vaiTro, String trangThai, LocalDateTime createdAt) {
+        this.id = id;
         this.tenDangNhap = tenDangNhap;
-        this.matKhau = matKhau;
         this.email = email;
-        this.role = role;
-        this.tranThaiTaiKhoan = tranThaiTaiKhoan;
-        this.taoTaiKhoan = taoTaiKhoan;
-        this.capNhatTaiKhoan = capNhatTaiKhoan;
+        this.vaiTro = vaiTro;
+        this.trangThai = trangThai;
+        this.createdAt = createdAt;
     }
 
-    public int getTaiKhoanId() {
-        return taiKhoanId;
+    // Getters and Setters
+    public int getId() {
+        return id;
     }
 
-    public void setTaiKhoanId(int taiKhoanId) {
-        this.taiKhoanId = taiKhoanId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTenDangNhap() {
@@ -50,14 +42,6 @@ public class TaiKhoanDTO {
         this.tenDangNhap = tenDangNhap;
     }
 
-    public String getMatKhau() {
-        return matKhau;
-    }
-
-    public void setMatKhau(String matKhau) {
-        this.matKhau = matKhau;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -66,37 +50,27 @@ public class TaiKhoanDTO {
         this.email = email;
     }
 
-    public String getRole() {
-        return role;
+    public String getVaiTro() {
+        return vaiTro;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setVaiTro(String vaiTro) {
+        this.vaiTro = vaiTro;
     }
 
-    public boolean isTrangThaiTaiKhoan() {
-        return tranThaiTaiKhoan;
+    public String getTrangThai() {
+        return trangThai;
     }
 
-    public void setTrangThaiTaiKhoan(boolean tranThaiTaiKhoan) {
-        this.tranThaiTaiKhoan = tranThaiTaiKhoan;
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
     }
 
-    public Date getTaoTaiKhoan() {
-        return taoTaiKhoan;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setTaoTaiKhoan(Date taoTaiKhoan) {
-        this.taoTaiKhoan = taoTaiKhoan;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
-
-    public Date getCapNhatTaiKhoan() {
-        return capNhatTaiKhoan;
-    }
-
-    public void setCapNhatTaiKhoan(Date capNhatTaiKhoan) {
-        this.capNhatTaiKhoan = capNhatTaiKhoan;
-    }
-    
-    
 }
