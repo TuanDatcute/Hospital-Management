@@ -20,8 +20,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import model.dto.BenhNhanDTO;
-import model.dto.ChiDinhDichVuDTO;
-import model.dto.DonThuocDTO;
 import model.dto.LichHenDTO;
 import model.dto.NhanVienDTO;
 
@@ -35,7 +33,7 @@ public class PhieuKhamBenh {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int phieuKhamBenhId;
+    private int id;
 
     @Column(name = "ma_phieu_kham", nullable = false, unique = true)
     private String maPhieuKham;
@@ -80,10 +78,10 @@ public class PhieuKhamBenh {
     private LichHenDTO lichHen ; 
     
     @OneToOne(mappedBy = "phieuKham", cascade = CascadeType.ALL)
-    private DonThuocDTO donThuoc;
+    private DonThuoc donThuoc;
     
     @OneToMany(mappedBy = "phieuKham", cascade = CascadeType.ALL)
-    private Set<ChiDinhDichVuDTO> danhSachChiDinh;
+    private Set<ChiDinhDichVu> danhSachChiDinh;
 
     public PhieuKhamBenh() {
     }
@@ -104,12 +102,12 @@ public class PhieuKhamBenh {
         this.lichHen = lichHen;
     }
 
-    public int getPhieuKhamBenhId() {
-        return phieuKhamBenhId;
+    public int getId() {
+        return id;
     }
 
-    public void setPhieuKhamBenhId(int phieuKhamBenhId) {
-        this.phieuKhamBenhId = phieuKhamBenhId;
+    public void setId(int phieuKhamBenhId) {
+        this.id = phieuKhamBenhId;
     }
 
     public String getMaPhieuKham() {
@@ -216,19 +214,19 @@ public class PhieuKhamBenh {
         this.lichHen = lichHen;
     }
 
-    public DonThuocDTO getDonThuoc() {
+    public DonThuoc getDonThuoc() {
         return donThuoc;
     }
 
-    public void setDonThuoc(DonThuocDTO donThuoc) {
+    public void setDonThuoc(DonThuoc donThuoc) {
         this.donThuoc = donThuoc;
     }
 
-    public Set<ChiDinhDichVuDTO> getDanhSachChiDinh() {
+    public Set<ChiDinhDichVu> getDanhSachChiDinh() {
         return danhSachChiDinh;
     }
 
-    public void setDanhSachChiDinh(Set<ChiDinhDichVuDTO> danhSachChiDinh) {
+    public void setDanhSachChiDinh(Set<ChiDinhDichVu> danhSachChiDinh) {
         this.danhSachChiDinh = danhSachChiDinh;
     }
 

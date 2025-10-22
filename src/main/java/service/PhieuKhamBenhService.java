@@ -56,7 +56,7 @@ public class PhieuKhamBenhService {
 
     private PhieuKhamBenhDTO toDTO(PhieuKhamBenh entity) {
         PhieuKhamBenhDTO dto = new PhieuKhamBenhDTO();
-        dto.setId(entity.getPhieuKhamBenhId());
+        dto.setId(entity.getId());
         dto.setMaPhieuKham(entity.getMaPhieuKham());
         dto.setThoiGianKham(entity.getThoiGianKham());
         dto.setTrieuChung(entity.getTrieuChung());

@@ -1,67 +1,46 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model.dto;
 
-import model.dto.DichVuDTO;
-import model.Entity.PhieuKhamBenh;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import java.math.BigDecimal;
 
 /**
- *
- * @author SunnyU
+ * DTO cho Chỉ Định Dịch Vụ. Vận chuyển thông tin về một dịch vụ được chỉ định
+ * trong lần khám.
  */
-@Entity
-@Table(name = "ChiDinhDichVu")
 public class ChiDinhDichVuDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int chiDinhDichVuId;
-
-    @Lob
-    @Column(name = "ket_qua")
+    private int id;
     private String ketQua;
-
-    @Column(name = "trang_thai", nullable = false)
     private String trangThai;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "phieu_kham_id", nullable = false)
-    private PhieuKhamBenh phieuKham;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dich_vu_id", nullable = false)
-    private DichVuDTO dichVu;
+    // Thông tin "làm phẳng" từ các đối tượng liên quan
+    private int phieuKhamId;
+    private int dichVuId;
+    private String tenDichVu; // Thêm tên dịch vụ để tiện hiển thị
+    private BigDecimal donGia;  // Thêm đơn giá để tiện tính tiền
 
     // Constructors
     public ChiDinhDichVuDTO() {
     }
 
-    public ChiDinhDichVuDTO(String ketQua, String trangThai, PhieuKhamBenh phieuKhamId, DichVuDTO dichVuId) {
+    public ChiDinhDichVuDTO(int id, String ketQua, String trangThai, int phieuKhamId, int dichVuId, String tenDichVu, BigDecimal donGia) {
+        this.id = id;
         this.ketQua = ketQua;
         this.trangThai = trangThai;
-        this.phieuKham = phieuKhamId;
-        this.dichVu = dichVuId;
+        this.phieuKhamId = phieuKhamId;
+        this.dichVuId = dichVuId;
+        this.tenDichVu = tenDichVu;
+        this.donGia = donGia;
+    }
+    
+    
+
+    // Getters and Setters...
+    public int getId() {
+        return id;
     }
 
-    // Getters and Setters
-    public int getChiDinhDichVuId() {
-        return chiDinhDichVuId;
-    }
-
-    public void setChiDinhDichVuId(int chiDinhDichVuId) {
-        this.chiDinhDichVuId = chiDinhDichVuId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getKetQua() {
@@ -80,20 +59,35 @@ public class ChiDinhDichVuDTO {
         this.trangThai = trangThai;
     }
 
-    public PhieuKhamBenh getPhieuKham() {
-        return phieuKham;
+    public int getPhieuKhamId() {
+        return phieuKhamId;
     }
 
-    public void setPhieuKham(PhieuKhamBenh phieuKham) {
-        this.phieuKham = phieuKham;
+    public void setPhieuKhamId(int phieuKhamId) {
+        this.phieuKhamId = phieuKhamId;
     }
 
-    public DichVuDTO getDichVu() {
-        return dichVu;
+    public int getDichVuId() {
+        return dichVuId;
     }
 
-    public void setDichVu(DichVuDTO dichVu) {
-        this.dichVu = dichVu;
+    public void setDichVuId(int dichVuId) {
+        this.dichVuId = dichVuId;
     }
 
+    public String getTenDichVu() {
+        return tenDichVu;
+    }
+
+    public void setTenDichVu(String tenDichVu) {
+        this.tenDichVu = tenDichVu;
+    }
+
+    public BigDecimal getDonGia() {
+        return donGia;
+    }
+
+    public void setDonGia(BigDecimal donGia) {
+        this.donGia = donGia;
+    }
 }

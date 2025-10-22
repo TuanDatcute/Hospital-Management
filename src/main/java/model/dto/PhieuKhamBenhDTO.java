@@ -4,6 +4,8 @@
  */
 package model.dto;
 
+import model.Entity.DonThuoc;
+import model.Entity.ChiDinhDichVu;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,8 +34,8 @@ public class PhieuKhamBenhDTO {
     private String tenBacSi;    
     private Integer lichHenId; 
 
-    private DonThuocDTO donThuoc;
-    private Set<ChiDinhDichVuDTO> danhSachChiDinh;
+    private DonThuoc donThuoc;
+    private Set<ChiDinhDichVu> danhSachChiDinh;
 
  
     public PhieuKhamBenhDTO() {
@@ -167,19 +169,19 @@ public class PhieuKhamBenhDTO {
         this.lichHenId = lichHenId;
     }
 
-    public DonThuocDTO getDonThuoc() {
+    public DonThuoc getDonThuoc() {
         return donThuoc;
     }
 
-    public void setDonThuoc(DonThuocDTO donThuoc) {
+    public void setDonThuoc(DonThuoc donThuoc) {
         this.donThuoc = donThuoc;
     }
 
-    public Set<ChiDinhDichVuDTO> getDanhSachChiDinh() {
+    public Set<ChiDinhDichVu> getDanhSachChiDinh() {
         return danhSachChiDinh;
     }
 
-    public void setDanhSachChiDinh(Set<ChiDinhDichVuDTO> danhSachChiDinh) {
+    public void setDanhSachChiDinh(Set<ChiDinhDichVu> danhSachChiDinh) {
         this.danhSachChiDinh = danhSachChiDinh;
     }
 }

@@ -1,57 +1,38 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model.dto;
 
-import model.dto.DonThuocDTO;
-import model.dto.ThuocDTO;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
 /**
- *
- * @author SunnyU
+ * DTO cho Chi Tiết Đơn Thuốc. Vận chuyển thông tin về một loại thuốc cụ thể
+ * trong một đơn thuốc.
  */
-@Entity
-@Table(name = "ChiTietDonThuoc")
 public class ChiTietDonThuocDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(name = "so_luong")
     private int soLuong;
-
-    @Column(name = "lieu_dung",nullable = false)
     private String lieuDung;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "don_thuoc_id",nullable = false)
-    private DonThuocDTO donThuoc;
+    // ID của các đối tượng cha
+    private int donThuocId;
+    private int thuocId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "thuoc_id", nullable = false)
-    private ThuocDTO thuoc;
+    // Thông tin "làm phẳng" từ Thuoc để tiện hiển thị
+    private String tenThuoc;
+    private String donViTinh;
 
+    // Constructors
     public ChiTietDonThuocDTO() {
     }
 
-    public ChiTietDonThuocDTO(int soLuong, String lieuDung, DonThuocDTO donThuoc, ThuocDTO thuoc) {
+    public ChiTietDonThuocDTO(Integer id, int soLuong, String lieuDung, int donThuocId, int thuocId, String tenThuoc, String donViTinh) {
+        this.id = id;
         this.soLuong = soLuong;
         this.lieuDung = lieuDung;
-        this.donThuoc = donThuoc;
-        this.thuoc = thuoc;
+        this.donThuocId = donThuocId;
+        this.thuocId = thuocId;
+        this.tenThuoc = tenThuoc;
+        this.donViTinh = donViTinh;
     }
 
+    
     public Integer getId() {
         return id;
     }
@@ -76,21 +57,35 @@ public class ChiTietDonThuocDTO {
         this.lieuDung = lieuDung;
     }
 
-    public DonThuocDTO getDonThuoc() {
-        return donThuoc;
+    public int getDonThuocId() {
+        return donThuocId;
     }
 
-    public void setDonThuoc(DonThuocDTO donThuoc) {
-        this.donThuoc = donThuoc;
+    public void setDonThuocId(int donThuocId) {
+        this.donThuocId = donThuocId;
     }
 
-    public ThuocDTO getThuoc() {
-        return thuoc;
+    public int getThuocId() {
+        return thuocId;
     }
 
-    public void setThuoc(ThuocDTO thuoc) {
-        this.thuoc = thuoc;
+    public void setThuocId(int thuocId) {
+        this.thuocId = thuocId;
     }
 
-     
+    public String getTenThuoc() {
+        return tenThuoc;
+    }
+
+    public void setTenThuoc(String tenThuoc) {
+        this.tenThuoc = tenThuoc;
+    }
+
+    public String getDonViTinh() {
+        return donViTinh;
+    }
+
+    public void setDonViTinh(String donViTinh) {
+        this.donViTinh = donViTinh;
+    }
 }

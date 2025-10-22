@@ -8,21 +8,75 @@ package model.dao;
  *
  * @author SunnyU
  */
+import java.util.Collections;
+import java.util.List;
+import model.Entity.ChiTietDonThuoc;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+import util.HibernateUtil;
+
 public class ChiTietDonThuocDAO {
 
-    // Thêm một loại thuốc vào đơn thuốc đã có
-    public boolean addMedicationToPrescription(int donThuocId, int thuocId, int soLuong, String lieuDung) {
-        return false;
+    public ChiTietDonThuoc create(ChiTietDonThuoc chiTiet) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.save(chiTiet);
+            transaction.commit();
+            return chiTiet;
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    // Xóa một loại thuốc khỏi đơn thuốc
-    public boolean removeMedicationFromPrescription(int chiTietDonthuocId) {
-        return false;
+    public ChiTietDonThuoc getById(int id) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(ChiTietDonThuoc.class, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    //Sửa thông tin thuốc trong đơn.
-    public boolean updateMedicationInPrescription(int chiTietId, int soLuongMoi, int lieuDungMoi) {
-        return false;
+    public void update(ChiTietDonThuoc chiTiet) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.update(chiTiet);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        }
+    }
+    
+    public void delete(int id) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            ChiTietDonThuoc chiTiet = session.get(ChiTietDonThuoc.class, id);
+            if (chiTiet != null) {
+                session.delete(chiTiet);
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        }
     }
 
+    public List<ChiTietDonThuoc> findByDonThuocId(int donThuocId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<ChiTietDonThuoc> query = session.createQuery(
+                "FROM ChiTietDonThuoc c WHERE c.donThuoc.id = :donThuocId", ChiTietDonThuoc.class);
+            query.setParameter("donThuocId", donThuocId);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
 }
