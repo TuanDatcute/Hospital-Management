@@ -10,12 +10,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 /**
  * Lớp này là một Entity, đại diện cho bảng 'PhongBenh' trong cơ sở dữ liệu.
  *
  * @author quang
  */
 @Entity
+
 @Table(name = "PhongBenh") // Ánh xạ tới bảng PhongBenh
 public class PhongBenhDTO {
 
@@ -41,7 +45,6 @@ public class PhongBenhDTO {
     private KhoaDTO khoa; // Giả định Entity Khoa của bạn tên là KhoaDTO
 
     // --- Constructors ---
-    
     public PhongBenhDTO() {
         // Constructor rỗng bắt buộc cho Hibernate
     }
@@ -56,7 +59,6 @@ public class PhongBenhDTO {
 
     // --- Getters and Setters ---
     // (Getters/Setters đã được cập nhật cho đối tượng 'khoa')
-
     public int getPhongBenhId() {
         return phongBenhId;
     }

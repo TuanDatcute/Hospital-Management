@@ -5,12 +5,16 @@
 package model.dto;
 
 import java.sql.Date;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  *
  * @author ADMIN
  */
+@Entity
 public class LichHenDTO {
+    @Id
     private int lichHenId;
     private Date thoiGianHen;
     private String lyDoKham;
