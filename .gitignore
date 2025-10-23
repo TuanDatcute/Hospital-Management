@@ -31,4 +31,4 @@ dist/
 target/
 
 
-hibernate.cfg
+hibernate.properties
