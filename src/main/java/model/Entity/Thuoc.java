@@ -2,29 +2,52 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package model.dto;
+package model.Entity;
 
 import java.math.BigDecimal;
+import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
- * DTO cho Thuốc (Medication). Dùng để vận chuyển dữ liệu về thuốc một cách an
- * toàn và gọn gàng.
+ *
+ * @author SunnyU
  */
-public class ThuocDTO {
+@Entity
+@Table(name = "Thuoc")
+public class Thuoc {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(name = "ten_thuoc", nullable = false, unique = true)
     private String tenThuoc;
+
+    @Column(name = "hoat_chat")
     private String hoatChat;
+
+    @Column(name = "don_vi_tinh", nullable = false)
     private String donViTinh;
+
+    @Column(name = "don_gia", nullable = false)
     private BigDecimal donGia;
+
+    @Column(name = "so_luong_ton_kho", nullable = false)
     private int soLuongTonKho;
 
-    // Constructors
-    public ThuocDTO() {
+    @OneToMany(mappedBy = "thuoc")
+    private Set<ChiTietDonThuoc> danhSachChiTietDonThuoc;
+
+    public Thuoc() {
     }
 
-    public ThuocDTO(int id, String tenThuoc, String hoatChat, String donViTinh, BigDecimal donGia, int soLuongTonKho) {
-        this.id = id;
+    public Thuoc(String tenThuoc, String hoatChat, String donViTinh, BigDecimal donGia, int soLuongTonKho) {
         this.tenThuoc = tenThuoc;
         this.hoatChat = hoatChat;
         this.donViTinh = donViTinh;
@@ -32,7 +55,6 @@ public class ThuocDTO {
         this.soLuongTonKho = soLuongTonKho;
     }
 
-    // Getters and Setters...
     public int getId() {
         return id;
     }
@@ -80,4 +102,14 @@ public class ThuocDTO {
     public void setSoLuongTonKho(int soLuongTonKho) {
         this.soLuongTonKho = soLuongTonKho;
     }
+
+    public Set<ChiTietDonThuoc> getDanhSachChiTietDonThuoc() {
+        return danhSachChiTietDonThuoc;
+    }
+
+    public void setDanhSachChiTietDonThuoc(Set<ChiTietDonThuoc> danhSachChiTietDonThuoc) {
+        this.danhSachChiTietDonThuoc = danhSachChiTietDonThuoc;
+    }
+
+    
 }

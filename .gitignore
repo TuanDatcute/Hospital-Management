@@ -28,6 +28,7 @@ replay_pid*
 nbproject/
 build/
 dist/
+target/
 
 
 hibernate.cfg

@@ -1,41 +1,74 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model.dao;
 
-import model.dto.ChiDinhDichVuDTO;
-import model.dto.DichVuDTO;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import model.Entity.ChiDinhDichVu;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+import util.HibernateUtil;
 
-/**
- *
- * @author SunnyU
- */
 public class ChiDinhDichVuDAO {
-    
-    //Tạo một yêu cầu thực hiện dịch vụ.
-    public ChiDinhDichVuDTO createServiceRequest(int phieuKhamId,int  dichVuId){
-        return new ChiDinhDichVuDTO();
+
+    /**
+     * Thêm một chỉ định dịch vụ mới vào CSDL.
+     */
+    public ChiDinhDichVu create(ChiDinhDichVu chiDinh) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.save(chiDinh);
+            transaction.commit();
+            return chiDinh;
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Lấy một chỉ định dịch vụ bằng ID của nó.
+     * Tương ứng với hàm findService của bạn.
+     */
+    public ChiDinhDichVu getById(int id) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(ChiDinhDichVu.class, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
     
-    //Cập nhật trạng thái thực hiện.
-    public boolean updateServiceRequestStatus(int requestId,String trangThaiMoi){
-        return false;
+    /**
+     * Cập nhật một chỉ định dịch vụ đã có.
+     */
+    public void update(ChiDinhDichVu chiDinh) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.update(chiDinh);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        }
     }
-    
-    //Nhập kết quả cho dịch vụ đã hoàn thành.
-    public boolean enterResult(int requestId,String ketQua){
-        return true;
-    }
-    
-    // Lấy danh sách các dịch vụ được chỉ định trong một phiếu khám.
-    public ArrayList<DichVuDTO> listRequestsByEncounter(int phieuKhamId){
-        return new ArrayList<DichVuDTO>();
-    }
-    
-    // tìm 1 cd dịch vụ bằng id
-     public ChiDinhDichVuDTO findService(int chiDinhDichVuId){
-        return new ChiDinhDichVuDTO();
+
+    /**
+     * Lấy tất cả các chỉ định dịch vụ thuộc về một phiếu khám.
+     */
+    public List<ChiDinhDichVu> findByPhieuKhamId(int phieuKhamId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<ChiDinhDichVu> query = session.createQuery(
+                "FROM ChiDinhDichVu cddv WHERE cddv.phieuKham.id = :phieuKhamId", 
+                ChiDinhDichVu.class
+            );
+            query.setParameter("phieuKhamId", phieuKhamId);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList(); // Trả về danh sách rỗng nếu có lỗi
+        }
     }
 }

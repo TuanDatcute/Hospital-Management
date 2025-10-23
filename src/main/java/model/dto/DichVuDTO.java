@@ -1,60 +1,35 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package model.dto;
+package model.dto; // DTO nên nằm trong package riêng
 
 import java.math.BigDecimal;
-import java.util.Set;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 /**
- *
- * @author SunnyU
+ * DTO (Data Transfer Object) 
  */
-@Entity
-@Table(name = "DichVu")
 public class DichVuDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int dichVuId;
-
-    @Column(name = "ten_dich_vu", nullable = false, unique = true)
+    private int id;
     private String tenDichVu;
-
-    @Lob
-    @Column(name = "mo_ta")
     private String moTa;
-
-    @Column(name = "don_gia", nullable = false)
     private BigDecimal donGia;
 
-    @OneToMany(mappedBy = "dichVu")
-    private Set<ChiDinhDichVuDTO> danhSachChiDinh;
-
+    // --- Constructors ---
     public DichVuDTO() {
     }
 
-    public DichVuDTO(String tenDichVu, String moTa, BigDecimal donGia) {
+    public DichVuDTO(int id, String tenDichVu, String moTa, BigDecimal donGia) {
+        this.id = id;
         this.tenDichVu = tenDichVu;
         this.moTa = moTa;
         this.donGia = donGia;
     }
 
-    public int getDichVuId() {
-        return dichVuId;
+    // --- Getters and Setters ---
+    public int getId() {
+        return id;
     }
 
-    public void setDichVuId(int dichVuId) {
-        this.dichVuId = dichVuId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTenDichVu() {
@@ -80,13 +55,4 @@ public class DichVuDTO {
     public void setDonGia(BigDecimal donGia) {
         this.donGia = donGia;
     }
-
-    public Set<ChiDinhDichVuDTO> getDanhSachChiDinh() {
-        return danhSachChiDinh;
-    }
-
-    public void setDanhSachChiDinh(Set<ChiDinhDichVuDTO> danhSachChiDinh) {
-        this.danhSachChiDinh = danhSachChiDinh;
-    }
-
 }
