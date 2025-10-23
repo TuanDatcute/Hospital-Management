@@ -14,7 +14,7 @@ public class HoaDon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private int id;
 
     @Column(name = "ma_hoa_don", length = 20, unique = true, nullable = false)
     private String maHoaDon;
@@ -45,11 +45,11 @@ public class HoaDon {
     }
 
     // --- Getters and Setters (Đã cập nhật cho trangThai) ---
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

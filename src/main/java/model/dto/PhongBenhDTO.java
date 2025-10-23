@@ -24,11 +24,11 @@ import javax.persistence.Id;
 @Table(name = "PhongBenh") // Ánh xạ tới bảng PhongBenh
 public class PhongBenhDTO {
     
-    private Long id;
+    private int id;
     private String tenPhong;
     private String loaiPhong;
     private Integer sucChua;
-    private Long khoaId; // Chỉ lưu ID của Khoa
+    private int khoaId; // Chỉ lưu ID của Khoa
     private String tenKhoa; // (Thêm) Thường hữu ích để hiển thị
 
     // --- Constructors ---
@@ -36,11 +36,11 @@ public class PhongBenhDTO {
     }
 
     // --- Getters and Setters ---
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -68,11 +68,11 @@ public class PhongBenhDTO {
         this.sucChua = sucChua;
     }
 
-    public Long getKhoaId() {
+    public int getKhoaId() {
         return khoaId;
     }
 
-    public void setKhoaId(Long khoaId) {
+    public void setKhoaId(int khoaId) {
         this.khoaId = khoaId;
     }
 

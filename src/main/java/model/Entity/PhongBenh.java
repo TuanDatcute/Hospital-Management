@@ -10,7 +10,7 @@ public class PhongBenh {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private int id;
 
     @Column(name = "ten_phong", length = 100, unique = true, nullable = false)
     private String tenPhong;
@@ -31,11 +31,11 @@ public class PhongBenh {
     }
 
     // --- Getters and Setters ---
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
