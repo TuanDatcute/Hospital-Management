@@ -82,7 +82,7 @@ public class DonThuocService {
     }
 
     // --- Phương thức chuyển đổi ---
-    private DonThuocDTO toDTO(DonThuoc entity) {
+    protected DonThuocDTO toDTO(DonThuoc entity) {
         if (entity == null) {
             return null;
         }

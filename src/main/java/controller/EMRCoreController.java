@@ -124,7 +124,7 @@ public class EMRCoreController extends HttpServlet {
         } catch (Exception e) {
             log("Lỗi không xác định trong createEncounter: " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
-            return ERROR_PAGE;
+            return CREATE_ENCOUNTER_PAGE;
         }
     }
 
