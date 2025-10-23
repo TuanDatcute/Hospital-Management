@@ -67,15 +67,15 @@ public class PhieuKhamBenh {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "benh_nhan_id", nullable = false)
-    private BenhNhanDTO benhNhan;
+    private BenhNhan benhNhan;
     
     @ManyToOne(fetch = FetchType.LAZY) 
     @JoinColumn(name = "nhan_vien_id", nullable = false)
-    private NhanVienDTO bacSi;
+    private NhanVien bacSi;
     
     @OneToOne
     @JoinColumn(name = "lich_hen_id")
-    private LichHenDTO lichHen ; 
+    private LichHen lichHen ; 
     
     @OneToOne(mappedBy = "phieuKham", cascade = CascadeType.ALL)
     private DonThuoc donThuoc;
@@ -86,7 +86,7 @@ public class PhieuKhamBenh {
     public PhieuKhamBenh() {
     }
 
-    public PhieuKhamBenh(String maPhieuKham, LocalDateTime thoiGianKham, String trieuChung, BigDecimal nhietDo, String huyetAp, int nhipTim, int nhipTho, String chanDoan, String ketLuan, LocalDateTime ngayTaiKham, BenhNhanDTO benhNhan, NhanVienDTO bacSi, LichHenDTO lichHen) {
+    public PhieuKhamBenh(String maPhieuKham, LocalDateTime thoiGianKham, String trieuChung, BigDecimal nhietDo, String huyetAp, int nhipTim, int nhipTho, String chanDoan, String ketLuan, LocalDateTime ngayTaiKham, BenhNhan benhNhan, NhanVien bacSi, LichHen lichHen) {
         this.maPhieuKham = maPhieuKham;
         this.thoiGianKham = thoiGianKham;
         this.trieuChung = trieuChung;
@@ -190,27 +190,27 @@ public class PhieuKhamBenh {
         this.ngayTaiKham = ngayTaiKham;
     }
 
-    public BenhNhanDTO getBenhNhan() {
+    public BenhNhan getBenhNhan() {
         return benhNhan;
     }
 
-    public void setBenhNhan(BenhNhanDTO benhNhan) {
+    public void setBenhNhan(BenhNhan benhNhan) {
         this.benhNhan = benhNhan;
     }
 
-    public NhanVienDTO getBacSi() {
+    public NhanVien getBacSi() {
         return bacSi;
     }
 
-    public void setBacSi(NhanVienDTO bacSi) {
+    public void setBacSi(NhanVien bacSi) {
         this.bacSi = bacSi;
     }
 
-    public LichHenDTO getLichHen() {
+    public LichHen getLichHen() {
         return lichHen;
     }
 
-    public void setLichHen(LichHenDTO lichHen) {
+    public void setLichHen(LichHen lichHen) {
         this.lichHen = lichHen;
     }
 
