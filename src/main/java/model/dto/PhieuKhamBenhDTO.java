@@ -1,16 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model.dto;
 
-import model.Entity.DonThuoc;
-import model.Entity.ChiDinhDichVu;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+/**
+ * DTO (Data Transfer Object) cho Phiếu Khám Bệnh. Dùng để vận chuyển dữ liệu
+ * giữa các tầng và ra ngoài API. Lớp này là một POJO đơn giản, KHÔNG chứa các
+ * annotation của Hibernate.
+ */
 public class PhieuKhamBenhDTO {
 
     // --- Thông tin cơ bản của Phiếu Khám ---
@@ -28,33 +27,19 @@ public class PhieuKhamBenhDTO {
     private Integer nhipTim;
     private Integer nhipTho;
 
+    // --- Thông tin liên kết (đã được "làm phẳng") ---
     private int benhNhanId;
-    private String tenBenhNhan; 
+    private String tenBenhNhan; // Tốt! Giữ lại để tiện hiển thị
     private int bacSiId;
-    private String tenBacSi;    
-    private Integer lichHenId; 
+    private String tenBacSi;    // Tốt! Giữ lại để tiện hiển thị
+    private Integer lichHenId;
 
-    private DonThuoc donThuoc;
-    private Set<ChiDinhDichVu> danhSachChiDinh;
+    // ✨ SỬA LỖI: Thay thế các đối tượng Entity bằng DTO tương ứng ✨
+    private DonThuocDTO donThuoc;
+    private Set<ChiDinhDichVuDTO> danhSachChiDinh;
 
- 
+    // --- Constructors ---
     public PhieuKhamBenhDTO() {
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getMaPhieuKham() {
-        return maPhieuKham;
-    }
-
-    public void setMaPhieuKham(String maPhieuKham) {
-        this.maPhieuKham = maPhieuKham;
     }
 
     public LocalDateTime getThoiGianKham() {
@@ -169,19 +154,57 @@ public class PhieuKhamBenhDTO {
         this.lichHenId = lichHenId;
     }
 
-    public DonThuoc getDonThuoc() {
+    public PhieuKhamBenhDTO(String maPhieuKham, LocalDateTime thoiGianKham, String trieuChung, String chanDoan, String ketLuan, LocalDate ngayTaiKham, BigDecimal nhietDo, String huyetAp, Integer nhipTim, Integer nhipTho, int benhNhanId, String tenBenhNhan, int bacSiId, String tenBacSi, Integer lichHenId, DonThuocDTO donThuoc, Set<ChiDinhDichVuDTO> danhSachChiDinh) {
+        this.maPhieuKham = maPhieuKham;
+        this.thoiGianKham = thoiGianKham;
+        this.trieuChung = trieuChung;
+        this.chanDoan = chanDoan;
+        this.ketLuan = ketLuan;
+        this.ngayTaiKham = ngayTaiKham;
+        this.nhietDo = nhietDo;
+        this.huyetAp = huyetAp;
+        this.nhipTim = nhipTim;
+        this.nhipTho = nhipTho;
+        this.benhNhanId = benhNhanId;
+        this.tenBenhNhan = tenBenhNhan;
+        this.bacSiId = bacSiId;
+        this.tenBacSi = tenBacSi;
+        this.lichHenId = lichHenId;
+        this.donThuoc = donThuoc;
+        this.danhSachChiDinh = danhSachChiDinh;
+    }
+
+    // --- Getters and Setters (Giữ nguyên như code của bạn) ---
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getMaPhieuKham() {
+        return maPhieuKham;
+    }
+
+    public void setMaPhieuKham(String maPhieuKham) {
+        this.maPhieuKham = maPhieuKham;
+    }
+
+    // ... (tất cả các getters và setters khác) ...
+    public DonThuocDTO getDonThuoc() {
         return donThuoc;
     }
 
-    public void setDonThuoc(DonThuoc donThuoc) {
+    public void setDonThuoc(DonThuocDTO donThuoc) {
         this.donThuoc = donThuoc;
     }
 
-    public Set<ChiDinhDichVu> getDanhSachChiDinh() {
+    public Set<ChiDinhDichVuDTO> getDanhSachChiDinh() {
         return danhSachChiDinh;
     }
 
-    public void setDanhSachChiDinh(Set<ChiDinhDichVu> danhSachChiDinh) {
+    public void setDanhSachChiDinh(Set<ChiDinhDichVuDTO> danhSachChiDinh) {
         this.danhSachChiDinh = danhSachChiDinh;
     }
 }

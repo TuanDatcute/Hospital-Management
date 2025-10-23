@@ -112,7 +112,7 @@
 
                     <div class="form-group">
                         <label for="nhanVienId">ID Nhân Viên (Bác sĩ)</label>
-                        <input type="number" id="nhanVienId" name="nhanVienId" required>
+                        <input type="number" id="nhanVienId" name="bacSiId" required>
                     </div>
 
                     <div class="form-group full-width">
