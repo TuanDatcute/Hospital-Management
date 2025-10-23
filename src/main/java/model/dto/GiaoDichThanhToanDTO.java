@@ -6,22 +6,22 @@ import java.time.LocalDateTime;
 
 public class GiaoDichThanhToanDTO {
 
-    private Long id;
+    private int id;
     private BigDecimal soTien;
     private String phuongThuc;
     private LocalDateTime thoiGianGiaoDich;
-    private Long hoaDonId; // Chỉ lưu ID
+    private int hoaDonId; // Chỉ lưu ID
 
     // --- Constructors ---
     public GiaoDichThanhToanDTO() {
     }
 
     // --- Getters and Setters ---
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -49,11 +49,11 @@ public class GiaoDichThanhToanDTO {
         this.thoiGianGiaoDich = thoiGianGiaoDich;
     }
 
-    public Long getHoaDonId() {
+    public int getHoaDonId() {
         return hoaDonId;
     }
 
-    public void setHoaDonId(Long hoaDonId) {
+    public void setHoaDonId(int hoaDonId) {
         this.hoaDonId = hoaDonId;
     }
 }

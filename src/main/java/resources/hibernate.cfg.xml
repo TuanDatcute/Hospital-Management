@@ -13,6 +13,11 @@
         <property name="hibernate.hbm2ddl.auto">create</property>
         
         <mapping class="model.Entity.PhieuKhamBenh"/>
+        <mapping class="model.Entity.HoaDon"/>
+        <mapping class="model.Entity.GiaoDichThanhToan"/>
+        <mapping class="model.Entity.PhongBenh"/>
+        <mapping class="model.Entity.GiuongBenh"/>
+        <mapping class="model.Entity.ThongBao"/>
 
     </session-factory>
 </hibernate-configuration>

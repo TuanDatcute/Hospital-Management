@@ -9,7 +9,7 @@ import model.Entity.TaiKhoan;
 import model.Entity.ThongBao;
 
 import java.util.List;
-import java.util.stream.Collectors;
+// import java.util.stream.Collectors; // Không được sử dụng
 
 public class ThongBaoService {
 
@@ -27,7 +27,7 @@ public class ThongBaoService {
             // Bước 1: Chuyển DTO sang Entity (Sử dụng hàm helper mới)
             ThongBao thongBao = convertToEntity(dto);
             if (thongBao == null) {
-                // Lỗi xảy ra nếu không tìm thấy TaiKhoan
+                // Lỗi xảy ra nếu không tìm thấy TaiKhoan (hoặc taiKhoanId = 0)
                 return false;
             }
 
@@ -41,9 +41,11 @@ public class ThongBaoService {
     }
 
     // Đánh dấu một thông báo là đã đọc
-    public boolean markAsRead(long thongBaoId) {
+    // THAY ĐỔI: Sử dụng int
+    public boolean markAsRead(int thongBaoId) {
         try {
-            ThongBao thongBao = thongBaoDAO.getThongBaoById(thongBaoId);
+            // Giả sử DAO đã cập nhật
+            ThongBao thongBao = thongBaoDAO.getThongBaoById(thongBaoId); 
             if (thongBao != null && !thongBao.isDaDoc()) {
                 thongBao.setDaDoc(true);
                 thongBaoDAO.updateThongBao(thongBao);
@@ -57,9 +59,9 @@ public class ThongBaoService {
     }
 
     // Lấy tất cả thông báo cho một người dùng (trả về DTO)
-
-    public List<ThongBaoDTO> getTatCaThongBao(long taiKhoanId) {
-        // 1. Lấy danh sách Entity từ DAO
+    // THAY ĐỔI: Sử dụng int
+    public List<ThongBaoDTO> getTatCaThongBao(int taiKhoanId) {
+        // 1. Lấy danh sách Entity từ DAO (Giả sử DAO đã cập nhật)
         List<ThongBao> entities = thongBaoDAO.getThongBaoByTaiKhoanId(taiKhoanId);
 
         // 2. Khởi tạo một danh sách DTO mới (rỗng)
@@ -81,8 +83,9 @@ public class ThongBaoService {
     }
 
     // Lấy các thông báo CHƯA ĐỌC cho người dùng
-    public List<ThongBaoDTO> getThongBaoChuaDoc(long taiKhoanId) {
-        // 1. Lấy danh sách Entity từ DAO
+    // THAY ĐỔI: Sử dụng int
+    public List<ThongBaoDTO> getThongBaoChuaDoc(int taiKhoanId) {
+        // 1. Lấy danh sách Entity từ DAO (Giả sử DAO đã cập nhật)
         List<ThongBao> entities = thongBaoDAO.getThongBaoChuaDocByTaiKhoanId(taiKhoanId);
 
         // 2. Khởi tạo một danh sách DTO rỗng
@@ -110,13 +113,15 @@ public class ThongBaoService {
             return null;
         }
 
+        // Giả sử ThongBaoDTO đã được cập nhật để nhận int cho ID
         return new ThongBaoDTO(
                 entity.getId(),
                 entity.getTieuDe(),
                 entity.getNoiDung(),
                 entity.isDaDoc(),
                 entity.getThoiGianGui(),
-                entity.getTaiKhoan() != null ? entity.getTaiKhoan().getId() : null // Kiểm tra null
+                // THAY ĐỔI: Nếu không có tài khoản, gán 0 (vì DTO dùng int)
+                entity.getTaiKhoan() != null ? entity.getTaiKhoan().getId() : 0 
         );
     }
 
@@ -129,15 +134,21 @@ public class ThongBaoService {
         ThongBao entity = new ThongBao();
 
         // Gán các giá trị đơn giản
-        entity.setId(dto.getId()); // Quan trọng nếu dùng cho việc cập nhật
+        // THAY ĐỔI: Kiểm tra != 0 (giả định 0 là ID cho entity mới)
+        if (dto.getId() != 0) {
+            entity.setId(dto.getId());
+        }
+        
         entity.setTieuDe(dto.getTieuDe());
         entity.setNoiDung(dto.getNoiDung());
         entity.setDaDoc(dto.isDaDoc());
         // Không set thoiGianGui vì nó được @CreationTimestamp quản lý khi tạo mới
 
         // Xử lý khóa ngoại (quan trọng)
-        if (dto.getTaiKhoanId() != null) {
-            TaiKhoan taiKhoan = taiKhoanDAO.getTaiKhoanById(dto.getTaiKhoanId());
+        // THAY ĐỔI: Kiểm tra != 0 thay vì != null (vì dto.getTaiKhoanId() là int)
+        if (dto.getTaiKhoanId() != 0) {
+            // Giả sử DAO đã cập nhật
+            TaiKhoan taiKhoan = taiKhoanDAO.getById(dto.getTaiKhoanId()); 
             if (taiKhoan == null) {
                 // Nếu không tìm thấy tài khoản, không thể tạo entity hợp lệ
                 System.err.println("Không tìm thấy tài khoản với ID: " + dto.getTaiKhoanId() + " khi chuyển đổi DTO sang Entity.");
@@ -145,8 +156,8 @@ public class ThongBaoService {
             }
             entity.setTaiKhoan(taiKhoan);
         } else {
-            // Nếu logic của bạn yêu cầu phải có taiKhoanId
-            System.err.println("taiKhoanId là null trong DTO.");
+            // Nếu logic của bạn yêu cầu phải có taiKhoanId (ID = 0 là không hợp lệ)
+            System.err.println("taiKhoanId là 0 trong DTO.");
             return null;
         }
 

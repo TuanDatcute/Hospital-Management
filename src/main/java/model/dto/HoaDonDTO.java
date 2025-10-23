@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class HoaDonDTO {
-    private Long id;
+    private int id;
     private String maHoaDon;
     private LocalDateTime ngayTao;
     private BigDecimal tongTien;
@@ -14,19 +14,19 @@ public class HoaDonDTO {
     // --- THAY ĐỔI Ở ĐÂY ---
     private String trangThai; // Dùng String
     
-    private Long benhNhanId;
-    private Long phieuKhamId;
+    private int benhNhanId;
+    private int phieuKhamId;
 
     // Constructors
     public HoaDonDTO() {
     }
 
     // Getters and Setters (Đã cập nhật cho trangThai)
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -62,19 +62,19 @@ public class HoaDonDTO {
         this.trangThai = trangThai;
     }
 
-    public Long getBenhNhanId() {
+    public int getBenhNhanId() {
         return benhNhanId;
     }
 
-    public void setBenhNhanId(Long benhNhanId) {
+    public void setBenhNhanId(int benhNhanId) {
         this.benhNhanId = benhNhanId;
     }
 
-    public Long getPhieuKhamId() {
+    public int getPhieuKhamBenhId() {
         return phieuKhamId;
     }
 
-    public void setPhieuKhamId(Long phieuKhamId) {
+    public void setPhieuKhamId(int phieuKhamId) {
         this.phieuKhamId = phieuKhamId;
     }
 }

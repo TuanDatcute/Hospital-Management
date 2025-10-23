@@ -11,6 +11,7 @@ import model.Entity.PhongBenh;
 
 import java.util.ArrayList;
 import java.util.List;
+// Đã loại bỏ import javafx.scene.input.KeyCode.L không cần thiết
 
 public class GiuongBenhService {
 
@@ -31,7 +32,7 @@ public class GiuongBenhService {
         try {
             // Khi tạo mới, giường luôn trống và không có bệnh nhân
             dto.setTrangThai("TRONG");
-            dto.setBenhNhanId(null); 
+            dto.setBenhNhanId(-1); // Giả định -1 hoặc 0 nghĩa là không có
             
             GiuongBenh entity = convertToEntity(dto);
             if (entity == null) {
@@ -49,10 +50,10 @@ public class GiuongBenhService {
     /**
      * Gán một bệnh nhân vào một giường trống
      */
-    public boolean assignBenhNhanToGiuong(long giuongId, long benhNhanId) {
+    public boolean assignBenhNhanToGiuong(int giuongId, int benhNhanId) {
         try {
             GiuongBenh giuong = giuongBenhDAO.getGiuongById(giuongId);
-            BenhNhan benhNhan = benhNhanDAO.getBenhNhanById(benhNhanId);
+            BenhNhan benhNhan = benhNhanDAO.getById(benhNhanId);
 
             if (giuong == null || benhNhan == null) {
                 System.err.println("Không tìm thấy giường hoặc bệnh nhân.");
@@ -78,8 +79,9 @@ public class GiuongBenhService {
 
     /**
      * Bệnh nhân trả giường (xuất viện hoặc chuyển giường)
+     * THAY ĐỔI: Sử dụng int
      */
-    public boolean releaseGiuong(long giuongId) {
+    public boolean releaseGiuong(int giuongId) {
         try {
             GiuongBenh giuong = giuongBenhDAO.getGiuongById(giuongId);
             if (giuong == null) {
@@ -100,8 +102,9 @@ public class GiuongBenhService {
     
     /**
      * Cập nhật trạng thái giường (ví dụ: Dọn dẹp -> Trống, hoặc Trống -> Bảo trì)
+     * THAY ĐỔI: Sử dụng int
      */
-    public boolean updateTrangThaiGiuong(long giuongId, String trangThaiMoi) {
+    public boolean updateTrangThaiGiuong(int giuongId, String trangThaiMoi) {
          try {
             GiuongBenh giuong = giuongBenhDAO.getGiuongById(giuongId);
             if (giuong == null) {
@@ -124,8 +127,9 @@ public class GiuongBenhService {
 
     /**
      * Lấy danh sách giường trong một phòng
+     * THAY ĐỔI: Sử dụng int
      */
-    public List<GiuongBenhDTO> getGiuongByPhong(long phongBenhId) {
+    public List<GiuongBenhDTO> getGiuongByPhong(int phongBenhId) {
         List<GiuongBenh> entities = giuongBenhDAO.getGiuongByPhongBenhId(phongBenhId);
         
         // **SỬ DỤNG VÒNG LẶP FOR**
@@ -140,8 +144,9 @@ public class GiuongBenhService {
     
     /**
      * Lấy danh sách giường TRỐNG trong một phòng
+     * THAY ĐỔI: Sử dụng int
      */
-    public List<GiuongBenhDTO> getGiuongTrongByPhong(long phongBenhId) {
+    public List<GiuongBenhDTO> getGiuongTrongByPhong(int phongBenhId) {
         List<GiuongBenh> entities = giuongBenhDAO.getGiuongTrongByPhong(phongBenhId);
         
         // **SỬ DỤNG VÒNG LẶP FOR**
@@ -187,15 +192,17 @@ public class GiuongBenhService {
         GiuongBenh entity = new GiuongBenh();
         
         // Nếu là update (có ID), gán ID
-        if (dto.getId() != null) {
+        // Logic này đã giả định ID là int (kiểm tra > 0)
+        if (dto.getId() > 0) {
              entity.setId(dto.getId());
         }
-       
+        
         entity.setTenGiuong(dto.getTenGiuong());
         entity.setTrangThai(dto.getTrangThai());
 
         // Lấy Phòng Bệnh (Bắt buộc)
-        if (dto.getPhongBenhId() == null) {
+        // Logic này đã giả định ID là int (kiểm tra == 0)
+        if (dto.getPhongBenhId() == 0) {
              System.err.println("DTO thiếu phongBenhId.");
             return null;
         }
@@ -207,8 +214,9 @@ public class GiuongBenhService {
         entity.setPhongBenh(phongBenh);
 
         // Lấy Bệnh Nhân (Không bắt buộc, có thể NULL)
-        if (dto.getBenhNhanId() != null) {
-            BenhNhan benhNhan = benhNhanDAO.getBenhNhanById(dto.getBenhNhanId());
+        // Logic này đã giả định ID là int (kiểm tra > 0)
+        if (dto.getBenhNhanId() > 0) {
+            BenhNhan benhNhan = benhNhanDAO.getById(dto.getBenhNhanId());
             if (benhNhan != null) {
                  entity.setBenhNhan(benhNhan);
             }

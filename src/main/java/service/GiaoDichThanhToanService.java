@@ -29,7 +29,7 @@ public class GiaoDichThanhToanService {
             // Bước 1: Chuyển DTO sang Entity
             GiaoDichThanhToan giaoDich = convertToEntity(dto);
             if (giaoDich == null) {
-                System.err.println("Không thể tạo giao dịch do không tìm thấy hóa đơn.");
+                System.err.println("Không thể tạo giao dịch do dữ liệu DTO không hợp lệ (ví dụ: hoaDonId = 0).");
                 return false;
             }
 
@@ -37,6 +37,7 @@ public class GiaoDichThanhToanService {
             giaoDichDAO.addGiaoDich(giaoDich);
 
             // Bước 3: (Logic nghiệp vụ) Cập nhật trạng thái hóa đơn liên quan
+            // dto.getHoaDonId() bây giờ trả về int
             checkAndUpdateHoaDonStatus(dto.getHoaDonId());
 
             return true;
@@ -49,7 +50,7 @@ public class GiaoDichThanhToanService {
     /**
      * Lấy tất cả giao dịch của một hóa đơn
      */
-    public List<GiaoDichThanhToanDTO> getGiaoDichByHoaDon(long hoaDonId) {
+    public List<GiaoDichThanhToanDTO> getGiaoDichByHoaDon(int hoaDonId) {
         List<GiaoDichThanhToan> entities = giaoDichDAO.getGiaoDichByHoaDonId(hoaDonId);
 
         // **SỬ DỤNG VÒNG LẶP FOR ĐỂ TRÁNH LỖI JAVA 8**
@@ -65,7 +66,7 @@ public class GiaoDichThanhToanService {
     /**
      * Logic kiểm tra và cập nhật trạng thái hóa đơn sau khi có giao dịch mới.
      */
-    private void checkAndUpdateHoaDonStatus(long hoaDonId) {
+    private void checkAndUpdateHoaDonStatus(int hoaDonId) {
         HoaDon hoaDon = hoaDonDAO.getHoaDonById(hoaDonId);
         if (hoaDon == null || hoaDon.getTrangThai().equals("DA_THANH_TOAN")) {
             return; // Hóa đơn không tồn tại hoặc đã thanh toán xong
@@ -97,13 +98,13 @@ public class GiaoDichThanhToanService {
         }
 
         GiaoDichThanhToanDTO dto = new GiaoDichThanhToanDTO();
-        dto.setId(entity.getId());
+        dto.setId(entity.getId()); // int sang int
         dto.setSoTien(entity.getSoTien());
         dto.setPhuongThuc(entity.getPhuongThuc());
         dto.setThoiGianGiaoDich(entity.getThoiGianGiaoDich());
 
         if (entity.getHoaDon() != null) {
-            dto.setHoaDonId(entity.getHoaDon().getId());
+            dto.setHoaDonId(entity.getHoaDon().getId()); // int sang int
         }
 
         return dto;
@@ -116,17 +117,27 @@ public class GiaoDichThanhToanService {
         }
 
         GiaoDichThanhToan entity = new GiaoDichThanhToan();
-        entity.setId(dto.getId());
+
+        // THAY ĐỔI: Kiểm tra != 0 thay vì != null
+        // Giả định ID 0 nghĩa là "mới" và không cần set
+        // (sẽ được CSDL tự động tạo)
+        if (dto.getId() != 0) {
+            entity.setId(dto.getId());
+        }
+
         entity.setSoTien(dto.getSoTien());
         entity.setPhuongThuc(dto.getPhuongThuc());
         // thoiGianGiaoDich sẽ được @CreationTimestamp tự động gán
 
         // Lấy Hóa Đơn
-        if (dto.getHoaDonId() == null) {
+        // THAY ĐỔI: Kiểm tra == 0 thay vì == null
+        // Vì dto.getHoaDonId() là int, nó không thể là null, giá trị mặc định là 0.
+        if (dto.getHoaDonId() == 0) {
+            System.err.println("Không thể tạo giao dịch: hoaDonId không được cung cấp (bằng 0).");
             return null; // Không thể tạo giao dịch mà không có hóa đơn
         }
 
-        HoaDon hoaDon = hoaDonDAO.getHoaDonById(dto.getHoaDonId());
+        HoaDon hoaDon = hoaDonDAO.getHoaDonById(dto.getHoaDonId()); // Gọi DAO với int
         if (hoaDon == null) {
             System.err.println("Không tìm thấy Hóa Đơn ID: " + dto.getHoaDonId());
             return null; // Hóa đơn không tồn tại

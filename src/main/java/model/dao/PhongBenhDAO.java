@@ -43,7 +43,7 @@ public class PhongBenhDAO {
     }
 
     // Lấy phòng bệnh bằng ID
-    public PhongBenh getPhongBenhById(long id) {
+    public PhongBenh getPhongBenhById(int id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // Dùng JOIN FETCH để tải thông tin Khoa ngay lập tức
             Query<PhongBenh> query = session.createQuery(
@@ -88,7 +88,7 @@ public class PhongBenhDAO {
     }
     
     // Lấy tất cả phòng bệnh theo Khoa
-    public List<PhongBenh> getPhongBenhByKhoa(long khoaId) {
+    public List<PhongBenh> getPhongBenhByKhoa(int khoaId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<PhongBenh> query = session.createQuery(
                 "FROM PhongBenh pb JOIN FETCH pb.khoa WHERE pb.khoa.id = :khoaId ORDER BY pb.tenPhong", 
@@ -103,7 +103,7 @@ public class PhongBenhDAO {
     }
     
     // (Tùy chọn) Xóa phòng bệnh
-    public void deletePhongBenh(long id) {
+    public void deletePhongBenh(int id) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();

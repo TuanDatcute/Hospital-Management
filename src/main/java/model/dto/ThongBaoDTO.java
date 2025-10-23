@@ -4,18 +4,18 @@ package model.dto;
 import java.time.LocalDateTime;
 
 public class ThongBaoDTO {
-    private Long id;
+    private int id;
     private String tieuDe;
     private String noiDung;
     private boolean daDoc;
     private LocalDateTime thoiGianGui;
-    private Long taiKhoanId; // Chỉ lưu ID của người nhận
+    private int taiKhoanId; // Chỉ lưu ID của người nhận
 
     // --- Constructors ---
     public ThongBaoDTO() {
     }
 
-    public ThongBaoDTO(Long id, String tieuDe, String noiDung, boolean daDoc, LocalDateTime thoiGianGui, Long taiKhoanId) {
+    public ThongBaoDTO(int id, String tieuDe, String noiDung, boolean daDoc, LocalDateTime thoiGianGui, int taiKhoanId) {
         this.id = id;
         this.tieuDe = tieuDe;
         this.noiDung = noiDung;
@@ -25,11 +25,11 @@ public class ThongBaoDTO {
     }
 
     // --- Getters and Setters ---
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -65,11 +65,11 @@ public class ThongBaoDTO {
         this.thoiGianGui = thoiGianGui;
     }
 
-    public Long getTaiKhoanId() {
+    public int getTaiKhoanId() {
         return taiKhoanId;
     }
 
-    public void setTaiKhoanId(Long taiKhoanId) {
+    public void setTaiKhoanId(int taiKhoanId) {
         this.taiKhoanId = taiKhoanId;
     }
 }

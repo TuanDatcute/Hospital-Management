@@ -43,7 +43,7 @@ public class HoaDonDAO {
     }
 
     // Lấy hóa đơn bằng ID
-    public HoaDon getHoaDonById(long id) {
+    public HoaDon getHoaDonById(int id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // Dùng JOIN FETCH để tải thông tin liên quan, tránh LazyInitializationException
             Query<HoaDon> query = session.createQuery(
@@ -76,7 +76,7 @@ public class HoaDonDAO {
     }
     
     // Lấy tất cả hóa đơn của một bệnh nhân
-    public List<HoaDon> getHoaDonByBenhNhanId(long benhNhanId) {
+    public List<HoaDon> getHoaDonByBenhNhanId(int benhNhanId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<HoaDon> query = session.createQuery(
                 "FROM HoaDon hd " +
