@@ -19,14 +19,14 @@
 
 
         <mapping class="model.Entity.PhieuKhamBenh"/>
-        <mapping class="model.dto.KhoaDTO"/>
-        <mapping class="model.dto.TaiKhoanDTO"/>
-        <mapping class="model.dto.NhanVienDTO"/>
-        <mapping class="model.dto.BenhNhanDTO"/>
+        <mapping class="model.Entity.KhoaDTO"/>
+        <mapping class="model.Entity.TaiKhoanDTO"/>
+        <mapping class="model.Entity.NhanVienDTO"/>
+        <mapping class="model.Entity.BenhNhanDTO"/>
         <mapping class="model.dto.PhongBenhDTO"/>
         <mapping class="model.dto.GiuongBenhDTO"/>
         <mapping class="model.dto.ThongBaoDTO"/>
-        <mapping class="model.dto.LichHenDTO"/>
+        <mapping class="model.Entity.LichHenDTO"/>
 
         <mapping class="model.dto.PhieuKhamBenhDTO"/>
         <mapping class="model.dto.DichVuDTO"/>
