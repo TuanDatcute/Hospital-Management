@@ -9,16 +9,10 @@ import model.dao.TaiKhoanDAO;
 import model.dto.NhanVienDTO;
 import java.util.List;
 import java.util.stream.Collectors;
-<<<<<<< HEAD
-import java.util.Collections; 
-
-/**
- * 
-=======
+import java.util.Collections;
 
 /**
  * Lớp Service chứa logic nghiệp vụ cho NhanVien.
->>>>>>> a0f9334e0a4081821c2e291c1fc282813bc26fbc
  * @author ADMIN
  */
 public class NhanVienService {
@@ -65,7 +59,7 @@ public class NhanVienService {
              throw new Exception("Tài khoản này đã được gán cho một nhân viên khác.");
         }
 
-        // 2.3. Kiểm tra Khoa (Khoa có thể null, nên chỉ kiểm tra nếu ID được cung cấp)
+        // 2.3. Kiểm tra Khoa (Khoa có thể null)
         Khoa khoaEntity = null; 
         if (dto.getKhoaId() != null && dto.getKhoaId() > 0) {
             khoaEntity = khoaDAO.getById(dto.getKhoaId());
@@ -75,10 +69,6 @@ public class NhanVienService {
         }
 
         // --- BƯỚC 3: CHUYỂN ĐỔI (MAP) ---
-<<<<<<< HEAD
-=======
-        // Truyền các entity đã lấy được vào hàm toEntity
->>>>>>> a0f9334e0a4081821c2e291c1fc282813bc26fbc
         NhanVien entity = toEntity(dto, taiKhoanEntity, khoaEntity);
 
         // --- BƯỚC 4: GỌI DAO ĐỂ LƯU ---
@@ -86,10 +76,6 @@ public class NhanVienService {
 
         // --- BƯỚC 5: TRẢ VỀ DTO ---
         if (savedEntity != null) {
-<<<<<<< HEAD
-=======
-            // Dùng toDTO để chuyển đổi entity (đã có ID) về DTO
->>>>>>> a0f9334e0a4081821c2e291c1fc282813bc26fbc
             return toDTO(savedEntity); 
         }
         return null;
@@ -111,10 +97,7 @@ public class NhanVienService {
             throw new Exception("Họ tên không được để trống.");
         }
         
-<<<<<<< HEAD
-=======
         // Kiểm tra SĐT nếu SĐT có thay đổi
->>>>>>> a0f9334e0a4081821c2e291c1fc282813bc26fbc
         String newSdt = dto.getSoDienThoai();
         if (newSdt != null && !newSdt.trim().isEmpty() && !newSdt.equals(existingEntity.getSoDienThoai())) {
             if (nhanVienDAO.isSoDienThoaiExisted(newSdt)) {
@@ -131,15 +114,10 @@ public class NhanVienService {
         existingEntity.setChuyenMon(dto.getChuyenMon());
         existingEntity.setBangCap(dto.getBangCap());
 
-<<<<<<< HEAD
-        Integer newKhoaId = dto.getKhoaId();
-        if (newKhoaId != null && newKhoaId > 0) {
-=======
         // Cập nhật Khoa (nếu có thay đổi)
         Integer newKhoaId = dto.getKhoaId();
         if (newKhoaId != null && newKhoaId > 0) {
             // Nếu ID khoa mới khác ID khoa cũ, hoặc cũ là null
->>>>>>> a0f9334e0a4081821c2e291c1fc282813bc26fbc
             if (existingEntity.getKhoa() == null || existingEntity.getKhoa().getId() != newKhoaId) {
                 Khoa khoaEntity = khoaDAO.getById(newKhoaId);
                 if (khoaEntity == null) {
@@ -148,9 +126,6 @@ public class NhanVienService {
                 existingEntity.setKhoa(khoaEntity);
             }
         } else {
-<<<<<<< HEAD
-            existingEntity.setKhoa(null);
-=======
             existingEntity.setKhoa(null); // Gán là null nếu DTO yêu cầu
         }
         
@@ -163,7 +138,6 @@ public class NhanVienService {
         }
 
         // --- BƯỚC 5: TRẢ VỀ DTO (ĐÃ CẬP NHẬT) ---
-        // Gọi lại hàm getByIdWithRelations để lấy dữ liệu mới nhất
         NhanVien updatedEntity = nhanVienDAO.getByIdWithRelations(nhanVienId);
         return toDTO(updatedEntity);
     }
@@ -173,28 +147,39 @@ public class NhanVienService {
      * Lấy nhân viên bằng ID.
      */
     public NhanVienDTO getNhanVienById(int id) throws Exception {
-        // Dùng hàm ...WithRelations để lấy cả TaiKhoan và Khoa
         NhanVien entity = nhanVienDAO.getByIdWithRelations(id); 
         if (entity == null) {
-            // --- SỬA LỖI 1 & 2: Thêm ID và trả về DTO ---
             throw new Exception("Không tìm thấy nhân viên với ID: " + id);
         }
         return toDTO(entity);
     }
     
-    // --- BỔ SUNG CÁC HÀM BỊ THIẾU ---
-    
     /**
      * Lấy tất cả nhân viên.
      */
     public List<NhanVienDTO> getAllNhanVien() {
-        // Dùng hàm ...WithRelations để tránh lỗi N+1 select
         List<NhanVien> entities = nhanVienDAO.getAllWithRelations();
         
         return entities.stream()
                        .map(this::toDTO)
                        .collect(Collectors.toList());
     }
+
+    /**
+     * Dịch vụ tìm tất cả nhân viên có chuyên môn là "Bác sĩ".
+     */
+    public List<NhanVienDTO> findDoctorsBySpecialty() {
+        List<NhanVien> entities = nhanVienDAO.findDoctorsBySpecialty("Bác sĩ");
+
+        if (entities == null) {
+            return Collections.emptyList();
+        }
+
+        return entities.stream()
+                .map(this::toDTO) 
+                .collect(Collectors.toList());
+    }
+    
 
     /**
      * Chuyển NhanVien (Entity) sang NhanVienDTO (Làm phẳng liên kết).
@@ -211,7 +196,6 @@ public class NhanVienService {
         dto.setChuyenMon(entity.getChuyenMon());
         dto.setBangCap(entity.getBangCap());
 
-        // "Làm phẳng" các đối tượng liên quan (Cần kiểm tra null)
         if (entity.getTaiKhoan() != null) {
             dto.setTaiKhoanId(entity.getTaiKhoan().getId());
         }
@@ -225,12 +209,10 @@ public class NhanVienService {
 
     /**
      * Chuyển NhanVienDTO sang NhanVien (Entity) để lưu CSDL.
-     * Hàm này cần các đối tượng (TaiKhoan, Khoa) đã được Service lấy từ CSDL.
      */
     private NhanVien toEntity(NhanVienDTO dto, TaiKhoan taiKhoan, Khoa khoa) {
         NhanVien entity = new NhanVien();
         
-        // Không set ID (vì là tạo mới)
         entity.setHoTen(dto.getHoTen());
         entity.setNgaySinh(dto.getNgaySinh());
         entity.setGioiTinh(dto.getGioiTinh());
@@ -239,11 +221,9 @@ public class NhanVienService {
         entity.setChuyenMon(dto.getChuyenMon());
         entity.setBangCap(dto.getBangCap());
         
-        // Gán các đối tượng Entity liên quan
         entity.setTaiKhoan(taiKhoan);
         entity.setKhoa(khoa);
         
         return entity;
     }
 }
->>>>>>> a0f9334e0a4081821c2e291c1fc282813bc26fbc
