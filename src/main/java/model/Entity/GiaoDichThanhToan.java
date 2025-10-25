@@ -14,7 +14,7 @@ public class GiaoDichThanhToan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private int id;
 
     @Column(name = "so_tien", precision = 15, scale = 2, nullable = false)
     private BigDecimal soTien;
@@ -36,11 +36,11 @@ public class GiaoDichThanhToan {
     }
 
     // --- Getters and Setters ---
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

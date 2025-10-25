@@ -50,7 +50,8 @@ public class PhongBenhService {
     public boolean updatePhongBenh(PhongBenhDTO dto) {
         try {
             // Kiểm tra xem phòng có tồn tại không
-            PhongBenh existingPhong = phongBenhDAO.getPhongBenhById(dto.getId());
+            // Giả sử dto.getId() trả về int và DAO nhận int
+            PhongBenh existingPhong = phongBenhDAO.getPhongBenhById(dto.getId()); 
             if (existingPhong == null) {
                 System.err.println("Không tìm thấy phòng để cập nhật.");
                 return false;
@@ -79,8 +80,9 @@ public class PhongBenhService {
 
     /**
      * Lấy 1 phòng bệnh bằng ID
+     * THAY ĐỔI: Sử dụng int
      */
-    public PhongBenhDTO getPhongBenhById(long id) {
+    public PhongBenhDTO getPhongBenhById(int id) {
         PhongBenh entity = phongBenhDAO.getPhongBenhById(id);
         return convertToDTO(entity);
     }
@@ -103,8 +105,9 @@ public class PhongBenhService {
     
     /**
      * Lấy tất cả phòng bệnh theo Khoa
+     * THAY ĐỔI: Sử dụng int
      */
-    public List<PhongBenhDTO> getPhongBenhByKhoa(long khoaId) {
+    public List<PhongBenhDTO> getPhongBenhByKhoa(int khoaId) {
         List<PhongBenh> entities = phongBenhDAO.getPhongBenhByKhoa(khoaId);
         
         // **SỬ DỤNG VÒNG LẶP FOR**
@@ -124,14 +127,14 @@ public class PhongBenhService {
         if (entity == null) return null;
 
         PhongBenhDTO dto = new PhongBenhDTO();
-        dto.setId(entity.getId());
+        dto.setId(entity.getId()); // int sang int
         dto.setTenPhong(entity.getTenPhong());
         dto.setLoaiPhong(entity.getLoaiPhong());
         dto.setSucChua(entity.getSucChua());
         
         // Đã JOIN FETCH trong DAO nên không lo LazyException
         if (entity.getKhoa() != null) {
-            dto.setKhoaId(entity.getKhoa().getId());
+            dto.setKhoaId(entity.getKhoa().getId()); // int sang int
             dto.setTenKhoa(entity.getKhoa().getTenKhoa()); // Thêm tên khoa
         }
         
@@ -144,25 +147,25 @@ public class PhongBenhService {
 
         PhongBenh entity = new PhongBenh();
         
-        // Nếu là update (có ID), nên lấy entity cũ
-        if (dto.getId() != null) {
-             // Tải entity hiện tại để Hibernate quản lý việc cập nhật
-             // Dùng getPhongBenhById sẽ bị JOIN FETCH, dùng session.get của KhoaDAO là đủ
-             // Tạm thời dùng cách đơn giản:
+        // THAY ĐỔI: Kiểm tra != 0 thay vì != null
+        // Giả định 0 nghĩa là "mới" và không cần set
+        if (dto.getId() != 0) {
              entity.setId(dto.getId());
         }
-       
+        
         entity.setTenPhong(dto.getTenPhong());
         entity.setLoaiPhong(dto.getLoaiPhong());
         entity.setSucChua(dto.getSucChua());
 
         // Lấy Khoa
-        if (dto.getKhoaId() == null) {
+        // THAY ĐỔI: Kiểm tra == 0 thay vì == null
+        if (dto.getKhoaId() == 0) {
              System.err.println("DTO thiếu khoaId.");
             return null;
         }
         
-        Khoa khoa = khoaDAO.getKhoaById(dto.getKhoaId());
+        // Giả sử DAO đã cập nhật
+        Khoa khoa = khoaDAO.getById(dto.getKhoaId()); 
         if (khoa == null) {
             System.err.println("Không tìm thấy Khoa ID: " + dto.getKhoaId());
             return null; // Khoa không tồn tại

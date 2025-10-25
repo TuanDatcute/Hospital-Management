@@ -28,7 +28,7 @@ public class GiaoDichThanhToanDAO {
     }
 
     // Lấy tất cả giao dịch của một hóa đơn
-    public List<GiaoDichThanhToan> getGiaoDichByHoaDonId(long hoaDonId) {
+    public List<GiaoDichThanhToan> getGiaoDichByHoaDonId(int hoaDonId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // Dùng JOIN FETCH để tải HoaDon, tránh LazyInitializationException
             Query<GiaoDichThanhToan> query = session.createQuery(
@@ -46,7 +46,7 @@ public class GiaoDichThanhToanDAO {
     }
 
     // (Tùy chọn) Lấy một giao dịch bằng ID
-    public GiaoDichThanhToan getGiaoDichById(long id) {
+    public GiaoDichThanhToan getGiaoDichById(int id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(GiaoDichThanhToan.class, id);
         } catch (Exception e) {

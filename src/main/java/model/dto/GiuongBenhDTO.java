@@ -3,14 +3,14 @@ package model.dto;
 
 public class GiuongBenhDTO {
     
-    private Long id;
+    private int id;
     private String tenGiuong;
     private String trangThai;
     
-    private Long phongBenhId;
+    private int phongBenhId;
     private String tenPhong; // (Thêm) Để hiển thị
     
-    private Long benhNhanId; // Có thể null
+    private int benhNhanId; // Có thể null
     private String tenBenhNhan; // (Thêm) Để hiển thị, có thể null
 
     // --- Constructors ---
@@ -18,11 +18,11 @@ public class GiuongBenhDTO {
     }
 
     // --- Getters and Setters ---
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -42,11 +42,11 @@ public class GiuongBenhDTO {
         this.trangThai = trangThai;
     }
 
-    public Long getPhongBenhId() {
+    public int getPhongBenhId() {
         return phongBenhId;
     }
 
-    public void setPhongBenhId(Long phongBenhId) {
+    public void setPhongBenhId(int phongBenhId) {
         this.phongBenhId = phongBenhId;
     }
 
@@ -58,11 +58,11 @@ public class GiuongBenhDTO {
         this.tenPhong = tenPhong;
     }
 
-    public Long getBenhNhanId() {
+    public int getBenhNhanId() {
         return benhNhanId;
     }
 
-    public void setBenhNhanId(Long benhNhanId) {
+    public void setBenhNhanId(int benhNhanId) {
         this.benhNhanId = benhNhanId;
     }
 

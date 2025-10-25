@@ -51,7 +51,7 @@ public class ThongBaoDAO {
     }
 
     // Lấy thông báo bằng ID
-    public ThongBao getThongBaoById(long id) {
+    public ThongBao getThongBaoById(int id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(ThongBao.class, id);
         } catch (Exception e) {
@@ -61,7 +61,7 @@ public class ThongBaoDAO {
     }
 
     // Lấy tất cả thông báo của một tài khoản cụ thể
-    public List<ThongBao> getThongBaoByTaiKhoanId(long taiKhoanId) {
+    public List<ThongBao> getThongBaoByTaiKhoanId(int taiKhoanId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // Sử dụng HQL (Hibernate Query Language)
             Query<ThongBao> query = session.createQuery(
@@ -77,7 +77,7 @@ public class ThongBaoDAO {
     }
     
     // Lấy các thông báo chưa đọc của một tài khoản
-    public List<ThongBao> getThongBaoChuaDocByTaiKhoanId(long taiKhoanId) {
+    public List<ThongBao> getThongBaoChuaDocByTaiKhoanId(int taiKhoanId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<ThongBao> query = session.createQuery(
                 "FROM ThongBao WHERE taiKhoan.id = :taiKhoanId AND daDoc = false ORDER BY thoiGianGui DESC", 
