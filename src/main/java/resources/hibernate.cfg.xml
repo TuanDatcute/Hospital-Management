@@ -35,6 +35,6 @@
         <mapping class="model.Entity.HoaDon"/>         
         <mapping class="model.Entity.ChiDinhDichVu"/>  
         <mapping class="model.Entity.GiaoDichThanhToan"/> 
-        <mapping class="model.Entity.ChiTietDonThuoc"/>   
+        <mapping class="model.Entity.ChiTietDonThuoc"/>  
     </session-factory>
 </hibernate-configuration>
