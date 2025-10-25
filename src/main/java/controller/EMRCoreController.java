@@ -10,11 +10,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.ValidationException;
 import model.dto.BenhNhanDTO;
+import model.dto.LichHenDTO;
 import model.dto.NhanVienDTO;
 import model.dto.PhieuKhamBenhDTO;
 import service.BenhNhanService;   // Import các Service cần thiết
+import service.LichHenService;
 import service.NhanVienService;
 import service.PhieuKhamBenhService;
 
@@ -34,6 +35,7 @@ public class EMRCoreController extends HttpServlet {
     private final PhieuKhamBenhService phieuKhamService = new PhieuKhamBenhService();
     private final BenhNhanService benhNhanService = new BenhNhanService();
     private final NhanVienService nhanVienService = new NhanVienService();
+    private final LichHenService lichHenService = new LichHenService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -123,6 +125,11 @@ public class EMRCoreController extends HttpServlet {
                 newEncounterDTO.setThoiGianKham(LocalDateTime.parse(thoiGianKhamStr));
             }
 
+            String ngayTaiKhamStr = request.getParameter("ngayTaiKham");
+            if (thoiGianKhamStr != null && !thoiGianKhamStr.isEmpty()) {
+                newEncounterDTO.setThoiGianKham(LocalDateTime.parse(thoiGianKhamStr));
+            }
+
             String nhietDoStr = request.getParameter("nhietDo");
             if (nhietDoStr != null && !nhietDoStr.isEmpty()) {
                 newEncounterDTO.setNhietDo(new BigDecimal(nhietDoStr));
@@ -132,7 +139,16 @@ public class EMRCoreController extends HttpServlet {
             if (nhipTimStr != null && !nhipTimStr.isEmpty()) {
                 newEncounterDTO.setNhipTim(Integer.parseInt(nhipTimStr));
             }
-
+            String nhipThoStr = request.getParameter("nhipTho");
+            if (nhipTimStr != null && !nhipTimStr.isEmpty()) {
+                newEncounterDTO.setNhipTho(Integer.parseInt(nhipThoStr));
+            }
+            
+             String lichHenStr = request.getParameter("lichHenId");
+            if (lichHenStr != null && !lichHenStr.isEmpty()) {
+                newEncounterDTO.setLichHenId(Integer.parseInt(lichHenStr));
+            }
+            
             newEncounterDTO.setBenhNhanId(Integer.parseInt(request.getParameter("benhNhanId")));
             newEncounterDTO.setBacSiId(Integer.parseInt(request.getParameter("bacSiId")));
 
@@ -143,14 +159,14 @@ public class EMRCoreController extends HttpServlet {
             request.setAttribute("SUCCESS_MESSAGE", "Tạo phiếu khám thành công! ID: " + result.getId());
             return SUCCESS_PAGE;
 
-        } catch (ValidationException e) {
+        } catch (IllegalArgumentException e) {
             // Bắt lỗi nghiệp vụ (do người dùng nhập sai)
             log("Lỗi nghiệp vụ khi tạo phiếu khám: " + e.getMessage());
             request.setAttribute("ERROR_MESSAGE", e.getMessage());
             request.setAttribute("ENCOUNTER_DATA", newEncounterDTO); // Gửi lại dữ liệu đã nhập
             loadCreateFormDependencies(request); // Tải lại dữ liệu cho dropdown
             return CREATE_ENCOUNTER_PAGE;
-        } catch (NumberFormatException | DateTimeParseException e) {
+        } catch (DateTimeParseException e) {
             // Bắt lỗi định dạng
             log("Lỗi định dạng dữ liệu: " + e.getMessage());
             request.setAttribute("ERROR_MESSAGE", "Dữ liệu ngày tháng hoặc số không hợp lệ.");
@@ -173,7 +189,9 @@ public class EMRCoreController extends HttpServlet {
         try {
             List<BenhNhanDTO> danhSachBenhNhan = benhNhanService.getAllBenhNhan();
             List<NhanVienDTO> danhSachBacSi = nhanVienService.findDoctorsBySpecialty();
+            List<LichHenDTO> danhSachLichHen = lichHenService.getAllLichHen();
 
+            request.setAttribute("danhSachLichHen", danhSachLichHen);
             request.setAttribute("danhSachBenhNhan", danhSachBenhNhan);
             request.setAttribute("danhSachBacSi", danhSachBacSi);
         } catch (Exception e) {

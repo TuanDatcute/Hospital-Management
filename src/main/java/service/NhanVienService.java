@@ -169,7 +169,7 @@ public class NhanVienService {
      * Dịch vụ tìm tất cả nhân viên có chuyên môn là "Bác sĩ".
      */
     public List<NhanVienDTO> findDoctorsBySpecialty() {
-        List<NhanVien> entities = nhanVienDAO.findDoctorsBySpecialty("Bác sĩ");
+        List<NhanVien> entities = nhanVienDAO.findDoctorsBySpecialty();
 
         if (entities == null) {
             return Collections.emptyList();

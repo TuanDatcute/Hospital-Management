@@ -45,7 +45,7 @@ public class BenhNhan {
     private String tienSuBenh;
 
     @OneToOne(fetch = FetchType.LAZY, optional = true) 
-    @JoinColumn(name = "tai_khoan_id", referencedColumnName = "id", nullable = true, unique = true)
+    @JoinColumn(name = "tai_khoan_id", referencedColumnName = "id", nullable = true)
     private TaiKhoan taiKhoan;
     
     // Constructors

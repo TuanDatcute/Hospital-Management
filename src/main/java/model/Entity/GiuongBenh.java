@@ -2,6 +2,7 @@
 package model.Entity;
 
 import javax.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "GiuongBenh")
@@ -16,7 +17,8 @@ public class GiuongBenh {
     private String tenGiuong; // 'Giường 01'
 
     @Column(name = "trang_thai", length = 50, nullable = false)
-    private String trangThai; // 'TRONG', 'DANG_SU_DUNG', 'DANG_DON_DEP', 'BAO_TRI'
+    @ColumnDefault("'TRONG'")
+    private String trangThai ; // 'TRONG', 'DANG_SU_DUNG', 'DANG_DON_DEP', 'BAO_TRI'
 
     // Nhiều giường bệnh thuộc MỘT phòng bệnh
     @ManyToOne(fetch = FetchType.LAZY)
