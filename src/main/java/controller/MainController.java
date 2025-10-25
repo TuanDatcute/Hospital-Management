@@ -45,7 +45,7 @@ public class MainController extends HttpServlet {
         // 2. Nhóm các action cho từng controller
         String[] userActions = {"login", "logout", "searchUser"};
 
-        String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "addVitals"};
+        String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateForm"};
 
         // 3. Điều hướng dựa trên action
         if (action == null) {
