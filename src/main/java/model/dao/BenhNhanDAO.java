@@ -10,6 +10,7 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import util.HibernateUtil;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,12 +21,13 @@ public class BenhNhanDAO {
 
     /**
      * Thêm một bệnh nhân mới vào CSDL.
+     *
      * @param benhNhan Đối tượng BenhNhan (Entity)
      * @return Đối tượng BenhNhan đã được lưu (có ID) hoặc null nếu lỗi.
      */
     public BenhNhan create(BenhNhan benhNhan) {
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.save(benhNhan);
             transaction.commit();
@@ -41,12 +43,13 @@ public class BenhNhanDAO {
 
     /**
      * Cập nhật thông tin một bệnh nhân.
+     *
      * @param benhNhan Đối tượng BenhNhan (Entity) đã được thay đổi.
      * @return true nếu cập nhật thành công, false nếu lỗi.
      */
     public boolean update(BenhNhan benhNhan) {
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.update(benhNhan);
             transaction.commit();
@@ -62,11 +65,12 @@ public class BenhNhanDAO {
 
     /**
      * Lấy thông tin bệnh nhân bằng ID (không tải thông tin Tài Khoản).
+     *
      * @param id ID của bệnh nhân
      * @return Đối tượng BenhNhan hoặc null nếu không tìm thấy.
      */
     public BenhNhan getById(int id) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             // session.get() là cách lấy nhanh bằng khóa chính
             return session.get(BenhNhan.class, id);
         } catch (Exception e) {
@@ -74,15 +78,16 @@ public class BenhNhanDAO {
             return null;
         }
     }
-    
+
     /**
-     * Lấy thông tin bệnh nhân bằng ID (tải kèm thông tin Tài Khoản).
-     * Dùng khi cần chuyển đổi sang DTO.
+     * Lấy thông tin bệnh nhân bằng ID (tải kèm thông tin Tài Khoản). Dùng khi
+     * cần chuyển đổi sang DTO.
+     *
      * @param id ID của bệnh nhân
      * @return Đối tượng BenhNhan (đã tải lazy relation) hoặc null.
      */
     public BenhNhan getByIdWithRelations(int id) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             // Dùng HQL với LEFT JOIN FETCH để tải cả TaiKhoan (vì nó là nullable)
             String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan WHERE bn.id = :id";
             Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
@@ -96,10 +101,11 @@ public class BenhNhanDAO {
 
     /**
      * Lấy tất cả bệnh nhân trong CSDL (không tải Tài Khoản).
+     *
      * @return Một danh sách (List) các đối tượng BenhNhan.
      */
     public List<BenhNhan> getAll() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM BenhNhan";
             Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
             return query.list();
@@ -108,13 +114,14 @@ public class BenhNhanDAO {
             return new ArrayList<>();
         }
     }
-    
+
     /**
      * Lấy tất cả bệnh nhân trong CSDL (tải kèm thông tin Tài Khoản).
+     *
      * @return Danh sách BenhNhan (đã tải lazy relations).
      */
     public List<BenhNhan> getAllWithRelations() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan";
             Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
             return query.list();
@@ -126,6 +133,7 @@ public class BenhNhanDAO {
 
     /**
      * Kiểm tra xem Mã Bệnh Nhân đã tồn tại chưa.
+     *
      * @param maBenhNhan Mã bệnh nhân cần kiểm tra
      * @return true nếu đã tồn tại, false nếu chưa.
      */
@@ -133,7 +141,7 @@ public class BenhNhanDAO {
         if (maBenhNhan == null || maBenhNhan.trim().isEmpty()) {
             return false;
         }
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "SELECT count(bn.id) FROM BenhNhan bn WHERE bn.maBenhNhan = :ma";
             Query<Long> query = session.createQuery(hql, Long.class);
             query.setParameter("ma", maBenhNhan);
@@ -146,11 +154,12 @@ public class BenhNhanDAO {
 
     /**
      * Kiểm tra xem TaiKhoan ID đã được liên kết với Bệnh nhân nào chưa.
+     *
      * @param taiKhoanId ID tài khoản cần kiểm tra
      * @return true nếu đã được liên kết, false nếu chưa.
      */
     public boolean isTaiKhoanIdLinked(int taiKhoanId) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "SELECT count(bn.id) FROM BenhNhan bn WHERE bn.taiKhoan.id = :tkId";
             Query<Long> query = session.createQuery(hql, Long.class);
             query.setParameter("tkId", taiKhoanId);
@@ -160,9 +169,10 @@ public class BenhNhanDAO {
             return true; // Failsafe
         }
     }
-    
+
     /**
      * Tìm bệnh nhân bằng Mã Bệnh Nhân.
+     *
      * @param maBenhNhan Mã bệnh nhân
      * @return Đối tượng BenhNhan (tải kèm TaiKhoan) hoặc null.
      */
@@ -170,24 +180,25 @@ public class BenhNhanDAO {
         if (maBenhNhan == null || maBenhNhan.trim().isEmpty()) {
             return null;
         }
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan WHERE bn.maBenhNhan = :ma";
             Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
             query.setParameter("ma", maBenhNhan);
-            return query.uniqueResult(); 
+            return query.uniqueResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
-    
+
     /**
      * Tìm bệnh nhân bằng ID Tài khoản.
+     *
      * @param taiKhoanId ID tài khoản
      * @return Đối tượng BenhNhan (tải kèm TaiKhoan) hoặc null.
      */
     public BenhNhan findByTaiKhoanId(int taiKhoanId) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan WHERE bn.taiKhoan.id = :tkId";
             Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
             query.setParameter("tkId", taiKhoanId);
@@ -195,6 +206,38 @@ public class BenhNhanDAO {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * Lấy tất cả bệnh nhân CHƯA được gán vào giường bệnh. Tải sẵn TaiKhoan để
+     * tránh lỗi N+1.
+     *
+     * CẬP NHẬT: Dùng subquery vì BenhNhan Entity không có liên kết ngược tới
+     * GiuongBenh.
+     */
+    public List<BenhNhan> getBenhNhanChuaCoGiuongWithRelations() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+
+            // Truy vấn này tìm tất cả BenhNhan (bn)
+            // mà ID (bn.id) KHÔNG NẰM TRONG danh sách các ID bệnh nhân
+            // đã có trong bảng GiuongBenh (gb.benhNhan.id).
+            Query<BenhNhan> query = session.createQuery(
+                    "FROM BenhNhan bn "
+                    + "LEFT JOIN FETCH bn.taiKhoan "
+                    + // Eager load TaiKhoan
+                    "WHERE bn.id NOT IN ( "
+                    + "    SELECT gb.benhNhan.id "
+                    + "    FROM GiuongBenh gb "
+                    + "    WHERE gb.benhNhan IS NOT NULL "
+                    + ") "
+                    + "ORDER BY bn.hoTen", // Sắp xếp theo tên
+                    BenhNhan.class
+            );
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList(); // Trả về danh sách rỗng nếu có lỗi
         }
     }
 }
