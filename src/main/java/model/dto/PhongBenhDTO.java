@@ -1,27 +1,13 @@
 // path: com/dto/PhongBenhDTO.java
 package model.dto;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
 /**
  * Lớp này là một Entity, đại diện cho bảng 'PhongBenh' trong cơ sở dữ liệu.
  *
  * @author quang
  */
-@Entity
 
-@Table(name = "PhongBenh") // Ánh xạ tới bảng PhongBenh
 public class PhongBenhDTO {
     
     private int id;

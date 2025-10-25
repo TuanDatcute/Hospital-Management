@@ -161,6 +161,20 @@ public class BenhNhanService {
                        .map(this::toDTO)
                        .collect(Collectors.toList());
     }
+    
+    /**
+     * Lấy tất cả bệnh nhân CHƯA được gán giường.
+     */
+    public List<BenhNhanDTO> getBenhNhanChuaCoGiuong() {
+        // 1. Gọi DAO
+        // (Hàm này cần LEFT JOIN FETCH TaiKhoan để toDTO hoạt động)
+        List<BenhNhan> entities = benhNhanDAO.getBenhNhanChuaCoGiuongWithRelations();
+        
+        // 2. Chuyển đổi sang DTO
+        return entities.stream()
+                       .map(this::toDTO)
+                       .collect(Collectors.toList());
+    }
 
     // --- CÁC HÀM MAPPER (Chuyển đổi DTO <-> Entity) ---
 
