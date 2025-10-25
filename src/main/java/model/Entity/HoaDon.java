@@ -37,7 +37,7 @@ public class HoaDon {
 
     // Một hóa đơn chỉ thuộc 1 phiếu khám (giả định)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "phieu_kham_Benh_id", unique = true, nullable = false)
+    @JoinColumn(name = "phieu_kham_benh_id", unique = true, nullable = false)
     private PhieuKhamBenh phieuKhamBenh;
 
     // --- Constructors ---

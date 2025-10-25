@@ -27,11 +27,10 @@ public class DichVu {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "ten_dich_vu", nullable = false, unique = true)
+    @Column(name = "ten_dich_vu", nullable = false, unique = true, columnDefinition = "NVARCHAR(255)")
     private String tenDichVu;
 
-    @Lob
-    @Column(name = "mo_ta")
+    @Column(name = "mo_ta",columnDefinition = "NVARCHAR(MAX)")
     private String moTa;
 
     @Column(name = "don_gia", nullable = false)

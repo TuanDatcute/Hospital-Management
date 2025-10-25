@@ -7,6 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "TaiKhoan")
@@ -27,14 +29,16 @@ public class TaiKhoan {
     private String email;
 
     @Column(name = "vai_tro", nullable = false)
-    private String vaiTro; 
+    private String vaiTro;
 
     @Column(name = "trang_thai", nullable = false)
-    private String trangThai; 
+    private String trangThai;
 
+    @CreationTimestamp //  TỰ ĐỘNG GÁN KHI TẠO MỚI
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp //  TỰ ĐỘNG GÁN KHI CẬP NHẬT
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 

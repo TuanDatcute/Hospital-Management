@@ -31,7 +31,7 @@ public class ChiTietDonThuoc {
     @Column(name = "so_luong")
     private int soLuong;
 
-    @Column(name = "lieu_dung",nullable = false)
+    @Column(name = "lieu_dung",nullable = false,columnDefinition = "NVARCHAR(255)")
     private String lieuDung;
 
     @ManyToOne(fetch = FetchType.LAZY)

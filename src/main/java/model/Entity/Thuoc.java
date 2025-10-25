@@ -26,13 +26,13 @@ public class Thuoc {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "ten_thuoc", nullable = false, unique = true)
+    @Column(name = "ten_thuoc", nullable = false, unique = true,columnDefinition = "NVARCHAR(255)")
     private String tenThuoc;
 
-    @Column(name = "hoat_chat")
+    @Column(name = "hoat_chat",columnDefinition = "NVARCHAR(255)")
     private String hoatChat;
 
-    @Column(name = "don_vi_tinh", nullable = false)
+    @Column(name = "don_vi_tinh", nullable = false,columnDefinition = "NVARCHAR(50)")
     private String donViTinh;
 
     @Column(name = "don_gia", nullable = false)

@@ -35,19 +35,19 @@ public class PhieuKhamBenh {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "ma_phieu_kham", nullable = false, unique = true)
+    @Column(name = "ma_phieu_kham", nullable = false, unique = true,columnDefinition = "NVARCHAR(50)")
     private String maPhieuKham;
 
     @Column(name = "thoi_gian_kham", nullable = false)
     private LocalDateTime thoiGianKham;
 
-    @Column(name = "trieu_chung")
+    @Column(name = "trieu_chung", columnDefinition = "NVARCHAR(MAX)")
     private String trieuChung;
 
     @Column(name = "nhiet_do")
     private BigDecimal nhietDo;
 
-    @Column(name = "huyet_ap")
+    @Column(name = "huyet_ap",columnDefinition = "NVARCHAR(50)")
     private String huyetAp;
 
     @Column(name = "nhip_tim")
@@ -56,17 +56,17 @@ public class PhieuKhamBenh {
     @Column(name = "nhip_tho")
     private int nhipTho;
 
-    @Column(name = "chan_doan")
+    @Column(name = "chan_doan", columnDefinition = "NVARCHAR(MAX)")
     private String chanDoan;
     
-    @Column(name = "ket_luan")
+    @Column(name = "ket_luan", columnDefinition = "NVARCHAR(MAX)")
     private String ketLuan;
     
     @Column(name = "ngay_tai_kham")
     private LocalDateTime ngayTaiKham; // Ngày hẹn tái khám
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "benh_nhan_id", nullable = false)
+    @JoinColumn(name = "benh_nhan_id", nullable = false )
     private BenhNhan benhNhan;
     
     @ManyToOne(fetch = FetchType.LAZY) 

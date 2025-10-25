@@ -29,10 +29,10 @@ public class ChiDinhDichVu {
     private int id;
 
     @Lob
-    @Column(name = "ket_qua")
+    @Column(name = "ket_qua",columnDefinition = "NVARCHAR(50)")
     private String ketQua;
 
-    @Column(name = "trang_thai", nullable = false)
+    @Column(name = "trang_thai", nullable = false,columnDefinition = "NVARCHAR(50)")
     private String trangThai;
 
     @ManyToOne(fetch = FetchType.LAZY)

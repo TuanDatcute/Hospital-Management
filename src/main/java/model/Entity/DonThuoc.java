@@ -34,8 +34,7 @@ public class DonThuoc {
     @Column(name = "ngay_ke_don", nullable = false)
     private LocalDateTime ngayKeDon;
 
-    @Lob
-    @Column(name = "loi_dan")
+    @Column(name = "loi_dan",columnDefinition = "NVARCHAR(MAX)")
     private String loiDan;
 
     @OneToOne

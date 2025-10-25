@@ -3,6 +3,7 @@ package model.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 /**
@@ -19,7 +20,7 @@ public class PhieuKhamBenhDTO {
     private String trieuChung;
     private String chanDoan;
     private String ketLuan;
-    private LocalDate ngayTaiKham;
+    private LocalDateTime ngayTaiKham;
 
     // --- Chỉ số sinh tồn ---
     private BigDecimal nhietDo;
@@ -34,9 +35,12 @@ public class PhieuKhamBenhDTO {
     private String tenBacSi;    // Tốt! Giữ lại để tiện hiển thị
     private Integer lichHenId;
 
-    // ✨ SỬA LỖI: Thay thế các đối tượng Entity bằng DTO tương ứng ✨
     private DonThuocDTO donThuoc;
     private Set<ChiDinhDichVuDTO> danhSachChiDinh;
+
+    //cho jsp format thời gian 
+    private String formattedThoiGianKham = getThoiGianKhamFormatted();
+    private String formattedNgayTaiKham = getNgayTaiKhamFormatted();
 
     // --- Constructors ---
     public PhieuKhamBenhDTO() {
@@ -74,11 +78,11 @@ public class PhieuKhamBenhDTO {
         this.ketLuan = ketLuan;
     }
 
-    public LocalDate getNgayTaiKham() {
+    public LocalDateTime getNgayTaiKham() {
         return ngayTaiKham;
     }
 
-    public void setNgayTaiKham(LocalDate ngayTaiKham) {
+    public void setNgayTaiKham(LocalDateTime ngayTaiKham) {
         this.ngayTaiKham = ngayTaiKham;
     }
 
@@ -154,7 +158,7 @@ public class PhieuKhamBenhDTO {
         this.lichHenId = lichHenId;
     }
 
-    public PhieuKhamBenhDTO(String maPhieuKham, LocalDateTime thoiGianKham, String trieuChung, String chanDoan, String ketLuan, LocalDate ngayTaiKham, BigDecimal nhietDo, String huyetAp, Integer nhipTim, Integer nhipTho, int benhNhanId, String tenBenhNhan, int bacSiId, String tenBacSi, Integer lichHenId, DonThuocDTO donThuoc, Set<ChiDinhDichVuDTO> danhSachChiDinh) {
+    public PhieuKhamBenhDTO(String maPhieuKham, LocalDateTime thoiGianKham, String trieuChung, String chanDoan, String ketLuan, LocalDateTime ngayTaiKham, BigDecimal nhietDo, String huyetAp, Integer nhipTim, Integer nhipTho, int benhNhanId, String tenBenhNhan, int bacSiId, String tenBacSi, Integer lichHenId, DonThuocDTO donThuoc, Set<ChiDinhDichVuDTO> danhSachChiDinh) {
         this.maPhieuKham = maPhieuKham;
         this.thoiGianKham = thoiGianKham;
         this.trieuChung = trieuChung;
@@ -206,5 +210,29 @@ public class PhieuKhamBenhDTO {
 
     public void setDanhSachChiDinh(Set<ChiDinhDichVuDTO> danhSachChiDinh) {
         this.danhSachChiDinh = danhSachChiDinh;
+    }
+
+    public String getFormattedThoiGianKham() {
+        return formattedThoiGianKham;
+    }
+
+    public String getFormattedNgayTaiKham() {
+        return formattedNgayTaiKham;
+    }
+
+    public String getThoiGianKhamFormatted() {
+        if (this.thoiGianKham == null) {
+            return "";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        return this.thoiGianKham.format(formatter);
+    }
+
+    public String getNgayTaiKhamFormatted() {
+        if (this.ngayTaiKham == null) {
+            return "";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        return this.ngayTaiKham.format(formatter);
     }
 }

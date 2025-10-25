@@ -1,7 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %> <%-- Thêm thư viện format ngày tháng --%>
-
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -117,8 +115,7 @@
                     <div class="form-group">
                         <label for="thoiGianKham">Thời Gian Khám</label>
                         <%-- Định dạng lại ngày tháng để hiển thị đúng --%>
-                        <fmt:formatDate value="${ENCOUNTER_DATA.thoiGianKham}" pattern="yyyy-MM-dd'T'HH:mm" var="formattedThoiGianKham" />
-                        <input type="datetime-local" id="thoiGianKham" name="thoiGianKham" value="${formattedThoiGianKham}" required>
+                        <input type="datetime-local" id="thoiGianKham" name="thoiGianKham" value="${ENCOUNTER_DATA.formattedThoiGianKham}" required>
                     </div>
 
                     <%-- ✨ NÂNG CẤP: Dùng dropdown thay vì nhập ID --%>
@@ -185,13 +182,21 @@
 
                     <div class="form-group">
                         <label for="ngayTaiKham">Ngày Tái Khám</label>
-                        <fmt:formatDate value="${ENCOUNTER_DATA.ngayTaiKham}" pattern="yyyy-MM-dd'T'HH:mm" var="formattedNgayTaiKham" />
-                        <input type="datetime-local" id="ngayTaiKham" name="ngayTaiKham" value="${formattedNgayTaiKham}">
+                        <input type="datetime-local" id="ngayTaiKham" name="ngayTaiKham" value="${ENCOUNTER_DATA.formattedNgayTaiKham}">
                     </div>
 
+                   
                     <div class="form-group">
-                        <label for="lichHenId">ID Lịch Hẹn (nếu có)</label>
-                        <input type="number" id="lichHenId" name="lichHenId" value="${ENCOUNTER_DATA.lichHenId}">
+                         <label for="lichHenId">ID Lịch Hẹn (nếu có)</label>
+                        <select id="lichHenId" name="lichHenId" >
+                            <option value="">-- Chọn --</option>
+                            <c:forEach var="lichHen" items="${danhSachLichHen}">
+                                <option value="${lichHen.id}" ${ENCOUNTER_DATA.lichHenId == lichHen.id ? 'selected' : ''}>
+                                    ${lichHen.stt} (${lichHen.lyDoKham})
+                                </option>
+                            </c:forEach>
+                        </select>         
+                                         
                     </div>
 
                     <div class="button-group">
