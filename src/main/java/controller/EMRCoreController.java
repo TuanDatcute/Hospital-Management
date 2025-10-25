@@ -4,71 +4,111 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.ValidationException;
+import model.dto.BenhNhanDTO;
+import model.dto.NhanVienDTO;
 import model.dto.PhieuKhamBenhDTO;
-import service.PhieuKhamBenhService; // Import lớp Service
+import service.BenhNhanService;   // Import các Service cần thiết
+import service.NhanVienService;
+import service.PhieuKhamBenhService;
 
 /**
- * Servlet đóng vai trò là Front Controller cho các nghiệp vụ cốt lõi của Bệnh
- * án điện tử (EMR). Nó điều phối các yêu cầu dựa trên tham số 'action'.
+ * Servlet đóng vai trò là Front Controller cho các nghiệp vụ của Bệnh án điện
+ * tử (EMR).
  */
 @WebServlet(name = "EMRCoreController", urlPatterns = {"/EMRCoreController"})
 public class EMRCoreController extends HttpServlet {
 
-    // Khai báo URL cho các trang JSP để dễ quản lý
+    // Khai báo URL cho các trang JSP 
     private static final String ERROR_PAGE = "error.jsp";
     private static final String SUCCESS_PAGE = "danhSachPhieuKham.jsp";
     private static final String CREATE_ENCOUNTER_PAGE = "PhieuKhamBenh.jsp";
 
-    // Khởi tạo Service ở cấp lớp để tái sử dụng trong các phương thức
+    // Khởi tạo các Service cần thiết ở cấp lớp để tái sử dụng
     private final PhieuKhamBenhService phieuKhamService = new PhieuKhamBenhService();
+    private final BenhNhanService benhNhanService = new BenhNhanService();
+    private final NhanVienService nhanVienService = new NhanVienService();
 
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         response.setContentType("text/html;charset=UTF-8");
-        request.setCharacterEncoding("UTF-8"); // Đảm bảo đọc tiếng Việt
+        request.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
-        String url = ERROR_PAGE; // Mặc định là trang lỗi
+        String url = ERROR_PAGE;
+
+        try {
+            if (action == null || action.isEmpty()) {
+                // Nếu không có action, có thể chuyển về trang chủ
+                // url = "home.jsp";
+                throw new Exception("Hành động không được chỉ định.");
+            }
+
+            switch (action) {
+                case "showCreateForm":
+                    url = showCreateForm(request);
+                    break;
+                default:
+                    request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho phương thức GET.");
+            }
+        } catch (Exception e) {
+            log("Lỗi tại EMRCoreController (doGet): " + e.getMessage(), e);
+            request.setAttribute("ERROR_MESSAGE", "Đã có lỗi xảy ra: " + e.getMessage());
+        } finally {
+            request.getRequestDispatcher(url).forward(request, response);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
+
+        String action = request.getParameter("action");
+        String url = ERROR_PAGE;
 
         try {
             if (action == null || action.isEmpty()) {
                 throw new Exception("Hành động không được chỉ định.");
             }
 
-            // Sử dụng switch-case để gọi phương thức xử lý tương ứng
             switch (action) {
                 case "createEncounter":
-                    url = createEncounter(request, response);
+                    url = createEncounter(request);
                     break;
-                // Bạn có thể thêm các case khác ở đây
-                // case "updateEncounter":
-                //     url = updateEncounter(request, response);
-                //     break;
                 default:
-                    request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ.");
+                    request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho phương thức POST.");
             }
         } catch (Exception e) {
-            log("Lỗi tại EMRCoreController: " + e.getMessage(), e);
+            log("Lỗi tại EMRCoreController (doPost): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Đã có lỗi nghiêm trọng xảy ra: " + e.getMessage());
         } finally {
-            // Chuyển hướng đến trang đã được xác định
             request.getRequestDispatcher(url).forward(request, response);
         }
     }
 
     /**
-     * Xử lý logic tạo mới một Phiếu Khám Bệnh.
-     *
-     * @param request HttpServletRequest
-     * @param response HttpServletResponse
-     * @return URL của trang JSP để forward tới.
+     * Chuẩn bị dữ liệu và hiển thị form tạo phiếu khám.
      */
-    private String createEncounter(HttpServletRequest request, HttpServletResponse response) {
+    private String showCreateForm(HttpServletRequest request) {
+        loadCreateFormDependencies(request);
+        return CREATE_ENCOUNTER_PAGE;
+    }
+
+    /**
+     * Xử lý logic tạo mới một Phiếu Khám Bệnh.
+     */
+    private String createEncounter(HttpServletRequest request) {
         PhieuKhamBenhDTO newEncounterDTO = new PhieuKhamBenhDTO();
         try {
             // 1. Lấy dữ liệu từ request và đóng gói vào DTO
@@ -78,7 +118,6 @@ public class EMRCoreController extends HttpServlet {
             newEncounterDTO.setChanDoan(request.getParameter("chanDoan"));
             newEncounterDTO.setKetLuan(request.getParameter("ketLuan"));
 
-            // 2. Chuyển đổi và kiểm tra các kiểu dữ liệu khác
             String thoiGianKhamStr = request.getParameter("thoiGianKham");
             if (thoiGianKhamStr != null && !thoiGianKhamStr.isEmpty()) {
                 newEncounterDTO.setThoiGianKham(LocalDateTime.parse(thoiGianKhamStr));
@@ -94,53 +133,56 @@ public class EMRCoreController extends HttpServlet {
                 newEncounterDTO.setNhipTim(Integer.parseInt(nhipTimStr));
             }
 
-            String nhipThoStr = request.getParameter("nhipTho");
-            if (nhipThoStr != null && !nhipThoStr.isEmpty()) {
-                newEncounterDTO.setNhipTho(Integer.parseInt(nhipThoStr));
-            }
-
-            // Các trường ID bắt buộc
             newEncounterDTO.setBenhNhanId(Integer.parseInt(request.getParameter("benhNhanId")));
             newEncounterDTO.setBacSiId(Integer.parseInt(request.getParameter("bacSiId")));
 
-            // 3. Gọi tầng Service để thực hiện logic nghiệp vụ
+            // 2. Gọi tầng Service để thực hiện logic nghiệp vụ
             PhieuKhamBenhDTO result = phieuKhamService.createEncounter(newEncounterDTO);
 
-            // 4. Xử lý kết quả trả về
-            if (result != null) {
-                request.setAttribute("SUCCESS_MESSAGE", "Tạo phiếu khám thành công! ID phiếu khám là: " + result.getId());
-                return SUCCESS_PAGE;
-            } else {
-                request.setAttribute("ERROR_MESSAGE", "Tạo phiếu khám thất bại. Dữ liệu có thể không hợp lệ.");
-                request.setAttribute("ENCOUNTER_DATA", newEncounterDTO); // Gửi lại dữ liệu đã nhập
-                return CREATE_ENCOUNTER_PAGE;
-            }
+            // 3. Xử lý kết quả thành công
+            request.setAttribute("SUCCESS_MESSAGE", "Tạo phiếu khám thành công! ID: " + result.getId());
+            return SUCCESS_PAGE;
 
-        } catch (NumberFormatException | DateTimeParseException e) {
-            log("Lỗi :" + e.getMessage());
+        } catch (ValidationException e) {
+            // Bắt lỗi nghiệp vụ (do người dùng nhập sai)
+            log("Lỗi nghiệp vụ khi tạo phiếu khám: " + e.getMessage());
             request.setAttribute("ERROR_MESSAGE", e.getMessage());
             request.setAttribute("ENCOUNTER_DATA", newEncounterDTO); // Gửi lại dữ liệu đã nhập
+            loadCreateFormDependencies(request); // Tải lại dữ liệu cho dropdown
+            return CREATE_ENCOUNTER_PAGE;
+        } catch (NumberFormatException | DateTimeParseException e) {
+            // Bắt lỗi định dạng
+            log("Lỗi định dạng dữ liệu: " + e.getMessage());
+            request.setAttribute("ERROR_MESSAGE", "Dữ liệu ngày tháng hoặc số không hợp lệ.");
+            request.setAttribute("ENCOUNTER_DATA", newEncounterDTO); // Gửi lại dữ liệu đã nhập
+            loadCreateFormDependencies(request); // Tải lại dữ liệu cho dropdown
             return CREATE_ENCOUNTER_PAGE;
         } catch (Exception e) {
-            log("Lỗi không xác định trong createEncounter: " + e.getMessage(), e);
-            request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
-            return CREATE_ENCOUNTER_PAGE;
+            // Bắt các lỗi hệ thống khác
+            log("Lỗi hệ thống khi tạo phiếu khám: " + e.getMessage(), e);
+            request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống nghiêm trọng.");
+            return ERROR_PAGE;
+        }
+    }
+
+    /**
+     * Tải các dữ liệu cần thiết cho form tạo phiếu khám (danh sách bệnh nhân,
+     * bác sĩ).
+     */
+    private void loadCreateFormDependencies(HttpServletRequest request) {
+        try {
+            List<BenhNhanDTO> danhSachBenhNhan = benhNhanService.getAllBenhNhan();
+            List<NhanVienDTO> danhSachBacSi = nhanVienService.findDoctorsBySpecialty();
+
+            request.setAttribute("danhSachBenhNhan", danhSachBenhNhan);
+            request.setAttribute("danhSachBacSi", danhSachBacSi);
+        } catch (Exception e) {
+            log("Không thể tải dữ liệu cho form tạo phiếu khám: " + e.getMessage(), e);
+            request.setAttribute("ERROR_MESSAGE", "Không thể tải danh sách bệnh nhân và bác sĩ.");
         }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
     @Override
     public String getServletInfo() {
         return "Servlet điều phối chính cho các chức năng của bệnh án điện tử.";
