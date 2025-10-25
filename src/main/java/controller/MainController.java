@@ -23,6 +23,7 @@ public class MainController extends HttpServlet {
     private static final String LOGIN_PAGE = "login.jsp";
     private static final String USER_CONTROLLER = "UserController";
     private static final String EMRCORE_CONTROLLER = "EMRCoreController";
+    private static final String PHONG_BENH_CONTROLLER = "PhongBenhController";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -46,6 +47,8 @@ public class MainController extends HttpServlet {
         String[] userActions = {"login", "logout", "searchUser"};
 
         String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "addVitals"};
+        
+        String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom"};
 
         // 3. Điều hướng dựa trên action
         if (action == null) {
@@ -54,6 +57,8 @@ public class MainController extends HttpServlet {
             url = USER_CONTROLLER;
         } else if (Arrays.asList(EMRCoreActions).contains(action)) {
             url = EMRCORE_CONTROLLER;
+        } else if (Arrays.asList(PhongBenhActions).contains(action)){
+            url = PHONG_BENH_CONTROLLER;
         }
 
         // 4. Forward đến controller tương ứng
