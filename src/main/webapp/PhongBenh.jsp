@@ -31,7 +31,7 @@
                     <option value="">-- Chọn khoa --</option>
                     <c:forEach var="khoa" items="${khoaList}">
                         <%-- Thêm 'selected' nếu khoaId khớp với khoa của phòng --%>
-                        <option value="${khoa.id}" ${khoa.id == roomToUpdate.khoa.id ? 'selected' : ''}>
+                        <option value="${khoa.id}" ${khoa.id == roomToUpdate.khoaId ? 'selected' : ''}>
                             <c:out value="${khoa.tenKhoa}"/>
                         </option>
                     </c:forEach>
@@ -89,7 +89,7 @@
                     <td><c:out value="${room.tenPhong}"/></td>
                     <td><c:out value="${room.loaiPhong}"/></td>
                     <td>${room.sucChua}</td>
-                    <td><c:out value="${room.khoa.tenKhoa}"/></td>
+                    <td><c:out value="${room.tenKhoa}"/></td>
                     <td>
                         <%-- Link Sửa: Trỏ về MainController với action 'getRoomForUpdate' --%>
                         <a href="MainController?action=getRoomForUpdate&roomId=${room.id}">Sửa</a>

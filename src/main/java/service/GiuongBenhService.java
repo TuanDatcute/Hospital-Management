@@ -1,4 +1,3 @@
-// path: com/service/GiuongBenhService.java
 package service;
 
 import model.dao.BenhNhanDAO;
@@ -156,6 +155,27 @@ public class GiuongBenhService {
                 dtos.add(convertToDTO(entity));
             }
         }
+        return dtos;
+    }
+    
+    /**
+     * Lấy tất cả giường bệnh trong hệ thống
+     */
+    public List<GiuongBenhDTO> getAllGiuong() {
+        // 1. Gọi DAO để lấy tất cả các Entity GiuongBenh
+        // (Giả định bạn đã có hàm getAllGiuong() trong GiuongBenhDAO)
+        List<GiuongBenh> entities = giuongBenhDAO.getAllGiuong(); 
+        
+        // 2. Chuyển đổi danh sách Entity sang danh sách DTO
+        List<GiuongBenhDTO> dtos = new ArrayList<>();
+        for (GiuongBenh entity : entities) {
+            if (entity != null) {
+                // Sử dụng hàm convertToDTO đã có
+                dtos.add(convertToDTO(entity));
+            }
+        }
+        
+        // 3. Trả về danh sách DTO
         return dtos;
     }
 

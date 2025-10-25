@@ -24,6 +24,7 @@ public class MainController extends HttpServlet {
     private static final String USER_CONTROLLER = "UserController";
     private static final String EMRCORE_CONTROLLER = "EMRCoreController";
     private static final String PHONG_BENH_CONTROLLER = "PhongBenhController";
+    private static final String GIUONG_BENH_CONTROLLER = "GiuongBenhController";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,7 +38,6 @@ public class MainController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
 
         // 1. Lấy action từ request
         String action = request.getParameter("action");
@@ -46,9 +46,11 @@ public class MainController extends HttpServlet {
         // 2. Nhóm các action cho từng controller
         String[] userActions = {"login", "logout", "searchUser"};
 
-        String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "addVitals"};
-        
-        String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom"};
+        String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateForm"};
+
+        String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate"};
+
+        String[] GiuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed"};
 
         // 3. Điều hướng dựa trên action
         if (action == null) {
@@ -57,8 +59,10 @@ public class MainController extends HttpServlet {
             url = USER_CONTROLLER;
         } else if (Arrays.asList(EMRCoreActions).contains(action)) {
             url = EMRCORE_CONTROLLER;
-        } else if (Arrays.asList(PhongBenhActions).contains(action)){
+        } else if (Arrays.asList(PhongBenhActions).contains(action)) {
             url = PHONG_BENH_CONTROLLER;
+        } else if (Arrays.asList(GiuongBenhActions).contains(action)) {
+            url = GIUONG_BENH_CONTROLLER;
         }
 
         // 4. Forward đến controller tương ứng

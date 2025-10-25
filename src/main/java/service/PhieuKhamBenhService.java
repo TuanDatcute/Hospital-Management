@@ -102,7 +102,7 @@ public class PhieuKhamBenhService {
         dto.setHuyetAp(entity.getHuyetAp());
         dto.setNhipTim(entity.getNhipTim());
         dto.setNhipTho(entity.getNhipTho());
-        // SỬA LỖI: Gán dữ liệu từ Entity sang DTO
+      
         dto.setChanDoan(entity.getChanDoan());
         dto.setKetLuan(entity.getKetLuan());
 
