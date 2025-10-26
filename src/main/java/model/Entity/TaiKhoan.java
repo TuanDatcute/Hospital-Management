@@ -17,13 +17,13 @@ public class TaiKhoan {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "ten_dang_nhap", nullable = false, unique = true)
+    @Column(name = "ten_dang_nhap", nullable = false, unique = true, columnDefinition = "NVARCHAR(MAX)" )
     private String tenDangNhap;
 
-    @Column(name = "mat_khau", nullable = false)
+    @Column(name = "mat_khau", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String matKhau;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true, columnDefinition = "NVARCHAR(MAX)")
     private String email;
 
     @Column(name = "vai_tro", nullable = false, columnDefinition = "NVARCHAR(MAX)")

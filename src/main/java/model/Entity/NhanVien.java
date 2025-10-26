@@ -33,7 +33,7 @@ public class NhanVien {
     @Column(name = "dia_chi", columnDefinition = "NVARCHAR(MAX)")
     private String diaChi;
 
-    @Column(name = "so_dien_thoai", unique = true)
+    @Column(name = "so_dien_thoai", unique = true, columnDefinition = "NVARCHAR(MAX)")
     private String soDienThoai;
 
     @Column(name = "chuyen_mon", columnDefinition = "NVARCHAR(MAX)")
