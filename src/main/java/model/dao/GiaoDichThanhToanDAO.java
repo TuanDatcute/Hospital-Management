@@ -54,4 +54,13 @@ public class GiaoDichThanhToanDAO {
             return null;
         }
     }
+    
+    /**
+     * Lưu một đối tượng GiaoDichThanhToan vào DB trong một transaction có sẵn.
+     * @param transactionEntity Đối tượng entity cần lưu.
+     * @param session Session Hibernate đang được quản lý bởi lớp Service.
+     */
+    public void save(GiaoDichThanhToan transactionEntity, Session session) {
+        session.save(transactionEntity);
+    }
 }

@@ -26,30 +26,50 @@ public class PhongBenhController extends HttpServlet {
 
     /**
      * Sửa đổi doGet:
-     * - Tải danh sách phòng và khoa.
-     * - Nếu action là 'getRoomForUpdate', tải thêm phòng đó và đặt vào attribute.
-     * - Forward đến JSP một lần duy nhất.
+     * - Nhận 'searchKeyword' để lọc danh sách phòng.
+     * - Tải danh sách khoa (cho form).
+     * - Xử lý 'getRoomForUpdate' (giữ nguyên).
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        request.setCharacterEncoding("UTF-8"); // Đảm bảo đọc UTF-8
+        
         String action = request.getParameter("action");
         if (action == null) action = "listRooms";
+
+        // =============================================
+        //        BẮT ĐẦU THAY ĐỔI
+        // =============================================
+        // Lấy từ khóa tìm kiếm
+        String searchKeyword = request.getParameter("searchKeyword");
+        // =============================================
+        //        KẾT THÚC THAY ĐỔI
+        // =============================================
 
         try {
             // 1. Luôn tải danh sách khoa (cho form)
             List<KhoaDTO> khoaList = khoaService.getAllKhoa();
             request.setAttribute("khoaList", khoaList);
             
-            // 2. Luôn tải danh sách phòng (cho bảng)
-            List<PhongBenhDTO> roomList = phongBenhService.getAllPhongBenh();
+            // =============================================
+            //        BẮT ĐẦU THAY ĐỔI
+            // =============================================
+            
+            // 2. Tải danh sách phòng (ĐÃ LỌC)
+            // Giả sử service của bạn có method searchPhongBenh(keyword)
+            // Nếu keyword là null/rỗng, service này sẽ trả về tất cả
+            List<PhongBenhDTO> roomList = phongBenhService.searchPhongBenh(searchKeyword);
             request.setAttribute("roomList", roomList);
 
-            // 3. Xử lý nếu có action 'getRoomForUpdate'
+            // =============================================
+            //        KẾT THÚC THAY ĐỔI
+            // =============================================
+
+            // 3. Xử lý nếu có action 'getRoomForUpdate' (Giữ nguyên)
             if (action.equals("getRoomForUpdate")) {
                 int roomId = Integer.parseInt(request.getParameter("roomId"));
-                // Giả sử bạn có service method này
                 PhongBenhDTO roomToUpdate = phongBenhService.getPhongBenhById(roomId); 
                 request.setAttribute("roomToUpdate", roomToUpdate);
             }
@@ -65,9 +85,8 @@ public class PhongBenhController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        request.setCharacterEncoding("UTF-8"); // Thêm để hỗ trợ Tiếng Việt
-        
+        // ... (GIỮ NGUYÊN TOÀN BỘ PHẦN doPost, KHÔNG CẦN SỬA) ...
+        request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
         if (action == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -78,17 +97,13 @@ public class PhongBenhController extends HttpServlet {
             case "createRoom":
                 createRoom(request, response);
                 break;
-            case "updateRoom": // Đã thêm
+            case "updateRoom":
                 updateRoom(request, response);
                 break;
         }
     }
 
-    /**
-     * Đã hoàn thiện:
-     * - Tạo DTO từ request.
-     * - Gọi service để thêm mới.
-     */
+    // ... (CÁC HÀM createRoom VÀ updateRoom GIỮ NGUYÊN) ...
     private void createRoom(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         String urlRedirect = "MainController?action=listRooms";
@@ -98,35 +113,26 @@ public class PhongBenhController extends HttpServlet {
             int sucChua = Integer.parseInt(request.getParameter("sucChua"));
             int khoaId = Integer.parseInt(request.getParameter("khoaId"));
             
-            // --- Hoàn thiện logic ---
             PhongBenhDTO newRoom = new PhongBenhDTO();
             newRoom.setTenPhong(tenPhong);
             newRoom.setLoaiPhong(loaiPhong);
             newRoom.setSucChua(sucChua);
             newRoom.setKhoaId(khoaId);
 
-            // Giả sử bạn có service method này
             phongBenhService.createPhongBenh(newRoom);
-            // -------------------------
             
             urlRedirect += "&createSuccess=true";
         } catch (Exception e) {
             urlRedirect += "&createError=Details: " + e.getMessage();
-            e.printStackTrace(); // Giúp debug
+            e.printStackTrace();
         }
         response.sendRedirect(urlRedirect);
     }
     
-    /**
-     * Chức năng mới:
-     * - Lấy ID phòng từ form.
-     * - Tạo DTO và gọi service để cập nhật.
-     */
     private void updateRoom(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         String urlRedirect = "MainController?action=listRooms";
         try {
-            // Lấy ID của phòng cần cập nhật
             int roomId = Integer.parseInt(request.getParameter("roomId"));
             String tenPhong = request.getParameter("tenPhong");
             String loaiPhong = request.getParameter("loaiPhong");
@@ -134,19 +140,18 @@ public class PhongBenhController extends HttpServlet {
             int khoaId = Integer.parseInt(request.getParameter("khoaId"));
             
             PhongBenhDTO roomToUpdate = new PhongBenhDTO();
-            roomToUpdate.setId(roomId); // ID là quan trọng nhất
+            roomToUpdate.setId(roomId);
             roomToUpdate.setTenPhong(tenPhong);
             roomToUpdate.setLoaiPhong(loaiPhong);
             roomToUpdate.setSucChua(sucChua);
             roomToUpdate.setKhoaId(khoaId);
 
-            // Giả sử bạn có service method này
             phongBenhService.updatePhongBenh(roomToUpdate);
             
             urlRedirect += "&updateSuccess=true";
         } catch (Exception e) {
             urlRedirect += "&updateError=Details: " + e.getMessage();
-            e.printStackTrace(); // Giúp debug
+            e.printStackTrace();
         }
         response.sendRedirect(urlRedirect);
     }
