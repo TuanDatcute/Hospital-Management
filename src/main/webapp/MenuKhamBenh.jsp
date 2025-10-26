@@ -18,5 +18,8 @@
         <div> 
             <a href="MainController?action=showCreateServiceForm">dichvu</a>
         </div>
+        <div> 
+            <a href="MainController?action=listMedications">Thuoc List</a>
+        </div>
     </body>
 </html>

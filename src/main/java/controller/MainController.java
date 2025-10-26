@@ -12,10 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author tungi (đã chỉnh sửa)
- */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 public class MainController extends HttpServlet {
 
@@ -26,6 +22,7 @@ public class MainController extends HttpServlet {
     private static final String CATALOG_CONTROLLER = "CatalogController";
     private static final String PHONG_BENH_CONTROLLER = "PhongBenhController";
     private static final String GIUONG_BENH_CONTROLLER = "GiuongBenhController";
+    private static final String DON_THUOC_CONTROLLER = "DonThuocController";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -47,9 +44,11 @@ public class MainController extends HttpServlet {
         // 2. Nhóm các action cho từng controller
         String[] userActions = {"login", "logout", "searchUser"};
 
-        String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateForm"};
+        String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateForm","listAllEncounters","viewEncounterDetails"};
 
-        String[] CatalogActions = {"createService", "showCreateServiceForm"};
+        String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication"};
+
+        String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateThuocForm","createPrescription"};
 
         String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate"};
 
@@ -68,6 +67,8 @@ public class MainController extends HttpServlet {
             url = GIUONG_BENH_CONTROLLER;
         } else if (Arrays.asList(CatalogActions).contains(action)) {
             url = CATALOG_CONTROLLER;
+        } else if (Arrays.asList(DonThuocActions).contains(action)) {
+            url = DON_THUOC_CONTROLLER;
         }
 
         // 4. Forward đến controller tương ứng

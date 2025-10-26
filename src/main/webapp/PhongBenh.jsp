@@ -12,7 +12,6 @@
       Kiểm tra xem 'roomToUpdate' (được gửi từ Servlet) có tồn tại không
     --%>
     <c:choose>
-        <%-- TRƯỜNG HỢP 1: CẬP NHẬT (roomToUpdate tồn tại) --%>
         <c:when test="${not empty roomToUpdate}">
             <h2>Cập nhật Phòng Bệnh: ${roomToUpdate.tenPhong}</h2>
             <form action="MainController" method="POST">

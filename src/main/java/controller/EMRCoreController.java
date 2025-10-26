@@ -31,6 +31,7 @@ public class EMRCoreController extends HttpServlet {
     private static final String ERROR_PAGE = "error.jsp";
     private static final String SUCCESS_PAGE = "danhSachPhieuKham.jsp";
     private static final String CREATE_ENCOUNTER_PAGE = "PhieuKhamBenh.jsp";
+    private static final String ENCOUNTER_LIST_PAGE = "DanhSachPhieuKham.jsp";
 
     // Khởi tạo các Service cần thiết ở cấp lớp để tái sử dụng
     private final PhieuKhamBenhService phieuKhamService = new PhieuKhamBenhService();
@@ -58,6 +59,12 @@ public class EMRCoreController extends HttpServlet {
             switch (action) {
                 case "showCreateForm":
                     url = showCreateForm(request);
+                    break;
+                case "listAllEncounters":
+                    url = listAllEncounters(request);
+                    break;
+                case "viewEncounterDetails":
+                    url = viewEncounterDetails(request);
                     break;
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho phương thức GET.");
@@ -98,6 +105,30 @@ public class EMRCoreController extends HttpServlet {
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
+    }
+
+    /**
+     * Lấy danh sách tất cả phiếu khám và hiển thị.
+     */
+    private String listAllEncounters(HttpServletRequest request) {
+        List<PhieuKhamBenhDTO> danhSach = phieuKhamService.getAllEncounters();
+        request.setAttribute("danhSachPhieuKham", danhSach);
+        return ENCOUNTER_LIST_PAGE;
+    }
+
+    /**
+     * Lấy chi tiết một phiếu khám và hiển thị (chuyển hướng đến trang chi
+     * tiết). (Đây là một ví dụ, bạn có thể tạo một trang JSP riêng cho việc
+     * này)
+     */
+    private String viewEncounterDetails(HttpServletRequest request) throws Exception {
+        int id = Integer.parseInt(request.getParameter("id"));
+        PhieuKhamBenhDTO phieuKham = phieuKhamService.getEncounterById(id);
+        if (phieuKham == null) {
+            throw new Exception("Không tìm thấy phiếu khám với ID: " + id);
+        }
+        request.setAttribute("phieuKham", phieuKham);
+        return "/chiTietPhieuKham.jsp"; // Chuyển đến trang chi tiết
     }
 
     /**
@@ -200,8 +231,6 @@ public class EMRCoreController extends HttpServlet {
         loadCreateFormDependencies(request);
         return CREATE_ENCOUNTER_PAGE;
     }
-    
-    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     @Override

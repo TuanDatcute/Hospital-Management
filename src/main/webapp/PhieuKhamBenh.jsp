@@ -107,7 +107,6 @@
                                 </option>
                             </c:forEach>
                         </select>         
-
                     </div>
 
                     <div class="button-group">

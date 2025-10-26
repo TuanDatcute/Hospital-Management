@@ -1,6 +1,8 @@
 package service;
 
 import exception.ValidationException;
+import java.util.List;
+import java.util.stream.Collectors;
 import model.Entity.BenhNhan;
 import model.Entity.LichHen;
 import model.Entity.NhanVien;
@@ -31,7 +33,6 @@ public class PhieuKhamBenhService {
      * @throws ValidationException nếu có lỗi nghiệp vụ (mã trùng, không tìm
      * thấy bệnh nhân...).
      */
-    // ✨ CẢI TIẾN: Chữ ký phương thức rõ ràng hơn
     public PhieuKhamBenhDTO createEncounter(PhieuKhamBenhDTO dto) throws ValidationException {
 
         // --- BƯỚC 1: LOGIC NGHIỆP VỤ (VALIDATION) ---
@@ -65,6 +66,19 @@ public class PhieuKhamBenhService {
 
         // --- BƯỚC 4: CHUYỂN ĐỔI ENTITY -> DTO ĐỂ TRẢ VỀ ---
         return toDTO(savedEntity);
+    }
+
+    public PhieuKhamBenhDTO getEncounterById(int id) {
+        PhieuKhamBenh entity = phieuKhamDAO.getEncounterById(id);
+        return toDTO(entity); // Sử dụng lại hàm toDTO đã có
+    }
+
+    public List<PhieuKhamBenhDTO> getAllEncounters() {
+        List<PhieuKhamBenh> entities = phieuKhamDAO.getAll();
+        // Chuyển đổi danh sách Entity sang danh sách DTO
+        return entities.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     /**

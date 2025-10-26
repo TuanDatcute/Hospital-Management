@@ -1,6 +1,7 @@
 package model.dto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -16,6 +17,19 @@ public class DonThuocDTO {
 
     // Một đơn thuốc DTO sẽ chứa một danh sách các chi tiết đơn thuốc DTO
     private List<ChiTietDonThuocDTO> chiTietDonThuoc;
+    private String tenBenhNhan;
+    
+  
+    
+   public String getNgayKeDonFormatted() {
+        if (this.ngayKeDon == null) {
+            return "";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
+        return this.ngayKeDon.format(formatter);
+    }
+
+
 
     // Constructors
     public DonThuocDTO() {
@@ -29,7 +43,6 @@ public class DonThuocDTO {
         this.chiTietDonThuoc = chiTietDonThuoc;
     }
 
-   
     // Getters and Setters...
     public Integer getId() {
         return id;
@@ -69,5 +82,13 @@ public class DonThuocDTO {
 
     public void setChiTietDonThuoc(List<ChiTietDonThuocDTO> chiTietDonThuoc) {
         this.chiTietDonThuoc = chiTietDonThuoc;
+    }
+
+    public String getTenBenhNhan() {
+        return tenBenhNhan;
+    }
+
+    public void setTenBenhNhan(String tenBenhNhan) {
+        this.tenBenhNhan = tenBenhNhan;
     }
 }

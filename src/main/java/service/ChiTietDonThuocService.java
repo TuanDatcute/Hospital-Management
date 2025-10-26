@@ -4,6 +4,7 @@
  */
 package service;
 
+import exception.ValidationException;
 import model.dao.ChiTietDonThuocDAO;
 import model.dao.DonThuocDAO;
 import model.dao.ThuocDAO;
@@ -24,20 +25,20 @@ public class ChiTietDonThuocService {
      * @return DTO của chi tiết vừa được tạo.
      * @throws Exception nếu có lỗi (đơn thuốc không tồn tại, hết thuốc...).
      */
-    public ChiTietDonThuocDTO addMedicationToPrescription(ChiTietDonThuocDTO dto) throws Exception {
+    public ChiTietDonThuocDTO addMedicationToPrescription(ChiTietDonThuocDTO dto) throws ValidationException {
         // --- Logic nghiệp vụ: Kiểm tra ---
         DonThuoc donThuoc = donThuocDAO.getById(dto.getDonThuocId());
         if (donThuoc == null) {
-            throw new Exception("Không tìm thấy đơn thuốc với ID: " + dto.getDonThuocId());
+            throw new ValidationException("Không tìm thấy đơn thuốc với ID: " + dto.getDonThuocId());
         }
 
         Thuoc thuoc = thuocDAO.getById(dto.getThuocId());
         if (thuoc == null) {
-            throw new Exception("Không tìm thấy thuốc với ID: " + dto.getThuocId());
+            throw new ValidationException("Không tìm thấy thuốc với ID: " + dto.getThuocId());
         }
 
         if (thuoc.getSoLuongTonKho() < dto.getSoLuong()) {
-            throw new Exception("Không đủ số lượng tồn kho cho thuốc: " + thuoc.getTenThuoc());
+            throw new ValidationException("Không đủ số lượng tồn kho cho thuốc: " + thuoc.getTenThuoc());
         }
 
         // --- Tạo Entity và lưu ---
@@ -56,10 +57,10 @@ public class ChiTietDonThuocService {
      * @param chiTietId ID của dòng chi tiết cần xóa.
      * @throws Exception nếu không tìm thấy chi tiết.
      */
-    public void removeMedicationFromPrescription(int chiTietId) throws Exception {
+    public void removeMedicationFromPrescription(int chiTietId) throws ValidationException {
         ChiTietDonThuoc chiTiet = chiTietDAO.getById(chiTietId);
         if (chiTiet == null) {
-            throw new Exception("Không tìm thấy chi tiết đơn thuốc với ID: " + chiTietId);
+            throw new ValidationException("Không tìm thấy chi tiết đơn thuốc với ID: " + chiTietId);
         }
 
         Thuoc thuoc = chiTiet.getThuoc();
@@ -73,6 +74,42 @@ public class ChiTietDonThuocService {
             thuoc.setSoLuongTonKho(thuoc.getSoLuongTonKho() + soLuongHoanTra);
             thuocDAO.update(thuoc);
         }
+    }
+    
+    public ChiTietDonThuocDTO updatePrescriptionDetail(ChiTietDonThuocDTO dto) throws ValidationException {
+        // 1. Lấy bản ghi Entity gốc từ CSDL
+        ChiTietDonThuoc existingDetail = chiTietDAO.getById(dto.getId());
+        if (existingDetail == null) {
+            throw new ValidationException("Không tìm thấy chi tiết đơn thuốc để cập nhật.");
+        }
+
+        // 2. Lấy thông tin cần thiết cho việc tính toán tồn kho
+        Thuoc thuoc = existingDetail.getThuoc();
+        int soLuongCu = existingDetail.getSoLuong();
+        int soLuongMoi = dto.getSoLuong();
+
+        // 3. Tính toán sự thay đổi và kiểm tra tồn kho
+        int soLuongThayDoi = soLuongMoi - soLuongCu; // > 0 nếu tăng, < 0 nếu giảm
+
+        // Nếu số lượng mới lớn hơn số lượng cũ (lấy thêm thuốc)
+        if (soLuongThayDoi > 0) {
+            if (thuoc.getSoLuongTonKho() < soLuongThayDoi) {
+                throw new ValidationException("Không đủ tồn kho. Chỉ còn " + thuoc.getSoLuongTonKho() + " sản phẩm.");
+            }
+        }
+        
+     
+        // (Nếu giảm số lượng thì soLuongThayDoi là số âm, trừ đi số âm sẽ thành cộng)
+        thuoc.setSoLuongTonKho(thuoc.getSoLuongTonKho() - soLuongThayDoi);
+        thuocDAO.update(thuoc);
+
+        //  Cập nhật thông tin cho chi tiết đơn thuốc 
+        existingDetail.setSoLuong(soLuongMoi);
+        existingDetail.setLieuDung(dto.getLieuDung());
+        chiTietDAO.update(existingDetail);
+
+        //  Trả về DTO đã được cập nhật 
+        return toDTO(existingDetail);
     }
     
     // --- Các phương thức chuyển đổi ---

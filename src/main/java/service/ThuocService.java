@@ -1,21 +1,23 @@
 package service;
 
+import exception.ValidationException;
 import model.dao.ThuocDAO;
 import model.dto.ThuocDTO;
 import model.Entity.Thuoc;
 import java.util.List;
 import java.util.stream.Collectors;
+import model.dao.ChiTietDonThuocDAO;
 
 public class ThuocService {
 
     private final ThuocDAO thuocDAO = new ThuocDAO();
 
-    public ThuocDTO createMedication(ThuocDTO dto) throws Exception {
+    public ThuocDTO createMedication(ThuocDTO dto) throws ValidationException {
         if (dto.getTenThuoc() == null || dto.getTenThuoc().trim().isEmpty()) {
-            throw new Exception("Tên thuốc không được để trống.");
+            throw new ValidationException("Tên thuốc không được để trống.");
         }
         if (thuocDAO.isTenThuocExisted(dto.getTenThuoc())) {
-            throw new Exception("Tên thuốc '" + dto.getTenThuoc() + "' đã tồn tại.");
+            throw new ValidationException("Tên thuốc '" + dto.getTenThuoc() + "' đã tồn tại.");
         }
 
         Thuoc entity = toEntity(dto);
@@ -33,20 +35,42 @@ public class ThuocService {
         return entities.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public ThuocDTO updateMedicationInfo(int id, ThuocDTO dto) throws Exception {
+    public ThuocDTO updateMedicationInfo(int id, ThuocDTO dto) throws ValidationException {
+        // --- Logic nghiệp vụ: Kiểm tra ---
         Thuoc existingEntity = thuocDAO.getById(id);
         if (existingEntity == null) {
-            throw new Exception("Không tìm thấy thuốc với ID: " + id);
+            throw new ValidationException("Không tìm thấy thuốc với ID: " + id);
         }
 
+        // Kiểm tra nếu tên mới đang được thay đổi và có trùng với thuốc khác không
+        if (!existingEntity.getTenThuoc().equalsIgnoreCase(dto.getTenThuoc())) {
+            if (thuocDAO.findToUpdateMed(dto.getTenThuoc()) != null) {
+                throw new ValidationException("Tên thuốc '" + dto.getTenThuoc() + "' đã được sử dụng.");
+            }
+        }
+
+        // --- Cập nhật thông tin từ DTO vào Entity đã có ---
         existingEntity.setTenThuoc(dto.getTenThuoc());
         existingEntity.setHoatChat(dto.getHoatChat());
         existingEntity.setDonViTinh(dto.getDonViTinh());
         existingEntity.setDonGia(dto.getDonGia());
-       
 
+        // --- Gọi DAO để cập nhật ---
         thuocDAO.update(existingEntity);
+
         return toDTO(existingEntity);
+    }
+
+    public void deleteMedication(int id) throws ValidationException {
+        Thuoc existingThuoc = thuocDAO.getById(id);
+        if (existingThuoc == null) {
+            throw new ValidationException("Không tìm thấy thuốc để xóa.");
+        }
+  
+         if (ChiTietDonThuocDAO.isMedicationInUse(id)) {
+             throw new ValidationException("Không thể xóa thuốc này vì nó đang được sử dụng trong các đơn thuốc đã kê.");
+         }
+        thuocDAO.delete(id);
     }
 
     /**
@@ -57,26 +81,25 @@ public class ThuocService {
      * xuất).
      * @return DTO của thuốc sau khi cập nhật kho.
      */
-    public ThuocDTO updateStockQuantity(int id, int quantityChange) throws Exception {
-        Thuoc thuoc = thuocDAO.getById(id);
+    public ThuocDTO updateStockQuantity(int thuocId, int soLuongThayDoi) throws ValidationException {
+        Thuoc thuoc = thuocDAO.getById(thuocId);
         if (thuoc == null) {
-            throw new Exception("Không tìm thấy thuốc với ID: " + id);
+            throw new ValidationException("Không tìm thấy thuốc với ID: " + thuocId);
         }
 
-        int newQuantity = thuoc.getSoLuongTonKho() + quantityChange;
-        if (newQuantity < 0) {
-            throw new Exception("Số lượng tồn kho không đủ để xuất.");
+        int soLuongMoi = thuoc.getSoLuongTonKho() + soLuongThayDoi;
+
+        // Logic nghiệp vụ: Không cho phép tồn kho là số âm
+        if (soLuongMoi < 0) {
+            throw new ValidationException("Số lượng tồn kho không đủ để xuất. Tồn kho hiện tại: " + thuoc.getSoLuongTonKho());
         }
 
-        thuoc.setSoLuongTonKho(newQuantity);
+        thuoc.setSoLuongTonKho(soLuongMoi);
         thuocDAO.update(thuoc);
+
         return toDTO(thuoc);
     }
 
-    public void deleteMedication(int id) {
-        // Cần thêm logic kiểm tra xem thuốc có đang được dùng trong đơn thuốc nào không
-        thuocDAO.delete(id);
-    }
 
     public List<ThuocDTO> searchMedicationsByName(String name) throws Exception {
         // --- Logic nghiệp vụ: Kiểm tra đầu vào ---
