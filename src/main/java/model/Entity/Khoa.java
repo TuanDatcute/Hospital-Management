@@ -16,10 +16,10 @@ public class Khoa {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "ten_khoa", nullable = false, unique = true)
+    @Column(name = "ten_khoa", nullable = false, unique = true, columnDefinition = "NVARCHAR(MAX)")
     private String tenKhoa;
 
-    @Column(name = "mo_ta")
+    @Column(name = "mo_ta", columnDefinition = "NVARCHAR(MAX)")
     private String moTa;
 
     // Constructors

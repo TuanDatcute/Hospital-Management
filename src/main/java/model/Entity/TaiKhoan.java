@@ -26,10 +26,10 @@ public class TaiKhoan {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "vai_tro", nullable = false)
+    @Column(name = "vai_tro", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String vaiTro; 
 
-    @Column(name = "trang_thai", nullable = false)
+    @Column(name = "trang_thai", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String trangThai; 
 
     @Column(name = "created_at", nullable = false, updatable = false)

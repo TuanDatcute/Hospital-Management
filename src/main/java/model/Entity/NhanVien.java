@@ -21,25 +21,25 @@ public class NhanVien {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "ho_ten", nullable = false)
+    @Column(name = "ho_ten", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String hoTen;
 
     @Column(name = "ngay_sinh")
-    private LocalDateTime ngaySinh; // <-- ĐÃ THAY ĐỔI
+    private LocalDateTime ngaySinh; 
 
-    @Column(name = "gioi_tinh")
+    @Column(name = "gioi_tinh", columnDefinition = "NVARCHAR(MAX)")
     private String gioiTinh;
 
-    @Column(name = "dia_chi")
+    @Column(name = "dia_chi", columnDefinition = "NVARCHAR(MAX)")
     private String diaChi;
 
     @Column(name = "so_dien_thoai", unique = true)
     private String soDienThoai;
 
-    @Column(name = "chuyen_mon")
+    @Column(name = "chuyen_mon", columnDefinition = "NVARCHAR(MAX)")
     private String chuyenMon;
 
-    @Column(name = "bang_cap")
+    @Column(name = "bang_cap", columnDefinition = "NVARCHAR(MAX)")
     private String bangCap;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -71,11 +71,11 @@ public class NhanVien {
         this.hoTen = hoTen;
     }
 
-    public LocalDateTime getNgaySinh() { // <-- ĐÃ THAY ĐỔI
+    public LocalDateTime getNgaySinh() { 
         return ngaySinh;
     }
 
-    public void setNgaySinh(LocalDateTime ngaySinh) { // <-- ĐÃ THAY ĐỔI
+    public void setNgaySinh(LocalDateTime ngaySinh) { 
         this.ngaySinh = ngaySinh;
     }
 
