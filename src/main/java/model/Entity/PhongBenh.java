@@ -12,10 +12,10 @@ public class PhongBenh {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "ten_phong", length = 100, unique = true, nullable = false)
+    @Column(name = "ten_phong", length = 100, unique = true, nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String tenPhong;
 
-    @Column(name = "loai_phong", length = 100)
+    @Column(name = "loai_phong", length = 100, columnDefinition = "NVARCHAR(MAX)")
     private String loaiPhong; // 'Phòng thường', 'Phòng VIP', 'Phòng cấp cứu'
 
     @Column(name = "suc_chua")

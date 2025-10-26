@@ -89,7 +89,7 @@ public class GiuongBenhService {
 
             // Bỏ gán bệnh nhân và cập nhật trạng thái
             giuong.setBenhNhan(null); // Gán về NULL
-            giuong.setTrangThai("DANG_DON_DEP"); // Chuyển sang dọn dẹp
+            giuong.setTrangThai("TRONG");
             
             giuongBenhDAO.updateGiuong(giuong);
             return true;
@@ -177,6 +177,22 @@ public class GiuongBenhService {
         
         // 3. Trả về danh sách DTO
         return dtos;
+    }
+    
+    public List<GiuongBenhDTO> searchGiuong(String keyword) {
+        List<GiuongBenh> entities;
+        if (keyword == null || keyword.trim().isEmpty()) {
+            entities = giuongBenhDAO.getAllGiuong();
+        } else {
+            entities = giuongBenhDAO.findGiuongByKeyword(keyword);
+        }
+        
+        // Chuyển List<Entity> sang List<DTO>
+        List<GiuongBenhDTO> dtoList = new ArrayList<>();
+        for (GiuongBenh entity : entities) {
+            dtoList.add(convertToDTO(entity));
+        }
+        return dtoList;
     }
 
     // --- Phương thức chuyển đổi (Helper Methods) ---

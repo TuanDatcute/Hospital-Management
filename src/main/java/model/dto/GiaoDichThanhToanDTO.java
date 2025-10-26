@@ -3,6 +3,7 @@ package model.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class GiaoDichThanhToanDTO {
 
@@ -55,5 +56,11 @@ public class GiaoDichThanhToanDTO {
 
     public void setHoaDonId(int hoaDonId) {
         this.hoaDonId = hoaDonId;
+    }
+    
+    public String getThoiGianGiaoDichFormatted() {
+        if (thoiGianGiaoDich == null) return "";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        return thoiGianGiaoDich.format(formatter);
     }
 }

@@ -26,6 +26,7 @@ public class MainController extends HttpServlet {
     private static final String CATALOG_CONTROLLER = "CatalogController";
     private static final String PHONG_BENH_CONTROLLER = "PhongBenhController";
     private static final String GIUONG_BENH_CONTROLLER = "GiuongBenhController";
+    private static final String HOA_DON_GIAO_DICH_THANH_TOAN_CONTROLLER = "HoaDon_GiaoDichThanhToanController";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -55,6 +56,8 @@ public class MainController extends HttpServlet {
 
         String[] GiuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed"};
 
+        String[] HoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices"};
+
         // 3. Điều hướng dựa trên action
         if (action == null) {
             url = LOGIN_PAGE;
@@ -68,6 +71,8 @@ public class MainController extends HttpServlet {
             url = GIUONG_BENH_CONTROLLER;
         } else if (Arrays.asList(CatalogActions).contains(action)) {
             url = CATALOG_CONTROLLER;
+        } else if (Arrays.asList(HoaDon_GiaoDichThanhToanActions).contains(action)) {
+            url = HOA_DON_GIAO_DICH_THANH_TOAN_CONTROLLER;
         }
 
         // 4. Forward đến controller tương ứng
