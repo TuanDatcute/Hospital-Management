@@ -12,6 +12,11 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <a href="MainController?action=showCreateForm">khambenh</a>
+        <div> 
+            <a href="MainController?action=showCreateForm">khambenh</a>
+        </div>
+        <div> 
+            <a href="MainController?action=showCreateServiceForm">dichvu</a>
+        </div>
     </body>
 </html>

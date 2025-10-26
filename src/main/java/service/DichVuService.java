@@ -1,11 +1,11 @@
 package service;
 
-import model.dao.DichVuDAO;
+import exception.ValidationException;
 import model.dto.DichVuDTO;
-import model.Entity.DichVu;
 import java.util.ArrayList;
 import java.util.List;
 import model.Entity.DichVu;
+import model.dao.ChiDinhDichVuDAO;
 import model.dao.DichVuDAO;
 
 /**
@@ -51,16 +51,16 @@ public class DichVuService {
      * @return DTO của dịch vụ đã tạo, hoặc null nếu thất bại.
      * @throws Exception nếu có lỗi nghiệp vụ (ví dụ: tên trùng).
      */
-    public DichVuDTO createService(DichVuDTO dto) throws Exception {
+    public DichVuDTO createService(DichVuDTO dto) throws ValidationException {
         // --- Logic nghiệp vụ: Kiểm tra dữ liệu đầu vào ---
         if (dto.getTenDichVu() == null || dto.getTenDichVu().trim().isEmpty()) {
-            throw new Exception("Tên dịch vụ không được để trống.");
+            throw new ValidationException("Tên dịch vụ không được để trống.");
         }
         if (dto.getDonGia() == null || dto.getDonGia().doubleValue() < 0) {
-            throw new Exception("Đơn giá không hợp lệ.");
+            throw new ValidationException("Đơn giá không hợp lệ.");
         }
         if (dichVuDAO.isTenDichVuExisted(dto.getTenDichVu())) {
-            throw new Exception("Tên dịch vụ '" + dto.getTenDichVu() + "' đã tồn tại.");
+            throw new ValidationException("Tên dịch vụ '" + dto.getTenDichVu() + "' đã tồn tại.");
         }
 
         // --- Chuyển đổi DTO -> Entity ---
@@ -84,16 +84,16 @@ public class DichVuService {
      * @return DTO của dịch vụ sau khi cập nhật.
      * @throws Exception nếu có lỗi (dịch vụ không tồn tại, tên trùng...).
      */
-    public DichVuDTO updateService(int id, DichVuDTO dto) throws Exception {
+    public DichVuDTO updateService(int id, DichVuDTO dto) throws ValidationException {
         // --- Logic nghiệp vụ: Kiểm tra ---
         DichVu existingEntity = dichVuDAO.getById(id);
         if (existingEntity == null) {
-            throw new Exception("Không tìm thấy dịch vụ với ID: " + id);
+            throw new ValidationException("Không tìm thấy dịch vụ với ID: " + id);
         }
 
         // Kiểm tra nếu tên mới trùng với một dịch vụ khác
         if (!existingEntity.getTenDichVu().equals(dto.getTenDichVu()) && dichVuDAO.isTenDichVuExisted(dto.getTenDichVu())) {
-            throw new Exception("Tên dịch vụ '" + dto.getTenDichVu() + "' đã được sử dụng.");
+            throw new ValidationException("Tên dịch vụ '" + dto.getTenDichVu() + "' đã được sử dụng.");
         }
 
         // --- Cập nhật thông tin từ DTO vào Entity đã có ---
@@ -114,13 +114,13 @@ public class DichVuService {
      * @throws Exception nếu có lỗi (dịch vụ không tồn tại, đang được sử
      * dụng...).
      */
-    public void deleteService(int id) throws Exception {
-        // --- Logic nghiệp vụ: Kiểm tra xem dịch vụ có đang được sử dụng không ---
-        // (Bạn cần thêm một phương thức trong ChiDinhDichVuDAO để kiểm tra điều này)
-        // if (chiDinhDichVuDAO.isServiceInUse(id)) {
-        //     throw new Exception("Không thể xóa dịch vụ này vì nó đang được sử dụng trong các phiếu khám.");
-        // }
-
+    public void deleteService(int id) throws ValidationException {
+//         --- Logic nghiệp vụ: Kiểm tra xem dịch vụ có đang được sử dụng không ---
+//         (Bạn cần thêm một phương thức trong ChiDinhDichVuDAO để kiểm tra điều này)
+        ChiDinhDichVuDAO check = new ChiDinhDichVuDAO();
+        if (check.isServiceInUse(id)) {
+            throw new ValidationException("Không thể xóa dịch vụ này vì nó đang được sử dụng trong các phiếu khám.");
+        }
         // --- Gọi DAO để xóa ---
         dichVuDAO.delete(id);
     }
