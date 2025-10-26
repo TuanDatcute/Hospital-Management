@@ -7,7 +7,10 @@ import model.dao.BenhNhanDAO;
 import model.dao.LichHenDAO;
 import model.dao.NhanVienDAO;
 import model.dto.LichHenDTO;
+import model.dto.NhanVienDTO; // Cần import NhanVienDTO
+import service.NhanVienService; // Cần import NhanVienService
 import java.time.OffsetDateTime;
+import java.util.Arrays; // Import Arrays để dùng List
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +24,13 @@ public class LichHenService {
     private final LichHenDAO lichHenDAO = new LichHenDAO();
     private final BenhNhanDAO benhNhanDAO = new BenhNhanDAO();
     private final NhanVienDAO nhanVienDAO = new NhanVienDAO();
+    // Khởi tạo Service cần thiết
+    private final NhanVienService nhanVienService = new NhanVienService(); // <-- Thêm Service
+
+    // Danh sách các trạng thái lịch hẹn hợp lệ
+    private static final List<String> VALID_TRANG_THAI = Arrays.asList(
+            "CHO_XAC_NHAN", "DA_XAC_NHAN", "HOAN_THANH", "DA_HUY", "DA_DEN_KHAM"
+    );
 
     /**
      * Dịch vụ tạo một Lịch hẹn mới.
@@ -30,7 +40,7 @@ public class LichHenService {
      * @throws Exception ném ra nếu logic validation thất bại.
      */
     public LichHenDTO createLichHen(LichHenDTO dto) throws Exception {
-        
+
         // --- BƯỚC 1: LOGIC NGHIỆP VỤ (VALIDATION) ---
         if (dto.getBenhNhanId() <= 0) {
             throw new Exception("ID Bệnh nhân không hợp lệ.");
@@ -48,31 +58,40 @@ public class LichHenService {
             throw new Exception("Không tìm thấy Bệnh nhân với ID: " + dto.getBenhNhanId());
         }
 
-        NhanVien bacSiEntity = nhanVienDAO.getById(dto.getBacSiId());
-        if (bacSiEntity == null) {
-            throw new Exception("Không tìm thấy Bác sĩ (Nhân viên) với ID: " + dto.getBacSiId());
+        // --- SỬA LẠI PHẦN KIỂM TRA BÁC SĨ ---
+        NhanVienDTO bacSiDTO = null; // Dùng để validate
+        try {
+            // Dùng NhanVienService.getNhanVienById để kiểm tra ID và trạng thái hoạt động
+            bacSiDTO = nhanVienService.getNhanVienById(dto.getBacSiId());
+        } catch (Exception e) {
+            throw new Exception("Không tìm thấy Bác sĩ đang hoạt động với ID: " + dto.getBacSiId());
         }
-        
-        // (Bạn có thể kiểm tra thêm vai trò của bác sĩ nếu cần)
-        // TaiKhoan tkBacSi = bacSiEntity.getTaiKhoan(); // Cần DAO tải lazy
-        // if (tkBacSi == null || !"BAC_SI".equals(tkBacSi.getVaiTro())) {
-        //     throw new Exception("Nhân viên này không có vai trò là Bác sĩ.");
+
+        // (Tùy chọn) Kiểm tra vai trò dựa trên TaiKhoan của NhanVien
+        // Cần sửa DAO/Service NhanVien để dễ dàng lấy vai trò nếu muốn kiểm tra ở đây
+        // NhanVien tempBacSi = nhanVienDAO.getByIdWithRelations(dto.getBacSiId());
+        // if (tempBacSi == null || tempBacSi.getTaiKhoan() == null || !"BAC_SI".equals(tempBacSi.getTaiKhoan().getVaiTro())) {
+        //     throw new Exception("Nhân viên (ID: " + dto.getBacSiId() + ") không phải là Bác sĩ hoặc không có tài khoản.");
         // }
+
+        // Lấy Entity Bác sĩ (chỉ cần ID vì đã validate)
+        NhanVien bacSiEntity = nhanVienDAO.getById(dto.getBacSiId());
+        if (bacSiEntity == null) { // Kiểm tra lại đề phòng
+             throw new Exception("Lỗi không mong muốn: Không thể lấy entity Bác sĩ ID: " + dto.getBacSiId());
+        }
+        // --- KẾT THÚC SỬA ---
+
 
         // --- BƯỚC 3: CHUYỂN ĐỔI (MAP) ---
         LichHen entity = toEntity(dto, benhNhanEntity, bacSiEntity);
-        
-        // Gán trạng thái mặc định khi tạo mới
-        entity.setTrangThai("CHO_XAC_NHAN");
-        // 'stt' sẽ do Trigger trong CSDL tự gán
+        entity.setTrangThai("CHO_XAC_NHAN"); // Trạng thái mặc định
 
         // --- BƯỚC 4: GỌI DAO ĐỂ LƯU ---
         LichHen savedEntity = lichHenDAO.create(entity);
 
         // --- BƯỚC 5: TRẢ VỀ DTO ---
         if (savedEntity != null) {
-            // Sau khi lưu, entity đã có ID và STT, chúng ta cần
-            // tải lại nó với các quan hệ để toDTO cho chuẩn
+            // Tải lại bản đầy đủ (có relations) để chuyển sang DTO
             LichHen fullSavedEntity = lichHenDAO.getByIdWithRelations(savedEntity.getId());
             return toDTO(fullSavedEntity);
         }
@@ -83,23 +102,25 @@ public class LichHenService {
      * Dịch vụ cập nhật trạng thái của một Lịch hẹn.
      */
     public LichHenDTO updateTrangThaiLichHen(int lichHenId, String newTrangThai, String ghiChu) throws Exception {
-        
+
         // --- BƯỚC 1: VALIDATION ---
         if (newTrangThai == null || newTrangThai.trim().isEmpty()) {
             throw new Exception("Trạng thái mới không được để trống.");
         }
-        // (Bạn nên có một Enum hoặc List để kiểm tra newTrangThai có hợp lệ không)
-        
+        // Kiểm tra trạng thái có hợp lệ không
+        if (!VALID_TRANG_THAI.contains(newTrangThai)) {
+            throw new Exception("Trạng thái '" + newTrangThai + "' không hợp lệ.");
+        }
+
         // --- BƯỚC 2: LẤY ENTITY GỐC ---
-        // Chỉ cần lấy entity gốc, không cần relations vì chỉ update
-        LichHen existingEntity = lichHenDAO.getById(lichHenId); 
+        LichHen existingEntity = lichHenDAO.getById(lichHenId);
         if (existingEntity == null) {
             throw new Exception("Không tìm thấy lịch hẹn với ID: " + lichHenId);
         }
-        
+
         // --- BƯỚC 3: CẬP NHẬT ---
         existingEntity.setTrangThai(newTrangThai);
-        if (ghiChu != null) {
+        if (ghiChu != null) { // Chỉ cập nhật ghi chú nếu được cung cấp
             existingEntity.setGhiChu(ghiChu);
         }
 
@@ -110,7 +131,6 @@ public class LichHenService {
         }
 
         // --- BƯỚC 5: TRẢ VỀ DTO (ĐÃ CẬP NHẬT) ---
-        // Tải lại bản đầy đủ để trả về
         LichHen updatedEntity = lichHenDAO.getByIdWithRelations(lichHenId);
         return toDTO(updatedEntity);
     }
@@ -119,14 +139,13 @@ public class LichHenService {
      * Lấy lịch hẹn bằng ID (tải đủ quan hệ).
      */
     public LichHenDTO getLichHenById(int id) throws Exception {
-        // Luôn dùng ...WithRelations để map sang DTO
-        LichHen entity = lichHenDAO.getByIdWithRelations(id); 
+        LichHen entity = lichHenDAO.getByIdWithRelations(id);
         if (entity == null) {
             throw new Exception("Không tìm thấy lịch hẹn với ID: " + id);
         }
         return toDTO(entity);
     }
-    
+
     /**
      * Lấy tất cả lịch hẹn (tải đủ quan hệ).
      */
@@ -136,25 +155,30 @@ public class LichHenService {
                        .map(this::toDTO)
                        .collect(Collectors.toList());
     }
-    
+
     /**
-     * Lấy tất cả lịch hẹn của một bác sĩ (tải đủ quan hệ).
+     * Lấy tất cả lịch hẹn của một bác sĩ đang hoạt động (tải đủ quan hệ).
      */
     public List<LichHenDTO> getLichHenByBacSi(int bacSiId) throws Exception {
-        if (nhanVienDAO.getById(bacSiId) == null) {
-             throw new Exception("Không tìm thấy Bác sĩ với ID: " + bacSiId);
-        }
+         // --- SỬA LẠI PHẦN KIỂM TRA BÁC SĨ ---
+         try {
+             nhanVienService.getNhanVienById(bacSiId); // Kiểm tra ID và trạng thái hoạt động
+         } catch (Exception e) {
+              throw new Exception("Không tìm thấy Bác sĩ đang hoạt động với ID: " + bacSiId);
+         }
+         // --- KẾT THÚC SỬA ---
+
         List<LichHen> entities = lichHenDAO.findByBacSiId(bacSiId);
         return entities.stream()
                        .map(this::toDTO)
                        .collect(Collectors.toList());
     }
-    
+
     /**
      * Lấy tất cả lịch hẹn của một bệnh nhân (tải đủ quan hệ).
      */
     public List<LichHenDTO> getLichHenByBenhNhan(int benhNhanId) throws Exception {
-        if (benhNhanDAO.getById(benhNhanId) == null) {
+        if (benhNhanDAO.getById(benhNhanId) == null) { // Chỉ cần kiểm tra tồn tại
              throw new Exception("Không tìm thấy Bệnh nhân với ID: " + benhNhanId);
         }
         List<LichHen> entities = lichHenDAO.findByBenhNhanId(benhNhanId);
@@ -169,6 +193,7 @@ public class LichHenService {
      * Chuyển LichHen (Entity) sang LichHenDTO.
      */
     private LichHenDTO toDTO(LichHen entity) {
+        if (entity == null) return null; // Thêm kiểm tra null
         LichHenDTO dto = new LichHenDTO();
         dto.setId(entity.getId());
         dto.setStt(entity.getStt());
@@ -177,35 +202,30 @@ public class LichHenService {
         dto.setTrangThai(entity.getTrangThai());
         dto.setGhiChu(entity.getGhiChu());
 
-        // "Làm phẳng" (Vì DAO đã dùng JOIN FETCH nên không sợ Lazy)
         if (entity.getBenhNhan() != null) {
             dto.setBenhNhanId(entity.getBenhNhan().getId());
         }
         if (entity.getBacSi() != null) {
             dto.setBacSiId(entity.getBacSi().getId());
         }
-        
+
         return dto;
     }
 
     /**
      * Chuyển LichHenDTO sang LichHen (Entity).
-     * Cần các đối tượng BenhNhan và NhanVien (BacSi) đã được Service lấy từ CSDL.
      */
     private LichHen toEntity(LichHenDTO dto, BenhNhan benhNhan, NhanVien bacSi) {
         LichHen entity = new LichHen();
-        
-        // Không set ID (tạo mới)
-        // Không set STT (trigger tự gán)
+
         entity.setThoiGianHen(dto.getThoiGianHen());
         entity.setLyDoKham(dto.getLyDoKham());
-        entity.setTrangThai(dto.getTrangThai());
+        entity.setTrangThai(dto.getTrangThai()); // Sẽ được ghi đè bởi logic create
         entity.setGhiChu(dto.getGhiChu());
-        
-        // Gán các đối tượng Entity liên quan
+
         entity.setBenhNhan(benhNhan);
         entity.setBacSi(bacSi);
-        
+
         return entity;
     }
 }
