@@ -23,6 +23,7 @@ public class MainController extends HttpServlet {
     private static final String LOGIN_PAGE = "login.jsp";
     private static final String USER_CONTROLLER = "UserController";
     private static final String EMRCORE_CONTROLLER = "EMRCoreController";
+    private static final String CATALOG_CONTROLLER = "CatalogController";
     private static final String PHONG_BENH_CONTROLLER = "PhongBenhController";
     private static final String GIUONG_BENH_CONTROLLER = "GiuongBenhController";
 
@@ -48,6 +49,8 @@ public class MainController extends HttpServlet {
 
         String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateForm"};
 
+        String[] CatalogActions = {"createService", "showCreateServiceForm"};
+
         String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate"};
 
         String[] GiuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed"};
@@ -63,6 +66,8 @@ public class MainController extends HttpServlet {
             url = PHONG_BENH_CONTROLLER;
         } else if (Arrays.asList(GiuongBenhActions).contains(action)) {
             url = GIUONG_BENH_CONTROLLER;
+        } else if (Arrays.asList(CatalogActions).contains(action)) {
+            url = CATALOG_CONTROLLER;
         }
 
         // 4. Forward đến controller tương ứng

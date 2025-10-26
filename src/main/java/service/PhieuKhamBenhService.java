@@ -1,6 +1,6 @@
 package service;
 
-import java.time.LocalDate;
+import exception.ValidationException;
 import model.Entity.BenhNhan;
 import model.Entity.LichHen;
 import model.Entity.NhanVien;
@@ -9,7 +9,6 @@ import model.dao.BenhNhanDAO;
 import model.dao.LichHenDAO;
 import model.dao.NhanVienDAO;
 import model.dao.PhieuKhamBenhDAO;
-import model.dto.DonThuocDTO;
 import model.dto.PhieuKhamBenhDTO;
 
 /**
@@ -22,7 +21,6 @@ public class PhieuKhamBenhService {
     private final PhieuKhamBenhDAO phieuKhamDAO = new PhieuKhamBenhDAO();
     private final BenhNhanDAO benhNhanDAO = new BenhNhanDAO();
     private final NhanVienDAO nhanVienDAO = new NhanVienDAO();
-    // ✨ CẢI TIẾN: Khởi tạo DonThuocService ở đây
     private final DonThuocService donThuocService = new DonThuocService();
 
     /**
@@ -34,24 +32,24 @@ public class PhieuKhamBenhService {
      * thấy bệnh nhân...).
      */
     // ✨ CẢI TIẾN: Chữ ký phương thức rõ ràng hơn
-    public PhieuKhamBenhDTO createEncounter(PhieuKhamBenhDTO dto) throws IllegalArgumentException {
+    public PhieuKhamBenhDTO createEncounter(PhieuKhamBenhDTO dto) throws ValidationException {
 
         // --- BƯỚC 1: LOGIC NGHIỆP VỤ (VALIDATION) ---
         if (dto.getMaPhieuKham() == null || dto.getMaPhieuKham().trim().isEmpty()) {
-            throw new IllegalArgumentException("Mã phiếu khám không được để trống.");
+            throw new ValidationException("Mã phiếu khám không được để trống.");
         }
         if (phieuKhamDAO.isMaPhieuKhamExisted(dto.getMaPhieuKham())) {
-            throw new IllegalArgumentException("Mã phiếu khám '" + dto.getMaPhieuKham() + "' đã tồn tại.");
+            throw new ValidationException("Mã phiếu khám '" + dto.getMaPhieuKham() + "' đã tồn tại.");
         }
 
         BenhNhan benhNhanEntity = benhNhanDAO.getById(dto.getBenhNhanId());
         if (benhNhanEntity == null) {
-            throw new IllegalArgumentException("Không tìm thấy bệnh nhân với ID: " + dto.getBenhNhanId());
+            throw new ValidationException("Không tìm thấy bệnh nhân với ID: " + dto.getBenhNhanId());
         }
 
         NhanVien nhanVienEntity = nhanVienDAO.getById(dto.getBacSiId());
         if (nhanVienEntity == null) {
-            throw new IllegalArgumentException("Không tìm thấy nhân viên (bác sĩ) với ID: " + dto.getBacSiId());
+            throw new ValidationException("Không tìm thấy nhân viên (bác sĩ) với ID: " + dto.getBacSiId());
         }
 
         LichHen lh = null;

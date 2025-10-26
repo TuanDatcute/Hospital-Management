@@ -1,5 +1,6 @@
 package controller;
 
+import exception.ValidationException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -100,14 +101,6 @@ public class EMRCoreController extends HttpServlet {
     }
 
     /**
-     * Chuẩn bị dữ liệu và hiển thị form tạo phiếu khám.
-     */
-    private String showCreateForm(HttpServletRequest request) {
-        loadCreateFormDependencies(request);
-        return CREATE_ENCOUNTER_PAGE;
-    }
-
-    /**
      * Xử lý logic tạo mới một Phiếu Khám Bệnh.
      */
     private String createEncounter(HttpServletRequest request) {
@@ -143,12 +136,12 @@ public class EMRCoreController extends HttpServlet {
             if (nhipTimStr != null && !nhipTimStr.isEmpty()) {
                 newEncounterDTO.setNhipTho(Integer.parseInt(nhipThoStr));
             }
-            
-             String lichHenStr = request.getParameter("lichHenId");
+
+            String lichHenStr = request.getParameter("lichHenId");
             if (lichHenStr != null && !lichHenStr.isEmpty()) {
                 newEncounterDTO.setLichHenId(Integer.parseInt(lichHenStr));
             }
-            
+
             newEncounterDTO.setBenhNhanId(Integer.parseInt(request.getParameter("benhNhanId")));
             newEncounterDTO.setBacSiId(Integer.parseInt(request.getParameter("bacSiId")));
 
@@ -159,7 +152,7 @@ public class EMRCoreController extends HttpServlet {
             request.setAttribute("SUCCESS_MESSAGE", "Tạo phiếu khám thành công! ID: " + result.getId());
             return SUCCESS_PAGE;
 
-        } catch (IllegalArgumentException e) {
+        } catch (ValidationException e) {
             // Bắt lỗi nghiệp vụ (do người dùng nhập sai)
             log("Lỗi nghiệp vụ khi tạo phiếu khám: " + e.getMessage());
             request.setAttribute("ERROR_MESSAGE", e.getMessage());
@@ -199,6 +192,16 @@ public class EMRCoreController extends HttpServlet {
             request.setAttribute("ERROR_MESSAGE", "Không thể tải danh sách bệnh nhân và bác sĩ.");
         }
     }
+
+    /**
+     * Chuẩn bị dữ liệu và hiển thị form tạo phiếu khám.
+     */
+    private String showCreateForm(HttpServletRequest request) {
+        loadCreateFormDependencies(request);
+        return CREATE_ENCOUNTER_PAGE;
+    }
+    
+    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     @Override
