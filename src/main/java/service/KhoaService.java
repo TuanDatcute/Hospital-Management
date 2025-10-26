@@ -1,6 +1,6 @@
 package service;
 
-import model.Entity.Khoa; 
+import model.Entity.Khoa;
 import model.dao.KhoaDAO;
 import model.dto.KhoaDTO;
 import java.util.List;
@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 /**
  * Lớp Service chứa logic nghiệp vụ cho Khoa.
+ *
  * @author ADMIN
  */
 public class KhoaService {
@@ -16,19 +17,20 @@ public class KhoaService {
 
     /**
      * Dịch vụ tạo một Khoa mới.
+     *
      * @param dto DTO chứa thông tin khoa mới.
      * @return DTO của khoa đã được tạo (có ID).
      * @throws Exception ném ra nếu tên khoa bị trùng hoặc để trống.
      */
     public KhoaDTO createKhoa(KhoaDTO dto) throws Exception {
-        
+
         // --- BƯỚC 1: LOGIC NGHIỆP VỤ (VALIDATION) ---
         if (dto.getTenKhoa() == null || dto.getTenKhoa().trim().isEmpty()) {
             throw new Exception("Tên khoa không được để trống.");
         }
-        
+
         String tenKhoa = dto.getTenKhoa().trim();
-        
+
         if (khoaDAO.isTenKhoaExisted(tenKhoa)) {
             throw new Exception("Tên khoa '" + tenKhoa + "' đã tồn tại.");
         }
@@ -51,7 +53,7 @@ public class KhoaService {
      * Dịch vụ cập nhật thông tin Khoa.
      */
     public KhoaDTO updateKhoa(int khoaId, KhoaDTO dto) throws Exception {
-        
+
         // --- BƯỚC 1: LẤY ENTITY GỐC ---
         Khoa existingEntity = khoaDAO.getById(khoaId);
         if (existingEntity == null) {
@@ -62,16 +64,16 @@ public class KhoaService {
         if (dto.getTenKhoa() == null || dto.getTenKhoa().trim().isEmpty()) {
             throw new Exception("Tên khoa không được để trống.");
         }
-        
+
         String newTenKhoa = dto.getTenKhoa().trim();
-        
+
         // Chỉ kiểm tra trùng tên NẾU tên mới khác tên cũ
         if (!newTenKhoa.equalsIgnoreCase(existingEntity.getTenKhoa())) {
             if (khoaDAO.isTenKhoaExisted(newTenKhoa)) {
                 throw new Exception("Tên khoa '" + newTenKhoa + "' đã tồn tại.");
             }
         }
-        
+
         // --- BƯỚC 3: CẬP NHẬT CÁC TRƯỜNG ---
         existingEntity.setTenKhoa(newTenKhoa);
         existingEntity.setMoTa(dto.getMoTa());
@@ -87,16 +89,15 @@ public class KhoaService {
     }
 
     /**
-     * Dịch vụ xóa một Khoa.
-     * (Lưu ý: CSDL của bạn có 'ON DELETE SET NULL', 
-     * nên việc xóa Khoa sẽ tự động gán KhoaId = NULL cho các Nhân Viên liên quan)
+     * Dịch vụ xóa một Khoa. (Lưu ý: CSDL của bạn có 'ON DELETE SET NULL', nên
+     * việc xóa Khoa sẽ tự động gán KhoaId = NULL cho các Nhân Viên liên quan)
      */
     public void deleteKhoa(int khoaId) throws Exception {
         Khoa existingEntity = khoaDAO.getById(khoaId);
         if (existingEntity == null) {
             throw new Exception("Không tìm thấy khoa với ID: " + khoaId + " để xóa.");
         }
-        
+
         boolean success = khoaDAO.delete(khoaId);
         if (!success) {
             throw new Exception("Xóa khoa thất bại.");
@@ -113,25 +114,27 @@ public class KhoaService {
         }
         return toDTO(entity);
     }
-    
+
     /**
      * Lấy tất cả các khoa.
      */
     public List<KhoaDTO> getAllKhoa() {
         List<Khoa> entities = khoaDAO.getAll();
-        
+
         // Dùng Java 8 Stream (vì dự án của bạn là 1.8)
         return entities.stream()
-                       .map(this::toDTO)
-                       .collect(Collectors.toList());
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     // --- CÁC HÀM MAPPER (Chuyển đổi DTO <-> Entity) ---
-
     /**
      * Chuyển Khoa (Entity) sang KhoaDTO.
      */
     private KhoaDTO toDTO(Khoa entity) {
+        if (entity == null) {
+            return null; // Thêm dòng này
+        }
         KhoaDTO dto = new KhoaDTO();
         dto.setId(entity.getId());
         dto.setTenKhoa(entity.getTenKhoa());
