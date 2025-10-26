@@ -200,10 +200,11 @@ public class NhanVienService {
 
     /**
      * Dịch vụ tìm tất cả bác sĩ đang hoạt động.
+     * @return 
      */
     public List<NhanVienDTO> findDoctorsBySpecialty() {
         // DAO cần được sửa để tối ưu hơn, tạm thời lọc ở Service
-        List<NhanVien> entities = nhanVienDAO.findDoctorsBySpecialty("Bác sĩ"); 
+        List<NhanVien> entities = nhanVienDAO.findDoctorsBySpecialty();
 
         if (entities == null) {
             return Collections.emptyList();

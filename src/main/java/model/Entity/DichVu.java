@@ -11,7 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -27,11 +26,10 @@ public class DichVu {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "ten_dich_vu", nullable = false, unique = true)
+    @Column(name = "ten_dich_vu", nullable = false, unique = true, columnDefinition = "NVARCHAR(255)")
     private String tenDichVu;
 
-    @Lob
-    @Column(name = "mo_ta")
+    @Column(name = "mo_ta",columnDefinition = "NVARCHAR(MAX)")
     private String moTa;
 
     @Column(name = "don_gia", nullable = false)

@@ -23,10 +23,15 @@ public class MainController extends HttpServlet {
     private static final String LOGIN_PAGE = "login.jsp";
     private static final String USER_CONTROLLER = "UserController";
     private static final String EMRCORE_CONTROLLER = "EMRCoreController";
+
     private static final String KHOA_CONTROLLER = "KhoaController";
     private static final String NHANVIEN_CONTROLLER = "NhanVienController";
     private static final String BENHNHAN_CONTROLLER = "BenhNhanController";
     private static final String LICHHEN_CONTROLLER = "LichHenController";
+
+    private static final String CATALOG_CONTROLLER = "CatalogController";
+    private static final String PHONG_BENH_CONTROLLER = "PhongBenhController";
+    private static final String GIUONG_BENH_CONTROLLER = "GiuongBenhController";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -53,6 +58,12 @@ public class MainController extends HttpServlet {
         String[] benhNhanActions = {"listBenhNhan", "showCreateForm", "createBenhNhan", "showEditForm", "updateBenhNhan","deleteBenhNhan"};
         String[] lichHenActions = {"listLichHen", "showCreateForm", "createLichHen", "updateLichHenStatus"};
 
+        String[] CatalogActions = {"createService", "showCreateServiceForm"};
+
+        String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate"};
+
+        String[] GiuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed"};
+
         // 3. Điều hướng dựa trên action
         if (action == null) {
             url = LOGIN_PAGE;
@@ -68,6 +79,12 @@ public class MainController extends HttpServlet {
             url = BENHNHAN_CONTROLLER;
         } else if (Arrays.asList(lichHenActions).contains(action)) { // <-- THÊM
             url = LICHHEN_CONTROLLER;
+        } else if (Arrays.asList(PhongBenhActions).contains(action)) {
+            url = PHONG_BENH_CONTROLLER;
+        } else if (Arrays.asList(GiuongBenhActions).contains(action)) {
+            url = GIUONG_BENH_CONTROLLER;
+        } else if (Arrays.asList(CatalogActions).contains(action)) {
+            url = CATALOG_CONTROLLER;
         }
 
         // 4. Forward đến controller tương ứng

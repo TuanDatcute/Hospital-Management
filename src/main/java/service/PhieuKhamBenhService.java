@@ -1,14 +1,14 @@
 package service;
 
+import exception.ValidationException;
 import model.Entity.BenhNhan;
-import model.Entity.DonThuoc;
+import model.Entity.LichHen;
 import model.Entity.NhanVien;
 import model.Entity.PhieuKhamBenh;
 import model.dao.BenhNhanDAO;
-import model.dao.DonThuocDAO; // Giả sử bạn có DonThuocDAO
+import model.dao.LichHenDAO;
 import model.dao.NhanVienDAO;
 import model.dao.PhieuKhamBenhDAO;
-import model.dto.DonThuocDTO;   // Import DTO tương ứng
 import model.dto.PhieuKhamBenhDTO;
 
 /**
@@ -17,56 +17,60 @@ import model.dto.PhieuKhamBenhDTO;
  */
 public class PhieuKhamBenhService {
 
-    // Khai báo các DAO một lần ở cấp lớp để tái sử dụng
+    // Khai báo các DAO và Service cần thiết một lần ở cấp lớp để tái sử dụng
     private final PhieuKhamBenhDAO phieuKhamDAO = new PhieuKhamBenhDAO();
     private final BenhNhanDAO benhNhanDAO = new BenhNhanDAO();
     private final NhanVienDAO nhanVienDAO = new NhanVienDAO();
+    private final DonThuocService donThuocService = new DonThuocService();
 
     /**
      * Xử lý nghiệp vụ tạo một phiếu khám bệnh mới.
      *
      * @param dto Dữ liệu phiếu khám từ Controller.
-     * @return DTO của phiếu khám đã được tạo, hoặc null nếu thất bại.
-     * @throws Exception nếu có lỗi nghiệp vụ.
+     * @return DTO của phiếu khám đã được tạo.
+     * @throws ValidationException nếu có lỗi nghiệp vụ (mã trùng, không tìm
+     * thấy bệnh nhân...).
      */
-    public PhieuKhamBenhDTO createEncounter(PhieuKhamBenhDTO dto) throws Exception {
+    // ✨ CẢI TIẾN: Chữ ký phương thức rõ ràng hơn
+    public PhieuKhamBenhDTO createEncounter(PhieuKhamBenhDTO dto) throws ValidationException {
 
         // --- BƯỚC 1: LOGIC NGHIỆP VỤ (VALIDATION) ---
+        if (dto.getMaPhieuKham() == null || dto.getMaPhieuKham().trim().isEmpty()) {
+            throw new ValidationException("Mã phiếu khám không được để trống.");
+        }
         if (phieuKhamDAO.isMaPhieuKhamExisted(dto.getMaPhieuKham())) {
-            throw new Exception("Mã phiếu khám '" + dto.getMaPhieuKham() + "' đã tồn tại.");
+            throw new ValidationException("Mã phiếu khám '" + dto.getMaPhieuKham() + "' đã tồn tại.");
         }
 
-        // Lấy các đối tượng Entity liên quan từ CSDL
         BenhNhan benhNhanEntity = benhNhanDAO.getById(dto.getBenhNhanId());
         if (benhNhanEntity == null) {
-            throw new Exception("Không tìm thấy bệnh nhân với ID: " + dto.getBenhNhanId());
+            throw new ValidationException("Không tìm thấy bệnh nhân với ID: " + dto.getBenhNhanId());
         }
 
         NhanVien nhanVienEntity = nhanVienDAO.getById(dto.getBacSiId());
         if (nhanVienEntity == null) {
-            throw new Exception("Không tìm thấy nhân viên (bác sĩ) với ID: " + dto.getBacSiId());
+            throw new ValidationException("Không tìm thấy nhân viên (bác sĩ) với ID: " + dto.getBacSiId());
+        }
+
+        LichHen lh = null;
+        if (dto.getLichHenId() != null) {
+            lh = new LichHenDAO().getById(dto.getLichHenId());
         }
 
         // --- BƯỚC 2: CHUYỂN ĐỔI DTO -> ENTITY ---
-        // Truyền các Entity đã lấy được vào hàm toEntity
-        PhieuKhamBenh entity = toEntity(dto, benhNhanEntity, nhanVienEntity);
+        PhieuKhamBenh entity = toEntity(dto, benhNhanEntity, nhanVienEntity, lh);
 
         // --- BƯỚC 3: GỌI DAO ĐỂ LƯU ---
         PhieuKhamBenh savedEntity = phieuKhamDAO.create(entity);
 
         // --- BƯỚC 4: CHUYỂN ĐỔI ENTITY -> DTO ĐỂ TRẢ VỀ ---
-        if (savedEntity != null) {
-            return toDTO(savedEntity);
-        }
-
-        return null;
+        return toDTO(savedEntity);
     }
 
     /**
-     * Chuyển đổi từ DTO sang Entity. Hàm này chỉ làm nhiệm vụ gán giá trị,
-     * không truy vấn CSDL.
+     * Chuyển đổi từ DTO sang Entity.
      */
-    private PhieuKhamBenh toEntity(PhieuKhamBenhDTO dto, BenhNhan benhNhan, NhanVien nhanVien) {
+    private PhieuKhamBenh toEntity(PhieuKhamBenhDTO dto, BenhNhan benhNhan, NhanVien nhanVien, LichHen lichHen) {
         PhieuKhamBenh entity = new PhieuKhamBenh();
         entity.setMaPhieuKham(dto.getMaPhieuKham());
         entity.setThoiGianKham(dto.getThoiGianKham());
@@ -77,8 +81,9 @@ public class PhieuKhamBenhService {
         entity.setNhipTho(dto.getNhipTho());
         entity.setChanDoan(dto.getChanDoan());
         entity.setKetLuan(dto.getKetLuan());
-
-        // Gán các đối tượng Entity đã được lấy từ trước
+        if (lichHen != null) {
+            entity.setLichHen(lichHen);
+        }
         entity.setBenhNhan(benhNhan);
         entity.setBacSi(nhanVien);
 
@@ -102,10 +107,16 @@ public class PhieuKhamBenhService {
         dto.setHuyetAp(entity.getHuyetAp());
         dto.setNhipTim(entity.getNhipTim());
         dto.setNhipTho(entity.getNhipTho());
-      
         dto.setChanDoan(entity.getChanDoan());
         dto.setKetLuan(entity.getKetLuan());
 
+        if (entity.getLichHen() != null) {
+            dto.setLichHenId(entity.getLichHen().getId());
+        }
+
+        if (entity.getNgayTaiKham() != null) {
+            dto.setNgayTaiKham(entity.getNgayTaiKham());
+        }
         if (entity.getBenhNhan() != null) {
             dto.setBenhNhanId(entity.getBenhNhan().getId());
             dto.setTenBenhNhan(entity.getBenhNhan().getHoTen());
@@ -114,10 +125,8 @@ public class PhieuKhamBenhService {
             dto.setBacSiId(entity.getBacSi().getId());
             dto.setTenBacSi(entity.getBacSi().getHoTen());
         }
-         if (entity.getDonThuoc() != null) {
-             DonThuocService donThuoc = new DonThuocService();
-            dto.setDonThuoc(donThuoc.toDTO(entity.getDonThuoc()));
-
+        if (entity.getDonThuoc() != null) {
+            dto.setDonThuoc(donThuocService.toDTO(entity.getDonThuoc()));
         }
         return dto;
     }

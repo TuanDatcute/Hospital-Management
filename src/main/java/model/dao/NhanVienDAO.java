@@ -200,21 +200,19 @@ public class NhanVienDAO {
         }
     }
 
-    public List<NhanVien> findDoctorsBySpecialty(String keyword) { // Đổi tên hàm cho rõ nghĩa
-        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query<NhanVien> query = session.createQuery(
-                    // ✨ SỬA LẠI CÂU HQL: Dùng LIKE và trỏ đến thuộc tính 'chuyenMon'
-                    "FROM NhanVien nv WHERE nv.chuyenMon LIKE :keyword",
-                    NhanVien.class
-            );
+   public List<NhanVien> findDoctorsBySpecialty() {
+    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        // ✨ SỬA LẠI HQL ĐỂ LỌC THEO VAI TRÒ BÁC SĨ
+        Query<NhanVien> query = session.createQuery(
+            "FROM NhanVien nv WHERE nv.taiKhoan.vaiTro = :role",
+            NhanVien.class
+        );
 
-            // Đưa vào tham số có dấu '%'
-            query.setParameter("keyword", "%" + keyword + "%");
-
-            return query.list();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Collections.emptyList();
-        }
+        query.setParameter("role", "BAC_SI"); // Thêm tham số cho vai trò
+        return query.list();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return Collections.emptyList();
     }
+}
 }
