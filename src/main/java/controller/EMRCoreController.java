@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.dto.BenhNhanDTO;
-import model.dto.ChiDinhDichVuDTO;
 import model.dto.DichVuDTO;
 import model.dto.LichHenDTO;
 import model.dto.NhanVienDTO;
@@ -44,6 +43,7 @@ public class EMRCoreController extends HttpServlet {
     private final NhanVienService nhanVienService = new NhanVienService();
     private final LichHenService lichHenService = new LichHenService();
     private final ChiDinhDichVuService chiDinhService = new ChiDinhDichVuService();
+    private final DichVuService dv = new DichVuService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -100,14 +100,17 @@ public class EMRCoreController extends HttpServlet {
 
             switch (action) {
                 case "addServiceRequest":
-                    addServiceRequest(request, response);
-                    return; // Phương thức này đã tự xử lý redirect
+                    url = addServiceRequest(request);
+                    break;
                 case "createEncounter":
                     url = createEncounter(request);
                     break;
-
-                default:
-                    request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho phương thức POST.");
+            }
+            if (url.startsWith("redirect:")) {
+                String redirectUrl = url.substring("redirect:".length());
+                response.sendRedirect(request.getContextPath() + redirectUrl);
+            } else {
+                request.getRequestDispatcher(url).forward(request, response);
             }
 
             request.getRequestDispatcher(url).forward(request, response);
@@ -147,7 +150,6 @@ public class EMRCoreController extends HttpServlet {
             }
 
             // 2. Lấy danh sách dịch vụ cho dropdown (vẫn cần thiết cho form "Thêm mới")
-            DichVuService dv = new DichVuService();
             List<DichVuDTO> danhSachDichVu = dv.getAllServices();
 
             // 3. Gửi các đối tượng cần thiết cho JSP
@@ -261,28 +263,46 @@ public class EMRCoreController extends HttpServlet {
         return CREATE_ENCOUNTER_PAGE;
     }
 
-    private void addServiceRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    /**
+     * Xử lý yêu cầu thêm một chỉ định dịch vụ vào phiếu khám. Luôn trả về một
+     * URL để redirect, dù thành công hay thất bại.
+     *
+     * @param request HttpServletRequest
+     * @return URL để redirect, có tiền tố "redirect:".
+     */
+    private String addServiceRequest(HttpServletRequest request) {
+        // Lấy ID phiếu khám để xây dựng URL redirect
         String phieuKhamIdStr = request.getParameter("phieuKhamId");
-        String dichVuIdStr = request.getParameter("dichVuId");
-        String redirectUrl = "MainController?action=viewEncounterDetails&id=" + phieuKhamIdStr;
+        String redirectUrl = "/emr-core?action=viewEncounterDetails&id=" + phieuKhamIdStr;
 
         try {
+            // 1. Lấy và kiểm tra các tham số
+            String dichVuIdStr = request.getParameter("dichVuId");
+            if (phieuKhamIdStr == null || dichVuIdStr == null) {
+                throw new ValidationException("ID phiếu khám hoặc dịch vụ không được để trống.");
+            }
+
             int phieuKhamId = Integer.parseInt(phieuKhamIdStr);
             int dichVuId = Integer.parseInt(dichVuIdStr);
 
+            // 2. Gọi Service để thực hiện nghiệp vụ
             chiDinhService.createServiceRequest(phieuKhamId, dichVuId);
 
+            // 3. Đặt thông báo thành công vào session
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã thêm dịch vụ vào phiếu khám thành công!");
-        } catch (ValidationException e) {
+
+        } catch (ValidationException | NumberFormatException e) {
+            // 4. Xử lý lỗi nghiệp vụ hoặc lỗi định dạng
+            // Đặt thông báo lỗi vào session
             request.getSession().setAttribute("ERROR_MESSAGE", e.getMessage());
-        } catch (NumberFormatException e) {
-            request.getSession().setAttribute("ERROR_MESSAGE", "ID phiếu khám hoặc dịch vụ không hợp lệ.");
         } catch (Exception e) {
-            log("Lỗi khi thêm chỉ định dịch vụ: ", e);
-            request.getSession().setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống.");
-        } finally {
-            response.sendRedirect(redirectUrl);
+            // 5. Xử lý các lỗi hệ thống khác
+            log("Lỗi hệ thống khi thêm chỉ định dịch vụ: ", e);
+            request.getSession().setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống nghiêm trọng.");
         }
+
+        // 6. Luôn trả về URL để redirect
+        return "redirect:" + redirectUrl;
     }
 
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

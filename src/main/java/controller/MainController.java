@@ -49,13 +49,13 @@ public class MainController extends HttpServlet {
         String url = LOGIN_PAGE; // Mặc định chuyển về trang login nếu action không hợp lệ
 
         // 2. Nhóm các action cho từng controller
-        String[] userActions = {"login", "logout", "searchUser"};
+       
 
         String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateForm","listAllEncounters","viewEncounterDetails","addServiceRequest"};
 
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication"};
         String[] userActions = {"login", "logout", "listUsers", "showCreateForm", "createUser", "showEditForm", "updateUserStatus"};
-        String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateForm"};
+        
         String[] khoaActions = {"listKhoa", "showCreateForm", "createKhoa", "showEditForm", "updateKhoa", "deleteKhoa"};
         String[] nhanVienActions = {"listNhanVien", "showCreateForm", "createNhanVien", "showEditForm", "updateNhanVien", "deleteNhanVien"};
         String[] benhNhanActions = {"listBenhNhan", "showCreateForm", "createBenhNhan", "showEditForm", "updateBenhNhan","deleteBenhNhan"};

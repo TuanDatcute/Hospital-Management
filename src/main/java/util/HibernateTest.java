@@ -1,9 +1,8 @@
 package util;
 
-// ✨ SỬA LẠI CÁC IMPORT CHO ĐÚNG ✨
-import org.hibernate.Session; // ĐÚNG: Session của Hibernate
+import org.hibernate.Session; 
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration; // ĐÚNG: Configuration của Hibernate
+import org.hibernate.cfg.Configuration; 
 
 /**
  * Lớp dùng để kiểm tra kết nối đến cơ sở dữ liệu thông qua Hibernate.
