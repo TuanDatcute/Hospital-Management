@@ -2,6 +2,7 @@
 package model.Entity;
 
 import javax.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "PhongBenh")
@@ -20,6 +21,10 @@ public class PhongBenh {
 
     @Column(name = "suc_chua")
     private Integer sucChua; // Dùng Integer để có thể null nếu muốn
+    
+    @Column(name = "trang_thai", length = 50, nullable = false, columnDefinition = "NVARCHAR(MAX)")
+    @ColumnDefault("'HOAT_DONG'")
+    private String trangThai ; // 'HOAT_DONG', 'NGUNG_SU_DUNG'
 
     // Mối quan hệ: Nhiều phòng bệnh thuộc MỘT khoa
     @ManyToOne(fetch = FetchType.LAZY)
@@ -70,4 +75,14 @@ public class PhongBenh {
     public void setKhoa(Khoa khoa) {
         this.khoa = khoa;
     }
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
+    }
+    
+    
 }

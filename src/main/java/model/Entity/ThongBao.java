@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "ThongBao")
@@ -29,6 +30,10 @@ public class ThongBao {
     @CreationTimestamp // Tự động gán thời gian khi tạo mới
     @Column(name = "thoi_gian_gui", updatable = false)
     private LocalDateTime thoiGianGui;
+    
+    @Column(name = "trang_thai", length = 50, nullable = false, columnDefinition = "NVARCHAR(MAX)")
+    @ColumnDefault("'HOAT_DONG'")
+    private String trangThai ; // 'HOAT_DONG', 'NGUNG_SU_DUNG'
 
     // Mối quan hệ: Nhiều thông báo thuộc về MỘT tài khoản
     @ManyToOne(fetch = FetchType.LAZY)
@@ -87,4 +92,13 @@ public class ThongBao {
     public void setTaiKhoan(TaiKhoan taiKhoan) {
         this.taiKhoan = taiKhoan;
     }
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
+    }
+    
 }

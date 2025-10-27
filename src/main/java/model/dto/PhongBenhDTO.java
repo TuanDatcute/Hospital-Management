@@ -14,6 +14,7 @@ public class PhongBenhDTO {
     private String tenPhong;
     private String loaiPhong;
     private Integer sucChua;
+    private String trangThai;
     private int khoaId; // Chỉ lưu ID của Khoa
     private String tenKhoa; // (Thêm) Thường hữu ích để hiển thị
 
@@ -52,6 +53,14 @@ public class PhongBenhDTO {
 
     public void setSucChua(Integer sucChua) {
         this.sucChua = sucChua;
+    }
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
     }
 
     public int getKhoaId() {

@@ -17,11 +17,22 @@ public class GiuongBenhService {
     private GiuongBenhDAO giuongBenhDAO;
     private PhongBenhDAO phongBenhDAO;
     private BenhNhanDAO benhNhanDAO;
+    private static final String TRANG_THAI_DANG_SU_DUNG = "DANG_SU_DUNG";
+    private static final String TRANG_THAI_XOA = "NGUNG_HOAT_DONG";
 
     public GiuongBenhService() {
         this.giuongBenhDAO = new GiuongBenhDAO();
         this.phongBenhDAO = new PhongBenhDAO();
         this.benhNhanDAO = new BenhNhanDAO();
+    }
+    
+    /**
+     * HÀM MỚI: Lấy thông tin giường theo ID (trả về DTO)
+     * Dùng cho form cập nhật
+     */
+    public GiuongBenhDTO getGiuongById(int bedId) {
+        GiuongBenh entity = giuongBenhDAO.getGiuongById(bedId); // DAO trả về Entity
+        return convertToDTO(entity); // Chuyển sang DTO
     }
 
     /**
@@ -123,6 +134,39 @@ public class GiuongBenhService {
             return false;
         }
     }
+    
+    /**
+     * HÀM MỚI: Xử lý logic nghiệp vụ Cập nhật giường
+     */
+    public void updateGiuong(GiuongBenhDTO dto) throws Exception {
+        // 1. Lấy Entity hiện tại từ DB
+        GiuongBenh existingBed = giuongBenhDAO.getGiuongById(dto.getId());
+        
+        if (existingBed == null) {
+            throw new Exception("Giường không tồn tại để cập nhật.");
+        }
+        
+        // 2. Kiểm tra trạng thái: Không cho cập nhật nếu đang dùng
+        if (TRANG_THAI_DANG_SU_DUNG.equals(existingBed.getTrangThai())) {
+            // Ném IllegalStateException cho lỗi nghiệp vụ
+            throw new IllegalStateException("Không thể cập nhật giường đang có bệnh nhân sử dụng.");
+        }
+        // Tùy chọn: Bạn có thể thêm kiểm tra trạng thái NGUNG_HOAT_DON nếu muốn
+        // if (TRANG_THAI_XOA.equals(existingBed.getTrangThai())) { ... }
+
+        // 3. Cập nhật thông tin từ DTO vào Entity
+        existingBed.setTenGiuong(dto.getTenGiuong());
+        
+        // Tạo tham chiếu đến Phòng Bệnh mới (chỉ cần ID)
+        PhongBenh phongBenhRef = new PhongBenh();
+        phongBenhRef.setId(dto.getPhongBenhId());
+        existingBed.setPhongBenh(phongBenhRef);
+        
+        // Không thay đổi trạng thái ở đây
+
+        // 4. Gọi DAO để lưu thay đổi
+        giuongBenhDAO.updateGiuong(existingBed); // DAO sẽ dùng merge hoặc update
+    }
 
     /**
      * Lấy danh sách giường trong một phòng
@@ -193,6 +237,28 @@ public class GiuongBenhService {
             dtoList.add(convertToDTO(entity));
         }
         return dtoList;
+    }
+    
+    /**
+     * HÀM MỚI: Xử lý logic xóa mềm
+     */
+    public void softDeleteGiuong(int bedId) throws Exception {
+        // 1. Lấy entity để kiểm tra logic
+        // (Bạn cần thêm hàm getById vào DAO)
+        GiuongBenh giuong = giuongBenhDAO.getGiuongById(bedId); 
+        
+        if (giuong == null) {
+            throw new Exception("Giường không tồn tại để xóa.");
+        }
+
+        // 2. Logic nghiệp vụ: Không cho xóa giường đang có bệnh nhân
+        if ("DANG_SU_DUNG".equals(giuong.getTrangThai())) {
+            throw new Exception("Không thể xóa giường đang có bệnh nhân.");
+        }
+        
+        // 3. Nếu logic OK, gọi DAO để cập nhật
+        // (Bạn cần thêm hàm updateTrangThai vào DAO)
+        giuongBenhDAO.updateTrangThai(bedId, "NGUNG_HOAT_DONG");
     }
 
     // --- Phương thức chuyển đổi (Helper Methods) ---

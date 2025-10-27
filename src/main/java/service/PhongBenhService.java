@@ -9,15 +9,24 @@ import model.Entity.PhongBenh;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import model.Entity.GiuongBenh;
+import model.dao.GiuongBenhDAO;
 
 public class PhongBenhService {
 
     private PhongBenhDAO phongBenhDAO;
     private KhoaDAO khoaDAO;
+    private GiuongBenhDAO giuongBenhDAO; // MỚI
+
+    // Hằng số xóa mềm
+    private static final String TRANG_THAI_XOA = "NGUNG_HOAT_DONG";
+    private static final String TRANG_THAI_DANG_SU_DUNG = "DANG_SU_DUNG";
 
     public PhongBenhService() {
         this.phongBenhDAO = new PhongBenhDAO();
         this.khoaDAO = new KhoaDAO();
+        this.giuongBenhDAO = new GiuongBenhDAO();
     }
 
     /**
@@ -120,20 +129,49 @@ public class PhongBenhService {
         return dtos;
     }
     
+    /**
+     * CẬP NHẬT: Hàm searchPhongBenh
+     * Sẽ gọi DAO (đã được sửa) để LỌC BỎ các phòng đã xóa.
+     */
     public List<PhongBenhDTO> searchPhongBenh(String keyword) {
         List<PhongBenh> entities;
         if (keyword == null || keyword.trim().isEmpty()) {
-            entities = phongBenhDAO.getAllPhongBenh();
+            entities = phongBenhDAO.getAllPhongBenh(); // DAO này PHẢI được sửa
         } else {
-            entities = phongBenhDAO.findPhongBenhByKeyword(keyword);
+            entities = phongBenhDAO.findPhongBenhByKeyword(keyword); // DAO này PHẢI được sửa
         }
         
-        // Chuyển List<Entity> sang List<DTO>
-        List<PhongBenhDTO> dtoList = new ArrayList<>();
-        for (PhongBenh entity : entities) {
-            dtoList.add(convertToDTO(entity));
+        // Chuyển đổi sang DTO
+        return entities.stream()
+                       .map(this::convertToDTO)
+                       .collect(Collectors.toList());
+    }
+    
+    /**
+     * HÀM MỚI: Xử lý logic nghiệp vụ Xóa mềm Phòng
+     */
+    public void softDeletePhongBenh(int roomId) throws Exception {
+        // 1. Lấy TẤT CẢ giường trong phòng (kể cả giường đã xóa)
+        // (Bạn cần sửa GiuongBenhDAO.getGiuongByPhongBenhId để không lọc)
+        List<GiuongBenh> bedsInRoom = giuongBenhDAO.getAllGiuongByPhongBenhId_Check(roomId);
+
+        // 2. Kiểm tra điều kiện:
+        for (GiuongBenh bed : bedsInRoom) {
+            if (TRANG_THAI_DANG_SU_DUNG.equals(bed.getTrangThai())) {
+                throw new Exception("Không thể xóa. Phòng đang có bệnh nhân tại giường [" + bed.getTenGiuong() + "].");
+            }
         }
-        return dtoList;
+
+        // 3. Nếu điều kiện OK, tiến hành xóa mềm các giường con
+        for (GiuongBenh bed : bedsInRoom) {
+            // Chỉ xóa mềm nếu nó chưa bị xóa
+            if (!TRANG_THAI_XOA.equals(bed.getTrangThai())) {
+                giuongBenhDAO.updateTrangThai(bed.getId(), TRANG_THAI_XOA);
+            }
+        }
+        
+        // 4. Xóa mềm phòng
+        phongBenhDAO.updateTrangThai(roomId, TRANG_THAI_XOA);
     }
 
     // --- Phương thức chuyển đổi (Helper Methods) ---
@@ -188,6 +226,7 @@ public class PhongBenhService {
         }
 
         entity.setKhoa(khoa);
+        entity.setTrangThai("HOAT_DONG");
         return entity;
     }
 }

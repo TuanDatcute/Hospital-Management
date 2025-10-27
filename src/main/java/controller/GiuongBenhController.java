@@ -34,63 +34,64 @@ public class GiuongBenhController extends HttpServlet {
 
     /**
      * Cập nhật doGet:
-     * - Nhận 'searchKeyword' từ request.
-     * - Gọi service tìm kiếm (thay vì getAll) để lấy 'bedList' đã lọc.
-     * - Tải dữ liệu cho các form như cũ.
+     * - Thêm xử lý cho action 'getBedForUpdate'.
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        request.setCharacterEncoding("UTF-8"); 
         
-        request.setCharacterEncoding("UTF-8"); // Đảm bảo đọc UTF-8
+        // === THÊM MỚI: Lấy action ===
+        String action = request.getParameter("action");
+        if (action == null) action = "listBeds"; // Mặc định là list
+        // ============================
 
         try {
-            // =============================================
-            //        THAY ĐỔI BẮT ĐẦU TỪ ĐÂY
-            // =============================================
-            
-            // 1. Lấy từ khóa tìm kiếm từ parameter (form GET)
             String searchKeyword = request.getParameter("searchKeyword");
-
-            // 2. Lấy danh sách giường (ĐÃ LỌC)
-            // Giả sử bạn tạo một service method mới tên là searchGiuong(keyword)
-            // Nếu keyword là null hoặc rỗng, service này nên trả về tất cả
+            
+            // 1. Lấy danh sách giường (ĐÃ LỌC, loại bỏ giường đã xóa)
             List<GiuongBenhDTO> bedList = giuongBenhService.searchGiuong(searchKeyword);
             
-            // =============================================
-            //        THAY ĐỔI KẾT THÚC
-            // =============================================
-
-            // 3. Lấy danh sách bệnh nhân (cho form gán) - Giữ nguyên
+            // 2. Lấy danh sách bệnh nhân (cho form gán)
             List<BenhNhanDTO> patientList = benhNhanService.getBenhNhanChuaCoGiuong();
 
-            // 4. Lấy danh sách phòng (cho form tạo giường) - Giữ nguyên
-            List<PhongBenhDTO> roomList = phongBenhService.getAllPhongBenh();
+            // 3. Lấy danh sách phòng (cho form thêm/sửa giường)
+            List<PhongBenhDTO> roomList = phongBenhService.getAllPhongBenh(); // Lấy phòng còn hoạt động
 
-            // 5. Gửi tất cả dữ liệu sang JSP
+            // 4. Gửi danh sách ra JSP
             request.setAttribute("bedList", bedList);
             request.setAttribute("patientList", patientList);
             request.setAttribute("roomList", roomList); 
-            
-            // Không cần setAttribute cho searchKeyword vì JSP có thể
-            // lấy trực tiếp từ ${param.searchKeyword}
+
+            // === THÊM MỚI: Xử lý lấy giường để cập nhật ===
+            if ("getBedForUpdate".equals(action)) {
+                 int bedId = Integer.parseInt(request.getParameter("bedId"));
+                 // Giả sử service có hàm getById trả về DTO
+                 GiuongBenhDTO bedToUpdate = giuongBenhService.getGiuongById(bedId); 
+                 request.setAttribute("bedToUpdate", bedToUpdate);
+            }
+            // ============================================
 
         } catch (Exception e) {
             request.setAttribute("error", "Lỗi tải dữ liệu giường bệnh: " + e.getMessage());
+            e.printStackTrace(); // In lỗi ra console
         } finally {
-            // Forward 1 lần duy nhất đến JSP
             request.getRequestDispatcher("GiuongBenh.jsp").forward(request, response);
         }
     }
 
+    /**
+     * CẬP NHẬT: Thêm case 'updateBed'
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // ... (GIỮ NGUYÊN TOÀN BỘ PHẦN doPost CỦA BẠN, KHÔNG CẦN SỬA) ...
+        
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
         if (action == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Action không được cung cấp.");
             return;
         }
 
@@ -104,10 +105,74 @@ public class GiuongBenhController extends HttpServlet {
             case "releaseBed":
                 releasePatientFromBed(request, response);
                 break;
+            case "deleteBed":
+                deleteBed(request, response);
+                break;
+            // === THÊM MỚI ===
+            case "updateBed":
+                 updateBed(request, response);
+                 break;
+            default:
+                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Action không hợp lệ: " + action);
         }
     }
+    
+    /**
+     * HÀM MỚI: Xử lý cập nhật thông tin giường
+     */
+    private void updateBed(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String urlRedirect = "MainController?action=listBeds";
+        int bedId = 0; // Khởi tạo để dùng trong catch
+        try {
+            bedId = Integer.parseInt(request.getParameter("bedId"));
+            String tenGiuong = request.getParameter("tenGiuong");
+            String phongBenhIdStr = request.getParameter("phongBenhId");
 
-    // ... (CÁC HÀM createBed, assignPatientToBed, releasePatientFromBed GIỮ NGUYÊN) ...
+            // --- VALIDATION ---
+            if (tenGiuong == null || tenGiuong.trim().isEmpty()) {
+                throw new IllegalArgumentException("Tên giường không được để trống.");
+            }
+            if (phongBenhIdStr == null || phongBenhIdStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("Vui lòng chọn một phòng bệnh.");
+            }
+            // --- KẾT THÚC VALIDATION ---
+
+            int phongBenhId = Integer.parseInt(phongBenhIdStr);
+
+            GiuongBenhDTO bedToUpdate = new GiuongBenhDTO();
+            bedToUpdate.setId(bedId);
+            bedToUpdate.setTenGiuong(tenGiuong.trim());
+            bedToUpdate.setPhongBenhId(phongBenhId);
+            // Trạng thái không cần set, Service sẽ tự kiểm tra và giữ nguyên nếu hợp lệ
+
+            // Gọi service để cập nhật (Service sẽ kiểm tra trạng thái)
+            giuongBenhService.updateGiuong(bedToUpdate);
+
+            urlRedirect += "&updateSuccess=true"; // Thêm param thành công
+
+        } catch (NumberFormatException e) {
+             urlRedirect += "&updateError=" + java.net.URLEncoder.encode("ID giường hoặc ID phòng không hợp lệ.", "UTF-8");
+             if (bedId > 0) urlRedirect += "&bedId=" + bedId; // Giữ lại ID nếu có thể
+             e.printStackTrace();
+        } catch (IllegalArgumentException e) { // Lỗi validation
+             urlRedirect += "&updateError=" + java.net.URLEncoder.encode(e.getMessage(), "UTF-8");
+             if (bedId > 0) urlRedirect += "&bedId=" + bedId;
+             e.printStackTrace();
+        } catch (IllegalStateException e) { // Lỗi nghiệp vụ từ Service (vd: giường đang dùng)
+             urlRedirect += "&updateError=" + java.net.URLEncoder.encode(e.getMessage(), "UTF-8");
+             if (bedId > 0) urlRedirect += "&bedId=" + bedId;
+             e.printStackTrace();
+        } catch (Exception e) { // Lỗi khác
+            urlRedirect += "&updateError=" + java.net.URLEncoder.encode("Lỗi hệ thống khi cập nhật giường: " + e.getMessage(), "UTF-8");
+            if (bedId > 0) urlRedirect += "&bedId=" + bedId;
+            e.printStackTrace();
+        }
+        response.sendRedirect(urlRedirect);
+    }
+
+
+    // (Các hàm createBed, assignPatientToBed, releasePatientFromBed, deleteBed giữ nguyên)
+    // ...
     private void createBed(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String urlRedirect = "MainController?action=listBeds";
         try {
@@ -162,6 +227,19 @@ public class GiuongBenhController extends HttpServlet {
             urlRedirect += "&releaseSuccess=true";
         } catch (Exception e) {
             urlRedirect += "&releaseError=" + e.getMessage();
+        }
+        response.sendRedirect(urlRedirect);
+    }
+    
+    private void deleteBed(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String urlRedirect = "MainController?action=listBeds";
+        try {
+            int bedId = Integer.parseInt(request.getParameter("bedId"));
+            giuongBenhService.softDeleteGiuong(bedId); 
+            urlRedirect += "&deleteSuccess=true";
+        } catch (Exception e) {
+            urlRedirect += "&deleteError=" + java.net.URLEncoder.encode(e.getMessage(), "UTF-8");
+            e.printStackTrace();
         }
         response.sendRedirect(urlRedirect);
     }

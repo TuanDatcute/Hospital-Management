@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import model.Entity.GiaoDichThanhToan;
+import model.dao.ChiDinhDichVuDAO;
+import model.dao.DonThuocDAO;
 import model.dao.GiaoDichThanhToanDAO;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -23,6 +25,19 @@ import org.hibernate.Transaction;
 import util.HibernateUtil;
 
 public class HoaDonService {
+    private final HoaDonDAO hoaDonDAO;
+    private final PhieuKhamBenhDAO phieuKhamBenhDAO;
+    private final ChiDinhDichVuDAO chiDinhDichVuDAO;
+    private final DonThuocDAO donThuocDAO;
+    private final SessionFactory sessionFactory;
+
+    public HoaDonService() {
+        this.hoaDonDAO = new HoaDonDAO();
+        this.phieuKhamBenhDAO = new PhieuKhamBenhDAO();
+        this.chiDinhDichVuDAO = new ChiDinhDichVuDAO();
+        this.donThuocDAO = new DonThuocDAO();
+        this.sessionFactory = HibernateUtil.getSessionFactory();
+    }
 
     /**
      * Tạo một hóa đơn mới
@@ -88,14 +103,15 @@ public class HoaDonService {
         return dtos;
     }
 
-    /**
-     * Lấy 1 hóa đơn bằng ID THAY ĐỔI: Sử dụng int
-     */
-    public HoaDonDTO getHoaDonById(int id) {
-        // Giả sử DAO đã cập nhật
-        HoaDonDAO hoaDonDAO = new HoaDonDAO();
-        HoaDon entity = hoaDonDAO.getHoaDonById(id);
-        return convertToDTO(entity);
+    public HoaDonDTO getHoaDonById(int invoiceId) throws Exception {
+        try (Session session = sessionFactory.openSession()) {
+            HoaDon hoaDonEntity = hoaDonDAO.getById(invoiceId, session);
+            if (hoaDonEntity == null) {
+                throw new Exception("Không tìm thấy hóa đơn.");
+            }
+            // Gọi hàm convert "phẳng" mà bạn đã có
+            return convertToDTO(hoaDonEntity); 
+        }
     }
 
     /**
@@ -197,6 +213,64 @@ public class HoaDonService {
                 session.close();
             }
         }
+    }
+    
+    /**
+     * HÀM MỚI: Tạo Hóa đơn từ Phiếu khám
+     * @return ID của hóa đơn mới được tạo
+     */
+    public int generateInvoice(int phieuKhamId) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        HoaDon newInvoice;
+
+        try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
+
+            // 1. Lấy Phiếu khám
+            PhieuKhamBenh phieuKham = phieuKhamBenhDAO.getById(phieuKhamId, session);
+            if (phieuKham == null) {
+                throw new Exception("Phiếu khám không tồn tại.");
+            }
+            
+            // 2. Kiểm tra xem hóa đơn đã tồn tại chưa
+            // (Giả sử bạn đã thêm @OneToOne vào PhieuKhamBenh, kiểm tra sẽ đơn giản hơn)
+            if (hoaDonDAO.isInvoiceExistsForPhieuKham(phieuKhamId, session)) {
+                 throw new Exception("Hóa đơn cho phiếu khám " + phieuKham.getMaPhieuKham() + " đã tồn tại.");
+            }
+
+            // 3. Tính tổng tiền dịch vụ
+            BigDecimal totalService = chiDinhDichVuDAO.calculateTotalService(phieuKhamId, session);
+            
+            // 4. Tính tổng tiền thuốc
+            BigDecimal totalMedication = donThuocDAO.calculateTotalMedication(phieuKhamId, session);
+
+            BigDecimal tongTien = totalService.add(totalMedication);
+
+            // 5. Tạo Hóa đơn mới
+            newInvoice = new HoaDon();
+            newInvoice.setMaHoaDon("HD-" + phieuKham.getMaPhieuKham()); // Tạo mã HĐ
+            newInvoice.setNgayTao(LocalDateTime.now());
+            newInvoice.setTrangThai("CHUA_THANH_TOAN");
+            newInvoice.setTongTien(tongTien);
+            newInvoice.setBenhNhan(phieuKham.getBenhNhan()); // Liên kết Bệnh nhân
+            newInvoice.setPhieuKhamBenh(phieuKham);             // Liên kết Phiếu khám
+            
+            // 6. Lưu Hóa đơn
+            hoaDonDAO.save(newInvoice, session);
+
+            // 7. Commit
+            transaction.commit();
+            
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            throw e; // Ném lỗi ra để Controller xử lý
+        } finally {
+            if (session != null) session.close();
+        }
+        
+        return newInvoice.getId();
     }
 
     // --- Phương thức chuyển đổi (Helper Methods) ---

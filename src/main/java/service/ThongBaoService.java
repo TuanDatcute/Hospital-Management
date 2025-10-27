@@ -1,166 +1,264 @@
 // path: com/service/ThongBaoService.java
 package service;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime; // Hoặc java.util.Date
 import java.util.ArrayList;
+import java.util.Collections; // Import Collections
 import model.dao.TaiKhoanDAO;
 import model.dao.ThongBaoDAO;
 import model.dto.ThongBaoDTO;
 import model.Entity.TaiKhoan;
 import model.Entity.ThongBao;
+import util.HibernateUtil; // Cần cho transaction
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+
 
 import java.util.List;
-// import java.util.stream.Collectors; // Không được sử dụng
+import java.util.stream.Collectors; // Sử dụng Stream API cho ngắn gọn
 
 public class ThongBaoService {
 
-    private ThongBaoDAO thongBaoDAO;
-    private TaiKhoanDAO taiKhoanDAO;
+    private final ThongBaoDAO thongBaoDAO;
+    private final TaiKhoanDAO taiKhoanDAO;
+    private final SessionFactory sessionFactory; // Cần cho quản lý transaction
+
+    // === Hằng số trạng thái ===
+    private static final String TRANG_THAI_ACTIVE = "HOAT_DONG"; 
+    private static final String TRANG_THAI_XOA = "NGUNG_HOAT_DONG";   
+    // ========================
 
     public ThongBaoService() {
         this.thongBaoDAO = new ThongBaoDAO();
         this.taiKhoanDAO = new TaiKhoanDAO();
+        this.sessionFactory = HibernateUtil.getSessionFactory(); // Khởi tạo SessionFactory
     }
 
-    // Tạo một thông báo mới
-    public boolean createThongBao(ThongBaoDTO dto) {
+    /**
+     * HÀM MỚI: Tìm kiếm các thông báo đang hoạt động theo keyword.
+     * @param keyword Từ khóa tìm kiếm (tiêu đề hoặc nội dung)
+     * @return Danh sách ThongBaoDTO
+     */
+    public List<ThongBaoDTO> searchActiveNotifications(String keyword) {
+        List<ThongBao> entities;
+        if (keyword == null || keyword.trim().isEmpty()) {
+            // Giả sử DAO có hàm này (chỉ lấy ACTIVE)
+            entities = thongBaoDAO.findAllActive(); 
+        } else {
+            // Giả sử DAO có hàm này (tìm theo keyword và chỉ lấy ACTIVE)
+            entities = thongBaoDAO.findActiveByKeyword(keyword); 
+        }
+
+        // Chuyển đổi List<Entity> sang List<DTO>
+        return entities.stream()
+                       .map(this::convertToDTO)
+                       .collect(Collectors.toList());
+    }
+
+    /**
+     * HÀM MỚI: Lấy thông báo theo ID (trả về DTO).
+     * Dùng cho form cập nhật.
+     */
+    public ThongBaoDTO getNotificationById(int notificationId) {
+        // Giả sử DAO có hàm getThongBaoById(int id)
+        ThongBao entity = thongBaoDAO.getThongBaoById(notificationId); 
+        return convertToDTO(entity);
+    }
+
+
+    /**
+     * HÀM MỚI: Tạo thông báo cho nhiều người dùng (quản lý transaction).
+     * @param tieuDe Tiêu đề thông báo
+     * @param noiDung Nội dung thông báo
+     * @param targetType Loại đối tượng ('ALL', 'ROLE', 'USER')
+     * @param targetValue Giá trị đối tượng ('ALL', tên vai trò, ID tài khoản)
+     * @throws Exception Nếu có lỗi xảy ra
+     */
+    public void createNotification(String tieuDe, String noiDung, String targetType, String targetValue) throws Exception {
+        List<Integer> targetAccountIds = new ArrayList<>();
+
+        // 1. Xác định danh sách ID tài khoản nhận thông báo
+        switch (targetType) {
+            case "ALL":
+                // Giả sử TaiKhoanDAO có hàm này
+                targetAccountIds = taiKhoanDAO.getAllActiveTaiKhoanIds(); 
+                break;
+            case "ROLE":
+                // Giả sử TaiKhoanDAO có hàm này
+                targetAccountIds = taiKhoanDAO.getActiveTaiKhoanIdsByRole(targetValue); 
+                break;
+            case "USER":
+                try {
+                    int accountId = Integer.parseInt(targetValue);
+                    // Kiểm tra xem tài khoản có tồn tại và active không (tùy chọn)
+                    TaiKhoan tk = taiKhoanDAO.getById(accountId); // Giả sử có hàm này
+                    if (tk != null /* && tk is active */) {
+                       targetAccountIds.add(accountId);
+                    } else {
+                        throw new IllegalArgumentException("Tài khoản với ID " + accountId + " không tồn tại hoặc không hoạt động.");
+                    }
+                } catch (NumberFormatException e) {
+                     throw new IllegalArgumentException("ID tài khoản không hợp lệ: " + targetValue);
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Loại đối tượng không hợp lệ: " + targetType);
+        }
+
+        if (targetAccountIds.isEmpty()) {
+            // Không ném lỗi mà chỉ thông báo (hoặc ghi log)
+            System.out.println("Không tìm thấy tài khoản hợp lệ để gửi thông báo.");
+            return; // Không có gì để làm
+        }
+
+        // 2. Tạo và lưu thông báo trong một transaction
+        Session session = null;
+        Transaction transaction = null;
         try {
-            // Bước 1: Chuyển DTO sang Entity (Sử dụng hàm helper mới)
-            ThongBao thongBao = convertToEntity(dto);
-            if (thongBao == null) {
-                // Lỗi xảy ra nếu không tìm thấy TaiKhoan (hoặc taiKhoanId = 0)
-                return false;
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
+
+            for (Integer accountId : targetAccountIds) {
+                ThongBao entity = new ThongBao();
+                entity.setTieuDe(tieuDe);
+                entity.setNoiDung(noiDung);
+                entity.setDaDoc(false); // Mặc định là chưa đọc
+                entity.setTrangThai(TRANG_THAI_ACTIVE); // Mặc định là active
+                entity.setThoiGianGui(LocalDateTime.now()); // Hoặc new Date()
+
+                // Tạo tham chiếu đến TaiKhoan (chỉ cần ID)
+                TaiKhoan taiKhoanRef = session.load(TaiKhoan.class, accountId);
+                entity.setTaiKhoan(taiKhoanRef);
+
+                // Giả sử DAO có hàm saveInSession(entity, session)
+                thongBaoDAO.saveInSession(entity, session); 
             }
 
-            // Bước 2: Lưu vào CSDL
-            thongBaoDAO.addThongBao(thongBao);
-            return true;
+            transaction.commit();
+
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace(); // Nên dùng logger
+            // Ném lại lỗi để Controller biết
+            throw new Exception("Lỗi hệ thống khi tạo thông báo hàng loạt: " + e.getMessage(), e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
-    // Đánh dấu một thông báo là đã đọc
-    // THAY ĐỔI: Sử dụng int
+     /**
+     * HÀM MỚI: Cập nhật Tiêu đề và Nội dung của thông báo.
+     * @param dto DTO chứa ID, Tiêu đề mới, Nội dung mới
+     * @throws Exception Nếu có lỗi
+     */
+    public void updateNotification(ThongBaoDTO dto) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
+
+            // Lấy entity hiện tại (nên dùng hàm getById trong transaction)
+            ThongBao existingNotification = thongBaoDAO.getThongBaoById(dto.getId(), session); // Sửa DAO để nhận session
+
+            if (existingNotification == null) {
+                throw new IllegalArgumentException("Thông báo với ID " + dto.getId() + " không tồn tại.");
+            }
+            
+            // Chỉ cho sửa thông báo đang active
+            if (!TRANG_THAI_ACTIVE.equals(existingNotification.getTrangThai())) {
+                 throw new IllegalStateException("Không thể sửa thông báo đã bị xóa.");
+            }
+
+            // Cập nhật các trường cho phép sửa
+            existingNotification.setTieuDe(dto.getTieuDe());
+            existingNotification.setNoiDung(dto.getNoiDung());
+            // Không cho sửa người nhận, trạng thái đọc, thời gian gửi...
+
+            // Gọi DAO để update (trong transaction)
+            thongBaoDAO.updateInSession(existingNotification, session); // Sửa DAO để nhận session
+
+            transaction.commit();
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+             e.printStackTrace(); // Nên dùng logger
+            // Ném lại lỗi
+            throw e;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+
+    /**
+     * HÀM MỚI: Xóa mềm thông báo.
+     * @param notificationId ID của thông báo cần xóa
+     * @throws Exception Nếu có lỗi
+     */
+    public void softDeleteNotification(int notificationId) throws Exception {
+        // Gọi DAO để cập nhật trạng thái
+        // Giả sử DAO `updateTrangThai` tự quản lý transaction của nó
+        thongBaoDAO.updateTrangThai(notificationId, TRANG_THAI_XOA); 
+    }
+
+
+    // --- Các hàm cũ có thể cần sửa lại ---
+
+    // Đánh dấu đã đọc (Giữ nguyên logic, nhưng DAO nên được sửa)
     public boolean markAsRead(int thongBaoId) {
         try {
-            // Giả sử DAO đã cập nhật
-            ThongBao thongBao = thongBaoDAO.getThongBaoById(thongBaoId); 
-            if (thongBao != null && !thongBao.isDaDoc()) {
-                thongBao.setDaDoc(true);
-                thongBaoDAO.updateThongBao(thongBao);
-                return true;
-            }
-            return false;
+            // Service không nên tự mở session/transaction cho các thao tác đơn lẻ
+            // DAO nên cung cấp hàm markAsRead(id) tự quản lý transaction
+            return thongBaoDAO.markAsRead(thongBaoId); // Giả sử DAO có hàm này
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    // Lấy tất cả thông báo cho một người dùng (trả về DTO)
-    // THAY ĐỔI: Sử dụng int
-    public List<ThongBaoDTO> getTatCaThongBao(int taiKhoanId) {
-        // 1. Lấy danh sách Entity từ DAO (Giả sử DAO đã cập nhật)
-        List<ThongBao> entities = thongBaoDAO.getThongBaoByTaiKhoanId(taiKhoanId);
-
-        // 2. Khởi tạo một danh sách DTO mới (rỗng)
-        List<ThongBaoDTO> dtos = new ArrayList<>();
-
-        // 3. Lặp qua từng 'entity' trong danh sách 'entities'
-        for (ThongBao entity : entities) {
-
-            // 4. (Thực hành tốt) Kiểm tra xem entity có null không
-            if (entity != null) {
-
-                // 5. Chuyển đổi entity đó sang DTO và thêm vào danh sách 'dtos'
-                dtos.add(this.convertToDTO(entity));
-            }
-        }
-
-        // 6. Trả về danh sách DTO đã được chuyển đổi
-        return dtos;
+    // Lấy tất cả thông báo ACTIVE cho người dùng (Sửa lại)
+    public List<ThongBaoDTO> getActiveNotificationsForUser(int taiKhoanId) {
+        // Giả sử DAO có hàm getActiveByTaiKhoanId(id)
+        List<ThongBao> entities = thongBaoDAO.getActiveByTaiKhoanId(taiKhoanId);
+        return entities.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    // Lấy các thông báo CHƯA ĐỌC cho người dùng
-    // THAY ĐỔI: Sử dụng int
-    public List<ThongBaoDTO> getThongBaoChuaDoc(int taiKhoanId) {
-        // 1. Lấy danh sách Entity từ DAO (Giả sử DAO đã cập nhật)
-        List<ThongBao> entities = thongBaoDAO.getThongBaoChuaDocByTaiKhoanId(taiKhoanId);
-
-        // 2. Khởi tạo một danh sách DTO rỗng
-        List<ThongBaoDTO> dtos = new ArrayList<>();
-
-        // 3. Dùng vòng lặp for-each để duyệt qua danh sách entities
-        for (ThongBao entity : entities) {
-
-            // 4. (Nên có) Kiểm tra xem entity có bị null hay không
-            if (entity != null) {
-
-                // 5. Chuyển đổi Entity thành DTO và thêm vào danh sách dtos
-                dtos.add(this.convertToDTO(entity));
-            }
-        }
-
-        // 6. Trả về danh sách DTO đã được chuyển đổi
-        return dtos;
+    // Lấy thông báo CHƯA ĐỌC và ACTIVE (Sửa lại)
+    public List<ThongBaoDTO> getUnreadActiveNotificationsForUser(int taiKhoanId) {
+        // Giả sử DAO có hàm getUnreadActiveByTaiKhoanId(id)
+        List<ThongBao> entities = thongBaoDAO.getUnreadActiveByTaiKhoanId(taiKhoanId);
+        return entities.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    // --- Phương thức chuyển đổi (Helper Methods) ---
-    // Chuyển Entity sang DTO
+
+    // --- Phương thức chuyển đổi (Giữ nguyên) ---
     private ThongBaoDTO convertToDTO(ThongBao entity) {
-        if (entity == null) {
-            return null;
-        }
-
-        // Giả sử ThongBaoDTO đã được cập nhật để nhận int cho ID
-        return new ThongBaoDTO(
-                entity.getId(),
-                entity.getTieuDe(),
-                entity.getNoiDung(),
-                entity.isDaDoc(),
-                entity.getThoiGianGui(),
-                // THAY ĐỔI: Nếu không có tài khoản, gán 0 (vì DTO dùng int)
-                entity.getTaiKhoan() != null ? entity.getTaiKhoan().getId() : 0 
-        );
+        if (entity == null) return null;
+        // Giả sử DTO của bạn có constructor phù hợp hoặc dùng setters
+         ThongBaoDTO dto = new ThongBaoDTO();
+         dto.setId(entity.getId());
+         dto.setTieuDe(entity.getTieuDe());
+         dto.setNoiDung(entity.getNoiDung());
+         dto.setDaDoc(entity.isDaDoc());
+         dto.setThoiGianGui(entity.getThoiGianGui()); // Giả sử DTO dùng Date/OffsetDateTime
+         dto.setTrangThai(entity.getTrangThai());
+         dto.setTaiKhoanId(entity.getTaiKhoan() != null ? entity.getTaiKhoan().getId() : 0);
+         return dto;
     }
 
-    // *** HÀM MỚI: Chuyển DTO sang Entity ***
-    private ThongBao convertToEntity(ThongBaoDTO dto) {
-        if (dto == null) {
-            return null;
-        }
-
-        ThongBao entity = new ThongBao();
-
-        // Gán các giá trị đơn giản
-        // THAY ĐỔI: Kiểm tra != 0 (giả định 0 là ID cho entity mới)
-        if (dto.getId() != 0) {
-            entity.setId(dto.getId());
-        }
-        
-        entity.setTieuDe(dto.getTieuDe());
-        entity.setNoiDung(dto.getNoiDung());
-        entity.setDaDoc(dto.isDaDoc());
-        // Không set thoiGianGui vì nó được @CreationTimestamp quản lý khi tạo mới
-
-        // Xử lý khóa ngoại (quan trọng)
-        // THAY ĐỔI: Kiểm tra != 0 thay vì != null (vì dto.getTaiKhoanId() là int)
-        if (dto.getTaiKhoanId() != 0) {
-            // Giả sử DAO đã cập nhật
-            TaiKhoan taiKhoan = taiKhoanDAO.getById(dto.getTaiKhoanId()); 
-            if (taiKhoan == null) {
-                // Nếu không tìm thấy tài khoản, không thể tạo entity hợp lệ
-                System.err.println("Không tìm thấy tài khoản với ID: " + dto.getTaiKhoanId() + " khi chuyển đổi DTO sang Entity.");
-                return null;
-            }
-            entity.setTaiKhoan(taiKhoan);
-        } else {
-            // Nếu logic của bạn yêu cầu phải có taiKhoanId (ID = 0 là không hợp lệ)
-            System.err.println("taiKhoanId là 0 trong DTO.");
-            return null;
-        }
-
-        return entity;
-    }
+    // Hàm này không còn cần thiết nếu dùng hàm createNotification mới
+    /*
+    private ThongBao convertToEntity(ThongBaoDTO dto) { ... }
+    */
 }

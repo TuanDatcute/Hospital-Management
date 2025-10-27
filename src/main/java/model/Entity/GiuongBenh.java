@@ -18,7 +18,7 @@ public class GiuongBenh {
 
     @Column(name = "trang_thai", length = 50, nullable = false, columnDefinition = "NVARCHAR(MAX)")
     @ColumnDefault("'TRONG'")
-    private String trangThai ; // 'TRONG', 'DANG_SU_DUNG', 'DANG_DON_DEP', 'BAO_TRI'
+    private String trangThai ; // 'TRONG', 'DANG_SU_DUNG', 'NGUNG_HOAT_DONG'
 
     // Nhiều giường bệnh thuộc MỘT phòng bệnh
     @ManyToOne(fetch = FetchType.LAZY)
