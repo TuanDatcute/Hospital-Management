@@ -51,13 +51,13 @@ public class NhanVienController extends HttpServlet {
                 case "listNhanVien":
                     url = listNhanVien(request);
                     break;
-                case "showCreateForm":
+                case "showNhanVienCreateForm":
                     loadFormDependencies(request, "createNhanVien"); // Truyền action vào
                     request.setAttribute("formAction", "createNhanVien");
                     url = NHANVIEN_FORM_PAGE;
                     break;
-                case "showEditForm":
-                    url = showEditForm(request);
+                case "showNhanVienEditForm":
+                    url = showNhanVienEditForm(request);
                     break;
                 // Không xử lý delete bằng GET nữa
                 default:
@@ -131,7 +131,7 @@ public class NhanVienController extends HttpServlet {
      /**
      * Lấy thông tin Nhân Viên cần sửa và hiển thị form.
      */
-    private String showEditForm(HttpServletRequest request) throws Exception {
+    private String showNhanVienEditForm(HttpServletRequest request) throws Exception {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             // Service đã được cập nhật để chỉ lấy nhân viên hoạt động

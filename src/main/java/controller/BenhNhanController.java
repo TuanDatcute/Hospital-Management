@@ -46,13 +46,13 @@ public class BenhNhanController extends HttpServlet {
                 case "listBenhNhan":
                     url = listBenhNhan(request);
                     break;
-                case "showCreateForm":
+                case "showBenhNhanCreateForm":
                     loadFormDependencies(request, "createBenhNhan");
                     request.setAttribute("formAction", "createBenhNhan");
                     url = BENHNHAN_FORM_PAGE;
                     break;
-                case "showEditForm":
-                    url = showEditForm(request);
+                case "showBenhNhanEditForm":
+                    url = showBenhNhanEditForm(request);
                     break;
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho GET.");
@@ -123,7 +123,7 @@ public class BenhNhanController extends HttpServlet {
      /**
      * Lấy thông tin Bệnh nhân cần sửa và hiển thị form.
      */
-    private String showEditForm(HttpServletRequest request) throws Exception {
+    private String showBenhNhanEditForm(HttpServletRequest request) throws Exception {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             BenhNhanDTO benhNhan = benhNhanService.getBenhNhanById(id);

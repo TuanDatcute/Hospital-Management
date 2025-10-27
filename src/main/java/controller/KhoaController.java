@@ -42,13 +42,13 @@ public class KhoaController extends HttpServlet {
                 case "listKhoa":
                     url = listKhoa(request);
                     break;
-                case "showCreateForm":
+                case "showKhoaCreateForm":
                     // Chỉ cần chuyển đến trang form, không cần load dữ liệu gì thêm
                     request.setAttribute("formAction", "createKhoa"); // Gửi action cho form biết là tạo mới
                     url = KHOA_FORM_PAGE;
                     break;
-                case "showEditForm":
-                    url = showEditForm(request);
+                case "showKhoaEditForm":
+                    url = showKhoaEditForm(request);
                     break;
                 case "deleteKhoa": // Xử lý xóa bằng GET (cẩn thận!) hoặc POST tùy thiết kế
                     url = deleteKhoa(request);
@@ -130,7 +130,7 @@ public class KhoaController extends HttpServlet {
      /**
      * Lấy thông tin Khoa cần sửa và hiển thị form.
      */
-    private String showEditForm(HttpServletRequest request) throws Exception {
+    private String showKhoaEditForm(HttpServletRequest request) throws Exception {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             KhoaDTO khoa = khoaService.getKhoaById(id);
