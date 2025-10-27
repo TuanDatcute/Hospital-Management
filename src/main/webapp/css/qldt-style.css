@@ -1,0 +1,282 @@
+/* ==========================================================================
+   CSS cho trang Chi Tiết Đơn Thuốc
+   ========================================================================== */
+
+/* Biến màu và thiết lập chung (có thể đặt trong file style.css chính) */
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --border-color: #dee2e6;
+    --background-color: #f4f7f6;
+}
+
+body {
+    font-family: 'Roboto', -apple-system, sans-serif;
+    background-color: var(--background-color);
+    margin: 0;
+    color: var(--dark-color);
+}
+
+.main-container {
+    width: 90%;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px 40px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Các khu vực chính của trang */
+.header-section, .table-section, .controls {
+    margin-bottom: 30px;
+}
+.header-section h1 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+.prescription-info {
+    text-align: center;
+    color: #6c757d;
+    line-height: 1.6;
+}
+.prescription-info p {
+    margin: 4px 0;
+}
+.prescription-info strong {
+    color: var(--text-color);
+}
+.controls {
+    text-align: right;
+}
+
+h2 {
+    color: var(--dark-color);
+    font-size: 22px;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+/* Bảng dữ liệu */
+.table-responsive {
+    overflow-x: auto;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+.data-table th, .data-table td {
+    border: 1px solid var(--border-color);
+    padding: 12px 15px;
+    vertical-align: middle;
+}
+.data-table thead th {
+    background-color: var(--light-color);
+    font-weight: 500;
+    text-align: left;
+}
+.data-table tbody tr:hover {
+    background-color: #f1f3f5;
+}
+.text-right {
+    text-align: right;
+}
+.text-center {
+    text-align: center;
+}
+.actions {
+    min-width: 120px;
+}
+.actions .btn, .actions form {
+    margin: 0 3px;
+}
+
+/* Các nút bấm chung */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+.btn:active {
+    transform: translateY(1px);
+}
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+.btn-success {
+    background-color: var(--success-color);
+    color: white;
+}
+.btn-edit {
+    background-color: var(--warning-color);
+    color: var(--dark-color);
+}
+.btn-delete {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+/* Hộp thông báo */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+}
+.alert-danger {
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+}
+.alert-success {
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+}
+
+/* Các thành phần Form chung */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+label {
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 14px;
+}
+.form-control {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+/* ==========================================================================
+   STYLE CHO POPUP (MODAL)
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 0;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    transform: translateY(-20px) scale(0.95);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.modal-overlay.active .modal-content {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.modal-header {
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+.modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+.close-button {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--secondary-color);
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s, color 0.2s;
+}
+.close-button:hover {
+    background-color: #f1f3f5;
+    color: var(--dark-color);
+}
+
+.modal-body {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.modal-footer {
+    padding: 20px 30px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background-color: var(--light-color);
+    border-top: 1px solid var(--border-color);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+/* Trong file chiTiet-style.css */
+
+.modal-overlay {
+    /* ... (các thuộc tính khác) ... */
+    z-index: 1000; /* Đảm bảo lớp phủ nền có z-index */
+}
+
+.modal-content {
+    /* ... (các thuộc tính khác) ... */
+    position: relative; /* Rất quan trọng */
+    z-index: 1001;      /* ✨ Đặt z-index cao hơn lớp phủ nền */
+}

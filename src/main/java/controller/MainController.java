@@ -12,10 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author tungi (đã chỉnh sửa)
- */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 public class MainController extends HttpServlet {
 
@@ -32,6 +28,7 @@ public class MainController extends HttpServlet {
     private static final String CATALOG_CONTROLLER = "CatalogController";
     private static final String PHONG_BENH_CONTROLLER = "PhongBenhController";
     private static final String GIUONG_BENH_CONTROLLER = "GiuongBenhController";
+    private static final String DON_THUOC_CONTROLLER = "DonThuocController";
     private static final String HOA_DON_GIAO_DICH_THANH_TOAN_CONTROLLER = "HoaDon_GiaoDichThanhToanController";
 
     /**
@@ -52,6 +49,11 @@ public class MainController extends HttpServlet {
         String url = LOGIN_PAGE; // Mặc định chuyển về trang login nếu action không hợp lệ
 
         // 2. Nhóm các action cho từng controller
+        String[] userActions = {"login", "logout", "searchUser"};
+
+        String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateForm","listAllEncounters","viewEncounterDetails"};
+
+        String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication"};
         String[] userActions = {"login", "logout", "listUsers", "showCreateForm", "createUser", "showEditForm", "updateUserStatus"};
         String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateForm"};
         String[] khoaActions = {"listKhoa", "showCreateForm", "createKhoa", "showEditForm", "updateKhoa", "deleteKhoa"};
@@ -59,7 +61,7 @@ public class MainController extends HttpServlet {
         String[] benhNhanActions = {"listBenhNhan", "showCreateForm", "createBenhNhan", "showEditForm", "updateBenhNhan","deleteBenhNhan"};
         String[] lichHenActions = {"listLichHen", "showCreateForm", "createLichHen", "updateLichHenStatus"};
 
-        String[] CatalogActions = {"createService", "showCreateServiceForm"};
+        String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateThuocForm","createPrescription"};
 
         String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate"};
 
@@ -88,6 +90,8 @@ public class MainController extends HttpServlet {
             url = GIUONG_BENH_CONTROLLER;
         } else if (Arrays.asList(CatalogActions).contains(action)) {
             url = CATALOG_CONTROLLER;
+        } else if (Arrays.asList(DonThuocActions).contains(action)) {
+            url = DON_THUOC_CONTROLLER;
         } else if (Arrays.asList(HoaDon_GiaoDichThanhToanActions).contains(action)) {
             url = HOA_DON_GIAO_DICH_THANH_TOAN_CONTROLLER;
         }

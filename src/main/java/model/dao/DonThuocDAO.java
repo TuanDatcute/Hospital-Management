@@ -4,6 +4,7 @@
  */
 package model.dao;
 
+import java.util.Collections;
 import java.util.List;
 import model.Entity.DonThuoc;
 import org.hibernate.Session;
@@ -12,6 +13,11 @@ import org.hibernate.query.Query;
 import util.HibernateUtil;
 
 public class DonThuocDAO {
+
+    public DonThuoc create(DonThuoc donThuoc, Session session) {
+        session.save(donThuoc);
+        return donThuoc;
+    }
 
     public DonThuoc create(DonThuoc donThuoc) {
         Transaction transaction = null;
@@ -29,12 +35,72 @@ public class DonThuocDAO {
         }
     }
 
+    // Trong dao/DonThuocDAO.java
     public DonThuoc getById(int id) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(DonThuoc.class, id);
+            Query<DonThuoc> query = session.createQuery(
+                    "SELECT DISTINCT dt FROM DonThuoc dt "
+                    + "LEFT JOIN FETCH dt.phieuKham pk "
+                    + "LEFT JOIN FETCH pk.benhNhan "
+                    + "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
+                    + "LEFT JOIN FETCH cdt.thuoc "
+                    + "WHERE dt.id = :id",
+                    DonThuoc.class
+            );
+            query.setParameter("id", id);
+            return query.uniqueResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    // Trong dao/DonThuocDAO.java
+    public List<DonThuoc> getAll() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<DonThuoc> query = session.createQuery(
+                    // Dùng DISTINCT để tránh các bản ghi DonThuoc bị lặp lại
+                    "SELECT DISTINCT dt FROM DonThuoc dt "
+                    + "LEFT JOIN FETCH dt.phieuKham pk "
+                    + "LEFT JOIN FETCH pk.benhNhan "
+                    + "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
+                    + // Lấy danh sách chi tiết
+                    "LEFT JOIN FETCH cdt.thuoc "
+                    + // Lấy luôn thông tin thuốc trong chi tiết
+                    "ORDER BY dt.ngayKeDon DESC",
+                    DonThuoc.class
+            );
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Tìm kiếm các đơn thuốc theo tên bệnh nhân (tìm kiếm tương đối).
+     *
+     */
+    public List<DonThuoc> findByPatientName(String patientName) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+
+            Query<DonThuoc> query = session.createQuery(
+                    "SELECT DISTINCT dt FROM DonThuoc dt "
+                    + "LEFT JOIN FETCH dt.phieuKham pk "
+                    + "LEFT JOIN FETCH pk.benhNhan bn "
+                    + "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
+                    + // Lấy danh sách chi tiết
+                    "LEFT JOIN FETCH cdt.thuoc "
+                    + // Lấy luôn thông tin thuốc trong chi tiết
+                    "WHERE bn.hoTen LIKE :keyword "
+                    + "ORDER BY dt.ngayKeDon DESC",
+                    DonThuoc.class
+            );
+            query.setParameter("keyword", "%" + patientName + "%");
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
         }
     }
 

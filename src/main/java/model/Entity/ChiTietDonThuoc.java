@@ -4,8 +4,7 @@
  */
 package model.Entity;
 
-import model.Entity.DonThuoc;
-import model.Entity.Thuoc;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;

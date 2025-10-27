@@ -75,11 +75,31 @@ public class PhieuKhamBenhDAO {
     //Xem chi tiết một lần khám.
     public PhieuKhamBenh getEncounterById(int phieuKhamId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(PhieuKhamBenh.class, phieuKhamId);
+            Query<PhieuKhamBenh> query = session.createQuery(
+                    "SELECT pkb FROM PhieuKhamBenh pkb "
+                    + "LEFT JOIN FETCH pkb.benhNhan "
+                    + "LEFT JOIN FETCH pkb.bacSi "
+                    + "LEFT JOIN FETCH pkb.donThuoc dt "
+                    + // Lấy đơn thuốc liên quan
+                    "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
+                    + // Lấy danh sách chi tiết của đơn thuốc
+                    "LEFT JOIN FETCH cdt.thuoc "
+                    + // Lấy luôn thông tin thuốc trong chi tiết
+                    "WHERE pkb.id = :id",
+                    PhieuKhamBenh.class
+            );
+            query.setParameter("id", phieuKhamId);
+            return query.uniqueResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public PhieuKhamBenh getEncounterById(int id, Session session) {
+        Query<PhieuKhamBenh> query = session.createQuery("FROM PhieuKhamBenh pk LEFT JOIN FETCH pk.benhNhan WHERE pk.id = :id", PhieuKhamBenh.class);
+        query.setParameter("id", id);
+        return query.uniqueResult();
     }
 
     //
@@ -97,7 +117,22 @@ public class PhieuKhamBenhDAO {
 
     public List<PhieuKhamBenh> getAll() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("FROM PhieuKhamBenh", PhieuKhamBenh.class).list();
+
+            Query<PhieuKhamBenh> query = session.createQuery(
+                    // Dùng DISTINCT để tránh các bản ghi PhieuKhamBenh bị lặp lại
+                    "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb "
+                    + "LEFT JOIN FETCH pkb.benhNhan "
+                    + "LEFT JOIN FETCH pkb.bacSi "
+                    + "LEFT JOIN FETCH pkb.donThuoc dt "
+                    + // Lấy đơn thuốc liên quan
+                    "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
+                    + // Lấy danh sách chi tiết của đơn thuốc
+                    "LEFT JOIN FETCH cdt.thuoc "
+                    + // Lấy luôn thông tin thuốc trong chi tiết
+                    "ORDER BY pkb.thoiGianKham DESC",
+                    PhieuKhamBenh.class
+            );
+            return query.list();
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
