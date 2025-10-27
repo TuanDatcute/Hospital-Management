@@ -5,10 +5,10 @@
 package model.dao;
 
 import model.Entity.PhieuKhamBenh;
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.hibernate.Transaction;
 import util.HibernateUtil;
@@ -18,6 +18,12 @@ import util.HibernateUtil;
  * @author SunnyU
  */
 public class PhieuKhamBenhDAO {
+
+    private final SessionFactory sessionFactory;
+
+    public PhieuKhamBenhDAO() {
+        this.sessionFactory = HibernateUtil.getSessionFactory();
+    }
 
     //Tạo một phiếu khám bệnh mới khi bệnh nhân đến khám.
     public PhieuKhamBenh create(PhieuKhamBenh phieuKham) {
@@ -162,5 +168,37 @@ public class PhieuKhamBenhDAO {
             e.printStackTrace();
             return Collections.emptyList();
         }
+    }
+
+    // HQL để tìm PKB chưa có hóa đơn (HoaDon là null)
+    private static final String UNINVOICED_HQL
+            = "SELECT p FROM PhieuKhamBenh p"
+            + " JOIN FETCH p.benhNhan bn"
+            + " JOIN FETCH p.bacSi nv"
+            + " WHERE NOT EXISTS ("
+            + "SELECT 1 FROM HoaDon h WHERE h.phieuKhamBenh = p)";
+
+    public List<PhieuKhamBenh> findUninvoiced() {
+        try ( Session session = sessionFactory.openSession()) {
+            return session.createQuery(UNINVOICED_HQL, PhieuKhamBenh.class).list();
+        }
+    }
+
+    public List<PhieuKhamBenh> findUninvoicedByKeyword(String keyword) {
+        String hql = UNINVOICED_HQL
+                + " AND (p.maPhieuKham LIKE :keyword "
+                + "OR bn.hoTen LIKE :keyword "
+                + "OR nv.hoTen LIKE :keyword)";
+
+        try ( Session session = sessionFactory.openSession()) {
+            Query<PhieuKhamBenh> query = session.createQuery(hql, PhieuKhamBenh.class);
+            query.setParameter("keyword", "%" + keyword + "%");
+            return query.list();
+        }
+    }
+
+    // Hàm này cần cho Service tạo hóa đơn
+    public PhieuKhamBenh getById(int id, Session session) {
+        return session.get(PhieuKhamBenh.class, id);
     }
 }

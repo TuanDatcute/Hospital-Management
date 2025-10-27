@@ -4,8 +4,11 @@
  */
 package model.dao;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import model.Entity.ChiTietDonThuoc;
 import model.Entity.DonThuoc;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -131,6 +134,49 @@ public class DonThuocDAO {
                 transaction.rollback();
             }
             e.printStackTrace();
+        }
+    }
+
+    public BigDecimal calculateTotalMedication(int phieuKhamId, Session session) {
+        String hql = "SELECT SUM(ctdt.soLuong * ctdt.thuoc.donGia) FROM ChiTietDonThuoc ctdt "
+                + "WHERE ctdt.donThuoc.phieuKham.id = :phieuKhamId";
+        BigDecimal total = session.createQuery(hql, BigDecimal.class)
+                .setParameter("phieuKhamId", phieuKhamId)
+                .uniqueResult();
+        return total == null ? BigDecimal.ZERO : total;
+    }
+
+    /**
+     * Lấy tất cả Chi tiết Đơn thuốc (kèm thông tin Thuốc) của một Phiếu khám
+     * bệnh cụ thể.
+     *
+     * @param phieuKhamId ID của Phiếu khám bệnh cần tìm.
+     * @param session Session Hibernate (do Service quản lý) để tham gia vào
+     * transaction.
+     * @return List các Entity ChiTietDonThuoc.
+     */
+    public List<ChiTietDonThuoc> findChiTietByPhieuKhamId(int phieuKhamId, Session session) {
+
+        // HQL này truy vấn dựa trên quan hệ Entity:
+        // ChiTietDonThuoc -> donThuoc -> phieuKham
+        //
+        // 'JOIN FETCH ctdt.thuoc' là rất quan trọng:
+        // Nó yêu cầu Hibernate tải luôn thông tin của Entity Thuoc
+        // trong cùng 1 câu query, tránh lỗi N+1.
+        String hql = "SELECT ctdt FROM ChiTietDonThuoc ctdt "
+                + "JOIN FETCH ctdt.thuoc "
+                + "WHERE ctdt.donThuoc.phieuKham.id = :phieuKhamId";
+
+        // Không cần try-with-resources cho session vì nó được 
+        // truyền từ bên ngoài (Service) và sẽ được đóng ở đó.
+        try {
+            Query<ChiTietDonThuoc> query = session.createQuery(hql, ChiTietDonThuoc.class);
+            query.setParameter("phieuKhamId", phieuKhamId);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Trả về danh sách rỗng nếu có lỗi để tránh NullPointerException
+            return new ArrayList<>();
         }
     }
 }

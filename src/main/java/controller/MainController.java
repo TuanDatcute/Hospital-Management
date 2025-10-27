@@ -30,6 +30,7 @@ public class MainController extends HttpServlet {
     private static final String GIUONG_BENH_CONTROLLER = "GiuongBenhController";
     private static final String DON_THUOC_CONTROLLER = "DonThuocController";
     private static final String HOA_DON_GIAO_DICH_THANH_TOAN_CONTROLLER = "HoaDon_GiaoDichThanhToanController";
+    private static final String THONG_BAO_CONTROLLER = "ThongBaoController";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -60,14 +61,11 @@ public class MainController extends HttpServlet {
         String[] nhanVienActions = {"listNhanVien", "showCreateForm", "createNhanVien", "showEditForm", "updateNhanVien", "deleteNhanVien"};
         String[] benhNhanActions = {"listBenhNhan", "showCreateForm", "createBenhNhan", "showEditForm", "updateBenhNhan","deleteBenhNhan"};
         String[] lichHenActions = {"listLichHen", "showCreateForm", "createLichHen", "updateLichHenStatus"};
-
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateThuocForm","createPrescription"};
-
-        String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate"};
-
-        String[] GiuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed"};
-
-        String[] HoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices"};
+        String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate", "deleteRoom"};
+        String[] GiuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed", "deleteBed", "updateBed", "getBedForUpdate"};
+        String[] HoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice"};
+        String[] ThongBaoActions = {"getThongBaoForUpdate", "createThongBao", "updateThongBao", "deleteThongBao", "listNotifications"};
 
         // 3. Điều hướng dựa trên action
         if (action == null) {
@@ -94,6 +92,8 @@ public class MainController extends HttpServlet {
             url = DON_THUOC_CONTROLLER;
         } else if (Arrays.asList(HoaDon_GiaoDichThanhToanActions).contains(action)) {
             url = HOA_DON_GIAO_DICH_THANH_TOAN_CONTROLLER;
+        } else if (Arrays.asList(ThongBaoActions).contains(action)) {
+            url = THONG_BAO_CONTROLLER;
         }
 
         // 4. Forward đến controller tương ứng

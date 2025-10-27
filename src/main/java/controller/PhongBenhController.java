@@ -25,10 +25,9 @@ public class PhongBenhController extends HttpServlet {
     }
 
     /**
-     * Sửa đổi doGet:
-     * - Nhận 'searchKeyword' để lọc danh sách phòng.
-     * - Tải danh sách khoa (cho form).
-     * - Xử lý 'getRoomForUpdate' (giữ nguyên).
+     * doGet (KHÔNG THAY ĐỔI)
+     * Hàm 'searchPhongBenh' ở Service sẽ tự động lọc bỏ
+     * các phòng đã bị xóa mềm ('NGUNG_HOAT_DON').
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,33 +38,17 @@ public class PhongBenhController extends HttpServlet {
         String action = request.getParameter("action");
         if (action == null) action = "listRooms";
 
-        // =============================================
-        //        BẮT ĐẦU THAY ĐỔI
-        // =============================================
-        // Lấy từ khóa tìm kiếm
         String searchKeyword = request.getParameter("searchKeyword");
-        // =============================================
-        //        KẾT THÚC THAY ĐỔI
-        // =============================================
 
         try {
             // 1. Luôn tải danh sách khoa (cho form)
             List<KhoaDTO> khoaList = khoaService.getAllKhoa();
             request.setAttribute("khoaList", khoaList);
             
-            // =============================================
-            //        BẮT ĐẦU THAY ĐỔI
-            // =============================================
-            
             // 2. Tải danh sách phòng (ĐÃ LỌC)
-            // Giả sử service của bạn có method searchPhongBenh(keyword)
-            // Nếu keyword là null/rỗng, service này sẽ trả về tất cả
+            // Service sẽ chỉ trả về các phòng 'HOAT_DONG'
             List<PhongBenhDTO> roomList = phongBenhService.searchPhongBenh(searchKeyword);
             request.setAttribute("roomList", roomList);
-
-            // =============================================
-            //        KẾT THÚC THAY ĐỔI
-            // =============================================
 
             // 3. Xử lý nếu có action 'getRoomForUpdate' (Giữ nguyên)
             if (action.equals("getRoomForUpdate")) {
@@ -82,10 +65,13 @@ public class PhongBenhController extends HttpServlet {
         }
     }
 
+    /**
+     * CẬP NHẬT: Thêm case "deleteRoom"
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // ... (GIỮ NGUYÊN TOÀN BỘ PHẦN doPost, KHÔNG CẦN SỬA) ...
+        
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
         if (action == null) {
@@ -100,10 +86,40 @@ public class PhongBenhController extends HttpServlet {
             case "updateRoom":
                 updateRoom(request, response);
                 break;
+            // === THÊM MỚI ===
+            case "deleteRoom":
+                deleteRoom(request, response);
+                break;
         }
     }
 
-    // ... (CÁC HÀM createRoom VÀ updateRoom GIỮ NGUYÊN) ...
+    /**
+     * HÀM MỚI: Xử lý yêu cầu xóa mềm phòng bệnh
+     */
+    private void deleteRoom(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        String urlRedirect = "MainController?action=listRooms";
+        try {
+            int roomId = Integer.parseInt(request.getParameter("roomId"));
+            
+            // 1. Gọi service để thực hiện logic nghiệp vụ
+            // (Service sẽ kiểm tra giường 'DANG_SU_DUNG',
+            //  xóa mềm giường con, và cuối cùng xóa mềm phòng)
+            phongBenhService.softDeletePhongBenh(roomId);
+            
+            // 2. Gửi thông báo thành công
+            urlRedirect += "&deleteSuccess=true";
+            
+        } catch (Exception e) {
+            // 3. Bắt lỗi nghiệp vụ (vd: phòng đang có bệnh nhân)
+            urlRedirect += "&deleteError=" + java.net.URLEncoder.encode(e.getMessage(), "UTF-8");
+            e.printStackTrace();
+        }
+        // 4. Chuyển hướng
+        response.sendRedirect(urlRedirect);
+    }
+    
+    // (Hàm createRoom giữ nguyên)
     private void createRoom(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         String urlRedirect = "MainController?action=listRooms";
@@ -129,6 +145,7 @@ public class PhongBenhController extends HttpServlet {
         response.sendRedirect(urlRedirect);
     }
     
+    // (Hàm updateRoom giữ nguyên)
     private void updateRoom(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         String urlRedirect = "MainController?action=listRooms";
@@ -145,6 +162,7 @@ public class PhongBenhController extends HttpServlet {
             roomToUpdate.setLoaiPhong(loaiPhong);
             roomToUpdate.setSucChua(sucChua);
             roomToUpdate.setKhoaId(khoaId);
+            roomToUpdate.setTrangThai("HOAT_DONG");
 
             phongBenhService.updatePhongBenh(roomToUpdate);
             

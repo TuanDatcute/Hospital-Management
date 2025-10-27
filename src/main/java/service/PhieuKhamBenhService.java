@@ -1,6 +1,7 @@
 package service;
 
 import exception.ValidationException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import model.Entity.BenhNhan;
@@ -81,6 +82,30 @@ public class PhieuKhamBenhService {
         return entities.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * HÀM MỚI: Lấy các phiếu khám chưa có hóa đơn (để tìm kiếm)
+     */
+    public List<PhieuKhamBenhDTO> getUninvoicedEncounters(String keyword) {
+        List<PhieuKhamBenh> entities;
+        if (keyword == null || keyword.trim().isEmpty()) {
+            entities = phieuKhamDAO.findUninvoiced();
+        } else {
+            entities = phieuKhamDAO.findUninvoicedByKeyword(keyword);
+        }
+
+        // Tạo một danh sách mới để chứa các DTO
+        List<PhieuKhamBenhDTO> dtos = new ArrayList<>();
+
+        // Lặp qua từng 'entity' trong danh sách 'entities'
+        for (PhieuKhamBenh entity : entities) {
+            // Chuyển đổi 'entity' thành DTO và thêm vào danh sách 'dtos'
+            dtos.add(this.toDTO(entity));
+        }
+
+        // Trả về danh sách DTO đã hoàn chỉnh
+        return dtos;
     }
 
     /**
