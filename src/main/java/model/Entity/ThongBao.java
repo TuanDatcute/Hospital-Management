@@ -15,11 +15,11 @@ public class ThongBao {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "tieu_de", length = 255, nullable = false)
+    @Column(name = "tieu_de", length = 255, nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String tieuDe;
 
     @Lob // Dùng @Lob cho kiểu TEXT để hỗ trợ nội dung dài
-    @Column(name = "noi_dung")
+    @Column(name = "noi_dung", columnDefinition = "NVARCHAR(MAX)")
     private String noiDung;
 
     // Đặt giá trị mặc định trực tiếp trong CSDL

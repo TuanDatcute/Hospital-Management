@@ -119,6 +119,22 @@ public class PhongBenhService {
         }
         return dtos;
     }
+    
+    public List<PhongBenhDTO> searchPhongBenh(String keyword) {
+        List<PhongBenh> entities;
+        if (keyword == null || keyword.trim().isEmpty()) {
+            entities = phongBenhDAO.getAllPhongBenh();
+        } else {
+            entities = phongBenhDAO.findPhongBenhByKeyword(keyword);
+        }
+        
+        // Chuyển List<Entity> sang List<DTO>
+        List<PhongBenhDTO> dtoList = new ArrayList<>();
+        for (PhongBenh entity : entities) {
+            dtoList.add(convertToDTO(entity));
+        }
+        return dtoList;
+    }
 
     // --- Phương thức chuyển đổi (Helper Methods) ---
 

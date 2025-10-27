@@ -19,7 +19,7 @@ public class GiaoDichThanhToan {
     @Column(name = "so_tien", precision = 15, scale = 2, nullable = false)
     private BigDecimal soTien;
 
-    @Column(name = "phuong_thuc", length = 50, nullable = false)
+    @Column(name = "phuong_thuc", length = 50, nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String phuongThuc; // 'Tiền mặt', 'Chuyển khoản', 'Thẻ'
 
     @CreationTimestamp // Tự động gán thời gian khi tạo mới

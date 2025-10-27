@@ -4,6 +4,7 @@ package model.dto;
 // import com.model.TrangThaiHoaDon; // Không cần import Enum nữa
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class HoaDonDTO {
     private int id;
@@ -15,7 +16,25 @@ public class HoaDonDTO {
     private String trangThai; // Dùng String
     
     private int benhNhanId;
+    private String hoTenBenhNhan;
     private int phieuKhamId;
+    private String maPhieuKhamBenh;
+
+    public String getMaPhieuKhamBenh() {
+        return maPhieuKhamBenh;
+    }
+
+    public void setMaPhieuKhamBenh(String maPhieuKhamBenh) {
+        this.maPhieuKhamBenh = maPhieuKhamBenh;
+    }
+
+    public String getHoTenBenhNhan() {
+        return hoTenBenhNhan;
+    }
+
+    public void setHoTenBenhNhan(String hoTenBenhNhan) {
+        this.hoTenBenhNhan = hoTenBenhNhan;
+    }
 
     // Constructors
     public HoaDonDTO() {
@@ -76,5 +95,11 @@ public class HoaDonDTO {
 
     public void setPhieuKhamId(int phieuKhamId) {
         this.phieuKhamId = phieuKhamId;
+    }
+    
+    public String getNgayTaoFormatted() {
+        if (ngayTao == null) return "";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        return ngayTao.format(formatter);
     }
 }

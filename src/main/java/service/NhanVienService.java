@@ -7,6 +7,7 @@ import model.dao.KhoaDAO;
 import model.dao.NhanVienDAO;
 import model.dao.TaiKhoanDAO;
 import model.dto.NhanVienDTO;
+import java.time.LocalDateTime; 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Collections;
@@ -39,7 +40,6 @@ public class NhanVienService {
             throw new Exception("ID Tài khoản không hợp lệ. Phải gán một tài khoản.");
         }
         
-        // Kiểm tra SĐT trùng (nếu có cung cấp)
         if (dto.getSoDienThoai() != null && !dto.getSoDienThoai().trim().isEmpty()) {
             if (nhanVienDAO.isSoDienThoaiExisted(dto.getSoDienThoai())) {
                 throw new Exception("Số điện thoại '" + dto.getSoDienThoai() + "' đã tồn tại.");
@@ -48,18 +48,18 @@ public class NhanVienService {
         
         // --- BƯỚC 2: KIỂM TRA & LẤY CÁC ENTITY LIÊN QUAN ---
         
-        // 2.1. Kiểm tra TaiKhoan
         TaiKhoan taiKhoanEntity = taiKhoanDAO.getById(dto.getTaiKhoanId());
         if (taiKhoanEntity == null) {
             throw new Exception("Không tìm thấy Tài khoản với ID: " + dto.getTaiKhoanId());
         }
+        if (!"HOAT_DONG".equals(taiKhoanEntity.getTrangThai())) {
+             throw new Exception("Không thể gán tài khoản đã bị khóa.");
+        }
         
-        // 2.2. Kiểm tra tài khoản đã được gán chưa (vì là OneToOne UNIQUE)
         if (nhanVienDAO.isTaiKhoanIdLinked(dto.getTaiKhoanId())) {
              throw new Exception("Tài khoản này đã được gán cho một nhân viên khác.");
         }
 
-        // 2.3. Kiểm tra Khoa (Khoa có thể null)
         Khoa khoaEntity = null; 
         if (dto.getKhoaId() != null && dto.getKhoaId() > 0) {
             khoaEntity = khoaDAO.getById(dto.getKhoaId());
@@ -76,7 +76,9 @@ public class NhanVienService {
 
         // --- BƯỚC 5: TRẢ VỀ DTO ---
         if (savedEntity != null) {
-            return toDTO(savedEntity); 
+             // Tải lại để đảm bảo có đủ thông tin relations cho toDTO
+            NhanVien fullSavedEntity = nhanVienDAO.getByIdWithRelations(savedEntity.getId());
+            return toDTO(fullSavedEntity); 
         }
         return null;
     }
@@ -86,18 +88,22 @@ public class NhanVienService {
      */
     public NhanVienDTO updateNhanVien(int nhanVienId, NhanVienDTO dto) throws Exception {
         
-        // --- BƯỚC 1: LẤY ENTITY GỐC ---
-        NhanVien existingEntity = nhanVienDAO.getById(nhanVienId);
+        // --- BƯỚC 1: LẤY ENTITY GỐC (Kèm relations để kiểm tra) ---
+        NhanVien existingEntity = nhanVienDAO.getByIdWithRelations(nhanVienId); 
         if (existingEntity == null) {
             throw new Exception("Không tìm thấy nhân viên với ID: " + nhanVienId);
         }
+        // Kiểm tra xem tài khoản có bị khóa không (không cho sửa nhân viên bị khóa)
+        if (existingEntity.getTaiKhoan() == null || !"HOAT_DONG".equals(existingEntity.getTaiKhoan().getTrangThai())) {
+             throw new Exception("Không thể cập nhật thông tin cho nhân viên có tài khoản bị khóa hoặc không tồn tại.");
+        }
+
 
         // --- BƯỚC 2: VALIDATION ---
         if (dto.getHoTen() == null || dto.getHoTen().trim().isEmpty()) {
             throw new Exception("Họ tên không được để trống.");
         }
         
-        // Kiểm tra SĐT nếu SĐT có thay đổi
         String newSdt = dto.getSoDienThoai();
         if (newSdt != null && !newSdt.trim().isEmpty() && !newSdt.equals(existingEntity.getSoDienThoai())) {
             if (nhanVienDAO.isSoDienThoaiExisted(newSdt)) {
@@ -114,10 +120,8 @@ public class NhanVienService {
         existingEntity.setChuyenMon(dto.getChuyenMon());
         existingEntity.setBangCap(dto.getBangCap());
 
-        // Cập nhật Khoa (nếu có thay đổi)
         Integer newKhoaId = dto.getKhoaId();
         if (newKhoaId != null && newKhoaId > 0) {
-            // Nếu ID khoa mới khác ID khoa cũ, hoặc cũ là null
             if (existingEntity.getKhoa() == null || existingEntity.getKhoa().getId() != newKhoaId) {
                 Khoa khoaEntity = khoaDAO.getById(newKhoaId);
                 if (khoaEntity == null) {
@@ -126,11 +130,9 @@ public class NhanVienService {
                 existingEntity.setKhoa(khoaEntity);
             }
         } else {
-            existingEntity.setKhoa(null); // Gán là null nếu DTO yêu cầu
+            existingEntity.setKhoa(null); 
         }
         
-        // Không cho phép cập nhật TaiKhoanId
-
         // --- BƯỚC 4: GỌI DAO ĐỂ CẬP NHẬT ---
         boolean success = nhanVienDAO.update(existingEntity);
         if (!success) {
@@ -138,44 +140,79 @@ public class NhanVienService {
         }
 
         // --- BƯỚC 5: TRẢ VỀ DTO (ĐÃ CẬP NHẬT) ---
+        // Tải lại để đảm bảo dữ liệu mới nhất
         NhanVien updatedEntity = nhanVienDAO.getByIdWithRelations(nhanVienId);
         return toDTO(updatedEntity);
     }
 
+     /**
+     * Dịch vụ thực hiện Soft Delete cho Nhân Viên.
+     * Bằng cách cập nhật trạng thái của TaiKhoan liên kết thành 'BI_KHOA'.
+     * @param nhanVienId ID của nhân viên cần "xóa".
+     * @throws Exception nếu không tìm thấy nhân viên hoặc lỗi cập nhật tài khoản.
+     */
+    public void softDeleteNhanVien(int nhanVienId) throws Exception {
+        NhanVien nhanVien = nhanVienDAO.getByIdWithRelations(nhanVienId);
+        if (nhanVien == null) {
+            throw new Exception("Không tìm thấy nhân viên với ID: " + nhanVienId + " để xóa.");
+        }
+
+        TaiKhoan taiKhoan = nhanVien.getTaiKhoan();
+        if (taiKhoan == null) {
+             throw new Exception("Nhân viên (ID: " + nhanVienId + ") không có tài khoản liên kết.");
+        }
+
+        if (!"BI_KHOA".equals(taiKhoan.getTrangThai())) {
+            taiKhoan.setTrangThai("BI_KHOA");
+            taiKhoan.setUpdatedAt(LocalDateTime.now()); 
+
+            boolean success = taiKhoanDAO.update(taiKhoan);
+            if (!success) {
+                throw new Exception("Không thể cập nhật trạng thái tài khoản cho nhân viên ID: " + nhanVienId);
+            }
+        }
+    }
+
 
     /**
-     * Lấy nhân viên bằng ID.
+     * Lấy nhân viên bằng ID (chỉ trả về nếu tài khoản đang hoạt động).
      */
     public NhanVienDTO getNhanVienById(int id) throws Exception {
         NhanVien entity = nhanVienDAO.getByIdWithRelations(id); 
-        if (entity == null) {
-            throw new Exception("Không tìm thấy nhân viên với ID: " + id);
+        if (entity == null || entity.getTaiKhoan() == null || !"HOAT_DONG".equals(entity.getTaiKhoan().getTrangThai())) {
+            throw new Exception("Không tìm thấy nhân viên đang hoạt động với ID: " + id);
         }
         return toDTO(entity);
     }
     
     /**
-     * Lấy tất cả nhân viên.
+     * Lấy tất cả nhân viên đang hoạt động.
      */
     public List<NhanVienDTO> getAllNhanVien() {
         List<NhanVien> entities = nhanVienDAO.getAllWithRelations();
         
+        // Lọc ra những nhân viên có tài khoản hoạt động
         return entities.stream()
+                       .filter(nv -> nv.getTaiKhoan() != null && "HOAT_DONG".equals(nv.getTaiKhoan().getTrangThai()))
                        .map(this::toDTO)
                        .collect(Collectors.toList());
     }
 
     /**
-     * Dịch vụ tìm tất cả nhân viên có chuyên môn là "Bác sĩ".
+     * Dịch vụ tìm tất cả bác sĩ đang hoạt động.
+     * @return 
      */
     public List<NhanVienDTO> findDoctorsBySpecialty() {
+        // DAO cần được sửa để tối ưu hơn, tạm thời lọc ở Service
         List<NhanVien> entities = nhanVienDAO.findDoctorsBySpecialty();
 
         if (entities == null) {
             return Collections.emptyList();
         }
 
+        // Lọc bác sĩ đang hoạt động
         return entities.stream()
+                .filter(nv -> nv.getTaiKhoan() != null && "HOAT_DONG".equals(nv.getTaiKhoan().getTrangThai()))
                 .map(this::toDTO) 
                 .collect(Collectors.toList());
     }
@@ -185,6 +222,7 @@ public class NhanVienService {
      * Chuyển NhanVien (Entity) sang NhanVienDTO (Làm phẳng liên kết).
      */
     private NhanVienDTO toDTO(NhanVien entity) {
+        if (entity == null) return null; // Thêm kiểm tra null
         NhanVienDTO dto = new NhanVienDTO();
         
         dto.setId(entity.getId());

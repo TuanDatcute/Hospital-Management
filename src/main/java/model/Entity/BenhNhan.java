@@ -20,28 +20,28 @@ public class BenhNhan {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "ma_benh_nhan", nullable = false, unique = true)
+    @Column(name = "ma_benh_nhan", nullable = false, unique = true, columnDefinition = "NVARCHAR(MAX)")
     private String maBenhNhan;
 
-    @Column(name = "ho_ten", nullable = false)
+    @Column(name = "ho_ten", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String hoTen;
 
     @Column(name = "ngay_sinh")
     private LocalDateTime ngaySinh; 
 
-    @Column(name = "gioi_tinh")
+    @Column(name = "gioi_tinh", columnDefinition = "NVARCHAR(MAX)")
     private String gioiTinh;
 
-    @Column(name = "dia_chi")
+    @Column(name = "dia_chi", columnDefinition = "NVARCHAR(MAX)")
     private String diaChi;
 
-    @Column(name = "so_dien_thoai")
+    @Column(name = "so_dien_thoai", columnDefinition = "NVARCHAR(MAX)")
     private String soDienThoai;
 
-    @Column(name = "nhom_mau")
+    @Column(name = "nhom_mau", columnDefinition = "NVARCHAR(MAX)")
     private String nhomMau;
 
-    @Column(name = "tien_su_benh")
+    @Column(name = "tien_su_benh", columnDefinition = "NVARCHAR(MAX)")
     private String tienSuBenh;
 
     @OneToOne(fetch = FetchType.LAZY, optional = true) 

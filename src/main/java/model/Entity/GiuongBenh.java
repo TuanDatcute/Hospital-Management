@@ -13,10 +13,10 @@ public class GiuongBenh {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "ten_giuong", length = 100, nullable = false)
+    @Column(name = "ten_giuong", length = 100, nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String tenGiuong; // 'Giường 01'
 
-    @Column(name = "trang_thai", length = 50, nullable = false)
+    @Column(name = "trang_thai", length = 50, nullable = false, columnDefinition = "NVARCHAR(MAX)")
     @ColumnDefault("'TRONG'")
     private String trangThai ; // 'TRONG', 'DANG_SU_DUNG', 'DANG_DON_DEP', 'BAO_TRI'
 

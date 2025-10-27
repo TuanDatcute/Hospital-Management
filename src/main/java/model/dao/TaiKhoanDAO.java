@@ -149,4 +149,41 @@ public class TaiKhoanDAO {
             return true; // Failsafe
         }
     }
+    
+    /**
+     * Tìm các tài khoản đang hoạt động và chưa được gán cho bất kỳ
+     * Nhân viên hay Bệnh nhân nào.
+     * @param role (Tùy chọn) Lọc thêm theo vai trò (ví dụ: "BENH_NHAN").
+     * Để null hoặc rỗng nếu không muốn lọc theo vai trò.
+     * @return Danh sách các TaiKhoan (Entity) phù hợp.
+     */
+    public List<TaiKhoan> findActiveAndUnassignedAccounts(String role) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Xây dựng câu HQL cơ bản
+            String hql = "SELECT tk FROM TaiKhoan tk " +
+                         "LEFT JOIN NhanVien nv ON nv.taiKhoan = tk " + // Join với NhanVien
+                         "LEFT JOIN BenhNhan bn ON bn.taiKhoan = tk " + // Join với BenhNhan
+                         "WHERE tk.trangThai = :trangThai " + // Lọc trạng thái hoạt động
+                         "AND nv.id IS NULL " +                // Điều kiện: Không có NhanVien liên kết
+                         "AND bn.id IS NULL ";                 // Điều kiện: Không có BenhNhan liên kết
+
+            // Thêm điều kiện lọc theo vai trò nếu có
+            if (role != null && !role.trim().isEmpty()) {
+                hql += " AND tk.vaiTro = :vaiTro";
+            }
+
+            Query<TaiKhoan> query = session.createQuery(hql, TaiKhoan.class);
+            query.setParameter("trangThai", "HOAT_DONG");
+
+            // Set tham số vai trò nếu có
+            if (role != null && !role.trim().isEmpty()) {
+                query.setParameter("vaiTro", role);
+            }
+
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>(); // Trả về list rỗng nếu lỗi
+        }
+    }
 }
