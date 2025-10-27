@@ -26,13 +26,13 @@ public class LichHen {
     @Column(name = "thoi_gian_hen", nullable = false)
     private OffsetDateTime thoiGianHen;
 
-    @Column(name = "ly_do_kham")
+    @Column(name = "ly_do_kham", columnDefinition = "NVARCHAR(MAX)")
     private String lyDoKham;
 
-    @Column(name = "trang_thai", nullable = false)
-    private String trangThai; // Phải là String để khớp với CSDL
+    @Column(name = "trang_thai", nullable = false, columnDefinition = "NVARCHAR(MAX)")
+    private String trangThai;
 
-    @Column(name = "ghi_chu")
+    @Column(name = "ghi_chu", columnDefinition = "NVARCHAR(MAX)")
     private String ghiChu;
 
     @ManyToOne(fetch = FetchType.LAZY)

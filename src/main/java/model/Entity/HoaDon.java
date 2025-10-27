@@ -16,7 +16,7 @@ public class HoaDon {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "ma_hoa_don", length = 20, unique = true, nullable = false)
+    @Column(name = "ma_hoa_don", length = 20, unique = true, nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String maHoaDon;
 
     @CreationTimestamp 
@@ -27,7 +27,7 @@ public class HoaDon {
     private BigDecimal tongTien;
 
     // --- THAY ĐỔI Ở ĐÂY ---
-    @Column(name = "trang_thai", length = 50, nullable = false)
+    @Column(name = "trang_thai", length = 50, nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String trangThai; // Đổi từ Enum về String
 
     // Nhiều hóa đơn có thể thuộc về 1 bệnh nhân

@@ -11,13 +11,14 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class GiaoDichThanhToanService {
 
-    private GiaoDichThanhToanDAO giaoDichDAO;
-    private HoaDonDAO hoaDonDAO; // Cần thiết để cập nhật Hóa Đơn
+    private final HoaDonDAO hoaDonDAO;
+    private final GiaoDichThanhToanDAO giaoDichThanhToanDAO;
 
     public GiaoDichThanhToanService() {
-        this.giaoDichDAO = new GiaoDichThanhToanDAO();
+        this.giaoDichThanhToanDAO = new GiaoDichThanhToanDAO();
         this.hoaDonDAO = new HoaDonDAO();
     }
 
@@ -34,7 +35,7 @@ public class GiaoDichThanhToanService {
             }
 
             // Bước 2: Lưu giao dịch mới
-            giaoDichDAO.addGiaoDich(giaoDich);
+            giaoDichThanhToanDAO.addGiaoDich(giaoDich);
 
             // Bước 3: (Logic nghiệp vụ) Cập nhật trạng thái hóa đơn liên quan
             // dto.getHoaDonId() bây giờ trả về int
@@ -51,7 +52,7 @@ public class GiaoDichThanhToanService {
      * Lấy tất cả giao dịch của một hóa đơn
      */
     public List<GiaoDichThanhToanDTO> getGiaoDichByHoaDon(int hoaDonId) {
-        List<GiaoDichThanhToan> entities = giaoDichDAO.getGiaoDichByHoaDonId(hoaDonId);
+        List<GiaoDichThanhToan> entities = giaoDichThanhToanDAO.getGiaoDichByHoaDonId(hoaDonId);
 
         // **SỬ DỤNG VÒNG LẶP FOR ĐỂ TRÁNH LỖI JAVA 8**
         List<GiaoDichThanhToanDTO> dtos = new ArrayList<>();
@@ -73,7 +74,7 @@ public class GiaoDichThanhToanService {
         }
 
         // Lấy tất cả giao dịch của hóa đơn này
-        List<GiaoDichThanhToan> allTransactions = giaoDichDAO.getGiaoDichByHoaDonId(hoaDonId);
+        List<GiaoDichThanhToan> allTransactions = giaoDichThanhToanDAO.getGiaoDichByHoaDonId(hoaDonId);
 
         // Tính tổng số tiền đã thanh toán
         BigDecimal tongDaThanhToan = BigDecimal.ZERO;
@@ -89,6 +90,19 @@ public class GiaoDichThanhToanService {
             hoaDonDAO.updateHoaDon(hoaDon);
         }
     }
+
+    /**
+     * Xử lý một giao dịch thanh toán hoàn chỉnh. Hàm này quản lý một
+     * transaction duy nhất để đảm bảo tính toàn vẹn: hoặc cả hai hành động (tạo
+     * giao dịch, cập nhật hóa đơn) đều thành công, hoặc cả hai đều thất bại.
+     *
+     * @param invoiceId ID của hóa đơn cần thanh toán.
+     * @param soTienThanhToan Số tiền khách hàng trả.
+     * @param phuongThuc Phương thức thanh toán (vd: 'TIEN_MAT').
+     * @throws Exception Nếu có lỗi xảy ra (vd: hóa đơn không tồn tại, đã thanh
+     * toán, v.v.).
+     */
+    
 
     // --- Phương thức chuyển đổi (Helper Methods) ---
     // Chuyển Entity sang DTO

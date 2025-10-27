@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- ========== Hibernate Settings ========== -->
+        <property name="hibernate.dialect">org.hibernate.dialect.SQLServer2012Dialect</property>
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <!-- ========== Unicode Support ========== -->
+        <property name="hibernate.connection.useUnicode">true</property>
+        <property name="hibernate.connection.characterEncoding">UTF-8</property>
+        <property name="hibernate.connection.charSet">UTF-8</property>
+
+        <!-- ========== Entity Mapping ========== -->
+        <mapping class="model.Entity.Khoa"/>
+        <mapping class="model.Entity.DichVu"/>
+        <mapping class="model.Entity.Thuoc"/>
+        <mapping class="model.Entity.TaiKhoan"/>
+        <mapping class="model.Entity.NhanVien"/>
+        <mapping class="model.Entity.BenhNhan"/>
+        <mapping class="model.Entity.PhongBenh"/>
+        <mapping class="model.Entity.ThongBao"/>
+        <mapping class="model.Entity.GiuongBenh"/>
+        <mapping class="model.Entity.LichHen"/>
+        <mapping class="model.Entity.PhieuKhamBenh"/>
+        <mapping class="model.Entity.DonThuoc"/>
+        <mapping class="model.Entity.HoaDon"/>
+        <mapping class="model.Entity.ChiDinhDichVu"/>
+        <mapping class="model.Entity.GiaoDichThanhToan"/>
+        <mapping class="model.Entity.ChiTietDonThuoc"/>
+        
+    </session-factory>
+</hibernate-configuration>

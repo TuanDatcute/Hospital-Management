@@ -19,10 +19,17 @@ public class MainController extends HttpServlet {
     private static final String LOGIN_PAGE = "login.jsp";
     private static final String USER_CONTROLLER = "UserController";
     private static final String EMRCORE_CONTROLLER = "EMRCoreController";
+
+    private static final String KHOA_CONTROLLER = "KhoaController";
+    private static final String NHANVIEN_CONTROLLER = "NhanVienController";
+    private static final String BENHNHAN_CONTROLLER = "BenhNhanController";
+    private static final String LICHHEN_CONTROLLER = "LichHenController";
+
     private static final String CATALOG_CONTROLLER = "CatalogController";
     private static final String PHONG_BENH_CONTROLLER = "PhongBenhController";
     private static final String GIUONG_BENH_CONTROLLER = "GiuongBenhController";
     private static final String DON_THUOC_CONTROLLER = "DonThuocController";
+    private static final String HOA_DON_GIAO_DICH_THANH_TOAN_CONTROLLER = "HoaDon_GiaoDichThanhToanController";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -47,12 +54,20 @@ public class MainController extends HttpServlet {
         String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateForm","listAllEncounters","viewEncounterDetails"};
 
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication"};
+        String[] userActions = {"login", "logout", "listUsers", "showCreateForm", "createUser", "showEditForm", "updateUserStatus"};
+        String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateForm"};
+        String[] khoaActions = {"listKhoa", "showCreateForm", "createKhoa", "showEditForm", "updateKhoa", "deleteKhoa"};
+        String[] nhanVienActions = {"listNhanVien", "showCreateForm", "createNhanVien", "showEditForm", "updateNhanVien", "deleteNhanVien"};
+        String[] benhNhanActions = {"listBenhNhan", "showCreateForm", "createBenhNhan", "showEditForm", "updateBenhNhan","deleteBenhNhan"};
+        String[] lichHenActions = {"listLichHen", "showCreateForm", "createLichHen", "updateLichHenStatus"};
 
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateThuocForm","createPrescription"};
 
         String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate"};
 
         String[] GiuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed"};
+
+        String[] HoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices"};
 
         // 3. Điều hướng dựa trên action
         if (action == null) {
@@ -61,6 +76,14 @@ public class MainController extends HttpServlet {
             url = USER_CONTROLLER;
         } else if (Arrays.asList(EMRCoreActions).contains(action)) {
             url = EMRCORE_CONTROLLER;
+        } else if (Arrays.asList(khoaActions).contains(action)) {
+            url = KHOA_CONTROLLER;
+        } else if (Arrays.asList(nhanVienActions).contains(action)) { // <-- THÊM
+            url = NHANVIEN_CONTROLLER;
+        } else if (Arrays.asList(benhNhanActions).contains(action)) { // <-- THÊM
+            url = BENHNHAN_CONTROLLER;
+        } else if (Arrays.asList(lichHenActions).contains(action)) { // <-- THÊM
+            url = LICHHEN_CONTROLLER;
         } else if (Arrays.asList(PhongBenhActions).contains(action)) {
             url = PHONG_BENH_CONTROLLER;
         } else if (Arrays.asList(GiuongBenhActions).contains(action)) {
@@ -69,13 +92,15 @@ public class MainController extends HttpServlet {
             url = CATALOG_CONTROLLER;
         } else if (Arrays.asList(DonThuocActions).contains(action)) {
             url = DON_THUOC_CONTROLLER;
+        } else if (Arrays.asList(HoaDon_GiaoDichThanhToanActions).contains(action)) {
+            url = HOA_DON_GIAO_DICH_THANH_TOAN_CONTROLLER;
         }
 
         // 4. Forward đến controller tương ứng
         request.getRequestDispatcher(url).forward(request, response);
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
