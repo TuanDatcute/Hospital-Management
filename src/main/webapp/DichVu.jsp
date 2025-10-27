@@ -32,7 +32,7 @@
         </c:if>
 
         <%-- ✅ Dùng c:url để tạo đường dẫn an toàn và đúng đắn --%>
-        <form action="<c:url value='/DanhMucController'/>" method="POST" class="form-grid">
+        <form action="<c:url value='/MainController'/>" method="POST" class="form-grid">
             <input type="hidden" name="action" value="createService">
 
             <div class="form-group full-width">

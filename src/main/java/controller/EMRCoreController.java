@@ -12,10 +12,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.dto.BenhNhanDTO;
+import model.dto.ChiDinhDichVuDTO;
+import model.dto.DichVuDTO;
 import model.dto.LichHenDTO;
 import model.dto.NhanVienDTO;
 import model.dto.PhieuKhamBenhDTO;
 import service.BenhNhanService;   // Import các Service cần thiết
+import service.ChiDinhDichVuService;
+import service.DichVuService;
 import service.LichHenService;
 import service.NhanVienService;
 import service.PhieuKhamBenhService;
@@ -29,15 +33,17 @@ public class EMRCoreController extends HttpServlet {
 
     // Khai báo URL cho các trang JSP 
     private static final String ERROR_PAGE = "error.jsp";
-    private static final String SUCCESS_PAGE = "danhSachPhieuKham.jsp";
+    private static final String SUCCESS_PAGE = "DanhSachPhieuKham.jsp";
     private static final String CREATE_ENCOUNTER_PAGE = "PhieuKhamBenh.jsp";
     private static final String ENCOUNTER_LIST_PAGE = "DanhSachPhieuKham.jsp";
+    private static final String CREATE_SERVICE_REQUEST_PAGE = "ChiTietPhieuKham.jsp";
 
     // Khởi tạo các Service cần thiết ở cấp lớp để tái sử dụng
     private final PhieuKhamBenhService phieuKhamService = new PhieuKhamBenhService();
     private final BenhNhanService benhNhanService = new BenhNhanService();
     private final NhanVienService nhanVienService = new NhanVienService();
     private final LichHenService lichHenService = new LichHenService();
+    private final ChiDinhDichVuService chiDinhService = new ChiDinhDichVuService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -93,17 +99,22 @@ public class EMRCoreController extends HttpServlet {
             }
 
             switch (action) {
+                case "addServiceRequest":
+                    addServiceRequest(request, response);
+                    return; // Phương thức này đã tự xử lý redirect
                 case "createEncounter":
                     url = createEncounter(request);
                     break;
+
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho phương thức POST.");
             }
+
+            request.getRequestDispatcher(url).forward(request, response);
         } catch (Exception e) {
             log("Lỗi tại EMRCoreController (doPost): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Đã có lỗi nghiêm trọng xảy ra: " + e.getMessage());
-        } finally {
-            request.getRequestDispatcher(url).forward(request, response);
+            request.getRequestDispatcher(ERROR_PAGE).forward(request, response);
         }
     }
 
@@ -118,17 +129,35 @@ public class EMRCoreController extends HttpServlet {
 
     /**
      * Lấy chi tiết một phiếu khám và hiển thị (chuyển hướng đến trang chi
-     * tiết). (Đây là một ví dụ, bạn có thể tạo một trang JSP riêng cho việc
-     * này)
+     * tiết).
      */
     private String viewEncounterDetails(HttpServletRequest request) throws Exception {
-        int id = Integer.parseInt(request.getParameter("id"));
-        PhieuKhamBenhDTO phieuKham = phieuKhamService.getEncounterById(id);
-        if (phieuKham == null) {
-            throw new Exception("Không tìm thấy phiếu khám với ID: " + id);
+        String idStr = request.getParameter("id");
+
+        if (idStr == null || idStr.trim().isEmpty()) {
+            throw new Exception("ID phiếu khám không hợp lệ hoặc bị thiếu.");
         }
-        request.setAttribute("phieuKham", phieuKham);
-        return "/chiTietPhieuKham.jsp"; // Chuyển đến trang chi tiết
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+
+            PhieuKhamBenhDTO phieuKham = phieuKhamService.getEncounterById(id);
+
+            if (phieuKham == null) {
+                throw new Exception("Không tìm thấy phiếu khám với ID: " + id);
+            }
+
+            // 2. Lấy danh sách dịch vụ cho dropdown (vẫn cần thiết cho form "Thêm mới")
+            DichVuService dv = new DichVuService();
+            List<DichVuDTO> danhSachDichVu = dv.getAllServices();
+
+            // 3. Gửi các đối tượng cần thiết cho JSP
+            request.setAttribute("phieuKham", phieuKham);
+            request.setAttribute("danhSachDichVu", danhSachDichVu);
+
+            return CREATE_SERVICE_REQUEST_PAGE;
+        } catch (Exception e) {
+            throw new Exception("ID phiếu khám phải là một con số.");
+        }
     }
 
     /**
@@ -232,7 +261,31 @@ public class EMRCoreController extends HttpServlet {
         return CREATE_ENCOUNTER_PAGE;
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    private void addServiceRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String phieuKhamIdStr = request.getParameter("phieuKhamId");
+        String dichVuIdStr = request.getParameter("dichVuId");
+        String redirectUrl = "MainController?action=viewEncounterDetails&id=" + phieuKhamIdStr;
+
+        try {
+            int phieuKhamId = Integer.parseInt(phieuKhamIdStr);
+            int dichVuId = Integer.parseInt(dichVuIdStr);
+
+            chiDinhService.createServiceRequest(phieuKhamId, dichVuId);
+
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã thêm dịch vụ vào phiếu khám thành công!");
+        } catch (ValidationException e) {
+            request.getSession().setAttribute("ERROR_MESSAGE", e.getMessage());
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("ERROR_MESSAGE", "ID phiếu khám hoặc dịch vụ không hợp lệ.");
+        } catch (Exception e) {
+            log("Lỗi khi thêm chỉ định dịch vụ: ", e);
+            request.getSession().setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống.");
+        } finally {
+            response.sendRedirect(redirectUrl);
+        }
+    }
+
+// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     @Override
     public String getServletInfo() {
         return "Servlet điều phối chính cho các chức năng của bệnh án điện tử.";
