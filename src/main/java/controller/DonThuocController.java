@@ -54,7 +54,7 @@ public class DonThuocController extends HttpServlet {
                 case "viewDetails":
                     url = viewDetails(request);
                     break;
-                case "showCreateThuocForm":
+                case "showCreateDonThuocForm":
                     url = showCreateForm(request);
                     break;
                 default:
@@ -230,7 +230,7 @@ public class DonThuocController extends HttpServlet {
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã kê đơn thuốc thành công!");
 
             // ✨ THAY ĐỔI: Trả về URL để redirect
-            return "redirect:/MainController?action=listAll&keyword=" + result.getTenBenhNhan();
+            return "redirect:/MainController?action=viewEncounterDetails&id=" + result.getPhieuKhamId();
 
         } catch (ValidationException | NumberFormatException e) {
             log("Lỗi khi tạo đơn thuốc: " + e.getMessage());

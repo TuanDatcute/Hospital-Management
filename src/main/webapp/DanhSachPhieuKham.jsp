@@ -12,10 +12,32 @@
     </head>
     <body>
         <div class="container">
+
+            <c:if test="${not empty sessionScope.ERROR_MESSAGE}">
+                <div class="alert alert-danger">${sessionScope.ERROR_MESSAGE}</div>
+                <c:remove var="ERROR_MESSAGE" scope="session" />
+            </c:if>
+            <c:if test="${not empty sessionScope.SUCCESS_MESSAGE}">
+                <div class="alert alert-success">${sessionScope.SUCCESS_MESSAGE}</div>
+                <c:remove var="SUCCESS_MESSAGE" scope="session" />
+            </c:if>
+                
             <h1>Danh Sách Phiếu Khám Bệnh</h1>
 
-            <div class="controls">
-                <a href="<c:url value='/MainController?action=showCreateForm'/>" class="btn btn-success">Tạo Phiếu Khám Mới</a>
+
+
+            <%-- ✨ KHU VỰC TÌM KIẾM VÀ THÊM MỚI ✨ --%>
+            <div class="header-controls">
+                <form action="<c:url value='/MainController'/>" method="GET" class="search-form">
+                    <input type="hidden" name="action" value="listAllEncounters">
+                    <input type="text" name="keyword" class="form-control" placeholder="Tìm theo mã phiếu, tên/mã bệnh nhân..." value="${requestScope.searchKeyword}">
+                    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                    <%-- Nút để quay lại xem tất cả, chỉ hiện khi đang tìm kiếm --%>
+                    <c:if test="${not empty requestScope.searchKeyword}">
+                        <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="btn btn-secondary">Xem tất cả</a>
+                    </c:if>
+                </form>
+                <a href="<c:url value='/MainController?action=showCreateEncounterForm'/>" class="btn btn-success">Tạo Phiếu Khám Mới</a>
             </div>
 
             <div class="table-responsive">
@@ -31,27 +53,37 @@
                         </tr>
                     </thead>
                     <tbody>
-                    <c:choose>
-                        <c:when test="${not empty danhSachPhieuKham}">
-                            <c:forEach var="pkb" items="${danhSachPhieuKham}">
+                        <c:choose>
+                            <c:when test="${not empty danhSachPhieuKham}">
+                                <c:forEach var="pkb" items="${danhSachPhieuKham}">
+                                    <tr>
+                                        <td><strong>${pkb.maPhieuKham}</strong></td>
+                                        <td>${pkb.thoiGianKhamFormatted}</td>
+                                        <td>${pkb.tenBenhNhan}</td>
+                                        <td>${pkb.tenBacSi}</td>
+                                        <td>${pkb.chanDoan}</td>
+                                        <td class="actions text-center">
+                                            <a href="<c:url value='MainController?action=viewEncounterDetails&id=${pkb.id}'/>" class="btn btn-primary">Xem Chi Tiết</a>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
                                 <tr>
-                                    <td><strong>${pkb.maPhieuKham}</strong></td>
-                                    <td>${pkb.thoiGianKhamFormatted}</td>
-                                    <td>${pkb.tenBenhNhan}</td>
-                                    <td>${pkb.tenBacSi}</td>
-                                    <td>${pkb.chanDoan}</td>
-                                    <td class="actions text-center">
-                                        <a href="<c:url value='MainController?action=viewEncounterDetails&id=${pkb.id}'/>" class="btn btn-primary">Xem Chi Tiết</a>
+                                    <td colspan="6" class="no-results">
+                                        <%-- ✨ Hiển thị thông báo phù hợp --%>
+                                        <c:choose>
+                                            <c:when test="${not empty requestScope.searchKeyword}">
+                                                Không tìm thấy phiếu khám nào khớp với từ khóa "${requestScope.searchKeyword}".
+                                            </c:when>
+                                            <c:otherwise>
+                                                Chưa có phiếu khám nào trong hệ thống.
+                                            </c:otherwise>
+                                        </c:choose>
                                     </td>
                                 </tr>
-                            </c:forEach>
-                        </c:when>
-                        <c:otherwise>
-                            <tr>
-                                <td colspan="6" class="no-results">Chưa có phiếu khám nào trong hệ thống.</td>
-                            </tr>
-                        </c:otherwise>
-                    </c:choose>
+                            </c:otherwise>
+                        </c:choose>
                     </tbody>
                 </table>
             </div>

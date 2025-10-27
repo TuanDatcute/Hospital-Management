@@ -58,24 +58,31 @@ public class ChiDinhDichVuService {
     }
 
     /**
-     * NGHIỆP VỤ: Cập nhật trạng thái của một chỉ định (ví dụ: từ
-     * 'CHO_THUC_HIEN' sang 'DANG_THUC_HIEN').
+     * NGHIỆP VỤ: Cập nhật kết quả và/hoặc trạng thái cho một chỉ định dịch vụ.
+     * Gộp chức năng của updateServiceRequestStatus và enterResult.
      *
-     * @param requestId ID của chỉ định cần cập nhật.
-     * @param trangThaiMoi Trạng thái mới.
+     * @param chiDinhId ID của chỉ định cần cập nhật.
+     * @param ketQua Kết quả mới của dịch vụ (có thể là chuỗi rỗng).
+     * @param trangThai Trạng thái mới (ví dụ: 'HOAN_THANH').
      * @return DTO của chỉ định sau khi đã được cập nhật.
      * @throws Exception nếu không tìm thấy chỉ định.
      */
-    public ChiDinhDichVuDTO updateServiceRequestStatus(int requestId, String trangThaiMoi) throws Exception {
-        ChiDinhDichVu chiDinh = chiDinhDAO.getById(requestId);
-        if (chiDinh == null) {
-            throw new Exception("Không tìm thấy chỉ định dịch vụ với ID: " + requestId);
+    public ChiDinhDichVuDTO updateResultAndStatus(int chiDinhId, String ketQua, String trangThai) throws Exception {
+        // 1. Lấy bản ghi Entity gốc từ CSDL (Không trùng lặp code nữa)
+        ChiDinhDichVu existingChiDinh = chiDinhDAO.getById(chiDinhId);
+        if (existingChiDinh == null) {
+            throw new Exception("Không tìm thấy chỉ định dịch vụ để cập nhật.");
         }
 
-        chiDinh.setTrangThai(trangThaiMoi);
-        chiDinhDAO.update(chiDinh);
+        // 2. Cập nhật các thuộc tính của Entity
+        existingChiDinh.setKetQua(ketQua);
+        existingChiDinh.setTrangThai(trangThai);
 
-        return toDTO(chiDinh);
+        // 3. Gọi DAO để lưu thay đổi vào CSDL
+        chiDinhDAO.update(existingChiDinh);
+
+        // 4. Trả về DTO đã được cập nhật
+        return toDTO(existingChiDinh);
     }
 
     /**
@@ -136,7 +143,7 @@ public class ChiDinhDichVuService {
      * @param entity Đối tượng Entity cần chuyển đổi.
      * @return Đối tượng DTO tương ứng.
      */
-    private ChiDinhDichVuDTO toDTO(ChiDinhDichVu entity) {
+    protected ChiDinhDichVuDTO toDTO(ChiDinhDichVu entity) {
         if (entity == null) {
             return null;
         }

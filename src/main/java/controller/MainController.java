@@ -52,7 +52,7 @@ public class MainController extends HttpServlet {
         // 2. Nhóm các action cho từng controller
        
 
-        String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateForm","listAllEncounters","viewEncounterDetails","addServiceRequest"};
+        String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm","listAllEncounters","viewEncounterDetails","addServiceRequest","updateServiceResult","showUpdateForm","showUpdateForm","updateEncounter"};
 
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication"};
         String[] userActions = {"login", "logout", "listUsers", "showUserCreateForm", "createUser", "showEditForm", "updateUserStatus"};
@@ -76,11 +76,11 @@ public class MainController extends HttpServlet {
             url = EMRCORE_CONTROLLER;
         } else if (Arrays.asList(khoaActions).contains(action)) {
             url = KHOA_CONTROLLER;
-        } else if (Arrays.asList(nhanVienActions).contains(action)) { // <-- THÊM
+        } else if (Arrays.asList(nhanVienActions).contains(action)) { 
             url = NHANVIEN_CONTROLLER;
-        } else if (Arrays.asList(benhNhanActions).contains(action)) { // <-- THÊM
+        } else if (Arrays.asList(benhNhanActions).contains(action)) { 
             url = BENHNHAN_CONTROLLER;
-        } else if (Arrays.asList(lichHenActions).contains(action)) { // <-- THÊM
+        } else if (Arrays.asList(lichHenActions).contains(action)) { 
             url = LICHHEN_CONTROLLER;
         } else if (Arrays.asList(PhongBenhActions).contains(action)) {
             url = PHONG_BENH_CONTROLLER;
