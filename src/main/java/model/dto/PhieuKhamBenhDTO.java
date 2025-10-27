@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -36,7 +37,7 @@ public class PhieuKhamBenhDTO {
     private Integer lichHenId;
 
     private DonThuocDTO donThuoc;
-    private Set<ChiDinhDichVuDTO> danhSachChiDinh;
+    private List<ChiDinhDichVuDTO> danhSachChiDinh;
 
     //cho jsp format thời gian 
     private String formattedThoiGianKham = getThoiGianKhamFormatted();
@@ -158,7 +159,7 @@ public class PhieuKhamBenhDTO {
         this.lichHenId = lichHenId;
     }
 
-    public PhieuKhamBenhDTO(String maPhieuKham, LocalDateTime thoiGianKham, String trieuChung, String chanDoan, String ketLuan, LocalDateTime ngayTaiKham, BigDecimal nhietDo, String huyetAp, Integer nhipTim, Integer nhipTho, int benhNhanId, String tenBenhNhan, int bacSiId, String tenBacSi, Integer lichHenId, DonThuocDTO donThuoc, Set<ChiDinhDichVuDTO> danhSachChiDinh) {
+    public PhieuKhamBenhDTO(String maPhieuKham, LocalDateTime thoiGianKham, String trieuChung, String chanDoan, String ketLuan, LocalDateTime ngayTaiKham, BigDecimal nhietDo, String huyetAp, Integer nhipTim, Integer nhipTho, int benhNhanId, String tenBenhNhan, int bacSiId, String tenBacSi, Integer lichHenId, DonThuocDTO donThuoc, List<ChiDinhDichVuDTO> danhSachChiDinh) {
         this.maPhieuKham = maPhieuKham;
         this.thoiGianKham = thoiGianKham;
         this.trieuChung = trieuChung;
@@ -204,11 +205,11 @@ public class PhieuKhamBenhDTO {
         this.donThuoc = donThuoc;
     }
 
-    public Set<ChiDinhDichVuDTO> getDanhSachChiDinh() {
+    public List<ChiDinhDichVuDTO> getDanhSachChiDinh() {
         return danhSachChiDinh;
     }
 
-    public void setDanhSachChiDinh(Set<ChiDinhDichVuDTO> danhSachChiDinh) {
+    public void setDanhSachChiDinh(List<ChiDinhDichVuDTO> danhSachChiDinh) {
         this.danhSachChiDinh = danhSachChiDinh;
     }
 

@@ -122,28 +122,41 @@ public class PhieuKhamBenhDAO {
     }
 
     public List<PhieuKhamBenh> getAll() {
-        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-
-            Query<PhieuKhamBenh> query = session.createQuery(
-                    // Dùng DISTINCT để tránh các bản ghi PhieuKhamBenh bị lặp lại
-                    "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb "
-                    + "LEFT JOIN FETCH pkb.benhNhan "
-                    + "LEFT JOIN FETCH pkb.bacSi "
-                    + "LEFT JOIN FETCH pkb.donThuoc dt "
-                    + // Lấy đơn thuốc liên quan
-                    "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
-                    + // Lấy danh sách chi tiết của đơn thuốc
-                    "LEFT JOIN FETCH cdt.thuoc "
-                    + // Lấy luôn thông tin thuốc trong chi tiết
-                    "ORDER BY pkb.thoiGianKham DESC",
-                    PhieuKhamBenh.class
-            );
-            return query.list();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Collections.emptyList();
-        }
+    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        
+        // ✨ SỬ DỤNG MỘT CÂU TRUY VẤN DUY NHẤT VÀ ĐẦY ĐỦ NHẤT ✨
+        Query<PhieuKhamBenh> query = session.createQuery(
+            // Dùng DISTINCT để tránh các bản ghi PhieuKhamBenh bị lặp lại
+            "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb " +
+            
+            // Lấy các mối quan hệ đơn lẻ
+            "LEFT JOIN FETCH pkb.benhNhan " +
+            "LEFT JOIN FETCH pkb.bacSi " +
+            "LEFT JOIN FETCH pkb.lichHen " +
+            
+            // Lấy danh sách Chỉ Định Dịch Vụ và các con của nó
+            "LEFT JOIN FETCH pkb.danhSachChiDinh cdd " +
+            "LEFT JOIN FETCH cdd.dichVu " +
+            
+            // Lấy Đơn Thuốc và các con của nó
+            "LEFT JOIN FETCH pkb.donThuoc dt " +
+            "LEFT JOIN FETCH dt.chiTietDonThuoc cdt " +
+            "LEFT JOIN FETCH cdt.thuoc " +
+            
+            // Sắp xếp kết quả
+            "ORDER BY pkb.thoiGianKham DESC", 
+            PhieuKhamBenh.class
+        );
+        
+        return query.list();
+        
+    } catch (Exception e) {
+        // Ghi log lỗi một cách chi tiết
+        System.err.println("Lỗi nghiêm trọng khi lấy tất cả Phiếu Khám Bệnh:");
+        e.printStackTrace();
+        return Collections.emptyList();
     }
+}
 
     public List<PhieuKhamBenh> findByBenhNhanId(int benhNhanId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
