@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Lớp Service cho Chỉ Định Dịch Vụ.
- * Chứa toàn bộ logic nghiệp vụ (business logic) liên quan đến việc chỉ định dịch vụ,
- * cập nhật trạng thái, nhập kết quả và truy vấn thông tin.
+ * Lớp Service cho Chỉ Định Dịch Vụ. Chứa toàn bộ logic nghiệp vụ (business
+ * logic) liên quan đến việc chỉ định dịch vụ, cập nhật trạng thái, nhập kết quả
+ * và truy vấn thông tin.
  */
 public class ChiDinhDichVuService {
 
@@ -24,6 +24,7 @@ public class ChiDinhDichVuService {
 
     /**
      * NGHIỆP VỤ: Chỉ định một dịch vụ mới cho một lần khám.
+     *
      * @param phieuKhamId ID của phiếu khám đang diễn ra.
      * @param dichVuId ID của dịch vụ được bác sĩ chọn.
      * @return DTO của chỉ định vừa được tạo.
@@ -49,32 +50,43 @@ public class ChiDinhDichVuService {
 
         // 3. Gọi DAO để lưu vào CSDL
         ChiDinhDichVu savedChiDinh = chiDinhDAO.create(newChiDinh);
-        
+
         // 4. Chuyển đổi sang DTO để trả về
         return toDTO(savedChiDinh);
     }
 
     /**
-     * NGHIỆP VỤ: Cập nhật trạng thái của một chỉ định (ví dụ: từ 'CHO_THUC_HIEN' sang 'DANG_THUC_HIEN').
-     * @param requestId ID của chỉ định cần cập nhật.
-     * @param trangThaiMoi Trạng thái mới.
+     * NGHIỆP VỤ: Cập nhật kết quả và/hoặc trạng thái cho một chỉ định dịch vụ.
+     * Gộp chức năng của updateServiceRequestStatus và enterResult.
+     *
+     * @param chiDinhId ID của chỉ định cần cập nhật.
+     * @param ketQua Kết quả mới của dịch vụ (có thể là chuỗi rỗng).
+     * @param trangThai Trạng thái mới (ví dụ: 'HOAN_THANH').
      * @return DTO của chỉ định sau khi đã được cập nhật.
      * @throws Exception nếu không tìm thấy chỉ định.
      */
-    public ChiDinhDichVuDTO updateServiceRequestStatus(int requestId, String trangThaiMoi) throws Exception {
-        ChiDinhDichVu chiDinh = chiDinhDAO.getById(requestId);
-        if (chiDinh == null) {
-            throw new Exception("Không tìm thấy chỉ định dịch vụ với ID: " + requestId);
+    public ChiDinhDichVuDTO updateResultAndStatus(int chiDinhId, String ketQua, String trangThai) throws Exception {
+        // 1. Lấy bản ghi Entity gốc từ CSDL (Không trùng lặp code nữa)
+        ChiDinhDichVu existingChiDinh = chiDinhDAO.getById(chiDinhId);
+        if (existingChiDinh == null) {
+            throw new Exception("Không tìm thấy chỉ định dịch vụ để cập nhật.");
         }
 
-        chiDinh.setTrangThai(trangThaiMoi);
-        chiDinhDAO.update(chiDinh);
-        
-        return toDTO(chiDinh);
+        // 2. Cập nhật các thuộc tính của Entity
+        existingChiDinh.setKetQua(ketQua);
+        existingChiDinh.setTrangThai(trangThai);
+
+        // 3. Gọi DAO để lưu thay đổi vào CSDL
+        chiDinhDAO.update(existingChiDinh);
+
+        // 4. Trả về DTO đã được cập nhật
+        return toDTO(existingChiDinh);
     }
 
     /**
-     * NGHIỆP VỤ: Nhập kết quả cho một dịch vụ và tự động chuyển trạng thái sang "HOAN_THANH".
+     * NGHIỆP VỤ: Nhập kết quả cho một dịch vụ và tự động chuyển trạng thái sang
+     * "HOAN_THANH".
+     *
      * @param requestId ID của chỉ định cần nhập kết quả.
      * @param ketQua Nội dung kết quả.
      * @return DTO của chỉ định sau khi đã được cập nhật.
@@ -88,14 +100,16 @@ public class ChiDinhDichVuService {
 
         chiDinh.setKetQua(ketQua);
         chiDinh.setTrangThai("HOAN_THANH"); // Logic nghiệp vụ: Nhập kết quả thì tự động hoàn thành
-        
+
         chiDinhDAO.update(chiDinh);
-        
+
         return toDTO(chiDinh);
     }
 
     /**
-     * NGHIỆP VỤ: Lấy danh sách các dịch vụ đã được chỉ định trong một phiếu khám.
+     * NGHIỆP VỤ: Lấy danh sách các dịch vụ đã được chỉ định trong một phiếu
+     * khám.
+     *
      * @param phieuKhamId ID của phiếu khám.
      * @return Một danh sách các ChiDinhDichVuDTO.
      */
@@ -107,9 +121,10 @@ public class ChiDinhDichVuService {
         // Chuyển đổi danh sách Entity sang danh sách DTO bằng Stream API
         return entities.stream().map(this::toDTO).collect(Collectors.toList());
     }
-    
+
     /**
      * NGHIỆP VỤ: Tìm một chỉ định dịch vụ cụ thể bằng ID của nó.
+     *
      * @param chiDinhDichVuId ID của chỉ định dịch vụ.
      * @return DTO của chỉ định dịch vụ hoặc null nếu không tìm thấy.
      */
@@ -120,21 +135,22 @@ public class ChiDinhDichVuService {
 
     // --- PHƯƠNG THỨC CHUYỂN ĐỔI (HELPER METHOD) ---
     /**
-     * Chuyển đổi một đối tượng Entity (ChiDinhDichVu) sang DTO (ChiDinhDichVuDTO).
-     * Dùng để trả dữ liệu ra bên ngoài một cách an toàn.
+     * Chuyển đổi một đối tượng Entity (ChiDinhDichVu) sang DTO
+     * (ChiDinhDichVuDTO). Dùng để trả dữ liệu ra bên ngoài một cách an toàn.
+     *
      * @param entity Đối tượng Entity cần chuyển đổi.
      * @return Đối tượng DTO tương ứng.
      */
-    private ChiDinhDichVuDTO toDTO(ChiDinhDichVu entity) {
+    protected ChiDinhDichVuDTO toDTO(ChiDinhDichVu entity) {
         if (entity == null) {
             return null;
         }
-        
+
         ChiDinhDichVuDTO dto = new ChiDinhDichVuDTO();
         dto.setId(entity.getId());
         dto.setKetQua(entity.getKetQua());
         dto.setTrangThai(entity.getTrangThai());
-        
+
         // Lấy thông tin từ các đối tượng liên quan để "làm phẳng" DTO
         if (entity.getPhieuKham() != null) {
             dto.setPhieuKhamId(entity.getPhieuKham().getId());
@@ -144,7 +160,7 @@ public class ChiDinhDichVuService {
             dto.setTenDichVu(entity.getDichVu().getTenDichVu());
             dto.setDonGia(entity.getDichVu().getDonGia());
         }
-        
+
         return dto;
     }
 }

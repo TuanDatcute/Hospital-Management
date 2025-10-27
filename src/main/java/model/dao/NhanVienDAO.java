@@ -200,19 +200,21 @@ public class NhanVienDAO {
         }
     }
 
-   public List<NhanVien> findDoctorsBySpecialty() {
-    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-        // ✨ SỬA LẠI HQL ĐỂ LỌC THEO VAI TRÒ BÁC SĨ
-        Query<NhanVien> query = session.createQuery(
-            "FROM NhanVien nv WHERE nv.taiKhoan.vaiTro = :role",
-            NhanVien.class
-        );
 
-        query.setParameter("role", "BAC_SI"); // Thêm tham số cho vai trò
-        return query.list();
-    } catch (Exception e) {
-        e.printStackTrace();
-        return Collections.emptyList();
+    public List<NhanVien> findDoctorsBySpecialty() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<NhanVien> query = session.createQuery(
+                    "SELECT nv FROM NhanVien nv "
+                    + "JOIN FETCH nv.taiKhoan "
+                    + 
+                    "WHERE nv.taiKhoan.vaiTro = :role",
+                    NhanVien.class
+            );
+            query.setParameter("role", "BAC_SI");
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
     }
-}
 }
