@@ -55,12 +55,12 @@ public class MainController extends HttpServlet {
         String[] EMRCoreActions = {"createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateForm","listAllEncounters","viewEncounterDetails","addServiceRequest"};
 
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication"};
-        String[] userActions = {"login", "logout", "listUsers", "showCreateForm", "createUser", "showEditForm", "updateUserStatus"};
+        String[] userActions = {"login", "logout", "listUsers", "showUserCreateForm", "createUser", "showEditForm", "updateUserStatus"};
         
-        String[] khoaActions = {"listKhoa", "showCreateForm", "createKhoa", "showEditForm", "updateKhoa", "deleteKhoa"};
-        String[] nhanVienActions = {"listNhanVien", "showCreateForm", "createNhanVien", "showEditForm", "updateNhanVien", "deleteNhanVien"};
-        String[] benhNhanActions = {"listBenhNhan", "showCreateForm", "createBenhNhan", "showEditForm", "updateBenhNhan","deleteBenhNhan"};
-        String[] lichHenActions = {"listLichHen", "showCreateForm", "createLichHen", "updateLichHenStatus"};
+        String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa", "showKhoaEditForm", "updateKhoa", "deleteKhoa"};
+        String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien", "showNhanVienEditForm", "updateNhanVien", "deleteNhanVien"};
+        String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan", "showBenhNhanEditForm", "updateBenhNhan","deleteBenhNhan"};
+        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus"};
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateThuocForm","createPrescription"};
         String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate", "deleteRoom"};
         String[] GiuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed", "deleteBed", "updateBed", "getBedForUpdate"};
