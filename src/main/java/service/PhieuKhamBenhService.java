@@ -11,6 +11,7 @@ import model.dao.BenhNhanDAO;
 import model.dao.LichHenDAO;
 import model.dao.NhanVienDAO;
 import model.dao.PhieuKhamBenhDAO;
+import model.dto.ChiDinhDichVuDTO;
 import model.dto.PhieuKhamBenhDTO;
 
 /**
@@ -24,6 +25,7 @@ public class PhieuKhamBenhService {
     private final BenhNhanDAO benhNhanDAO = new BenhNhanDAO();
     private final NhanVienDAO nhanVienDAO = new NhanVienDAO();
     private final DonThuocService donThuocService = new DonThuocService();
+    private final ChiDinhDichVuService chiDinhService = new ChiDinhDichVuService();
 
     /**
      * Xử lý nghiệp vụ tạo một phiếu khám bệnh mới.
@@ -141,6 +143,11 @@ public class PhieuKhamBenhService {
         }
         if (entity.getDonThuoc() != null) {
             dto.setDonThuoc(donThuocService.toDTO(entity.getDonThuoc()));
+        }
+        if (entity.getDanhSachChiDinh() != null && !entity.getDanhSachChiDinh().isEmpty()) {
+            List<ChiDinhDichVuDTO> chiDinhDTOs = chiDinhService.listRequestsByEncounter(entity.getId());
+            // Gán danh sách DTO con vào DTO cha
+            dto.setDanhSachChiDinh(chiDinhDTOs);
         }
         return dto;
     }

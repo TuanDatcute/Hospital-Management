@@ -129,7 +129,10 @@ public class PhieuKhamBenhDAO {
                     + // Lấy danh sách chi tiết của đơn thuốc
                     "LEFT JOIN FETCH cdt.thuoc "
                     + // Lấy luôn thông tin thuốc trong chi tiết
-                    "ORDER BY pkb.thoiGianKham DESC",
+                    "LEFT JOIN FETCH pkb.danhSachChiDinh cdd "
+                    + // Lấy danh sách chỉ định
+                    "LEFT JOIN FETCH cdd.dichVu "
+                    + "ORDER BY pkb.thoiGianKham DESC",
                     PhieuKhamBenh.class
             );
             return query.list();

@@ -1,0 +1,204 @@
+/* --- CSS cho các trang chi tiết --- */
+
+/* (Bạn có thể giữ lại các style chung từ các file trước) */
+body { /* ... */ }
+.btn { /* ... */ }
+
+/* Container chính của trang chi tiết */
+.main-container {
+    width: 90%;
+    max-width: 960px;
+    margin: 40px auto;
+    padding: 30px 40px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Khu vực tiêu đề */
+.header-section {
+    text-align: center;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 20px;
+    margin-bottom: 25px;
+}
+.header-section h1 {
+    margin: 0;
+    font-size: 28px;
+}
+.header-section h2 {
+    margin: 5px 0 0 0;
+    font-size: 18px;
+    font-weight: 400;
+    color: #6c757d;
+}
+
+/* Lưới thông tin chung */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+.info-item {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+}
+.info-item .label {
+    display: block;
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+.info-item .value {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Các khu vực section chung */
+.section {
+    margin-bottom: 30px;
+}
+.section h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #0d6efd;
+    display: inline-block;
+}
+
+/* Lưới chỉ số sinh tồn */
+.vitals-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+.vital-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #f1f3f5;
+}
+.vital-item .label {
+    color: #6c757d;
+}
+.vital-item .value {
+    font-weight: 500;
+}
+
+/* Thông tin lâm sàng */
+.clinical-item {
+    margin-bottom: 15px;
+}
+.clinical-item h4 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+}
+.clinical-item p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Lưới 2 cột cho Dịch vụ và Đơn thuốc */
+.sub-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+/* Danh sách dịch vụ */
+.service-item {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+.service-item .status {
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+}
+.status-HOAN_THANH { background-color: #198754; }
+.status-CHO_THUC_HIEN { background-color: #ffc107; color: #333; }
+.service-item .result {
+    margin: 8px 0 0 0;
+    font-size: 14px;
+}
+
+/* Nút hành động ở cuối */
+.action-buttons {
+    text-align: right;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+}
+.action-buttons .btn {
+    margin-left: 10px;
+}
+
+/* (Giữ lại tất cả các style chung từ các câu trả lời trước) */
+
+/* ✨ CSS MỚI CHO KHU VỰC QUẢN LÝ DỊCH VỤ ✨ */
+
+/* Form thêm dịch vụ mới */
+.add-service-form {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+
+.add-service-form form {
+    display: flex;
+    align-items: flex-end; /* Căn chỉnh các phần tử theo đáy */
+    gap: 15px;
+}
+
+.add-service-form .form-group {
+    flex-grow: 1; /* Cho phép ô select co giãn */
+    margin: 0;
+}
+
+.add-service-form label {
+    font-size: 14px;
+}
+
+.add-service-form .form-control {
+    padding: 8px 12px;
+    font-size: 15px;
+}
+
+.add-service-form .btn {
+    padding: 8px 20px;
+    font-size: 15px;
+    white-space: nowrap; /* Ngăn nút "Thêm" bị xuống dòng */
+}
+
+/* Bảng liệt kê dịch vụ */
+.data-table .actions form {
+    display: flex;
+    gap: 5px;
+}
+.data-table .actions input[type="text"] {
+    font-size: 13px;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 150px;
+}
+
+/* Trạng thái trong bảng */
+.status {
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+.status-HOAN_THANH { background-color: #198754; } /* Xanh lá */
+.status-CHO_THUC_HIEN { background-color: #ffc107; color: #333; } /* Vàng */
+.status-DANG_THUC_HIEN { background-color: #0dcaf0; color: #333; } /* Xanh lơ */

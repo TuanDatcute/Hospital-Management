@@ -28,11 +28,10 @@ public class ChiDinhDichVu {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Lob
-    @Column(name = "ket_qua",columnDefinition = "NVARCHAR(50)")
+    @Column(name = "ket_qua",columnDefinition = "NVARCHAR(MAX)")
     private String ketQua;
 
-    @Column(name = "trang_thai", nullable = false,columnDefinition = "NVARCHAR(50)")
+    @Column(name = "trang_thai", nullable = false,columnDefinition = "NVARCHAR(MAX)")
     private String trangThai;
 
     @ManyToOne(fetch = FetchType.LAZY)
