@@ -176,4 +176,16 @@ public class HoaDonDAO {
     public void update(HoaDon hoaDonEntity, Session session) {
         session.update(hoaDonEntity);
     }
+
+    public void save(HoaDon hoaDon, Session session) {
+        session.save(hoaDon);
+    }
+
+    public boolean isInvoiceExistsForPhieuKham(int phieuKhamId, Session session) {
+        String hql = "SELECT COUNT(h.id) FROM HoaDon h WHERE h.phieuKhamBenh.id = :phieuKhamId";
+        Long count = session.createQuery(hql, Long.class)
+                .setParameter("phieuKhamId", phieuKhamId)
+                .uniqueResult();
+        return count > 0;
+    }
 }

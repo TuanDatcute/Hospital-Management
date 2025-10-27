@@ -50,12 +50,12 @@ public class UserController extends HttpServlet {
                      case "listUsers":
                          url = listUsers(request);
                          break;
-                     case "showCreateForm":
+                     case "showUserCreateForm":
                          request.setAttribute("formAction", "createUser");
                          url = USER_FORM_PAGE;
                          break;
-                     case "showEditForm": // Form để sửa trạng thái/vai trò
-                         url = showEditForm(request);
+                     case "showUserEditForm": // Form để sửa trạng thái/vai trò
+                         url = showUserEditForm(request);
                          break;
                      default:
                          request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho GET.");
@@ -180,7 +180,7 @@ public class UserController extends HttpServlet {
      /**
      * Lấy thông tin Tài khoản cần sửa (trạng thái/vai trò) và hiển thị form.
      */
-    private String showEditForm(HttpServletRequest request) throws Exception {
+    private String showUserEditForm(HttpServletRequest request) throws Exception {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             TaiKhoanDTO taiKhoan = taiKhoanService.getTaiKhoanById(id);

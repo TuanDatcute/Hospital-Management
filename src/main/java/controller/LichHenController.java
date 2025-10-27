@@ -54,7 +54,7 @@ public class LichHenController extends HttpServlet {
                 case "listLichHen":
                     url = listLichHen(request);
                     break;
-                case "showCreateForm":
+                case "showLichHenCreateForm":
                     loadFormDependencies(request);
                     request.setAttribute("formAction", "createLichHen");
                     url = LICHHEN_FORM_PAGE;

@@ -1,4 +1,6 @@
-package model.dto;
+ package model.dto;
+
+import java.math.BigDecimal;
 
 /**
  * DTO cho Chi Tiết Đơn Thuốc. Vận chuyển thông tin về một loại thuốc cụ thể
@@ -17,6 +19,9 @@ public class ChiTietDonThuocDTO {
     // Thông tin "làm phẳng" từ Thuoc để tiện hiển thị
     private String tenThuoc;
     private String donViTinh;
+    
+    private BigDecimal donGia;
+    private BigDecimal thanhTien;
 
     // Constructors
     public ChiTietDonThuocDTO() {
@@ -88,4 +93,22 @@ public class ChiTietDonThuocDTO {
     public void setDonViTinh(String donViTinh) {
         this.donViTinh = donViTinh;
     }
+
+    public BigDecimal getDonGia() {
+        return donGia;
+    }
+
+    public void setDonGia(BigDecimal donGia) {
+        this.donGia = donGia;
+    }
+
+    public BigDecimal getThanhTien() {
+        return thanhTien;
+    }
+
+    public void setThanhTien(BigDecimal thanhTien) {
+        this.thanhTien = thanhTien;
+    }
+    
+    
 }

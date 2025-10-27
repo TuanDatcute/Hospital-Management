@@ -1,6 +1,7 @@
 package service;
 
 import exception.ValidationException;
+import java.math.BigDecimal;
 import model.dao.DonThuocDAO;
 import model.dao.PhieuKhamBenhDAO;
 import model.dao.ThuocDAO;
@@ -145,6 +146,17 @@ public class DonThuocService {
                 .collect(Collectors.toList());
     }
 
+    public List<ChiTietDonThuocDTO> getChiTietByPhieuKhamId(int phieuKhamId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            List<ChiTietDonThuoc> entities = donThuocDAO.findChiTietByPhieuKhamId(phieuKhamId, session);
+
+            // Chuyển List<Entity> sang List<DTO>
+            return entities.stream()
+                    .map(this::convertThuocToDTO)
+                    .collect(Collectors.toList());
+        }
+    }
+
     // --- Phương thức chuyển đổi ---
     protected DonThuocDTO toDTO(DonThuoc entity) {
         if (entity == null) {
@@ -196,5 +208,17 @@ public class DonThuocService {
         }
 
         return chiTietDTO;
+    }
+
+    private ChiTietDonThuocDTO convertThuocToDTO(ChiTietDonThuoc entity) {
+        ChiTietDonThuocDTO dto = new ChiTietDonThuocDTO();
+        dto.setTenThuoc(entity.getThuoc().getTenThuoc());
+        dto.setSoLuong(entity.getSoLuong());
+        dto.setDonGia(entity.getThuoc().getDonGia());
+
+        BigDecimal thanhTien = entity.getThuoc().getDonGia()
+                .multiply(new BigDecimal(entity.getSoLuong()));
+        dto.setThanhTien(thanhTien);
+        return dto;
     }
 }

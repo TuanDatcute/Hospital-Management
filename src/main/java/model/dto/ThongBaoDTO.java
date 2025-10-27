@@ -9,21 +9,23 @@ public class ThongBaoDTO {
     private String noiDung;
     private boolean daDoc;
     private LocalDateTime thoiGianGui;
+    private String trangThai;
     private int taiKhoanId; // Chỉ lưu ID của người nhận
 
     // --- Constructors ---
     public ThongBaoDTO() {
     }
 
-    public ThongBaoDTO(int id, String tieuDe, String noiDung, boolean daDoc, LocalDateTime thoiGianGui, int taiKhoanId) {
+    public ThongBaoDTO(int id, String tieuDe, String noiDung, boolean daDoc, LocalDateTime thoiGianGui, String trangThai, int taiKhoanId) {
         this.id = id;
         this.tieuDe = tieuDe;
         this.noiDung = noiDung;
         this.daDoc = daDoc;
         this.thoiGianGui = thoiGianGui;
+        this.trangThai = trangThai;
         this.taiKhoanId = taiKhoanId;
     }
-
+    
     // --- Getters and Setters ---
     public int getId() {
         return id;
@@ -72,4 +74,14 @@ public class ThongBaoDTO {
     public void setTaiKhoanId(int taiKhoanId) {
         this.taiKhoanId = taiKhoanId;
     }
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
+    }
+    
+    
 }

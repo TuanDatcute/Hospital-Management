@@ -1,4 +1,4 @@
-// path: com/dto/HoaDonDTO.java
+  // path: com/dto/HoaDonDTO.java
 package model.dto;
 
 // import com.model.TrangThaiHoaDon; // Không cần import Enum nữa

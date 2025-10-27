@@ -10,6 +10,8 @@ import model.Entity.PhieuKhamBenh;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.hibernate.Session;
+import util.HibernateUtil;
 
 /**
  * Lớp Service cho Chỉ Định Dịch Vụ. Chứa toàn bộ logic nghiệp vụ (business
@@ -162,5 +164,16 @@ public class ChiDinhDichVuService {
         }
 
         return dto;
+    }
+
+    public List<ChiDinhDichVuDTO> getByPhieuKhamId(int phieuKhamId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            List<ChiDinhDichVu> entities = chiDinhDAO.findByPhieuKhamId(phieuKhamId, session);
+            
+            // Chuyển List<Entity> sang List<DTO>
+            return entities.stream()
+                           .map(this::toDTO)
+                           .collect(Collectors.toList());
+        }
     }
 }

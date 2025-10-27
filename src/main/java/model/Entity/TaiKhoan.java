@@ -19,7 +19,7 @@ public class TaiKhoan {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "ten_dang_nhap", nullable = false, unique = true, columnDefinition = "NVARCHAR(MAX)" )
+    @Column(name = "ten_dang_nhap", nullable = false, unique = true, columnDefinition = "NVARCHAR(MAX)")
     private String tenDangNhap;
 
     @Column(name = "mat_khau", nullable = false, columnDefinition = "NVARCHAR(MAX)")
@@ -27,12 +27,12 @@ public class TaiKhoan {
 
     @Column(name = "email", nullable = false, unique = true, columnDefinition = "NVARCHAR(MAX)")
     private String email;
-    
+
     @Column(name = "vai_tro", nullable = false, columnDefinition = "NVARCHAR(MAX)")
-    private String vaiTro; 
+    private String vaiTro;
 
     @Column(name = "trang_thai", nullable = false, columnDefinition = "NVARCHAR(MAX)")
-    private String trangThai; 
+    private String trangThai;
 
     @CreationTimestamp //  TỰ ĐỘNG GÁN KHI TẠO MỚI
     @Column(name = "created_at", nullable = false, updatable = false)

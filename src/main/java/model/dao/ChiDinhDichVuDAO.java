@@ -1,5 +1,6 @@
 package model.dao;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import model.Entity.ChiDinhDichVu;
@@ -97,4 +98,21 @@ public class ChiDinhDichVuDAO {
         }
     }
 
+    public BigDecimal calculateTotalService(int phieuKhamId, Session session) {
+        String hql = "SELECT SUM(cdv.dichVu.donGia) FROM ChiDinhDichVu cdv "
+                + "WHERE cdv.phieuKham.id = :phieuKhamId AND cdv.trangThai = 'HOAN_THANH'"; // Chỉ tính DV đã hoàn thành
+        BigDecimal total = session.createQuery(hql, BigDecimal.class)
+                .setParameter("phieuKhamId", phieuKhamId)
+                .uniqueResult();
+        return total == null ? BigDecimal.ZERO : total;
+    }
+
+    public List<ChiDinhDichVu> findByPhieuKhamId(int phieuKhamId, Session session) {
+        String hql = "FROM ChiDinhDichVu cddv WHERE cddv.phieuKham.id = :phieuKhamId";
+
+        Query<ChiDinhDichVu> query = session.createQuery(hql, ChiDinhDichVu.class);
+        query.setParameter("phieuKhamId", phieuKhamId);
+
+        return query.list();
+    }
 }

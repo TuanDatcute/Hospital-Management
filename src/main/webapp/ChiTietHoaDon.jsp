@@ -7,18 +7,64 @@
     <title>Chi tiết Hóa đơn ${invoice.maHoaDon}</title>
 </head>
 <body>
-    <h2>Chi tiết Hóa đơn: ${invoice.maHoaDon}</h2>
-    <p>Bệnh nhân: <strong>${invoice.hoTenBenhNhan}</strong></p>
-    <p>Phiếu khám: ${invoice.maPhieuKhamBenh}</p>
-    <p>Tổng tiền: 
-        <strong>
-            <td><fmt:formatNumber value="${invoice.tongTien}" pattern="#,##0 '₫'"/></td>
-        </strong>
-    </p>
-    <p>Trạng thái: <strong>${invoice.trangThai}</strong></p>
-
-    <%-- (Bạn có thể lặp qua chi tiết dịch vụ, thuốc ở đây nếu DTO của bạn hỗ trợ) --%>
+    <a href="MainController?action=listInvoices">&lt;&lt; Quay lại Danh sách</a>
+    <hr>
     
+    <h2>Chi tiết Hóa đơn: ${invoice.maHoaDon}</h2>
+    <%-- Hiển thị thông tin từ DTO "phẳng" --%>
+    <p>Bệnh nhân: <strong>${invoice.hoTenBenhNhan}</strong></p>
+    <p>Trạng thái: <strong>${invoice.trangThai}</strong></p>
+    
+    <%-- ============================================= --%>
+    <%--      THAY ĐỔI: Lấy từ request attribute      --%>
+    <%-- ============================================= --%>
+    <h3>Chi tiết Dịch vụ</h3>
+    <table border="1" style="width: 70%">
+        <thead>
+            <tr> <th>STT</th> <th>Tên Dịch vụ</th> <th>Đơn giá</th> </tr>
+        </thead>
+        <tbody>
+            <%-- SỬA: Dùng "danhSachDichVu" thay vì "invoice.danhSachDichVu" --%>
+            <c:forEach var="dv" items="${danhSachDichVu}" varStatus="loop">
+                <tr>
+                    <td>${loop.count}</td>
+                    <td><c:out value="${dv.tenDichVu}"/></td>
+                    <td><fmt:formatNumber value="${dv.donGia}" pattern="#,##0 '₫'"/></td>
+                </tr>
+            </c:forEach>
+        </tbody>
+    </table>
+    <br>
+
+    <%-- ============================================= --%>
+    <%--      THAY ĐỔI: Lấy từ request attribute      --%>
+    <%-- ============================================= --%>
+    <h3>Chi tiết Đơn thuốc</h3>
+    <table border="1" style="width: 70%">
+        <thead>
+            <tr>
+                <th>STT</th> <th>Tên Thuốc</th> <th>Số lượng</th> <th>Đơn giá</th> <th>Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            <%-- SỬA: Dùng "danhSachThuoc" thay vì "invoice.danhSachThuoc" --%>
+            <c:forEach var="thuoc" items="${danhSachThuoc}" varStatus="loop">
+                <tr>
+                    <td>${loop.count}</td>
+                    <td><c:out value="${thuoc.tenThuoc}"/></td>
+                    <td>${thuoc.soLuong}</td>
+                    <td><fmt:formatNumber value="${thuoc.donGia}" pattern="#,##0 '₫'"/></td>
+                    <td><fmt:formatNumber value="${thuoc.thanhTien}" pattern="#,##0 '₫'"/></td>
+                </tr>
+            </c:forEach>
+        </tbody>
+    </table>
+    <br>
+    
+    <hr>
+    <h3>TỔNG CỘNG: 
+        <fmt:formatNumber value="${invoice.tongTien}" pattern="#,##0 '₫'"/>
+    </h3>
     <hr>
     
     <h3>Ghi nhận Thanh toán (cho Lễ tân)</h3>
