@@ -3,8 +3,10 @@ package service;
 import exception.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import model.Entity.BenhNhan;
+import model.Entity.ChiDinhDichVu;
 import model.Entity.LichHen;
 import model.Entity.NhanVien;
 import model.Entity.PhieuKhamBenh;
@@ -46,17 +48,17 @@ public class PhieuKhamBenhService {
         if (phieuKhamDAO.isMaPhieuKhamExisted(dto.getMaPhieuKham())) {
             throw new ValidationException("Mã phiếu khám '" + dto.getMaPhieuKham() + "' đã tồn tại.");
         }
-        
+
         BenhNhan benhNhanEntity = benhNhanDAO.getById(dto.getBenhNhanId());
         if (benhNhanEntity == null) {
             throw new ValidationException("Không tìm thấy bệnh nhân với ID: " + dto.getBenhNhanId());
         }
-        
+
         NhanVien nhanVienEntity = nhanVienDAO.getById(dto.getBacSiId());
         if (nhanVienEntity == null) {
             throw new ValidationException("Không tìm thấy nhân viên (bác sĩ) với ID: " + dto.getBacSiId());
         }
-        
+
         LichHen lh = null;
         if (dto.getLichHenId() != null) {
             lh = new LichHenDAO().getById(dto.getLichHenId());
@@ -71,12 +73,12 @@ public class PhieuKhamBenhService {
         // --- BƯỚC 4: CHUYỂN ĐỔI ENTITY -> DTO ĐỂ TRẢ VỀ ---
         return toDTO(savedEntity);
     }
-    
+
     public PhieuKhamBenhDTO getEncounterById(int id) {
         PhieuKhamBenh entity = phieuKhamDAO.getEncounterById(id);
         return toDTO(entity); // Sử dụng lại hàm toDTO đã có
     }
-    
+
     public List<PhieuKhamBenhDTO> getAllEncounters() {
         List<PhieuKhamBenh> entities = phieuKhamDAO.getAll();
         // Chuyển đổi danh sách Entity sang danh sách DTO
@@ -84,20 +86,13 @@ public class PhieuKhamBenhService {
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
-    
+
     public List<PhieuKhamBenhDTO> searchEncounters(String keyword) {
         // Gọi hàm tìm kiếm gọn nhẹ
         List<PhieuKhamBenh> entities = phieuKhamDAO.searchForListing(keyword);
         return entities.stream().map(this::toDTOForListing).collect(Collectors.toList());
     }
-    
-    public PhieuKhamBenhDTO getEncounterDetailsById(int id) {
-        // Gọi hàm đầy đủ để xem chi tiết
-        PhieuKhamBenh entity = phieuKhamDAO.getEncounterById(id);
-        return toDTO(entity); // Một hàm toDTO khác, chi tiết hơn
-    }
-    
-    
+
 
     /**
      * Chuyển đổi một Entity PhieuKhamBenh sang một DTO "gọn nhẹ", chỉ chứa các
@@ -110,7 +105,7 @@ public class PhieuKhamBenhService {
         if (entity == null) {
             return null;
         }
-        
+
         PhieuKhamBenhDTO dto = new PhieuKhamBenhDTO();
         dto.setId(entity.getId());
         dto.setMaPhieuKham(entity.getMaPhieuKham());
@@ -124,8 +119,48 @@ public class PhieuKhamBenhService {
         if (entity.getBacSi() != null) {
             dto.setTenBacSi(entity.getBacSi().getHoTen());
         }
-        
+
         return dto;
+    }
+
+    /**
+     * NGHIỆP VỤ: Cập nhật trạng thái của phiếu khám thành "HOAN_THANH". Chỉ
+     * thực hiện được khi tất cả các dịch vụ chỉ định đã ở trạng thái
+     * "HOAN_THANH".
+     *
+     * @param phieuKhamId ID của phiếu khám cần hoàn thành.
+     * @return DTO của phiếu khám sau khi cập nhật.
+     * @throws ValidationException nếu có lỗi nghiệp vụ.
+     */
+    public PhieuKhamBenhDTO completeEncounterStatus(int phieuKhamId) throws ValidationException {
+        // 1. Lấy Entity đầy đủ từ CSDL (bao gồm cả danh sách chỉ định)
+        PhieuKhamBenh existingEntity = phieuKhamDAO.getDetailsByIdToUpdateStatus(phieuKhamId);
+        if (existingEntity == null) {
+            throw new ValidationException("Không tìm thấy phiếu khám để hoàn thành.");
+        }
+
+        Set<ChiDinhDichVu> danhSachChiDinh = existingEntity.getDanhSachChiDinh();
+
+        // Nếu có danh sách chỉ định, kiểm tra từng mục
+        if (danhSachChiDinh != null && !danhSachChiDinh.isEmpty()) {
+            // Dùng Stream API để kiểm tra xem "tất cả" có khớp điều kiện không
+            boolean allServicesCompleted = danhSachChiDinh.stream()
+                    .allMatch(chiDinh -> "HOAN_THANH".equals(chiDinh.getTrangThai()));
+
+            if (!allServicesCompleted) {
+                throw new ValidationException("Không thể hoàn thành phiếu khám vì còn dịch vụ chưa hoàn tất.");
+            }
+        }
+        // Nếu không có dịch vụ nào, có thể cho phép hoàn thành (tùy nghiệp vụ)
+
+        // 3. Cập nhật trạng thái
+        existingEntity.setTrangThai("HOAN_THANH");
+
+        // 4. Gọi DAO để lưu thay đổi
+        phieuKhamDAO.update(existingEntity);
+
+        // 5. Trả về DTO đã cập nhật
+        return toDTO(existingEntity); // Giả sử có hàm toDTO đầy đủ
     }
 
     /**
@@ -143,7 +178,7 @@ public class PhieuKhamBenhService {
         PhieuKhamBenh existingEntity = phieuKhamDAO.getEncounterById(dto.getId());
         if (existingEntity.getTrangThai().equals("HOAN_THANH")) {
             throw new ValidationException("Không thể sửa phiếu khám đã hoàn thành");
-            
+
         }
         if (existingEntity == null) {
             throw new ValidationException("Không tìm thấy phiếu khám để cập nhật.");
@@ -176,7 +211,7 @@ public class PhieuKhamBenhService {
         // Xử lý cả 3 trường hợp: gán mới, thay đổi, hoặc xóa bỏ lịch hẹn
         Integer lichHenIdMoi = dto.getLichHenId();
         LichHen lichHenHienTai = existingEntity.getLichHen();
-        
+
         if (lichHenIdMoi != null) {
             if (lichHenHienTai == null || lichHenHienTai.getId() != lichHenIdMoi) {
                 LichHen newLichHen = lichHenDAO.getById(lichHenIdMoi);
@@ -241,7 +276,7 @@ public class PhieuKhamBenhService {
         }
         entity.setBenhNhan(benhNhan);
         entity.setBacSi(nhanVien);
-        
+
         return entity;
     }
 
@@ -252,7 +287,7 @@ public class PhieuKhamBenhService {
         if (entity == null) {
             return null;
         }
-        
+
         PhieuKhamBenhDTO dto = new PhieuKhamBenhDTO();
         dto.setId(entity.getId());
         dto.setMaPhieuKham(entity.getMaPhieuKham());
@@ -265,11 +300,11 @@ public class PhieuKhamBenhService {
         dto.setChanDoan(entity.getChanDoan());
         dto.setKetLuan(entity.getKetLuan());
         dto.setTrangThai(entity.getTrangThai());
-        
+
         if (entity.getLichHen() != null) {
             dto.setLichHenId(entity.getLichHen().getId());
         }
-        
+
         if (entity.getNgayTaiKham() != null) {
             dto.setNgayTaiKham(entity.getNgayTaiKham());
         }
@@ -285,7 +320,7 @@ public class PhieuKhamBenhService {
             dto.setDonThuoc(donThuocService.toDTO(entity.getDonThuoc()));
         }
         if (entity.getDanhSachChiDinh() != null && !entity.getDanhSachChiDinh().isEmpty()) {
-            
+
             List<ChiDinhDichVuDTO> chiDinhDTOs = entity.getDanhSachChiDinh().stream()
                     .map(chiDinhService::toDTO)
                     .collect(Collectors.toList());

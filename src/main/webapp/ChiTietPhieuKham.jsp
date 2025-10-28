@@ -8,7 +8,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Chi Tiết Phiếu Khám Bệnh</title>
 
-        <link rel="stylesheet" href="<c:url value='/css/pkb-style.css'/>">
         <link rel="stylesheet" href="<c:url value='/css/ctdt-style.css'/>">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     </head>
@@ -17,7 +16,11 @@
 
             <div class="header-section">
                 <h1>Chi Tiết Phiếu Khám Bệnh</h1>
-                <h2>Mã Phiếu Khám: ${phieuKham.maPhieuKham}</h2>
+                <div class="header-status">
+                    <h2>Mã: ${phieuKham.maPhieuKham}</h2>
+                    <%-- Hiển thị trạng thái của phiếu khám --%>
+                    <span class="status status-${phieuKham.trangThai}">${phieuKham.trangThai}</span>
+                </div>
             </div>
 
             <%-- Thông báo thành công/thất bại --%>
@@ -29,6 +32,7 @@
                 <div class="alert alert-success">${sessionScope.SUCCESS_MESSAGE}</div>
                 <c:remove var="SUCCESS_MESSAGE" scope="session" />
             </c:if>
+
 
             <div class="info-grid">
                 <div class="info-item"><span class="label">Bệnh Nhân:</span><span class="value">${phieuKham.tenBenhNhan}</span></div>
@@ -59,36 +63,47 @@
             <div class="sub-grid">
                 <div class="section">
                     <h3>III. Dịch vụ đã chỉ định</h3>
-                    <div class="add-service-form">
-                        <form action="<c:url value='/MainController'/>" method="POST">
-                            <input type="hidden" name="action" value="addServiceRequest">
-                            <input type="hidden" name="phieuKhamId" value="${phieuKham.id}">
-                            <div class="form-group">
-                                <label for="dichVuId">Thêm dịch vụ mới:</label>
-                                <select id="dichVuId" name="dichVuId" class="form-control" required>
-                                    <option value="">-- Chọn dịch vụ --</option>
-                                    <c:forEach var="dv" items="${danhSachDichVu}"><option value="${dv.id}">${dv.tenDichVu}</option></c:forEach>
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn btn-primary" style="align-self: end">Thêm</button>
+                    <c:if test="${phieuKham.trangThai ne 'HOAN_THANH'}">
+                        <div class="add-service-form">
+                            <form action="<c:url value='/MainController'/>" method="POST">
+                                <input type="hidden" name="action" value="addServiceRequest">
+                                <input type="hidden" name="phieuKhamId" value="${phieuKham.id}">
+                                <div class="form-group">
+                                    <label for="dichVuId">Thêm dịch vụ mới:</label>
+                                    <select id="dichVuId" name="dichVuId" class="form-control" required>
+                                        <option value="">-- Chọn dịch vụ --</option>
+                                        <c:forEach var="dv" items="${danhSachDichVu}"><option value="${dv.id}">${dv.tenDichVu}</option></c:forEach>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Thêm</button>
+                                </form>
+                            </div>
+                    </c:if>
 
-                            </form>
-                        </div>
+                    <table class="data-table">
+                        <c:choose>
+                            <c:when test="${not empty phieuKham.danhSachChiDinh}">
+                                <thead><tr><th>Tên Dịch Vụ</th><th>Trạng Thái</th><th>Kết Quả</th><th class="text-center">Hành động</th></tr></thead>
+                                <tbody id="service-request-body">
+                                    <c:forEach var="chiDinh" items="${phieuKham.danhSachChiDinh}">
+                                        <tr>
+                                            <td><strong>${chiDinh.tenDichVu}</strong></td>
+                                            <td><span class="status status-${chiDinh.trangThai}">${chiDinh.trangThai}</span></td>
+                                            <td><c:out value="${chiDinh.ketQua}" default="Chưa có"/></td>
+                                            <td class="actions text-center">
+                                                <c:if test="${phieuKham.trangThai ne 'HOAN_THANH'}">
+                                                    <button class="btn btn-edit update-result-btn" data-id="${chiDinh.id}" data-tendichvu="${chiDinh.tenDichVu}" data-ketqua="${chiDinh.ketQua}" data-trangthai="${chiDinh.trangThai}">Cập nhật</button>
+                                                </c:if>                                    
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </c:when>
+                            <c:otherwise>
+                                <p>Chưa có dịch vụ đã chỉ định.</p>                                                  
+                            </c:otherwise>
+                        </c:choose>
 
-                        <table class="data-table">
-                            <thead><tr><th>Tên Dịch Vụ</th><th>Trạng Thái</th><th>Kết Quả</th><th class="text-center">Hành động</th></tr></thead>
-                            <tbody id="service-request-body">
-                            <c:forEach var="chiDinh" items="${phieuKham.danhSachChiDinh}">
-                                <tr>
-                                    <td><strong>${chiDinh.tenDichVu}</strong></td>
-                                    <td><span class="status status-${chiDinh.trangThai}">${chiDinh.trangThai}</span></td>
-                                    <td><c:out value="${chiDinh.ketQua}" default="Chưa có"/></td>
-                                    <td class="actions text-center">
-                                        <button class="btn btn-edit update-result-btn" data-id="${chiDinh.id}" data-tendichvu="${chiDinh.tenDichVu}" data-ketqua="${chiDinh.ketQua}" data-trangthai="${chiDinh.trangThai}">Cập nhật</button>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                        </tbody>
                     </table>
                 </div>
 
@@ -96,12 +111,42 @@
                     <h3>IV. Đơn thuốc</h3>
                     <c:choose>
                         <c:when test="${not empty phieuKham.donThuoc}">
-                            <p>Đã có đơn thuốc cho lần khám này.</p>
-                            <a href="<c:url value='/MainController?action=viewDetails&id=${phieuKham.donThuoc.id}'/>" class="btn btn-primary">Xem & Quản lý Đơn thuốc</a>
+
+                            <%-- HIỂN THỊ THÔNG TIN CHI TIẾT CÁC THUỐC ĐÃ KÊ --%>
+                            <div class="prescription-details">
+                                <p><strong>Lời dặn chung:</strong> ${phieuKham.donThuoc.loiDan}</p>
+                                <table class="mini-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên Thuốc</th>
+                                            <th class="text-right">Số Lượng</th>
+                                            <th>Liều Dùng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:forEach var="chiTiet" items="${phieuKham.donThuoc.chiTietDonThuoc}">
+                                            <tr>
+                                                <td><strong>${chiTiet.tenThuoc}</strong></td>
+                                                <td class="text-right">${chiTiet.soLuong}</td>
+                                                <td>${chiTiet.lieuDung}</td>
+                                            </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <%-- Nút để đi đến trang quản lý chi tiết --%>
+                            <a href="<c:url value='/MainController?action=viewDetails&id=${phieuKham.donThuoc.id}'/>" class="btn btn-primary" style="margin-top: 15px;">
+                                Xem & Quản lý Chi tiết Đơn thuốc
+                            </a>
+
                         </c:when>
                         <c:otherwise>
                             <p>Chưa có đơn thuốc nào được kê.</p>
-                            <a href="<c:url value='/MainController?action=showCreateDonThuocForm&phieuKhamId=${phieuKham.id}'/>" class="btn btn-success">Kê Đơn Thuốc</a>
+                            <%-- Chỉ hiển thị nút "Kê Đơn" khi phiếu khám chưa hoàn thành --%>
+                            <c:if test="${phieuKham.trangThai ne 'HOAN_THANH'}">
+                                <a href="<c:url value='/MainController?action=showCreateDonThuocForm&phieuKhamId=${phieuKham.id}'/>" class="btn btn-success">Kê Đơn Thuốc</a>
+                            </c:if>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -109,7 +154,15 @@
 
             <div class="action-buttons">
                 <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="btn btn-secondary">Quay lại danh sách</a>
-                <a href="<c:url value='/MainController?action=showUpdateEncounterForm&id=${phieuKham.id}'/>" class="btn btn-edit">Chỉnh sửa Phiếu khám</a>
+                <c:if test="${phieuKham.trangThai ne 'HOAN_THANH'}">
+                    <a href="<c:url value='/MainController?action=showUpdateEncounterForm&id=${phieuKham.id}'/>" class="btn btn-edit">Chỉnh sửa Phiếu khám</a>
+                    <form action="<c:url value='/MainController'/>" method="POST" style="display:inline;" 
+                          onsubmit="return confirm('Bạn có chắc chắn muốn hoàn thành phiếu khám này?');">
+                        <input type="hidden" name="action" value="completeEncounter">
+                        <input type="hidden" name="phieuKhamId" value="${phieuKham.id}">
+                        <button type="submit" class="btn btn-success">Hoàn thành Phiếu khám</button>
+                    </form>
+                </c:if>
             </div>
         </div>
 

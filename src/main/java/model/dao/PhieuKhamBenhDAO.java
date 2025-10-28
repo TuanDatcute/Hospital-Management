@@ -79,19 +79,19 @@ public class PhieuKhamBenhDAO {
     }
 
     /**
-     * PHƯƠNG THỨC ĐẦY ĐỦ: Lấy tất cả thông tin chi tiết cho một phiếu khám.
+     * PHƯƠNG THỨC ĐẦY ĐỦ: Lấy thông tim để chỉnh sửa trạng thái
      *
      * @return Một đối tượng PhieuKhamBenh duy nhất với tất cả dữ liệu liên
      * quan.
      */
-    public PhieuKhamBenh getDetailsById(int id) {
+    public PhieuKhamBenh getDetailsByIdToUpdateStatus(int id) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             // Câu query này đã lấy sẵn danh sách chỉ định, hoàn hảo cho nghiệp vụ của chúng ta
             Query<PhieuKhamBenh> query = session.createQuery(
                     "SELECT pkb FROM PhieuKhamBenh pkb "
                     + "LEFT JOIN FETCH pkb.danhSachChiDinh cdd "
-                    + // Lấy danh sách chỉ định
-                    "WHERE pkb.id = :id",
+                    + "LEFT JOIN FETCH pkb.benhNhan "
+                    + "WHERE pkb.id = :id",
                     PhieuKhamBenh.class
             );
             query.setParameter("id", id);
@@ -158,7 +158,7 @@ public class PhieuKhamBenhDAO {
                     + "JOIN FETCH pkb.benhNhan bn "
                     + "JOIN FETCH pkb.bacSi "
                     + "WHERE pkb.maPhieuKham LIKE :keyword OR bn.hoTen LIKE :keyword "
-                    + "ORDER BY pkb.thoiGianKham DESC",
+                    + "ORDER BY pkb.trangThai ASC, pkb.thoiGianKham DESC",
                     PhieuKhamBenh.class
             );
             query.setParameter("keyword", "%" + keyword + "%");
@@ -202,7 +202,7 @@ public class PhieuKhamBenhDAO {
                     + "LEFT JOIN FETCH pkb.donThuoc dt "
                     + "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
                     + "LEFT JOIN FETCH cdt.thuoc "
-                    + "ORDER BY pkb.thoiGianKham DESC",
+                    + "ORDER BY pkb.trangThai ASC, pkb.thoiGianKham DESC",
                     PhieuKhamBenh.class
             );
 

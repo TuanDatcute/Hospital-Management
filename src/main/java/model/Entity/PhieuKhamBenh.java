@@ -67,14 +67,6 @@ public class PhieuKhamBenh {
     @ColumnDefault("'CHUA_HOAN_THANH'")
     private String trangThai;//HOAN_THANH   CHUA_HOAN_THANH
 
-    public String getTrangThai() {
-        return trangThai;
-    }
-
-    public void setTrangThai(String trangThai) {
-        this.trangThai = trangThai;
-    }
-
     @Column(name = "ngay_tai_kham")
     private LocalDateTime ngayTaiKham; // Ngày hẹn tái khám
 
@@ -113,6 +105,14 @@ public class PhieuKhamBenh {
         this.benhNhan = benhNhan;
         this.bacSi = bacSi;
         this.lichHen = lichHen;
+    }
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
     }
 
     public int getId() {
