@@ -12,7 +12,6 @@
             <c:otherwise><title>Chỉnh Sửa Phiếu Khám</title></c:otherwise>
         </c:choose>
 
-        <link rel="stylesheet" href="<c:url value='/danhSach-css/style.css'/>">
         <link rel="stylesheet" href="<c:url value='/css/pkb-style.css'/>">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     </head>

@@ -22,6 +22,7 @@ import javax.persistence.Table;
 import model.dto.BenhNhanDTO;
 import model.dto.LichHenDTO;
 import model.dto.NhanVienDTO;
+import org.hibernate.annotations.ColumnDefault;
 
 /**
  *
@@ -35,7 +36,7 @@ public class PhieuKhamBenh {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "ma_phieu_kham", nullable = false, unique = true,columnDefinition = "NVARCHAR(50)")
+    @Column(name = "ma_phieu_kham", nullable = false, unique = true, columnDefinition = "NVARCHAR(50)")
     private String maPhieuKham;
 
     @Column(name = "thoi_gian_kham", nullable = false)
@@ -47,7 +48,7 @@ public class PhieuKhamBenh {
     @Column(name = "nhiet_do")
     private BigDecimal nhietDo;
 
-    @Column(name = "huyet_ap",columnDefinition = "NVARCHAR(50)")
+    @Column(name = "huyet_ap", columnDefinition = "NVARCHAR(50)")
     private String huyetAp;
 
     @Column(name = "nhip_tim")
@@ -58,28 +59,40 @@ public class PhieuKhamBenh {
 
     @Column(name = "chan_doan", columnDefinition = "NVARCHAR(MAX)")
     private String chanDoan;
-    
+
     @Column(name = "ket_luan", columnDefinition = "NVARCHAR(MAX)")
     private String ketLuan;
-    
+
+    @Column(name = "trang_thai", columnDefinition = "NVARCHAR(MAX)")
+    @ColumnDefault("'CHUA_HOAN_THANH'")
+    private String trangThai;//HOAN_THANH   CHUA_HOAN_THANH
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
+    }
+
     @Column(name = "ngay_tai_kham")
     private LocalDateTime ngayTaiKham; // Ngày hẹn tái khám
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "benh_nhan_id", nullable = false )
+    @JoinColumn(name = "benh_nhan_id", nullable = false)
     private BenhNhan benhNhan;
-    
-    @ManyToOne(fetch = FetchType.LAZY) 
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nhan_vien_id", nullable = false)
     private NhanVien bacSi;
-    
+
     @OneToOne
     @JoinColumn(name = "lich_hen_id")
-    private LichHen lichHen ; 
-    
+    private LichHen lichHen;
+
     @OneToOne(mappedBy = "phieuKham", cascade = CascadeType.ALL)
     private DonThuoc donThuoc;
-    
+
     @OneToMany(mappedBy = "phieuKham", cascade = CascadeType.ALL)
     private Set<ChiDinhDichVu> danhSachChiDinh;
 
@@ -230,5 +243,4 @@ public class PhieuKhamBenh {
         this.danhSachChiDinh = danhSachChiDinh;
     }
 
-    
 }

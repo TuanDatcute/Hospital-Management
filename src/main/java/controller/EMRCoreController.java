@@ -33,7 +33,7 @@ public class EMRCoreController extends HttpServlet {
     // Khai báo URL cho các trang JSP 
     
     private static final String ERROR_PAGE = "error.jsp";
-    private static final String SUCCESS_PAGE = "MainController?action=listAllEncounters";
+    private static final String SUCCESS_PAGE = "DanhSachPhieuKham.jsp";
     private static final String CREATE_ENCOUNTER_PAGE = "PhieuKhamBenh.jsp";
     private static final String ENCOUNTER_LIST_PAGE = "DanhSachPhieuKham.jsp";
     private static final String CREATE_SERVICE_REQUEST_PAGE = "ChiTietPhieuKham.jsp";
@@ -79,7 +79,7 @@ public class EMRCoreController extends HttpServlet {
                 case "showCreateDonThuocForm":
                     url = showCreateForm(request);
                     break;
-                case "showUpdateForm":
+                case "showUpdateEncounterForm":
                     url = showUpdateForm(request);
                     break;
                 default:

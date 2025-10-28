@@ -36,6 +36,7 @@ public class PhieuKhamBenhDTO {
     private String tenBacSi;    // Tốt! Giữ lại để tiện hiển thị
     private Integer lichHenId;
 
+    private String trangThai;
     private DonThuocDTO donThuoc;
     private List<ChiDinhDichVuDTO> danhSachChiDinh;
 
@@ -65,6 +66,14 @@ public class PhieuKhamBenhDTO {
 
     public String getChanDoan() {
         return chanDoan;
+    }
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
     }
 
     public void setChanDoan(String chanDoan) {
