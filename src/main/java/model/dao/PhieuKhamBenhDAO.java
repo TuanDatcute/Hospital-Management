@@ -78,6 +78,30 @@ public class PhieuKhamBenhDAO {
         }
     }
 
+    /**
+     * PHƯƠNG THỨC ĐẦY ĐỦ: Lấy tất cả thông tin chi tiết cho một phiếu khám.
+     *
+     * @return Một đối tượng PhieuKhamBenh duy nhất với tất cả dữ liệu liên
+     * quan.
+     */
+    public PhieuKhamBenh getDetailsById(int id) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Câu query này đã lấy sẵn danh sách chỉ định, hoàn hảo cho nghiệp vụ của chúng ta
+            Query<PhieuKhamBenh> query = session.createQuery(
+                    "SELECT pkb FROM PhieuKhamBenh pkb "
+                    + "LEFT JOIN FETCH pkb.danhSachChiDinh cdd "
+                    + // Lấy danh sách chỉ định
+                    "WHERE pkb.id = :id",
+                    PhieuKhamBenh.class
+            );
+            query.setParameter("id", id);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     //Xem chi tiết một lần khám.
     public PhieuKhamBenh getEncounterById(int phieuKhamId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
