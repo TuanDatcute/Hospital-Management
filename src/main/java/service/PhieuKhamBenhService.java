@@ -46,17 +46,17 @@ public class PhieuKhamBenhService {
         if (phieuKhamDAO.isMaPhieuKhamExisted(dto.getMaPhieuKham())) {
             throw new ValidationException("Mã phiếu khám '" + dto.getMaPhieuKham() + "' đã tồn tại.");
         }
-
+        
         BenhNhan benhNhanEntity = benhNhanDAO.getById(dto.getBenhNhanId());
         if (benhNhanEntity == null) {
             throw new ValidationException("Không tìm thấy bệnh nhân với ID: " + dto.getBenhNhanId());
         }
-
+        
         NhanVien nhanVienEntity = nhanVienDAO.getById(dto.getBacSiId());
         if (nhanVienEntity == null) {
             throw new ValidationException("Không tìm thấy nhân viên (bác sĩ) với ID: " + dto.getBacSiId());
         }
-
+        
         LichHen lh = null;
         if (dto.getLichHenId() != null) {
             lh = new LichHenDAO().getById(dto.getLichHenId());
@@ -71,12 +71,12 @@ public class PhieuKhamBenhService {
         // --- BƯỚC 4: CHUYỂN ĐỔI ENTITY -> DTO ĐỂ TRẢ VỀ ---
         return toDTO(savedEntity);
     }
-
+    
     public PhieuKhamBenhDTO getEncounterById(int id) {
         PhieuKhamBenh entity = phieuKhamDAO.getEncounterById(id);
         return toDTO(entity); // Sử dụng lại hàm toDTO đã có
     }
-
+    
     public List<PhieuKhamBenhDTO> getAllEncounters() {
         List<PhieuKhamBenh> entities = phieuKhamDAO.getAll();
         // Chuyển đổi danh sách Entity sang danh sách DTO
@@ -84,13 +84,13 @@ public class PhieuKhamBenhService {
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
-
+    
     public List<PhieuKhamBenhDTO> searchEncounters(String keyword) {
         // Gọi hàm tìm kiếm gọn nhẹ
         List<PhieuKhamBenh> entities = phieuKhamDAO.searchForListing(keyword);
         return entities.stream().map(this::toDTOForListing).collect(Collectors.toList());
     }
-
+    
     public PhieuKhamBenhDTO getEncounterDetailsById(int id) {
         // Gọi hàm đầy đủ để xem chi tiết
         PhieuKhamBenh entity = phieuKhamDAO.getEncounterById(id);
@@ -108,7 +108,7 @@ public class PhieuKhamBenhService {
         if (entity == null) {
             return null;
         }
-
+        
         PhieuKhamBenhDTO dto = new PhieuKhamBenhDTO();
         dto.setId(entity.getId());
         dto.setMaPhieuKham(entity.getMaPhieuKham());
@@ -122,7 +122,7 @@ public class PhieuKhamBenhService {
         if (entity.getBacSi() != null) {
             dto.setTenBacSi(entity.getBacSi().getHoTen());
         }
-
+        
         return dto;
     }
 
@@ -139,6 +139,10 @@ public class PhieuKhamBenhService {
 
         // --- BƯỚC 1: LẤY BẢN GHI GỐC TỪ CSDL ---
         PhieuKhamBenh existingEntity = phieuKhamDAO.getEncounterById(dto.getId());
+        if (existingEntity.getTrangThai().equals("HOAN_THANH")) {
+            throw new ValidationException("Không thể sửa phiếu khám đã hoàn thành");
+            
+        }
         if (existingEntity == null) {
             throw new ValidationException("Không tìm thấy phiếu khám để cập nhật.");
         }
@@ -170,7 +174,7 @@ public class PhieuKhamBenhService {
         // Xử lý cả 3 trường hợp: gán mới, thay đổi, hoặc xóa bỏ lịch hẹn
         Integer lichHenIdMoi = dto.getLichHenId();
         LichHen lichHenHienTai = existingEntity.getLichHen();
-
+        
         if (lichHenIdMoi != null) {
             if (lichHenHienTai == null || lichHenHienTai.getId() != lichHenIdMoi) {
                 LichHen newLichHen = lichHenDAO.getById(lichHenIdMoi);
@@ -229,12 +233,13 @@ public class PhieuKhamBenhService {
         entity.setNhipTho(dto.getNhipTho());
         entity.setChanDoan(dto.getChanDoan());
         entity.setKetLuan(dto.getKetLuan());
+        entity.setTrangThai(dto.getTrangThai());
         if (lichHen != null) {
             entity.setLichHen(lichHen);
         }
         entity.setBenhNhan(benhNhan);
         entity.setBacSi(nhanVien);
-
+        
         return entity;
     }
 
@@ -245,7 +250,7 @@ public class PhieuKhamBenhService {
         if (entity == null) {
             return null;
         }
-
+        
         PhieuKhamBenhDTO dto = new PhieuKhamBenhDTO();
         dto.setId(entity.getId());
         dto.setMaPhieuKham(entity.getMaPhieuKham());
@@ -257,11 +262,12 @@ public class PhieuKhamBenhService {
         dto.setNhipTho(entity.getNhipTho());
         dto.setChanDoan(entity.getChanDoan());
         dto.setKetLuan(entity.getKetLuan());
-
+        dto.setTrangThai(entity.getTrangThai());
+        
         if (entity.getLichHen() != null) {
             dto.setLichHenId(entity.getLichHen().getId());
         }
-
+        
         if (entity.getNgayTaiKham() != null) {
             dto.setNgayTaiKham(entity.getNgayTaiKham());
         }
@@ -277,7 +283,7 @@ public class PhieuKhamBenhService {
             dto.setDonThuoc(donThuocService.toDTO(entity.getDonThuoc()));
         }
         if (entity.getDanhSachChiDinh() != null && !entity.getDanhSachChiDinh().isEmpty()) {
-
+            
             List<ChiDinhDichVuDTO> chiDinhDTOs = entity.getDanhSachChiDinh().stream()
                     .map(chiDinhService::toDTO)
                     .collect(Collectors.toList());

@@ -109,7 +109,7 @@
 
             <div class="action-buttons">
                 <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="btn btn-secondary">Quay lại danh sách</a>
-                <a href="<c:url value='/MainController?action=showUpdateForm&id=${phieuKham.id}'/>" class="btn btn-edit">Chỉnh sửa Phiếu khám</a>
+                <a href="<c:url value='/MainController?action=showUpdateEncounterForm&id=${phieuKham.id}'/>" class="btn btn-edit">Chỉnh sửa Phiếu khám</a>
             </div>
         </div>
 

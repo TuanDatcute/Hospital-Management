@@ -1,21 +1,61 @@
-/* --- CSS cho form Phiếu Khám Bệnh --- */
+/* ==========================================================================
+   BIẾN TOÀN CỤC & THIẾT LẬP CƠ BẢN
+   ========================================================================== */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --background-color: #f4f7f6;
+    --text-color: #212529;
+    --border-color: #ced4da;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --font-family: 'Roboto', sans-serif;
+}
 
-/* Sử dụng lại container từ file style.css chung */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* ==========================================================================
+   LAYOUT CHÍNH VÀ TIÊU ĐỀ
+   ========================================================================== */
 .container {
-    max-width: 800px;
+    max-width: 960px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 30px 40px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
 }
 
-h1 {
+.container h1 {
     text-align: center;
-    color: #333;
-    margin-bottom: 30px;
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
 }
 
-/* Lưới cho form */
+/* ==========================================================================
+   BỐ CỤC LƯỚI CHO FORM
+   ========================================================================== */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px 25px; /* Tăng khoảng cách ngang */
+    gap: 25px;
 }
 
 .form-group {
@@ -24,31 +64,39 @@ h1 {
 }
 
 .full-width {
-    grid-column: 1 / -1; /* Trải dài trên cả 2 cột */
+    grid-column: 1 / -1; /* Trải dài toàn bộ chiều rộng của grid */
 }
 
+/* ==========================================================================
+   CÁC THÀNH PHẦN CỦA FORM
+   ========================================================================== */
 label {
     margin-bottom: 8px;
     font-weight: 500;
-    color: #555;
-    font-size: 14px;
+    color: #495057;
 }
 
-/* Áp dụng class .form-control cho tất cả input/select/textarea */
 .form-control {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 16px;
     width: 100%;
-    box-sizing: border-box;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    padding: 12px 15px;
+    font-size: 1rem;
+    font-family: var(--font-family);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-control:focus {
     outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
+}
+
+/* Style cho các ô input bị khóa (readonly) */
+input[readonly].form-control {
+    background-color: #e9ecef;
+    cursor: not-allowed;
 }
 
 textarea.form-control {
@@ -56,38 +104,92 @@ textarea.form-control {
     min-height: 80px;
 }
 
-/* Style riêng cho các input bị khóa */
-.readonly-input {
-    background-color: #e9ecef;
-    cursor: not-allowed;
-}
-
-/* Nhóm nút bấm */
+/* ==========================================================================
+   NÚT BẤM (BUTTONS)
+   ========================================================================== */
 .button-group {
     grid-column: 1 / -1;
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-    margin-top: 25px;
+    gap: 15px;
+    margin-top: 20px;
     padding-top: 20px;
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid #eee;
 }
 
-/* ✨ SỬA LỖI: Định dạng lại các nút bấm (giả sử có class .btn từ file style.css) */
-.btn-submit {
-    /* Đã được định nghĩa trong style.css là .btn-primary */
-}
-.btn-reset {
-    /* Đã được định nghĩa trong style.css là .btn-secondary */
+.btn {
+    display: inline-block;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
 }
 
-/* Hộp thông báo lỗi */
-.error-box {
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #0069d9;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+
+/* ==========================================================================
+   THÔNG BÁO LỖI (ALERT)
+   ========================================================================== */
+.alert {
     padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+.alert-danger {
     background-color: #f8d7da;
     color: #721c24;
-    border: 1px solid #f5c6cb;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    grid-column: 1 / -1;
+    border-color: #f5c6cb;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 20px;
+        margin: 10px auto;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr; /* Chuyển thành 1 cột trên màn hình nhỏ */
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
 }

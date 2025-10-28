@@ -170,19 +170,15 @@ public class PhieuKhamBenhDAO {
             Query<PhieuKhamBenh> query = session.createQuery(
                     // Dùng DISTINCT để tránh các bản ghi PhieuKhamBenh bị lặp lại
                     "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb "
-                    + // Lấy các mối quan hệ đơn lẻ
-                    "LEFT JOIN FETCH pkb.benhNhan "
+                    + "LEFT JOIN FETCH pkb.benhNhan "
                     + "LEFT JOIN FETCH pkb.bacSi "
                     + "LEFT JOIN FETCH pkb.lichHen "
-                    + // Lấy danh sách Chỉ Định Dịch Vụ và các con của nó
-                    "LEFT JOIN FETCH pkb.danhSachChiDinh cdd "
+                    + "LEFT JOIN FETCH pkb.danhSachChiDinh cdd "
                     + "LEFT JOIN FETCH cdd.dichVu "
-                    + // Lấy Đơn Thuốc và các con của nó
-                    "LEFT JOIN FETCH pkb.donThuoc dt "
+                    + "LEFT JOIN FETCH pkb.donThuoc dt "
                     + "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
                     + "LEFT JOIN FETCH cdt.thuoc "
-                    + // Sắp xếp kết quả
-                    "ORDER BY pkb.thoiGianKham DESC",
+                    + "ORDER BY pkb.thoiGianKham DESC",
                     PhieuKhamBenh.class
             );
 

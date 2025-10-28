@@ -9,7 +9,7 @@
         <title>Chi Tiết Đơn Thuốc</title>
 
         <%-- Link đến các file CSS --%>
-        <link rel="stylesheet" href="<c:url value='/css/style.css'/>">
+        <link rel="stylesheet" href="<c:url value='/css/danhSach-style.css'/>">
         <link rel="stylesheet" href="<c:url value='/css/qldt-style.css'/>">
 
         <%-- (Tùy chọn) Thêm font từ Google Fonts cho đẹp hơn --%>
@@ -23,7 +23,8 @@
                 <h1>Chi Tiết Đơn Thuốc #${donThuoc.id}</h1>
                 <div class="prescription-info">
                     <p><strong>Ngày kê đơn:</strong> ${donThuoc.ngayKeDonFormatted}</p>
-                    <p><strong>Phiếu khám liên quan:</strong> <a href="<c:url value='MainController?action=viewDetails&id=${donThuoc.phieuKhamId}'/>">ID #${donThuoc.phieuKhamId}</a></p>
+                    <p><strong>Tên bệnh nhân:</strong> ${donThuoc.tenBenhNhan}</p>
+                    <p><strong>Phiếu khám liên quan:</strong> <a href="<c:url value='MainController?action=viewEncounterDetails&id=${donThuoc.phieuKhamId}'/>">ID #${donThuoc.phieuKhamId}</a></p>
                     <p><strong>Lời dặn:</strong> ${donThuoc.loiDan}</p>
                 </div>
             </div>
