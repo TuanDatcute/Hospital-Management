@@ -1,5 +1,7 @@
+<%-- BƯỚC 1: Thêm thư viện 'fmt' để xử lý định dạng ngày giờ --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -23,23 +25,39 @@
             </c:choose>
             <c:if test="${not empty requestScope.ERROR_MESSAGE}"><div class="alert alert-danger"><strong>Lỗi!</strong> ${requestScope.ERROR_MESSAGE}</div></c:if>
 
-                <form action="<c:url value='/MainController'/>" method="POST">
+            <form action="<c:url value='/MainController'/>" method="POST">
                 <c:choose>
                     <c:when test="${empty phieuKham.id}"><input type="hidden" name="action" value="createEncounter"></c:when>
-                    <c:otherwise><input type="hidden" name="action" value="updateEncounter"><input type="hidden" name="id" value="${phieuKham.id}"></c:otherwise>
+                    <c:otherwise>
+                        <input type="hidden" name="action" value="updateEncounter">
+                        <input type="hidden" name="id" value="${phieuKham.id}">
+                    </c:otherwise>
                 </c:choose>
 
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="maPhieuKham">Mã Phiếu Khám</label>
+                        <%-- Cải thiện: Dùng c:if để code dễ đọc hơn so với toán tử 3 ngôi --%>
                         <input type="text" id="maPhieuKham" name="maPhieuKham" class="form-control" value="${phieuKham.maPhieuKham}" 
-                               ${not empty phieuKham.id ? 'readonly' : ''} required>
+                               <c:if test="${not empty phieuKham.id}">readonly</c:if> required>
                     </div>
+
+                    <%-- BƯỚC 2: Chuẩn bị dữ liệu cho ô Thời Gian Khám --%>
+                    <jsp:useBean id="now" class="java.util.Date" />
+                    <c:choose>
+                        <c:when test="${not empty phieuKham.thoiGianKhamFormatted}">
+                            <c:set var="thoiGianKhamValue" value="${phieuKham.thoiGianKhamFormatted}" />
+                        </c:when>
+                        <c:otherwise>
+                            <fmt:formatDate value="${now}" pattern="yyyy-MM-dd'T'HH:mm" var="thoiGianKhamValue" />
+                        </c:otherwise>
+                    </c:choose>
 
                     <div class="form-group">
                         <label for="thoiGianKham">Thời Gian Khám</label>
+                        <%-- BƯỚC 3: Điền giá trị đã được chuẩn bị vào ô input --%>
                         <input type="datetime-local" id="thoiGianKham" name="thoiGianKham" class="form-control"
-                               value="${phieuKham.thoiGianKhamFormatted}" required>
+                               value="${thoiGianKhamValue}" required>
                     </div>
 
                     <div class="form-group">
@@ -55,6 +73,8 @@
                             </c:when>
                             <c:otherwise>
                                 <input type="text" value="${phieuKham.tenBenhNhan}" readonly class="form-control readonly-input">
+                                <%-- Thêm một input ẩn để gửi ID bệnh nhân khi cập nhật (nếu cần) --%>
+                                <input type="hidden" name="benhNhanId" value="${phieuKham.benhNhanId}">
                             </c:otherwise>
                         </c:choose>
                     </div>

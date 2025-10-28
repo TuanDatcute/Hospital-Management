@@ -31,7 +31,6 @@ import service.PhieuKhamBenhService;
 public class EMRCoreController extends HttpServlet {
 
     // Khai báo URL cho các trang JSP 
-    
     private static final String ERROR_PAGE = "error.jsp";
     private static final String SUCCESS_PAGE = "DanhSachPhieuKham.jsp";
     private static final String CREATE_ENCOUNTER_PAGE = "PhieuKhamBenh.jsp";
@@ -239,9 +238,13 @@ public class EMRCoreController extends HttpServlet {
             // 2. Gọi tầng Service để thực hiện logic nghiệp vụ
             PhieuKhamBenhDTO result = phieuKhamService.createEncounter(newEncounterDTO);
 
+            String keyword = result.getTenBenhNhan();
+            // Cần mã hóa keyword để đảm bảo URL hợp lệ
+            String encodedKeyword = java.net.URLEncoder.encode(keyword, "UTF-8");
+            
             // 3. Xử lý kết quả thành công
             request.setAttribute("SUCCESS_MESSAGE", "Tạo phiếu khám thành công! ID: " + result.getId());
-            return SUCCESS_PAGE;
+            return "redirect:/MainController?action=listAllEncounters&keyword=" + encodedKeyword;
 
         } catch (ValidationException e) {
             // Bắt lỗi nghiệp vụ (do người dùng nhập sai)
@@ -398,8 +401,8 @@ public class EMRCoreController extends HttpServlet {
             dto.setHuyetAp(request.getParameter("huyetAp"));
             dto.setChanDoan(request.getParameter("chanDoan"));
             dto.setKetLuan(request.getParameter("ketLuan"));
-            
-             String thoiGianKhamStr = request.getParameter("thoiGianKham");
+
+            String thoiGianKhamStr = request.getParameter("thoiGianKham");
             if (thoiGianKhamStr != null && !thoiGianKhamStr.isEmpty()) {
                 dto.setThoiGianKham(LocalDateTime.parse(thoiGianKhamStr));
             }

@@ -96,6 +96,8 @@ public class PhieuKhamBenhService {
         PhieuKhamBenh entity = phieuKhamDAO.getEncounterById(id);
         return toDTO(entity); // Một hàm toDTO khác, chi tiết hơn
     }
+    
+    
 
     /**
      * Chuyển đổi một Entity PhieuKhamBenh sang một DTO "gọn nhẹ", chỉ chứa các
@@ -114,7 +116,7 @@ public class PhieuKhamBenhService {
         dto.setMaPhieuKham(entity.getMaPhieuKham());
         dto.setThoiGianKham(entity.getThoiGianKham());
         dto.setChanDoan(entity.getChanDoan());
-
+        dto.setTrangThai(entity.getTrangThai());
         // Lấy thông tin từ các đối tượng liên quan đã được JOIN FETCH
         if (entity.getBenhNhan() != null) {
             dto.setTenBenhNhan(entity.getBenhNhan().getHoTen());
