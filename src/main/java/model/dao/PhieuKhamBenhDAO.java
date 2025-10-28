@@ -229,16 +229,28 @@ public class PhieuKhamBenhDAO {
     }
 
     // HQL để tìm PKB chưa có hóa đơn (HoaDon là null)
-    private static final String UNINVOICED_HQL
-            = "SELECT DISTINCT p FROM PhieuKhamBenh p"
-            + " JOIN FETCH p.benhNhan bn"
-            + " JOIN FETCH p.bacSi nv"
-            // 1. Tải danh sách chỉ định VÀ gán alias 'cd'
-            + " LEFT JOIN FETCH p.danhSachChiDinh cd"
-            // 2. Tải luôn 'dichVu' TỪ 'cd'
-            + " LEFT JOIN FETCH cd.dichVu"
-            + " WHERE p.trangThai = 'CHUA_HOAN_THANH' AND NOT EXISTS ("
-            + "SELECT 1 FROM HoaDon h WHERE h.phieuKhamBenh = p)";
+private static final String UNINVOICED_HQL
+        = "SELECT DISTINCT p FROM PhieuKhamBenh p"
+        + " JOIN FETCH p.benhNhan bn"
+        + " JOIN FETCH p.bacSi nv"
+        
+        // 1. Tải danh sách chỉ định VÀ gán alias 'cd'
+        + " LEFT JOIN FETCH p.danhSachChiDinh cd"
+        // 2. Tải luôn 'dichVu' TỪ 'cd'
+        + " LEFT JOIN FETCH cd.dichVu"
+        
+        // --- BỔ SUNG MỚI ĐỂ SỬA LỖI ---
+        // 3. Tải đơn thuốc (nếu có) VÀ gán alias 'dt'
+        + " LEFT JOIN FETCH p.donThuoc dt"
+        // 4. Tải chi tiết đơn thuốc TỪ 'dt' VÀ gán alias 'ctdt'
+        + " LEFT JOIN FETCH dt.chiTietDonThuoc ctdt"
+        // 5. (Dự phòng) Tải luôn 'thuoc' (medicine) TỪ 'ctdt'
+        // Vì rất có thể toDTO của ChiTietDonThuoc sẽ cần tên thuốc
+        + " LEFT JOIN FETCH ctdt.thuoc" 
+        // --- HẾT PHẦN BỔ SUNG ---
+
+        + " WHERE p.trangThai = 'CHUA_HOAN_THANH' AND NOT EXISTS ("
+        + "SELECT 1 FROM HoaDon h WHERE h.phieuKhamBenh = p)";
 
     public List<PhieuKhamBenh> findUninvoiced() {
         try ( Session session = sessionFactory.openSession()) {
