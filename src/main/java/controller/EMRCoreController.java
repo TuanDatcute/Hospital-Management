@@ -235,7 +235,7 @@ public class EMRCoreController extends HttpServlet {
 
             newEncounterDTO.setBenhNhanId(Integer.parseInt(request.getParameter("benhNhanId")));
             newEncounterDTO.setBacSiId(Integer.parseInt(request.getParameter("bacSiId")));
-
+            newEncounterDTO.setTrangThai("CHUA_HOAN_THANH");
             // 2. Gọi tầng Service để thực hiện logic nghiệp vụ
             PhieuKhamBenhDTO result = phieuKhamService.createEncounter(newEncounterDTO);
 
