@@ -102,24 +102,46 @@ public class PhieuKhamBenhDAO {
         }
     }
 
-    //Xem chi tiết một lần khám.
-    public PhieuKhamBenh getEncounterById(int phieuKhamId) {
+    // Trong file dao/PhieuKhamBenhDAO.java
+    public PhieuKhamBenh getEncounterById(int id) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query<PhieuKhamBenh> query = session.createQuery(
+
+            // BƯỚC 1: Lấy Phiếu Khám và các mối quan hệ ĐƠN LẺ (@ManyToOne, @OneToOne)
+            PhieuKhamBenh phieuKham = session.createQuery(
                     "SELECT pkb FROM PhieuKhamBenh pkb "
                     + "LEFT JOIN FETCH pkb.benhNhan "
                     + "LEFT JOIN FETCH pkb.bacSi "
                     + "LEFT JOIN FETCH pkb.lichHen "
-                    + "LEFT JOIN FETCH pkb.donThuoc dt "
-                    + "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
-                    + "LEFT JOIN FETCH cdt.thuoc "
+                    + "WHERE pkb.id = :id",
+                    PhieuKhamBenh.class
+            ).setParameter("id", id).uniqueResult();
+
+            if (phieuKham == null) {
+                return null;
+            }
+
+            // BƯỚC 2: Tải DANH SÁCH Chỉ Định Dịch Vụ
+            // Hibernate sẽ tự động "đính kèm" danh sách này vào đối tượng phieuKham đã có
+            session.createQuery(
+                    "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb "
                     + "LEFT JOIN FETCH pkb.danhSachChiDinh cdd "
                     + "LEFT JOIN FETCH cdd.dichVu "
                     + "WHERE pkb.id = :id",
                     PhieuKhamBenh.class
-            );
-            query.setParameter("id", phieuKhamId);
-            return query.uniqueResult();
+            ).setParameter("id", id).uniqueResult();
+
+            // BƯỚC 3: Tải DANH SÁCH Chi Tiết Đơn Thuốc
+            session.createQuery(
+                    "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb "
+                    + "LEFT JOIN FETCH pkb.donThuoc dt "
+                    + "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
+                    + "LEFT JOIN FETCH cdt.thuoc "
+                    + "WHERE pkb.id = :id",
+                    PhieuKhamBenh.class
+            ).setParameter("id", id).uniqueResult();
+
+            return phieuKham;
+
         } catch (Exception e) {
             e.printStackTrace();
             return null;
