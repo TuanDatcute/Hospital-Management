@@ -206,10 +206,12 @@ public class PhieuKhamBenhDAO {
 
     // HQL để tìm PKB chưa có hóa đơn (HoaDon là null)
     private static final String UNINVOICED_HQL
-            = "SELECT p FROM PhieuKhamBenh p"
+            = "SELECT DISTINCT p FROM PhieuKhamBenh p" // Thêm DISTINCT
             + " JOIN FETCH p.benhNhan bn"
             + " JOIN FETCH p.bacSi nv"
-            + " WHERE NOT EXISTS ("
+            // Thêm dòng này để tải luôn danh sách chỉ định
+            + " LEFT JOIN FETCH p.danhSachChiDinh"
+            + " WHERE p.trangThai = 'CHUA_HOAN_THANH' AND NOT EXISTS ("
             + "SELECT 1 FROM HoaDon h WHERE h.phieuKhamBenh = p)";
 
     public List<PhieuKhamBenh> findUninvoiced() {
