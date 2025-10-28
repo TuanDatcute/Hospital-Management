@@ -206,11 +206,13 @@ public class PhieuKhamBenhDAO {
 
     // HQL để tìm PKB chưa có hóa đơn (HoaDon là null)
     private static final String UNINVOICED_HQL
-            = "SELECT DISTINCT p FROM PhieuKhamBenh p" // Thêm DISTINCT
+            = "SELECT DISTINCT p FROM PhieuKhamBenh p"
             + " JOIN FETCH p.benhNhan bn"
             + " JOIN FETCH p.bacSi nv"
-            // Thêm dòng này để tải luôn danh sách chỉ định
-            + " LEFT JOIN FETCH p.danhSachChiDinh"
+            // 1. Tải danh sách chỉ định VÀ gán alias 'cd'
+            + " LEFT JOIN FETCH p.danhSachChiDinh cd"
+            // 2. Tải luôn 'dichVu' TỪ 'cd'
+            + " LEFT JOIN FETCH cd.dichVu"
             + " WHERE p.trangThai = 'CHUA_HOAN_THANH' AND NOT EXISTS ("
             + "SELECT 1 FROM HoaDon h WHERE h.phieuKhamBenh = p)";
 
