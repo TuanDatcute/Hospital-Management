@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="css/ChiTietHoaDon.css">
         
         <%-- TÙY CHỌN: Bạn cũng có thể liên kết CSS chung ở đây
-             để dùng chung các lớp như .message
+                 để dùng chung các lớp như .message
         <link rel="stylesheet" href="css/DanhSachHoaDon.css">
         --%>
     </head>
@@ -18,12 +18,13 @@
         <hr>
 
         <h2>Chi tiết Hóa đơn: ${invoice.maHoaDon}</h2>
+
         <%-- Hiển thị thông tin từ DTO "phẳng" --%>
         <p>Bệnh nhân: <strong>${invoice.hoTenBenhNhan}</strong></p>
         <p>Trạng thái: <strong>${invoice.trangThai}</strong></p>
 
         <%-- ============================================= --%>
-        <%--         Chi tiết Dịch vụ                 --%>
+        <%--         Chi tiết Dịch vụ                     --%>
         <%-- ============================================= --%>
         <h3>Chi tiết Dịch vụ</h3>
         <%-- SỬA: Đã xóa border="1" và style="width: 70%" --%>
@@ -44,7 +45,7 @@
         <br>
 
         <%-- ============================================= --%>
-        <%--         Chi tiết Đơn thuốc               --%>
+        <%--         Chi tiết Đơn thuốc                   --%>
         <%-- ============================================= --%>
         <h3>Chi tiết Đơn thuốc</h3>
         <%-- SỬA: Đã xóa border="1" và style="width: 70%" --%>
@@ -124,9 +125,9 @@
         <c:if test="${invoice.trangThai == 'DA_THANH_TOAN'}">
             <%-- SỬA: Thay thế style="color:green;" bằng class --%>
             <%-- Ghi chú: Class 'message' & 'success' được định nghĩa
-                 trong file 'DanhSachHoaDon.css' (trang trước)
-                 Bạn cần đảm bảo class này cũng có trong 'ChiTietHoaDon.css'
-                 hoặc liên kết cả 2 tệp CSS. --%>
+                     trong file 'DanhSachHoaDon.css' (trang trước)
+                     Bạn cần đảm bảo class này cũng có trong 'ChiTietHoaDon.css'
+                     hoặc liên kết cả 2 tệp CSS. --%>
             <p class="message success">Hóa đơn này đã được thanh toán.</p>
         </c:if>
 
@@ -152,6 +153,15 @@
                 </c:forEach>
             </tbody>
         </table>
+        
+        <%-- ================== MỚI ================== --%>
+        <%-- Thêm nút "In Hóa Đơn" --%>
+        <%-- Nó gọi action 'printInvoice' mà chúng ta đã thêm vào Controller --%>
+        <%-- target="_blank" sẽ mở trang in trong một tab mới --%>
+        <a href="MainController?action=printInvoice&id=${invoice.id}" target="_blank" class="button-print">
+             &#128424; In Hóa Đơn
+        </a>
+        <%-- ================== HẾT MỚI ================== --%>
 
         <%-- JavaScript giữ nguyên --%>
         <script>
