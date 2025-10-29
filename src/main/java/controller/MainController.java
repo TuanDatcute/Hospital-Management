@@ -64,7 +64,7 @@ public class MainController extends HttpServlet {
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm","createPrescription"};
         String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate", "deleteRoom"};
         String[] GiuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed", "deleteBed", "updateBed", "getBedForUpdate"};
-        String[] HoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice"};
+        String[] HoaDon_GiaoDichThanhToanActions = {"printInvoice", "viewInvoice", "payInvoice", "listInvoices", "generateInvoice"};
         String[] ThongBaoActions = {"getThongBaoForUpdate", "createThongBao", "updateThongBao", "deleteThongBao", "listNotifications"};
 
         // 3. Điều hướng dựa trên action

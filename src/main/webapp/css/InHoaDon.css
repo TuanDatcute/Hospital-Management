@@ -1,0 +1,55 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    /* Cố định chiều rộng (khoảng A4) và căn giữa */
+    width: 210mm; 
+    margin-left: auto;
+    margin-right: auto;
+    color: #000;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+th, td {
+    border: 1px solid #999; /* Nét đậm hơn cho dễ đọc */
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+h1, h2, h3 {
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+}
+
+/* Class để ẩn các nút khi in */
+@media print {
+    .no-print {
+        display: none;
+    }
+}
+
+.summary-section {
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 2px dashed #000;
+}
+
+.summary-section p {
+    font-size: 1.1em;
+    margin: 5px 0;
+    text-align: right; /* Căn phải cho dễ nhìn */
+}
+
+.summary-section .total {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #000;
+}

@@ -51,6 +51,14 @@ public class HoaDon_GiaoDichThanhToanController extends HttpServlet {
             case "viewInvoice":
                 showInvoiceDetails(request, response);
                 break;
+            
+            // ================== MỚI ==================
+            // Thêm case để xử lý action in hóa đơn
+            case "printInvoice":
+                showPrintableInvoice(request, response);
+                break;
+            // ================== HẾT MỚI ==================
+
             case "listInvoices":
             default:
                 listAllInvoices(request, response);
@@ -127,8 +135,6 @@ public class HoaDon_GiaoDichThanhToanController extends HttpServlet {
         response.sendRedirect(urlRedirect);
     }
     
-    // (Hàm showInvoiceDetails và processPayment giữ nguyên)
-// ...
     private void showInvoiceDetails(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -137,7 +143,7 @@ public class HoaDon_GiaoDichThanhToanController extends HttpServlet {
             // 1. Lấy Hóa đơn (DTO phẳng)
             HoaDonDTO invoice = hoaDonService.getHoaDonById(invoiceId);
             if (invoice == null) {
-                 throw new Exception("Không tìm thấy hóa đơn.");
+                throw new Exception("Không tìm thấy hóa đơn.");
             }
             
             // 2. Lấy Lịch sử giao dịch (DTO list)
@@ -165,6 +171,51 @@ public class HoaDon_GiaoDichThanhToanController extends HttpServlet {
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
+    
+    // ================== HÀM MỚI ==================
+    /**
+     * HÀM MỚI: Lấy dữ liệu chi tiết hóa đơn và chuyển đến trang in
+     * (Logic giống hệt showInvoiceDetails, chỉ khác file JSP đích)
+     */
+    private void showPrintableInvoice(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            int invoiceId = Integer.parseInt(request.getParameter("id"));
+
+            // 1. Lấy Hóa đơn (DTO phẳng)
+            HoaDonDTO invoice = hoaDonService.getHoaDonById(invoiceId);
+            if (invoice == null) {
+                throw new Exception("Không tìm thấy hóa đơn.");
+            }
+            
+            // 2. Lấy Lịch sử giao dịch (DTO list)
+            List<GiaoDichThanhToanDTO> transactions = giaoDichThanhToanService.getGiaoDichByHoaDon(invoiceId);
+
+            // 3. Lấy ID phiếu khám từ hóa đơn
+            int phieuKhamId = invoice.getPhieuKhamBenhId();
+
+            // 4. Lấy danh sách Dịch vụ (DTO list)
+            List<ChiDinhDichVuDTO> dichVuList = chiDinhDichVuService.getByPhieuKhamId(phieuKhamId);
+
+            // 5. Lấy danh sách Thuốc (DTO list)
+            List<ChiTietDonThuocDTO> thuocList = donThuocService.getChiTietByPhieuKhamId(phieuKhamId);
+
+            // --- Đẩy 4 ĐỐI TƯỢNG ra request ---
+            request.setAttribute("invoice", invoice); // (1)
+            request.setAttribute("transactions", transactions); // (2)
+            request.setAttribute("danhSachDichVu", dichVuList); // (4)
+            request.setAttribute("danhSachThuoc", thuocList); // (5)
+
+            // --- MỚI: Chuyển đến trang JSP thiết kế cho việc in ---
+            request.getRequestDispatcher("InHoaDon.jsp").forward(request, response);
+            
+        } catch (Exception e) {
+            request.setAttribute("ERROR_MESSAGE", "Không tìm thấy hóa đơn: " + e.getMessage());
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+        }
+    }
+    // ================== HẾT HÀM MỚI ==================
+
     private void processPayment(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int invoiceId = Integer.parseInt(request.getParameter("invoiceId"));
         String urlRedirect = "MainController?action=viewInvoice&id=" + invoiceId;

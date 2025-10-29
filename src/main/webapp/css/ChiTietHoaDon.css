@@ -16,7 +16,7 @@ body {
     background-color: var(--white-color);
     color: var(--text-color);
     line-height: 1.5;
-    
+
     /* Căn giữa nội dung, dễ đọc hơn */
     max-width: 960px;
     margin: 20px auto;
@@ -116,7 +116,7 @@ tbody tr:hover {
 
 /* Căn phải các cột số/tiền tệ */
 /* Bảng Dịch vụ (cột 3) */
-table:nth-of-type(1) th:last-child, 
+table:nth-of-type(1) th:last-child,
 table:nth-of-type(1) td:last-child {
     text-align: right;
 }
@@ -129,7 +129,7 @@ table:nth-of-type(2) th:nth-child(5), table:nth-of-type(2) td:nth-child(5) {
 }
 
 /* Bảng Lịch sử Giao dịch (cột 2) */
-table:nth-of-type(3) th:nth-child(2), 
+table:nth-of-type(3) th:nth-child(2),
 table:nth-of-type(3) td:nth-child(2) {
     text-align: right;
 }
@@ -245,4 +245,19 @@ p[style*="color:green"] {
     border-radius: 4px;
     font-weight: bold;
     font-size: 1.1em;
+}
+
+.button-print {
+    display: inline-block;
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+}
+.button-print:hover {
+    background-color: #0056b3;
 }
