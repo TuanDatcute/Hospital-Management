@@ -1,8 +1,15 @@
 package model.dto;
 
+import java.io.Serializable; // Bắt buộc phải import
 import java.time.LocalDateTime;
 
-public class TaiKhoanDTO {
+/**
+ * Data Transfer Object (DTO) cho TaiKhoan.
+ * Triển khai Serializable để có thể lưu trữ an toàn trong HttpSession.
+ */
+public class TaiKhoanDTO implements Serializable { // <<< ĐÃ THÊM SERIALIZABLE
+    
+    private static final long serialVersionUID = 1L; // Thêm serialVersionUID (khuyến nghị)
 
     private int id;
     private String tenDangNhap;
