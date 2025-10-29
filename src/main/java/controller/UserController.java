@@ -20,7 +20,7 @@ import service.TaiKhoanService;
 public class UserController extends HttpServlet {
 
     private static final String LOGIN_PAGE = "login.jsp";
-    private static final String HOME_PAGE = "login.jsp";
+    private static final String HOME_PAGE = "home.jsp";
     private static final String ADMIN_DASHBOARD_PAGE = "admin/dashBoard.jsp";
     private static final String USER_LIST_PAGE = "admin/danhSachTaiKhoan.jsp";
     private static final String USER_FORM_PAGE = "admin/formTaiKhoan.jsp";

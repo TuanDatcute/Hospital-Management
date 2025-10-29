@@ -39,7 +39,6 @@
         <c:if test="${not empty ERROR_MESSAGE}">
             <div class="error-message">${ERROR_MESSAGE}</div>
         </c:if>
-            <div class="error-message">${ERROR_MESSAGE}</div>
 
         <form action="MainController" method="post">
             <input type="hidden" name="action" value="login" />
