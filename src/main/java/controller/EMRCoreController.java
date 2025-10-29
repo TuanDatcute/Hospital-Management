@@ -12,13 +12,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.dto.BenhNhanDTO;
+import model.dto.ChiTietDonThuocDTO;
 import model.dto.DichVuDTO;
+import model.dto.DonThuocDTO;
 import model.dto.LichHenDTO;
 import model.dto.NhanVienDTO;
 import model.dto.PhieuKhamBenhDTO;
 import service.BenhNhanService;   // Import các Service cần thiết
 import service.ChiDinhDichVuService;
 import service.DichVuService;
+import service.DonThuocService;
 import service.LichHenService;
 import service.NhanVienService;
 import service.PhieuKhamBenhService;
@@ -35,7 +38,7 @@ public class EMRCoreController extends HttpServlet {
     private static final String SUCCESS_PAGE = "DanhSachPhieuKham.jsp";
     private static final String CREATE_ENCOUNTER_PAGE = "PhieuKhamBenh.jsp";
     private static final String ENCOUNTER_LIST_PAGE = "DanhSachPhieuKham.jsp";
-    private static final String CREATE_SERVICE_REQUEST_PAGE = "ChiTietPhieuKham.jsp";
+    private static final String ENCOUNTER_DETAIL_PAGE = "ChiTietPhieuKham.jsp";
 
     // Khởi tạo các Service cần thiết ở cấp lớp để tái sử dụng
     private final PhieuKhamBenhService phieuKhamService = new PhieuKhamBenhService();
@@ -44,6 +47,7 @@ public class EMRCoreController extends HttpServlet {
     private final LichHenService lichHenService = new LichHenService();
     private final ChiDinhDichVuService chiDinhService = new ChiDinhDichVuService();
     private final DichVuService dv = new DichVuService();
+    private final DonThuocService donThuocService = new DonThuocService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -120,6 +124,9 @@ public class EMRCoreController extends HttpServlet {
                 case "updateServiceResult":
                     url = updateServiceResult(request);
                     break;
+                case "completeEncounter":
+                    url = completeEncounter(request);
+                    break;
             }
             if (url.startsWith("redirect:")) {
                 String redirectUrl = url.substring("redirect:".length());
@@ -177,14 +184,16 @@ public class EMRCoreController extends HttpServlet {
                 throw new ValidationException("Không tìm thấy phiếu khám với ID: " + id);
             }
 
-            // 2. Lấy danh sách dịch vụ cho dropdown (vẫn cần thiết cho form "Thêm mới")
+            // 2. Lấy danh sách dịch vụ cho dropdown 
             List<DichVuDTO> danhSachDichVu = dv.getAllServices();
+            List<ChiTietDonThuocDTO> danhSachDonThuoc = donThuocService.getChiTietByPhieuKhamId(id);
 
             // 3. Gửi các đối tượng cần thiết cho JSP
             request.setAttribute("phieuKham", phieuKham);
             request.setAttribute("danhSachDichVu", danhSachDichVu);
+            request.setAttribute("danhSachDonThuoc", danhSachDonThuoc);
 
-            return CREATE_SERVICE_REQUEST_PAGE;
+            return ENCOUNTER_DETAIL_PAGE;
         } catch (ValidationException e) {
             throw new ValidationException("ID phiếu khám phải là một con số.");
         }
@@ -238,13 +247,13 @@ public class EMRCoreController extends HttpServlet {
             // 2. Gọi tầng Service để thực hiện logic nghiệp vụ
             PhieuKhamBenhDTO result = phieuKhamService.createEncounter(newEncounterDTO);
 
-            String keyword = result.getTenBenhNhan();
-            // Cần mã hóa keyword để đảm bảo URL hợp lệ
-            String encodedKeyword = java.net.URLEncoder.encode(keyword, "UTF-8");
-            
+            int keyword = result.getId();
+//            // Cần mã hóa keyword để đảm bảo URL hợp lệ
+//            String encodedKeyword = java.net.URLEncoder.encode(keyword, "UTF-8");
+
             // 3. Xử lý kết quả thành công
             request.setAttribute("SUCCESS_MESSAGE", "Tạo phiếu khám thành công! ID: " + result.getId());
-            return "redirect:/MainController?action=listAllEncounters&keyword=" + encodedKeyword;
+            return "redirect:/MainController?action=listAllEncounters&keyword=" + keyword;
 
         } catch (ValidationException e) {
             // Bắt lỗi nghiệp vụ (do người dùng nhập sai)
@@ -432,8 +441,10 @@ public class EMRCoreController extends HttpServlet {
             }
             phieuKhamService.updateEncounter(dto); // Giả sử Service có hàm update
 
+            //maPhieuKham để tìm kiếm
+            String maPhieuKham = request.getParameter("maPhieuKham");
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Cập nhật phiếu khám thành công!");
-            return "redirect:/MainController?action=listAllEncounters";
+            return "redirect:/MainController?action=listAllEncounters&keyword="+maPhieuKham;
 
         } catch (ValidationException e) {
             request.setAttribute("ERROR_MESSAGE", e.getMessage());
@@ -446,6 +457,27 @@ public class EMRCoreController extends HttpServlet {
             loadCreateFormDependencies(request);
             return CREATE_ENCOUNTER_PAGE;
         }
+    }
+
+    /**
+     * Xử lý yêu cầu hoàn thành một phiếu khám.
+     *
+     * @return URL để redirect về trang chi tiết.
+     */
+    private String completeEncounter(HttpServletRequest request) {
+        String phieuKhamIdStr = request.getParameter("phieuKhamId");
+        try {
+            int phieuKhamId = Integer.parseInt(phieuKhamIdStr);
+            phieuKhamService.completeEncounterStatus(phieuKhamId);
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã hoàn thành phiếu khám thành công!");
+        } catch (ValidationException e) {
+            request.getSession().setAttribute("ERROR_MESSAGE", e.getMessage());
+        } catch (Exception e) {
+            log("Lỗi khi hoàn thành phiếu khám: ", e);
+            request.getSession().setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống.");
+        }
+        // Luôn redirect về lại trang chi tiết để xem kết quả
+        return "redirect:/MainController?action=viewEncounterDetails&id=" + phieuKhamIdStr;
     }
 
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

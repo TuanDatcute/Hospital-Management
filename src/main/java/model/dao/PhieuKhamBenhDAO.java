@@ -79,19 +79,20 @@ public class PhieuKhamBenhDAO {
     }
 
     /**
-     * PHƯƠNG THỨC ĐẦY ĐỦ: Lấy tất cả thông tin chi tiết cho một phiếu khám.
+     * PHƯƠNG THỨC ĐẦY ĐỦ: Lấy thông tim để chỉnh sửa trạng thái
      *
      * @return Một đối tượng PhieuKhamBenh duy nhất với tất cả dữ liệu liên
      * quan.
      */
-    public PhieuKhamBenh getDetailsById(int id) {
+    public PhieuKhamBenh getDetailsByIdToUpdateStatus(int id) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             // Câu query này đã lấy sẵn danh sách chỉ định, hoàn hảo cho nghiệp vụ của chúng ta
             Query<PhieuKhamBenh> query = session.createQuery(
                     "SELECT pkb FROM PhieuKhamBenh pkb "
                     + "LEFT JOIN FETCH pkb.danhSachChiDinh cdd "
-                    + // Lấy danh sách chỉ định
-                    "WHERE pkb.id = :id",
+                    + "LEFT JOIN FETCH pkb.benhNhan "
+                    + "LEFT JOIN FETCH pkb.bacSi "
+                    + "WHERE pkb.id = :id",
                     PhieuKhamBenh.class
             );
             query.setParameter("id", id);
@@ -102,24 +103,46 @@ public class PhieuKhamBenhDAO {
         }
     }
 
-    //Xem chi tiết một lần khám.
-    public PhieuKhamBenh getEncounterById(int phieuKhamId) {
+    // Trong file dao/PhieuKhamBenhDAO.java
+    public PhieuKhamBenh getEncounterById(int id) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query<PhieuKhamBenh> query = session.createQuery(
+
+            // BƯỚC 1: Lấy Phiếu Khám và các mối quan hệ ĐƠN LẺ (@ManyToOne, @OneToOne)
+            PhieuKhamBenh phieuKham = session.createQuery(
                     "SELECT pkb FROM PhieuKhamBenh pkb "
                     + "LEFT JOIN FETCH pkb.benhNhan "
                     + "LEFT JOIN FETCH pkb.bacSi "
                     + "LEFT JOIN FETCH pkb.lichHen "
-                    + "LEFT JOIN FETCH pkb.donThuoc dt "
-                    + "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
-                    + "LEFT JOIN FETCH cdt.thuoc "
+                    + "WHERE pkb.id = :id",
+                    PhieuKhamBenh.class
+            ).setParameter("id", id).uniqueResult();
+
+            if (phieuKham == null) {
+                return null;
+            }
+
+            // BƯỚC 2: Tải DANH SÁCH Chỉ Định Dịch Vụ
+            // Hibernate sẽ tự động "đính kèm" danh sách này vào đối tượng phieuKham đã có
+            session.createQuery(
+                    "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb "
                     + "LEFT JOIN FETCH pkb.danhSachChiDinh cdd "
                     + "LEFT JOIN FETCH cdd.dichVu "
                     + "WHERE pkb.id = :id",
                     PhieuKhamBenh.class
-            );
-            query.setParameter("id", phieuKhamId);
-            return query.uniqueResult();
+            ).setParameter("id", id).uniqueResult();
+
+            // BƯỚC 3: Tải DANH SÁCH Chi Tiết Đơn Thuốc
+            session.createQuery(
+                    "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb "
+                    + "LEFT JOIN FETCH pkb.donThuoc dt "
+                    + "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
+                    + "LEFT JOIN FETCH cdt.thuoc "
+                    + "WHERE pkb.id = :id",
+                    PhieuKhamBenh.class
+            ).setParameter("id", id).uniqueResult();
+
+            return phieuKham;
+
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -158,7 +181,7 @@ public class PhieuKhamBenhDAO {
                     + "JOIN FETCH pkb.benhNhan bn "
                     + "JOIN FETCH pkb.bacSi "
                     + "WHERE pkb.maPhieuKham LIKE :keyword OR bn.hoTen LIKE :keyword "
-                    + "ORDER BY pkb.thoiGianKham DESC",
+                    + "ORDER BY pkb.trangThai ASC, pkb.thoiGianKham DESC",
                     PhieuKhamBenh.class
             );
             query.setParameter("keyword", "%" + keyword + "%");
@@ -202,7 +225,7 @@ public class PhieuKhamBenhDAO {
                     + "LEFT JOIN FETCH pkb.donThuoc dt "
                     + "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
                     + "LEFT JOIN FETCH cdt.thuoc "
-                    + "ORDER BY pkb.thoiGianKham DESC",
+                    + "ORDER BY pkb.trangThai ASC, pkb.thoiGianKham DESC",
                     PhieuKhamBenh.class
             );
 

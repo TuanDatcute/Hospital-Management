@@ -7,6 +7,7 @@ import model.dao.PhieuKhamBenhDAO;
 import model.dao.ThuocDAO;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import model.dto.ChiTietDonThuocDTO;
@@ -147,17 +148,26 @@ public class DonThuocService {
     }
 
     public List<ChiTietDonThuocDTO> getChiTietByPhieuKhamId(int phieuKhamId) {
+        Transaction transaction = null;
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
             List<ChiTietDonThuoc> entities = donThuocDAO.findChiTietByPhieuKhamId(phieuKhamId, session);
-
+            transaction.commit();
             // Chuyển List<Entity> sang List<DTO>
             return entities.stream()
                     .map(this::convertThuocToDTO)
                     .collect(Collectors.toList());
+        }catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback(); // Rollback nếu có lỗi
+            }
+            e.printStackTrace(); // Log lỗi
+            // Có thể throw một custom exception ở đây
+            return new LinkedList<>(); 
         }
     }
 
-    // --- Phương thức chuyển đổi ---
+// --- Phương thức chuyển đổi ---
     protected DonThuocDTO toDTO(DonThuoc entity) {
         if (entity == null) {
             return null;
