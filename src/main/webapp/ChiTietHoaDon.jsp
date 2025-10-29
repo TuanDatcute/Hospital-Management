@@ -3,110 +3,194 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <html>
-<head>
-    <title>Chi tiết Hóa đơn ${invoice.maHoaDon}</title>
-</head>
-<body>
-    <a href="MainController?action=listInvoices">&lt;&lt; Quay lại Danh sách</a>
-    <hr>
-    
-    <h2>Chi tiết Hóa đơn: ${invoice.maHoaDon}</h2>
-    <%-- Hiển thị thông tin từ DTO "phẳng" --%>
-    <p>Bệnh nhân: <strong>${invoice.hoTenBenhNhan}</strong></p>
-    <p>Trạng thái: <strong>${invoice.trangThai}</strong></p>
-    
-    <%-- ============================================= --%>
-    <%--      THAY ĐỔI: Lấy từ request attribute      --%>
-    <%-- ============================================= --%>
-    <h3>Chi tiết Dịch vụ</h3>
-    <table border="1" style="width: 70%">
-        <thead>
-            <tr> <th>STT</th> <th>Tên Dịch vụ</th> <th>Đơn giá</th> </tr>
-        </thead>
-        <tbody>
-            <%-- SỬA: Dùng "danhSachDichVu" thay vì "invoice.danhSachDichVu" --%>
-            <c:forEach var="dv" items="${danhSachDichVu}" varStatus="loop">
-                <tr>
-                    <td>${loop.count}</td>
-                    <td><c:out value="${dv.tenDichVu}"/></td>
-                    <td><fmt:formatNumber value="${dv.donGia}" pattern="#,##0 '₫'"/></td>
-                </tr>
-            </c:forEach>
-        </tbody>
-    </table>
-    <br>
+    <head>
+        <title>Chi tiết Hóa đơn ${invoice.maHoaDon}</title>
+        <%-- THÊM: Liên kết đến tệp CSS chi tiết --%>
+        <link rel="stylesheet" href="css/ChiTietHoaDon.css">
+        
+        <%-- TÙY CHỌN: Bạn cũng có thể liên kết CSS chung ở đây
+             để dùng chung các lớp như .message
+        <link rel="stylesheet" href="css/DanhSachHoaDon.css">
+        --%>
+    </head>
+    <body>
+        <a href="MainController?action=listInvoices">&lt;&lt; Quay lại Danh sách</a>
+        <hr>
 
-    <%-- ============================================= --%>
-    <%--      THAY ĐỔI: Lấy từ request attribute      --%>
-    <%-- ============================================= --%>
-    <h3>Chi tiết Đơn thuốc</h3>
-    <table border="1" style="width: 70%">
-        <thead>
-            <tr>
-                <th>STT</th> <th>Tên Thuốc</th> <th>Số lượng</th> <th>Đơn giá</th> <th>Thành tiền</th>
-            </tr>
-        </thead>
-        <tbody>
-            <%-- SỬA: Dùng "danhSachThuoc" thay vì "invoice.danhSachThuoc" --%>
-            <c:forEach var="thuoc" items="${danhSachThuoc}" varStatus="loop">
-                <tr>
-                    <td>${loop.count}</td>
-                    <td><c:out value="${thuoc.tenThuoc}"/></td>
-                    <td>${thuoc.soLuong}</td>
-                    <td><fmt:formatNumber value="${thuoc.donGia}" pattern="#,##0 '₫'"/></td>
-                    <td><fmt:formatNumber value="${thuoc.thanhTien}" pattern="#,##0 '₫'"/></td>
-                </tr>
-            </c:forEach>
-        </tbody>
-    </table>
-    <br>
-    
-    <hr>
-    <h3>TỔNG CỘNG: 
-        <fmt:formatNumber value="${invoice.tongTien}" pattern="#,##0 '₫'"/>
-    </h3>
-    <hr>
-    
-    <h3>Ghi nhận Thanh toán (cho Lễ tân)</h3>
-    <c:if test="${invoice.trangThai == 'CHUA_THANH_TOAN'}">
-        <form action="MainController" method="POST">
-            <input type="hidden" name="action" value="payInvoice">
-            <input type="hidden" name="invoiceId" value="${invoice.id}">
-            
-            Số tiền: <input type="number" name="soTien" value="${invoice.tongTien}" required> <br/>
-            Phương thức: 
-            <select name="phuongThuc">
-                <option value="TIEN_MAT">Tiền mặt</option>
-                <option value="QUET_THE">Quẹt thẻ</option>
-                <option value="CHUYEN_KHOAN">Chuyển khoản</option>
-            </select> <br/>
-            <button type="submit">Xác nhận Thanh toán</button>
-        </form>
-    </c:if>
-    <c:if test="${invoice.trangThai == 'DA_THANH_TOAN'}">
-        <p style="color:green;">Hóa đơn này đã được thanh toán.</p>
-    </c:if>
+        <h2>Chi tiết Hóa đơn: ${invoice.maHoaDon}</h2>
+        <%-- Hiển thị thông tin từ DTO "phẳng" --%>
+        <p>Bệnh nhân: <strong>${invoice.hoTenBenhNhan}</strong></p>
+        <p>Trạng thái: <strong>${invoice.trangThai}</strong></p>
 
-    <hr>
+        <%-- ============================================= --%>
+        <%--         Chi tiết Dịch vụ                 --%>
+        <%-- ============================================= --%>
+        <h3>Chi tiết Dịch vụ</h3>
+        <%-- SỬA: Đã xóa border="1" và style="width: 70%" --%>
+        <table>
+            <thead>
+                <tr> <th>STT</th> <th>Tên Dịch vụ</th> <th>Đơn giá</th> </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="dv" items="${danhSachDichVu}" varStatus="loop">
+                    <tr>
+                        <td>${loop.count}</td>
+                        <td><c:out value="${dv.tenDichVu}"/></td>
+                        <td><fmt:formatNumber value="${dv.donGia}" pattern="#,##0 '₫'"/></td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+        <br>
 
-    <h3>Lịch sử Giao dịch</h3>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Thời gian</th>
-                <th>Số tiền</th>
-                <th>Phương thức</th>
-            </tr>
-        </thead>
-        <tbody>
-            <c:forEach var="txn" items="${transactions}">
+        <%-- ============================================= --%>
+        <%--         Chi tiết Đơn thuốc               --%>
+        <%-- ============================================= --%>
+        <h3>Chi tiết Đơn thuốc</h3>
+        <%-- SỬA: Đã xóa border="1" và style="width: 70%" --%>
+        <table>
+            <thead>
                 <tr>
-                    <td><c:out value="${txn.thoiGianGiaoDich}"/></td>
-                    <td><fmt:formatNumber value="${txn.soTien}" pattern="#,##0 '₫'"/></td>
-                    <td>${txn.phuongThuc}</td>
+                    <th>STT</th> <th>Tên Thuốc</th> <th>Số lượng</th> <th>Đơn giá</th> <th>Thành tiền</th>
                 </tr>
-            </c:forEach>
-        </tbody>
-    </table>
-</body>
+            </thead>
+            <tbody>
+                <c:forEach var="thuoc" items="${danhSachThuoc}" varStatus="loop">
+                    <tr>
+                        <td>${loop.count}</td>
+                        <td><c:out value="${thuoc.tenThuoc}"/></td>
+                        <td>${thuoc.soLuong}</td>
+                        <td><fmt:formatNumber value="${thuoc.donGia}" pattern="#,##0 '₫'"/></td>
+                        <td><fmt:formatNumber value="${thuoc.thanhTien}" pattern="#,##0 '₫'"/></td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+        <br>
+
+        <hr>
+        <h3>TỔNG CỘNG: 
+            <fmt:formatNumber value="${invoice.tongTien}" pattern="#,##0 '₫'"/>
+        </h3>
+        <hr>
+
+        <h3>Ghi nhận Thanh toán (cho Lễ tân)</h3>
+        <c:if test="${invoice.trangThai == 'CHUA_THANH_TOAN'}">
+            <form action="MainController" method="POST">
+                <input type="hidden" name="action" value="payInvoice">
+                <input type="hidden" name="invoiceId" id="invoiceId" value="${invoice.id}">
+
+                <%-- SỬA: Dùng <p> và <label> cho cấu trúc tốt hơn --%>
+                <p>
+                    <label for="soTien">Số tiền:</label>
+                    <input type="number" name="soTien" id="soTien" value="${invoice.tongTien}" required>
+                </p>
+
+                <%-- SỬA: Dùng <p> và <label> cho cấu trúc tốt hơn --%>
+                <p>
+                    <label for="phuongThuc">Phương thức:</label>
+                    <select name="phuongThuc" id="phuongThuc" onchange="toggleQrCode()">
+                        <option value="TIEN_MAT">Tiền mặt</option>
+                        <option value="QUET_THE">Quẹt thẻ</option>
+                        <option value="CHUYEN_KHOAN">Chuyển khoản</option>
+                    </select>
+                </p>
+
+                <%-- ======================================================= --%>
+                <%-- Khối hiển thị QR Code --%>
+                <%-- SỬA: Đã xóa toàn bộ style="..." inline --%>
+                <%-- ======================================================= --%>
+                <div id="qrCodeContainer">
+                    <h4>Quét Mã QR để Thanh Toán</h4>
+                    <p>Vui lòng chuyển khoản chính xác số tiền: <br>
+                        <strong><span id="qrAmount"><fmt:formatNumber value="${invoice.tongTien}" pattern="#,##0 '₫'"/></span></strong>
+                    </p>
+
+                    <%-- TODO: Cập nhật thông tin ngân hàng của bạn --%>
+                    <p><strong>Ngân hàng:</strong> MB BANK</p>
+                    <p><strong>Số tài khoản:</strong> 0384011575</p>
+                    <p><strong>Nội dung:</strong> <span id="qrContent">Thanh toan hoa don ${invoice.maHoaDon}</span></p>
+
+                    <%-- TODO: Thay thế bằng đường dẫn ảnh QR của bạn --%>
+                    <%-- SỬA: Đã xóa style="..." inline --%>
+                    <img src="images/QRCode.jpg" alt="Mã QR chuyển khoản">
+                </div>
+                <%-- ======================================================= --%>
+
+                <%-- SỬA: Đã xóa style="margin-top: 15px;" --%>
+                <button type="submit">Xác nhận Thanh toán</button>
+            </form>
+        </c:if>
+        <c:if test="${invoice.trangThai == 'DA_THANH_TOAN'}">
+            <%-- SỬA: Thay thế style="color:green;" bằng class --%>
+            <%-- Ghi chú: Class 'message' & 'success' được định nghĩa
+                 trong file 'DanhSachHoaDon.css' (trang trước)
+                 Bạn cần đảm bảo class này cũng có trong 'ChiTietHoaDon.css'
+                 hoặc liên kết cả 2 tệp CSS. --%>
+            <p class="message success">Hóa đơn này đã được thanh toán.</p>
+        </c:if>
+
+        <hr>
+
+        <h3>Lịch sử Giao dịch</h3>
+        <%-- SỬA: Đã xóa border="1" --%>
+        <table>
+            <thead>
+                <tr>
+                    <th>Thời gian</th>
+                    <th>Số tiền</th>
+                    <th>Phương thức</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="txn" items="${transactions}">
+                    <tr>
+                        <td><c:out value="${txn.thoiGianGiaoDich}"/></td>
+                        <td><fmt:formatNumber value="${txn.soTien}" pattern="#,##0 '₫'"/></td>
+                        <td>${txn.phuongThuc}</td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+
+        <%-- JavaScript giữ nguyên --%>
+        <script>
+            function toggleQrCode() {
+                var methodSelect = document.getElementById("phuongThuc");
+                var qrContainer = document.getElementById("qrCodeContainer");
+                var soTienInput = document.getElementById("soTien");
+                var qrAmountSpan = document.getElementById("qrAmount");
+                var maHoaDon = "${invoice.maHoaDon}"; // Lấy mã hóa đơn từ JSTL
+                var qrContentSpan = document.getElementById("qrContent");
+
+                if (methodSelect.value === "CHUYEN_KHOAN") {
+                    // 1. Hiển thị khối QR
+                    qrContainer.style.display = "block";
+
+                    // 2. Cập nhật số tiền (lấy từ ô input, phòng trường hợp người dùng sửa)
+                    var soTien = parseFloat(soTienInput.value) || 0;
+                    // Dùng hàm của trình duyệt để format tiền tệ (hiện đại hơn JSTL)
+                    qrAmountSpan.innerText = soTien.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'});
+
+                    // 3. Cập nhật nội dung chuyển khoản
+                    qrContentSpan.innerText = "Thanh toan HD " + maHoaDon;
+
+                } else {
+                    // Ẩn khối QR
+                    qrContainer.style.display = "none";
+                }
+            }
+
+            // Bổ sung: Thêm sự kiện 'input' cho ô số tiền
+            // Để nếu người dùng sửa số tiền thì số tiền trên QR code cũng cập nhật theo
+            document.getElementById('soTien').addEventListener('input', function () {
+                // Chỉ cập nhật nếu QR code đang được hiển thị
+                if (document.getElementById('phuongThuc').value === 'CHUYEN_KHOAN') {
+                    var soTien = parseFloat(this.value) || 0;
+                    document.getElementById('qrAmount').innerText = soTien.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'});
+                }
+            });
+        </script>
+
+    </body>
 </html>

@@ -1,0 +1,248 @@
+/* === BIẾN MÀU (THEME PHÒNG KHÁM) === */
+:root {
+    --primary-color: #007bff; /* Xanh dương (tin cậy, chuyên nghiệp) */
+    --secondary-color: #6c757d; /* Xám (trung tính, văn bản phụ) */
+    --success-color: #28a745; /* Xanh lá (sức khỏe, thành công) */
+    --error-color: #dc3545; /* Đỏ (cảnh báo) */
+    --light-bg: #f8f9fa; /* Nền sáng (sạch sẽ) */
+    --border-color: #dee2e6; /* Viền */
+    --text-color: #212529; /* Màu chữ chính */
+    --white-color: #ffffff;
+}
+
+/* === CÀI ĐẶT CHUNG & LAYOUT === */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--white-color);
+    color: var(--text-color);
+    line-height: 1.5;
+    
+    /* Căn giữa nội dung, dễ đọc hơn */
+    max-width: 960px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* === TIÊU ĐỀ & PHÂN CÁCH === */
+h2 {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--light-bg);
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+
+h3 {
+    color: var(--text-color);
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--border-color);
+    margin: 30px 0;
+}
+
+/* === NÚT QUAY LẠI === */
+a[href*="listInvoices"] {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+    text-decoration: none;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+}
+
+a[href*="listInvoices"]:hover {
+    background-color: #5a6268;
+}
+
+/* === THÔNG TIN CƠ BẢN (BỆNH NHÂN, TRẠNG THÁI) === */
+body > p {
+    font-size: 1.1em;
+    margin: 10px 0;
+}
+
+body > p > strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* === BẢNG DỮ LIỆU (DỊCH VỤ, THUỐC, LỊCH SỬ) === */
+table {
+    width: 100%; /* Ghi đè style="width: 70%" */
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-color); /* Ghi đè border="1" */
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+    vertical-align: middle;
+    border-right: 1px solid var(--border-color); /* Ghi đè border="1" */
+}
+
+th:last-child, td:last-child {
+    border-right: none;
+}
+
+/* Tiêu đề bảng */
+thead th {
+    background-color: var(--light-bg);
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+tbody tr:nth-child(even) {
+    background-color: var(--light-bg);
+}
+
+tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Căn phải các cột số/tiền tệ */
+/* Bảng Dịch vụ (cột 3) */
+table:nth-of-type(1) th:last-child, 
+table:nth-of-type(1) td:last-child {
+    text-align: right;
+}
+
+/* Bảng Đơn thuốc (cột 3, 4, 5) */
+table:nth-of-type(2) th:nth-child(3), table:nth-of-type(2) td:nth-child(3),
+table:nth-of-type(2) th:nth-child(4), table:nth-of-type(2) td:nth-child(4),
+table:nth-of-type(2) th:nth-child(5), table:nth-of-type(2) td:nth-child(5) {
+    text-align: right;
+}
+
+/* Bảng Lịch sử Giao dịch (cột 2) */
+table:nth-of-type(3) th:nth-child(2), 
+table:nth-of-type(3) td:nth-child(2) {
+    text-align: right;
+}
+
+
+/* === KHỐI TỔNG CỘNG === */
+/* Chọn h3 thứ 3 trên trang (Dịch vụ, Thuốc, TỔNG CỘNG) */
+body > h3:nth-of-type(3) {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    font-size: 1.6em;
+    font-weight: bold;
+    padding: 20px;
+    border: none;
+    border-radius: 5px;
+    margin: 20px 0;
+}
+
+/* === FORM THANH TOÁN === */
+form[action="MainController"][method="POST"] {
+    background-color: var(--light-bg);
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+}
+
+form[action="MainController"][method="POST"] input[type="number"],
+form[action="MainController"][method="POST"] select {
+    width: 100%;
+    max-width: 350px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    box-sizing: border-box; /* Quan trọng để padding không làm vỡ layout */
+}
+
+form[action="MainController"][method="POST"] button[type="submit"] {
+    background-color: var(--success-color);
+    color: var(--white-color);
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-top: 15px; /* Ghi đè style inline */
+    transition: opacity 0.2s ease;
+}
+
+form[action="MainController"][method="POST"] button[type="submit"]:hover {
+    opacity: 0.85;
+}
+
+/* === KHỐI MÃ QR === */
+#qrCodeContainer {
+    /* Ghi đè các style inline */
+    display: none; /* Vẫn giữ nguyên, JS sẽ xử lý */
+    border: 1px dashed var(--primary-color) !important;
+    padding: 20px !important;
+    margin-top: 20px !important;
+    background-color: var(--white-color) !important;
+    max-width: 350px !important;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+#qrCodeContainer h4 {
+    margin-top: 0;
+    color: var(--primary-color);
+    font-size: 1.2em;
+}
+
+#qrCodeContainer p {
+    margin: 8px 0;
+    font-size: 0.95em;
+    line-height: 1.4;
+}
+
+#qrCodeContainer #qrAmount {
+    color: var(--error-color); /* Làm nổi bật số tiền */
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+#qrCodeContainer #qrContent {
+    background-color: #e9ecef;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-family: "Courier New", Courier, monospace;
+    font-weight: bold;
+}
+
+#qrCodeContainer img {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 200px;
+    margin: 10px auto;
+    display: block;
+    border: 1px solid var(--border-color);
+}
+
+/* === THÔNG BÁO "ĐÃ THANH TOÁN" === */
+/* Ghi đè style="color:green;" */
+p[style*="color:green"] {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724 !important; /* Dùng !important để thắng inline style */
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 1.1em;
+}

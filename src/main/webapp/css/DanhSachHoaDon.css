@@ -1,0 +1,209 @@
+/* === BIẾN MÀU (THEME PHÒNG KHÁM) === */
+:root {
+    --primary-color: #007bff; /* Xanh dương (tin cậy, chuyên nghiệp) */
+    --secondary-color: #6c757d; /* Xám (trung tính, văn bản phụ) */
+    --success-color: #28a745; /* Xanh lá (sức khỏe, thành công) */
+    --error-color: #dc3545; /* Đỏ (cảnh báo) */
+    --light-bg: #f8f9fa; /* Nền sáng (sạch sẽ) */
+    --border-color: #dee2e6; /* Viền */
+    --text-color: #212529; /* Màu chữ chính */
+    --white-color: #ffffff;
+}
+
+/* === CÀI ĐẶT CHUNG === */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--white-color); /* Nền trắng sạch sẽ */
+    color: var(--text-color);
+    margin: 20px;
+    line-height: 1.5;
+}
+
+/* === TIÊU ĐỀ === */
+h2 {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--light-bg);
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+
+h3 {
+    color: var(--text-color);
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--border-color);
+    margin: 25px 0;
+}
+
+p {
+    color: var(--secondary-color);
+    font-size: 0.95em;
+}
+
+/* === BẢNG DỮ LIỆU === */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border-radius: 5px;
+    overflow: hidden; /* Giúp bo góc cho thead */
+}
+
+th, td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+    vertical-align: middle; /* Căn giữa theo chiều dọc */
+}
+
+/* Tiêu đề bảng */
+thead th {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    letter-spacing: 0.5px;
+}
+
+/* Zebra striping cho các hàng */
+tbody tr:nth-child(even) {
+    background-color: var(--light-bg);
+}
+
+tbody tr:hover {
+    background-color: #e9ecef; /* Màu khi di chuột qua */
+}
+
+/* Căn lề phải cho cột tổng tiền */
+td:nth-child(4) { /* Cột "Tổng tiền" */
+    text-align: right;
+    font-weight: bold;
+    color: var(--success-color);
+}
+
+/* === FORM TÌM KIẾM === */
+form[action="MainController"][method="GET"] {
+    background-color: var(--light-bg);
+    padding: 15px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Khoảng cách giữa các phần tử */
+    margin-bottom: 20px;
+}
+
+form[action="MainController"][method="GET"] label {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    flex-grow: 1; /* Cho phép ô input co giãn */
+    max-width: 400px;
+}
+
+/* === NÚT BẤM & LIÊN KẾT === */
+button,
+a[href="MainController?action=listInvoices"] { /* Nút & link "Xóa lọc" */
+    display: inline-block;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+/* Nút "Tìm" (Nút chính) */
+form[method="GET"] button[type="submit"] {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+form[method="GET"] button[type="submit"]:hover {
+    opacity: 0.85;
+}
+
+/* Link "Xóa lọc" (Thiết kế như nút phụ) */
+a[href="MainController?action=listInvoices"] {
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+}
+
+a[href="MainController?action=listInvoices"]:hover {
+    background-color: #5a6268;
+}
+
+/* Link "Xem chi tiết" trong bảng */
+td a {
+    color: var(--primary-color);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+td a:hover {
+    text-decoration: underline;
+}
+
+/* Nút "Lập Hóa đơn" (Nút thành công) */
+td form {
+    margin: 0; /* Giữ nguyên từ JSP */
+}
+
+td form button {
+    background-color: var(--success-color);
+    color: var(--white-color);
+    font-size: 0.9em;
+    padding: 6px 10px;
+}
+
+td form button:hover {
+    opacity: 0.85;
+}
+
+/* === THÔNG BÁO (SUCCESS/ERROR) === */
+/* CSS này được thiết kế để thay thế cho các thẻ <b style="...">
+   Bạn nên cập nhật JSP để dùng class sẽ tốt hơn.
+*/
+.message {
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    font-weight: bold;
+}
+
+.message.success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724; /* Màu xanh lá đậm */
+}
+
+.message.error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24; /* Màu đỏ đậm */
+}
+
+/* DÀNH CHO CODE HIỆN TẠI (Nếu bạn chưa muốn đổi <b style...>):
+   CSS này sẽ dùng cho thông báo rỗng trong bảng 
+   (vì JSP của bạn đã dùng var(--secondary-color))
+*/
+td[colspan="6"],
+td[colspan="5"] {
+    text-align: center;
+    font-style: italic;
+    color: var(--secondary-color); /* Biến này được định nghĩa ở :root */
+}
