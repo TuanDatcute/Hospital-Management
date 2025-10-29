@@ -12,12 +12,14 @@
     --text-secondary: #6c757d;
     --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
     --card-hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    --danger-color: #dc3545;
 }
 
 /* ==========================================================================
    DARK MODE "BẠC ĐEN" (SILVER-BLACK) VARIABLES
    ========================================================================== */
 body.dark-mode {
+    --danger-color: #e57373;
     --primary-color: #77A5D9;
     --success-color: #3d8c5a;
     --warning-color: #c7811a;
@@ -66,7 +68,57 @@ h1 {
 .btn:hover {
     transform: translateY(-2px);
 }
+/* ==========================================================================
+   ALERT / NOTIFICATION STYLES
+   ========================================================================== */
+.alert {
+    padding: 15px 20px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Khoảng cách giữa icon và chữ */
+    border: 1px solid transparent;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
 
+/* Thêm icon vào trước mỗi thông báo */
+.alert::before {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 1.2rem;
+}
+
+/* --- Kiểu thông báo thành công --- */
+.alert-success {
+    /* Sử dụng hàm color-mix để tạo màu nền nhạt hơn từ màu chính,
+       tự động hoạt động cho cả light/dark mode */
+    background-color: color-mix(in srgb, var(--success-color) 15%, var(--surface-color));
+    color: var(--success-color);
+    border-color: color-mix(in srgb, var(--success-color) 30%, transparent);
+}
+.alert-success::before {
+    content: "\f00c"; /* Icon checkmark của Font Awesome */
+}
+
+/* --- Kiểu thông báo lỗi --- */
+.alert-danger {
+    background-color: color-mix(in srgb, var(--danger-color) 15%, var(--surface-color));
+    color: var(--danger-color);
+    border-color: color-mix(in srgb, var(--danger-color) 30%, transparent);
+}
+.alert-danger::before {
+    content: "\f071"; /* Icon exclamation-triangle của Font Awesome */
+}
+
+/* Điều chỉnh màu chữ trong dark mode để dễ đọc hơn */
+body.dark-mode .alert-success {
+    color: #81c784; /* Màu xanh lá cây nhạt hơn */
+}
+body.dark-mode .alert-danger {
+    color: var(--danger-color); /* Giữ nguyên màu đã định nghĩa ở trên */
+}
 /* ==========================================================================
    HEADER & SEARCH BAR
    ========================================================================== */
@@ -273,20 +325,25 @@ h1 {
 /* ==========================================================================
    NÚT GẠT CHUYỂN CHẾ ĐỘ
    ========================================================================== */
+/* --- Bắt đầu đoạn mã đã chỉnh sửa để căn chỉnh và đổi màu icon --- */
+
 .theme-switch-wrapper {
     display: flex;
     align-items: center;
     gap: 10px;
 }
+
 .theme-switch {
     display: inline-block;
     height: 24px;
     position: relative;
     width: 50px;
 }
+
 .theme-switch input {
     display: none;
 }
+
 .slider {
     background-color: #ccc;
     bottom: 0;
@@ -297,21 +354,66 @@ h1 {
     top: 0;
     transition: .4s;
     border-radius: 24px;
+
+    display: flex;
+    align-items: center;
+    /* Dùng justify-content: space-between để icon nằm ở hai đầu */
+    justify-content: space-between;
+    padding: 0 5px; /* Giữ padding để icon không quá sát mép */
 }
+
 .slider:before {
     background-color: #fff;
-    bottom: 4px;
     content: "";
     height: 16px;
-    left: 4px;
-    position: absolute;
-    transition: .4s;
     width: 16px;
     border-radius: 50%;
+    position: absolute;
+    left: 4px; /* Vị trí ban đầu của nút tròn */
+    top: 4px; /* Căn giữa theo chiều dọc */
+    transition: .4s;
+    z-index: 1;
 }
+
+/* Cập nhật màu sắc icon theo yêu cầu */
+.sun-icon,
+.moon-icon {
+    font-size: 12px;
+    transition: opacity 0.4s ease;
+    z-index: 2; /* Đảm bảo icon nổi lên trên nút tròn */
+    position: relative; /* Thêm để đảm bảo z-index hoạt động tốt với các icon */
+    line-height: 1; /* Căn chỉnh icon tốt hơn */
+}
+
+.sun-icon {
+    color: #FFD700; /* Màu vàng mặt trời */
+    opacity: 1;
+    /* Điều chỉnh vị trí của icon mặt trời */
+    margin-left: 1.10px; /* Đẩy icon mặt trời vào trong một chút */
+}
+
+.moon-icon {
+    color: #4682B4; /* Màu xanh nước biển cho mặt trăng */
+    opacity: 0;
+    /* Điều chỉnh vị trí của icon mặt trăng */
+    margin-right: 3px; /* Đẩy icon mặt trăng vào trong một chút */
+}
+
 input:checked + .slider {
-    background-color: var(--primary-color);
+    background-color: var(--primary-color); /* Giữ màu nền slider khi được check */
 }
+
 input:checked + .slider:before {
-    transform: translateX(26px);
+    transform: translateX(26px); /* Khoảng cách di chuyển của nút tròn */
 }
+
+input:checked + .slider .sun-icon {
+    opacity: 0;
+}
+
+input:checked + .slider .moon-icon {
+    opacity: 1;
+}
+
+/* --- Kết thúc đoạn mã đã chỉnh sửa --- */
+

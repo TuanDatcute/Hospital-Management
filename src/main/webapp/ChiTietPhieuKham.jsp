@@ -7,19 +7,37 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Dashboard Bệnh Án - ${phieuKham.maPhieuKham}</title>
+        <title>Bệnh Án - ${phieuKham.maPhieuKham}</title>
 
         <%-- Sử dụng c:url để đảm bảo đường dẫn luôn đúng --%>
         <link rel="stylesheet" href="<c:url value='/css/ctdt-style.css'/>">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     </head>
     <body>
         <div class="dashboard-container">
+
+            <%--  nút gạt  --%>
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="theme-toggle">
+                    <input type="checkbox" id="theme-toggle" />
+                    <div class="slider round">
+
+                        <span class="sun-icon"><i class="fas fa-sun"></i></span>
+                        <span class="moon-icon"><i class="fas fa-moon"></i></span>
+                    </div>
+                </label>
+            </div>
+            <c:if test="${not empty sessionScope.ERROR_MESSAGE}">
+                <div class="alert alert-danger">${sessionScope.ERROR_MESSAGE}</div>
+                <c:remove var="ERROR_MESSAGE" scope="session" />
+            </c:if>
+            <c:if test="${not empty sessionScope.SUCCESS_MESSAGE}">
+                <div class="alert alert-success">${sessionScope.SUCCESS_MESSAGE}</div>
+                <c:remove var="SUCCESS_MESSAGE" scope="session" />
+            </c:if>
 
             <%-- Card Thông tin Bệnh nhân --%>
             <div class="card profile-card">
@@ -36,7 +54,7 @@
             </div>
 
             <%-- Card Hành động nhanh --%>
-            <div class="card actions-card">
+            <div class="card actions-card">              
                 <div class="card-header"><h3><i class="fa-solid fa-bolt"></i> Hành động</h3></div>
                 <div class="card-body action-buttons">
                     <c:if test="${phieuKham.trangThai ne 'HOAN_THANH'}">
@@ -53,24 +71,36 @@
             </div>
 
             <%-- Card Chỉ số sinh tồn (Vitals) --%>
+
             <div class="card vitals-dashboard-card">
                 <div class="card-header"><h3><i class="fas fa-heart-pulse"></i> Chỉ số Sinh tồn</h3></div>
                 <div class="card-body vitals-grid">
-                    <%-- Thêm data-value để JS đọc được giá trị --%>
                     <div class="vital-gauge" data-value="${phieuKham.nhietDo}" data-type="temp">
-                        <div class="gauge-header"><span>Nhiệt độ (°C)</span><strong class="value">${phieuKham.nhietDo}</strong></div>
+                        <div class="gauge-header">
+                            <span><i class="fa-solid fa-temperature-half"></i> Nhiệt độ (°C)</span>
+                            <strong class="value">${phieuKham.nhietDo}</strong>
+                        </div>
                         <div class="gauge-bar"><div class="gauge-fill"></div></div>
                     </div>
                     <div class="vital-gauge" data-value="${phieuKham.huyetAp}" data-type="bp">
-                        <div class="gauge-header"><span>Huyết áp (mmHg)</span><strong class="value">${phieuKham.huyetAp}</strong></div>
+                        <div class="gauge-header">
+                            <span><i class="fa-solid fa-stethoscope"></i> Huyết áp (mmHg)</span>
+                            <strong class="value">${phieuKham.huyetAp}</strong>
+                        </div>
                         <div class="gauge-bar"><div class="gauge-fill"></div></div>
                     </div>
                     <div class="vital-gauge" data-value="${phieuKham.nhipTim}" data-type="hr">
-                        <div class="gauge-header"><span>Nhịp tim (bpm)</span><strong class="value">${phieuKham.nhipTim}</strong></div>
+                        <div class="gauge-header">
+                            <span><i class="fa-solid fa-heart-pulse"></i> Nhịp tim (bpm)</span>
+                            <strong class="value">${phieuKham.nhipTim}</strong>
+                        </div>
                         <div class="gauge-bar"><div class="gauge-fill"></div></div>
                     </div>
                     <div class="vital-gauge" data-value="${phieuKham.nhipTho}" data-type="rr">
-                        <div class="gauge-header"><span>Nhịp thở (/p)</span><strong class="value">${phieuKham.nhipTho}</strong></div>
+                        <div class="gauge-header">
+                            <span><i class="fa-solid fa-lungs"></i> Nhịp thở (/p)</span>
+                            <strong class="value">${phieuKham.nhipTho}</strong>
+                        </div>
                         <div class="gauge-bar"><div class="gauge-fill"></div></div>
                     </div>
                 </div>
@@ -177,7 +207,6 @@
                     </c:choose>
                 </div>
             </div>
-
         </div>
 
         <%-- MODAL (POPUP) Cập nhật kết quả dịch vụ --%>
@@ -198,6 +227,7 @@
                                 <option value="CHO_THUC_HIEN">Chờ thực hiện</option>
                                 <option value="DANG_THUC_HIEN">Đang thực hiện</option>
                                 <option value="HOAN_THANH">Hoàn thành</option>
+                                <option value="DA_HUY">Đã Hủy</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -214,7 +244,12 @@
         </div>
 
         <script>
+            // Thay thế toàn bộ nội dung trong thẻ <script> bằng đoạn mã này
+
             document.addEventListener('DOMContentLoaded', function () {
+
+
+
                 // --- Xử lý Modal ---
                 const modalOverlay = document.getElementById('modal-overlay');
                 const updateButtons = document.querySelectorAll('.update-result-btn');
@@ -255,14 +290,13 @@
                     // Định nghĩa ngưỡng giá trị bình thường, cảnh báo và nguy hiểm
                     const thresholds = {
                         temp: {normal: [36.5, 37.5], warning: [37.6, 38.5], range: [35, 42]},
-                        bp: {normal: [110, 130], warning: [131, 140], range: [70, 180]}, // Giả sử đây là huyết áp tâm thu
+                        bp: {normal: [90, 120], warning: [121, 139], range: [70, 180]}, // Huyết áp tâm thu
                         hr: {normal: [60, 100], warning: [101, 120], range: [40, 180]},
                         rr: {normal: [16, 20], warning: [21, 24], range: [10, 30]}
                     };
 
                     gauges.forEach(gauge => {
                         const type = gauge.dataset.type;
-                        // Xử lý huyết áp dạng "120/80" -> lấy số đầu tiên
                         const rawValue = gauge.dataset.value.split('/')[0];
                         const value = parseFloat(rawValue);
 
@@ -274,19 +308,17 @@
                         const fillElement = gauge.querySelector('.gauge-fill');
                         const valueElement = gauge.querySelector('.value');
 
-                        // Tính toán phần trăm thanh gauge
                         let percentage = (value - minRange) / (maxRange - minRange) * 100;
-                        percentage = Math.max(0, Math.min(100, percentage)); // Giới hạn từ 0-100
+                        percentage = Math.max(0, Math.min(100, percentage));
                         fillElement.style.width = `${percentage}%`;
 
-                        // Cập nhật màu sắc dựa trên ngưỡng
                         gauge.classList.remove('status-normal', 'status-warning', 'status-high');
                         valueElement.classList.remove('status-normal', 'status-warning', 'status-high');
 
                         if (value >= config.normal[0] && value <= config.normal[1]) {
                             gauge.classList.add('status-normal');
                             valueElement.classList.add('status-normal');
-                        } else if (value > config.normal[1] && value <= config.warning[1]) {
+                        } else if (value > config.normal[1] && value <= config.warning[1] || (value < config.normal[0] && value >= 80)) {
                             gauge.classList.add('status-warning');
                             valueElement.classList.add('status-warning');
                         } else {
@@ -297,7 +329,55 @@
                 }
 
                 updateVitalGauges();
+                // 1. Lấy ra các đối tượng cần thiết từ DOM
+                const themeToggle = document.getElementById('theme-toggle');
+                const body = document.body;
+
+                // Tên key để lưu trong localStorage
+                const themeKey = 'theme-preference';
+
+                // 2. Hàm để áp dụng theme được lưu
+                const applyTheme = (theme) => {
+                    if (theme === 'dark') {
+                        // Thêm class 'dark-mode' vào body
+                        body.classList.add('dark-mode');
+                        // Đánh dấu check cho nút gạt
+                        themeToggle.checked = true;
+                    } else {
+                        // Xóa class 'dark-mode' khỏi body
+                        body.classList.remove('dark-mode');
+                        // Bỏ check cho nút gạt
+                        themeToggle.checked = false;
+                    }
+                };
+
+                // 3. Lấy theme đã lưu từ localStorage khi tải trang
+                const savedTheme = localStorage.getItem(themeKey);
+
+                // Mặc định là 'light' nếu chưa có gì được lưu
+                const currentTheme = savedTheme ? savedTheme : 'light';
+                applyTheme(currentTheme);
+
+
+                // 4. Lắng nghe sự kiện 'change' trên nút gạt
+                themeToggle.addEventListener('change', () => {
+                    let newTheme;
+                    // Nếu nút gạt được check, theme mới là 'dark'
+                    if (themeToggle.checked) {
+                        newTheme = 'dark';
+                    } else {
+                        // Nếu không, theme mới là 'light'
+                        newTheme = 'light';
+                    }
+
+                    // Lưu lựa chọn mới vào localStorage
+                    localStorage.setItem(themeKey, newTheme);
+                    // Áp dụng theme mới ngay lập tức
+                    applyTheme(newTheme);
+                });
             });
+
+
         </script>
     </body>
 </html>

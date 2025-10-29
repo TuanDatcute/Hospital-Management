@@ -187,7 +187,7 @@ public class CatalogController extends HttpServlet {
             // 4. XỬ LÝ KẾT QUẢ THÀNH CÔNG
             request.setAttribute("SUCCESS_MESSAGE", "Đã tạo dịch vụ '" + result.getTenDichVu() + "' thành công!");
             // Có thể chuyển hướng về trang danh sách dịch vụ
-            return "danhSachDichVu.jsp";
+            return "index.jsp";
 
         } catch (ValidationException e) {
             // Bắt lỗi nghiệp vụ (ví dụ: tên trùng) từ Service

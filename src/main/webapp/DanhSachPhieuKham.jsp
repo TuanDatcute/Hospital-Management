@@ -7,7 +7,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Danh Sách Phiếu Khám Bệnh</title>
-        <%-- ĐỔI TÊN FILE CSS SANG MỘT FILE MỚI, VÍ DỤ: danhSach-style-cards.css --%>
+
         <link rel="stylesheet" href="<c:url value='/css/danhSach-style.css'/>">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">    </head>
@@ -45,9 +45,13 @@
                 </div>
 
                 <div class="theme-switch-wrapper">
-                    <label class="theme-switch" for="checkbox">
-                        <input type="checkbox" id="checkbox" />
-                        <div class="slider"></div>
+                    <label class="theme-switch" for="theme-toggle">
+                        <input type="checkbox" id="theme-toggle" />
+                        <div class="slider round">
+
+                            <span class="sun-icon"><i class="fas fa-sun"></i></span>
+                            <span class="moon-icon"><i class="fas fa-moon"></i></span>
+                        </div>
                     </label>
                 </div>
 
@@ -109,33 +113,53 @@
             </div>
         </div>
         <script>
-            const toggleSwitch = document.querySelector('#checkbox');
-            const currentTheme = localStorage.getItem('theme');
+            document.addEventListener('DOMContentLoaded', function () {
+                // 1. Lấy ra các đối tượng cần thiết từ DOM
+                const themeToggle = document.getElementById('theme-toggle');
+                const body = document.body;
 
-            // Hàm để áp dụng theme
-            function applyTheme(theme) {
-                if (theme === 'dark') {
-                    document.body.classList.add('dark-mode');
-                    toggleSwitch.checked = true;
-                } else {
-                    document.body.classList.remove('dark-mode');
-                    toggleSwitch.checked = false;
-                }
-            }
+                // Tên key để lưu trong localStorage
+                const themeKey = 'theme-preference';
 
-            // Kiểm tra theme đã lưu khi tải trang
-            if (currentTheme) {
+                // 2. Hàm để áp dụng theme được lưu
+                const applyTheme = (theme) => {
+                    if (theme === 'dark') {
+                        // Thêm class 'dark-mode' vào body
+                        body.classList.add('dark-mode');
+                        // Đánh dấu check cho nút gạt
+                        themeToggle.checked = true;
+                    } else {
+                        // Xóa class 'dark-mode' khỏi body
+                        body.classList.remove('dark-mode');
+                        // Bỏ check cho nút gạt
+                        themeToggle.checked = false;
+                    }
+                };
+
+                // 3. Lấy theme đã lưu từ localStorage khi tải trang
+                const savedTheme = localStorage.getItem(themeKey);
+
+                // Mặc định là 'light' nếu chưa có gì được lưu
+                const currentTheme = savedTheme ? savedTheme : 'light';
                 applyTheme(currentTheme);
-            }
 
-            // Lắng nghe sự kiện click vào nút gạt
-            toggleSwitch.addEventListener('change', function () {
-                let theme = 'light';
-                if (this.checked) {
-                    theme = 'dark';
-                }
-                document.body.classList.toggle('dark-mode', this.checked);
-                localStorage.setItem('theme', theme);
+
+                // 4. Lắng nghe sự kiện 'change' trên nút gạt
+                themeToggle.addEventListener('change', () => {
+                    let newTheme;
+                    // Nếu nút gạt được check, theme mới là 'dark'
+                    if (themeToggle.checked) {
+                        newTheme = 'dark';
+                    } else {
+                        // Nếu không, theme mới là 'light'
+                        newTheme = 'light';
+                    }
+
+                    // Lưu lựa chọn mới vào localStorage
+                    localStorage.setItem(themeKey, newTheme);
+                    // Áp dụng theme mới ngay lập tức
+                    applyTheme(newTheme);
+                });
             });
         </script>
     </body>

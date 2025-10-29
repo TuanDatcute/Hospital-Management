@@ -6,23 +6,22 @@
     <head>
         <meta charset="UTF-8">
         <title>Kê Đơn Thuốc Mới</title>
-        <link rel="stylesheet" href="<c:url value='/css/style.css'/>">
-        <style>
-            .medication-row {
-                display: flex;
-                gap: 10px;
-                align-items: center;
-                margin-bottom: 10px;
-            }
-            .medication-row .form-group {
-                flex-grow: 1;
-            }
-            .medication-row .remove-btn {
-                margin-top: 20px;
-            }
-        </style>
+        <link rel="stylesheet" href="<c:url value='/css/taoDonThuoc-style.css'/>">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     </head>
     <body>
+
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="theme-toggle">
+                <input type="checkbox" id="theme-toggle" />
+                <div class="slider round">
+
+                    <span class="sun-icon"><i class="fas fa-sun"></i></span>
+                    <span class="moon-icon"><i class="fas fa-moon"></i></span>
+                </div>
+            </label>
+        </div>
+
 
 
         <div class="form-container">
@@ -48,7 +47,9 @@
                     <%-- JavaScript sẽ thêm các dòng thuốc vào đây --%>
                 </div>
 
-                <button type="button" id="add-med-btn" class="btn btn-secondary">Thêm thuốc</button>
+                <button type="button" id="add-med-btn" class="btn btn-secondary">
+                    <i class="fas fa-plus"></i> Thêm thuốc
+                </button>
 
                 <div class="button-group">
                     <button type="submit" class="btn btn-primary">Lưu Đơn Thuốc</button>
@@ -58,7 +59,7 @@
 
         <div id="medication-row-template" style="display: none;">
             <div class="medication-row">
-                <div class="form-group">
+                <div class="form-group ten-thuoc">
                     <label>Tên Thuốc</label>
                     <select name="thuocId" class="form-control" required>
                         <option value="">-- Chọn thuốc --</option>
@@ -67,20 +68,72 @@
                         </c:forEach>
                     </select>
                 </div>
-                <div class="form-group" style="flex-basis: 120px; flex-grow: 0;">
+                <div class="form-group so-luong">
                     <label>Số Lượng</label>
                     <input type="number" name="soLuong" class="form-control" min="1" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group lieu-dung">
                     <label>Liều Dùng</label>
-                    <input type="text" name="lieuDung" class="form-control" placeholder="Ví dụ: Sáng 1 viên, tối 1 viên" required>
+                    <input type="text" name="lieuDung" class="form-control" placeholder="Ví dụ: Sáng 1v, tối 1v" required>
                 </div>
-                <button type="button" class="btn btn-delete remove-btn">Xóa</button>
+                <button type="button" class="btn btn-delete remove-btn">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
         </div>
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
+                // 1. Lấy ra các đối tượng cần thiết từ DOM
+                const themeToggle = document.getElementById('theme-toggle');
+                const body = document.body;
+
+                // Tên key để lưu trong localStorage
+                const themeKey = 'theme-preference';
+
+                // 2. Hàm để áp dụng theme được lưu
+                const applyTheme = (theme) => {
+                    if (theme === 'dark') {
+                        // Thêm class 'dark-mode' vào body
+                        body.classList.add('dark-mode');
+                        // Đánh dấu check cho nút gạt
+                        themeToggle.checked = true;
+                    } else {
+                        // Xóa class 'dark-mode' khỏi body
+                        body.classList.remove('dark-mode');
+                        // Bỏ check cho nút gạt
+                        themeToggle.checked = false;
+                    }
+                };
+
+                // 3. Lấy theme đã lưu từ localStorage khi tải trang
+                const savedTheme = localStorage.getItem(themeKey);
+
+                // Mặc định là 'light' nếu chưa có gì được lưu
+                const currentTheme = savedTheme ? savedTheme : 'light';
+                applyTheme(currentTheme);
+
+
+                // 4. Lắng nghe sự kiện 'change' trên nút gạt
+                themeToggle.addEventListener('change', () => {
+                    let newTheme;
+                    // Nếu nút gạt được check, theme mới là 'dark'
+                    if (themeToggle.checked) {
+                        newTheme = 'dark';
+                    } else {
+                        // Nếu không, theme mới là 'light'
+                        newTheme = 'light';
+                    }
+
+                    // Lưu lựa chọn mới vào localStorage
+                    localStorage.setItem(themeKey, newTheme);
+                    // Áp dụng theme mới ngay lập tức
+                    applyTheme(newTheme);
+                });
+
+                // ===================================================
+                // LOGIC THÊM/XÓA ĐƠN THUỐC CỦA BẠN
+                // ===================================================
                 const addBtn = document.getElementById('add-med-btn');
                 const listContainer = document.getElementById('medication-list');
                 const template = document.getElementById('medication-row-template');
@@ -94,8 +147,10 @@
 
                 // Dùng event delegation để xử lý nút xóa
                 listContainer.addEventListener('click', function (event) {
-                    if (event.target.classList.contains('remove-btn')) {
-                        event.target.closest('.medication-row').remove();
+                    // Tìm nút xóa gần nhất mà người dùng click
+                    const removeButton = event.target.closest('.remove-btn');
+                    if (removeButton) {
+                        removeButton.closest('.medication-row').remove();
                     }
                 });
 

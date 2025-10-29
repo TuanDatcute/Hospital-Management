@@ -91,6 +91,7 @@ public class PhieuKhamBenhDAO {
                     "SELECT pkb FROM PhieuKhamBenh pkb "
                     + "LEFT JOIN FETCH pkb.danhSachChiDinh cdd "
                     + "LEFT JOIN FETCH pkb.benhNhan "
+                    + "LEFT JOIN FETCH pkb.bacSi "
                     + "WHERE pkb.id = :id",
                     PhieuKhamBenh.class
             );

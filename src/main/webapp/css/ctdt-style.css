@@ -2,6 +2,7 @@
    BIẾN TOÀN CỤC & KIỂU DÁNG CHUNG
    ========================================================================== */
 :root {
+    /* Chế độ SÁNG */
     --primary-color: #4A6CFD;
     --primary-light: #eff2ff;
     --success-color: #10B981;
@@ -13,36 +14,144 @@
     --edit-color: #8B5CF6;
     --edit-light: #ede9fe;
 
-    --bg-color: #f8faff; /* Nền sáng hơn một chút */
+    --bg-color: #f8faff;
     --surface-color: #ffffff;
     --border-color: #e5e7eb;
     --text-primary: #111827;
     --text-secondary: #6b7280;
-    --shadow: 0 4px 15px -1px rgba(0,0,0,0.05); /* Shadow nhẹ nhàng hơn */
-    --shadow-lg: 0 10px 25px -3px rgba(74,108,253,0.15); /* Shadow có màu thương hiệu */
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-brand: 0 10px 25px -3px rgba(74,108,253,0.15);
 
     --font-family: 'Be Vietnam Pro', sans-serif;
 }
 
-/* Cải thiện font loading */
-@font-face {
-    font-family: 'Be Vietnam Pro';
-    font-style: normal;
-    font-weight: 400 700;
-    src: url(https://fonts.gstatic.com/s/bevietnampro/v11/QdVPdTaaXFpEpMv3H3AbvlXgDM_R-pA.woff2) format('woff2');
-    font-display: swap;
+/* ==========================================================================
+   CHẾ ĐỘ TỐI (DARK MODE) - OVERRIDE VARIABLES
+   ========================================================================== */
+body.dark-mode {
+    --primary-color: #77A5D9;
+    --success-color: #3d8c5a;
+    --warning-color: #c7811a;
+    --danger-color: #e57373;
+
+    --bg-color: #121212;
+    --surface-color: #1E1E1E;
+    --border-color: #333333;
+    --text-primary: #E0E0E0;
+    --text-secondary: #888888;
+
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    --card-hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
 }
 
+/* ==========================================================================
+   TINH CHỈNH MÀU SẮC CHO DARK MODE
+   ========================================================================== */
+body.dark-mode .card-header,
+body.dark-mode .modal-header {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: #444;
+}
 
+body.dark-mode .data-table tr:hover td {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .empty-state {
+    background-color: rgba(0,0,0,0.1);
+}
+
+/* ==========================================================================
+   NÚT GẠT CHUYỂN CHẾ ĐỘ (ĐÃ SỬA LỖI)
+   ========================================================================== */
+.theme-switch-wrapper {
+    position: absolute;
+    top: 25px;
+    right: 30px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+}
+.theme-switch {
+    display: inline-block;
+    height: 30px;
+    position: relative;
+    width: 60px;
+}
+.theme-switch input {
+    display: none;
+}
+.slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 7px;
+}
+.slider:before {
+    background-color: #fff;
+    bottom: 4px;
+    content: "";
+    height: 22px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 22px;
+    border-radius: 50%;
+    z-index: 1; /* SỬA 1: Giảm z-index của nút tròn xuống 1 */
+}
+.sun-icon,
+.moon-icon {
+    font-size: 14px;
+    color: #f39c12;
+    transition: opacity 0.4s ease;
+    z-index: 2; /* SỬA 2: Tăng z-index của icon lên 2 để nó nổi lên trên */
+}
+.moon-icon {
+    color: var(--primary-color); /* SỬA 3: Đổi màu icon mặt trăng để thấy được trên nền trắng */
+    opacity: 0;
+}
+.sun-icon {
+    opacity: 1;
+}
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+input:checked + .slider:before {
+    transform: translateX(30px);
+}
+input:checked + .slider .sun-icon {
+    opacity: 0;
+}
+input:checked + .slider .moon-icon {
+    opacity: 1;
+}
+/* ==========================================================================
+   KIỂU DÁNG CHUNG & RESET
+   ========================================================================== */
 body {
     font-family: var(--font-family);
     background-color: var(--bg-color);
-    /* Thêm gradient tinh tế cho nền */
-    background-image: linear-gradient(180deg, #f8faff 0%, #ffffff 100%);
     margin: 0;
     color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
+}
+body, .card, .modal-content, .btn, .form-control, .data-table tbody tr,
+.search-box input, .search-box button {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* ==========================================================================
@@ -59,7 +168,7 @@ body {
 }
 
 /* ==========================================================================
-   CARD COMPONENT - Nền tảng cho các khối thông tin
+   CARD COMPONENT
    ========================================================================== */
 .card {
     background-color: var(--surface-color);
@@ -97,29 +206,32 @@ body {
 /* ==========================================================================
    PHÂN VÙNG GRID & KIỂU DÁNG CỤ THỂ
    ========================================================================== */
-.profile-card             {
+.profile-card {
     grid-column: 1 / 9;
 }
-.actions-card             {
+.actions-card {
     grid-column: 9 / 13;
 }
-.vitals-dashboard-card    {
+.vitals-dashboard-card {
     grid-column: 1 / 13;
 }
-.clinical-card            {
+.clinical-card {
     grid-column: 1 / 13;
 }
-.services-card            {
+.services-card {
     grid-column: 1 / 8;
 }
-.prescription-card        {
+.prescription-card {
     grid-column: 8 / 13;
 }
 
 /* --- Profile Card --- */
 .profile-card {
     padding: 32px;
-    background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(245,247,255,1) 100%);
+    background: linear-gradient(135deg, var(--surface-color) 0%, rgba(245,247,255,1) 100%);
+}
+body.dark-mode .profile-card {
+    background: linear-gradient(135deg, var(--surface-color) 0%, rgba(31,41,55,0.8) 100%);
 }
 .profile-card h1 {
     font-size: 2.5rem;
@@ -130,6 +242,9 @@ body {
     text-overflow: ellipsis;
     color: #0d1e51;
 }
+body.dark-mode .profile-card h1 {
+    color: var(--text-primary);
+}
 .profile-card .patient-id {
     color: var(--text-secondary);
     font-size: 1.1rem;
@@ -139,7 +254,7 @@ body {
     margin-top: 24px;
     display: flex;
     flex-wrap: wrap;
-    gap: 32px; /* Tăng khoảng cách */
+    gap: 32px;
 }
 .info-item {
     display: flex;
@@ -158,19 +273,36 @@ body {
     font-size: 1.1rem;
 }
 
-/* --- Actions Card --- */
+/* --- Actions Card (Sửa lỗi chiều cao các nút bên trong form) --- */
+
+/* 1. Yêu cầu vùng card-body phải co giãn để có không gian cho các nút */
+.actions-card .card-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 2. Yêu cầu vùng chứa các nút (.action-buttons) lấp đầy card-body */
 .actions-card .action-buttons {
+    flex-grow: 1; /* Co giãn lấp đầy card-body */
     display: flex;
     flex-direction: column;
     gap: 12px;
-    justify-content: center;
 }
-.actions-card form, .actions-card .btn {
+
+/* 3. Biến thẻ form thành một "hộp linh hoạt" để quản lý button bên trong */
+.actions-card .action-buttons form {
+    display: flex; /* Quan trọng: để button bên trong có thể co giãn */
+}
+
+/* 4. Yêu cầu tất cả các nút (cả thẻ <a> và <button>) phải co giãn lấp đầy */
+.actions-card .action-buttons .btn {
+    flex-grow: 1; /* Lệnh cho nút tự giãn ra để lấp đầy thẻ form hoặc không gian được chia */
     width: 100%;
     box-sizing: border-box;
 }
 
-/* --- Vitals Dashboard Card --- */
+/* --- Vitals Dashboard Card (IMPROVED) --- */
 .vitals-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -185,6 +317,14 @@ body {
 .vital-gauge span {
     color: var(--text-secondary);
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.vital-gauge span i {
+    width: 1em;
+    text-align: center;
+    color: var(--text-secondary);
 }
 .vital-gauge .value {
     font-size: 1.5rem;
@@ -198,6 +338,9 @@ body {
     border-radius: 4px;
     overflow: hidden;
 }
+body.dark-mode .vital-gauge .gauge-bar {
+    background-color: #2D3748;
+}
 .vital-gauge .gauge-fill {
     height: 100%;
     border-radius: 4px;
@@ -209,14 +352,12 @@ body {
 .value.status-normal {
     color: var(--success-color);
 }
-
 .vital-gauge.status-warning .gauge-fill {
     background-color: var(--warning-color);
 }
 .value.status-warning {
     color: var(--warning-color);
 }
-
 .vital-gauge.status-high .gauge-fill {
     background-color: var(--danger-color);
 }
@@ -225,11 +366,10 @@ body {
 }
 
 /* --- Clinical Card --- */
-.clinical-card .clinical-item {
-    margin-bottom: 24px;
-}
-.clinical-card .clinical-item:last-child {
-    margin-bottom: 0;
+.clinical-card .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
 .clinical-item h4 {
     margin: 0 0 8px 0;
@@ -238,14 +378,10 @@ body {
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 8px; /* Thêm icon */
 }
 .clinical-item p {
     margin: 0;
     line-height: 1.6;
-    padding-left: 24px; /* Thụt vào để thẳng hàng với text của h4 */
 }
 .clinical-item .diagnosis {
     font-weight: 600;
@@ -264,7 +400,7 @@ body {
     border-collapse: collapse;
 }
 .data-table th {
-    padding: 12px 8px;
+    padding: 12px 16px;
     text-align: left;
     font-size: 0.85rem;
     color: var(--text-secondary);
@@ -272,12 +408,21 @@ body {
     text-transform: uppercase;
 }
 .data-table td {
-    padding: 16px 8px;
+    padding: 16px;
     border-bottom: 1px solid var(--border-color);
     vertical-align: middle;
 }
 .data-table tbody tr:last-child td {
     border-bottom: none;
+}
+.data-table tbody tr {
+    transition: background-color 0.2s;
+}
+.data-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+body.dark-mode .data-table tbody tr:hover {
+    background-color: #2d3a4d;
 }
 .data-table strong {
     font-weight: 600;
@@ -303,12 +448,15 @@ body {
     gap: 8px;
 }
 .form-control {
-    flex-grow: 1;
+    width: 100%;
+    box-sizing: border-box;
     padding: 10px 14px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-family: var(--font-family);
     font-size: 1rem;
+    background-color: var(--surface-color);
+    color: var(--text-primary);
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 .form-control:focus {
@@ -325,7 +473,7 @@ textarea.form-control {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 20px; /* Tăng padding */
+    padding: 12px 20px;
     font-size: 0.95rem;
     font-weight: 600;
     border: 1px solid transparent;
@@ -333,22 +481,21 @@ textarea.form-control {
     cursor: pointer;
     text-decoration: none;
     transition: all 0.2s ease-in-out;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Thêm shadow cho nút */
+    box-shadow: var(--shadow-sm);
+    box-sizing: border-box;
 }
 .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow);
 }
 .btn:active {
     transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-sm);
 }
-/* Cải thiện focus state cho accessbility */
 .btn:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px var(--primary-light);
 }
-
 .btn-primary {
     background-color: var(--primary-color);
     color: white;
@@ -356,7 +503,7 @@ textarea.form-control {
 .btn-secondary {
     background-color: #6B7280;
     color: white;
-} /* Đổi màu secondary */
+}
 .btn-success {
     background-color: var(--success-color);
     color: white;
@@ -373,22 +520,30 @@ textarea.form-control {
 .btn-outline-primary:hover {
     background-color: var(--primary-light);
 }
+.btn.full-width {
+    width: 100%;
+}
 .btn-icon {
     background: none;
     border: none;
-    padding: 8px;
+    padding: 0;
     color: var(--text-secondary);
     font-size: 1.1rem;
     border-radius: 50%;
     width: 36px;
     height: 36px;
+    cursor: pointer;
     transition: color 0.2s, background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 .btn-icon:hover {
     color: var(--primary-color);
     background-color: var(--primary-light);
 }
 
+/* GOM NHÓM CÁC CLASS TRẠNG THÁI */
 .status {
     padding: 4px 12px;
     border-radius: 999px;
@@ -398,40 +553,133 @@ textarea.form-control {
     display: inline-block;
     border: 1px solid transparent;
 }
+.status-CHUA_HOAN_THANH {
+    background-color: #ffc107;
+    color: #343a40;
+}
+
+/* Trạng thái LIGHT MODE */
 .status-HOAN_THANH {
     background-color: var(--success-light);
     color: var(--success-color);
-    border-color: var(--success-color);
 }
-.status-CHUA_HOAN_THANH, .status-CHO_THUC_HIEN {
+.status-DA_HUY {
+    background-color: var(--danger-light);
+    color: var(--danger-color);
+}
+.status-CHO_THUC_HIEN {
     background-color: var(--warning-light);
     color: var(--warning-color);
-    border-color: var(--warning-color);
 }
 .status-DANG_THUC_HIEN {
     background-color: var(--primary-light);
     color: var(--primary-color);
-    border-color: var(--primary-color);
+}
+
+/* Trạng thái DARK MODE */
+body.dark-mode .status-HOAN_THANH {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+}
+body.dark-mode .status-DA_HUY {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+}
+body.dark-mode .status-CHO_THUC_HIEN {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #fcd34d;
+}
+body.dark-mode .status-DANG_THUC_HIEN {
+    background-color: rgba(74, 108, 253, 0.2);
+    color: #a5b4fc;
+}
+body.dark-mode .status-CHUA_HOAN_THANH {
+    background-color: #c7811a;
+    color: #E0E0E0;
 }
 
 .empty-state {
     text-align: center;
-    padding: 48px; /* Tăng padding */
+    padding: 48px;
     color: var(--text-secondary);
     background-color: #f9fafb;
     border-radius: 12px;
+    border: 1px dashed var(--border-color);
+}
+body.dark-mode .empty-state {
+    background-color: #2D3748;
 }
 .empty-state i {
     font-size: 2.5rem;
     color: #d1d5db;
-    margin-bottom: 16px;
 }
-.empty-state p {
-    margin: 0 0 16px 0;
+body.dark-mode .empty-state i {
+    color: #5B6372;
+}
+
+.prescription-note {
+    background-color: var(--primary-light);
+    color: #4358ac;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    border-left: 4px solid var(--primary-color);
+}
+body.dark-mode .prescription-note {
+    color: #000000;
+    background-color: #d1dada;
 }
 
 /* ==========================================================================
-   MODAL (POPUP)
+   ALERTS & NOTIFICATIONS
+   ========================================================================== */
+.alert {
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    grid-column: 1 / -1;
+}
+.alert::before {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 1.2rem;
+}
+.alert-danger {
+    background-color: var(--danger-light);
+    color: #922c2c;
+    border-color: #f7c5c5;
+}
+body.dark-mode .alert-danger {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    border-color: #7b3131;
+}
+.alert-danger::before {
+    content: "\f071";
+    color: var(--danger-color);
+}
+.alert-success {
+    background-color: var(--success-light);
+    color: #0d6b52;
+    border-color: #a7f3d0;
+}
+body.dark-mode .alert-success {
+    color: #00a158;
+    border-color: #317b5f;
+}
+.alert-success::before {
+    content: "\f058";
+    color: var(--success-color);
+}
+
+/* ==========================================================================
+   MODAL (POPUP) - IMPROVED
    ========================================================================== */
 .modal-overlay {
     position: fixed;
@@ -458,13 +706,14 @@ textarea.form-control {
     background-color: var(--surface-color);
     border-radius: 16px;
     width: 90%;
-    max-width: 550px; /* Tăng chiều rộng một chút */
-    box-shadow: 0 10px 25px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+    max-width: 550px;
+    box-shadow: var(--shadow-lg);
     transform: scale(0.95);
     transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
     flex-direction: column;
-    max-height: 90vh; /* Giới hạn chiều cao */
+    max-height: 90vh;
+    border: 1px solid var(--border-color);
 }
 .modal-overlay.active .modal-content {
     transform: scale(1);
@@ -500,7 +749,7 @@ textarea.form-control {
 }
 .modal-body {
     padding: 24px;
-    overflow-y: auto; /* Cho phép cuộn nếu nội dung dài */
+    overflow-y: auto;
 }
 .form-group {
     margin-bottom: 24px;
@@ -526,72 +775,75 @@ textarea.form-control {
     border-bottom-right-radius: 16px;
     flex-shrink: 0;
 }
+body.dark-mode .modal-footer {
+    background-color: #1d2635;
+}
 
 /* ==========================================================================
-   CONTAINER BÁO LỖI
+   SEARCH BAR VÀ NÚT TẠO PHIẾU KHÁM
    ========================================================================== */
-.error-container {
+.search-and-create-bar {
+    grid-column: 1 / -1;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    height: 80vh;
-    padding: 24px;
-}
-.error-container i {
-    font-size: 4rem;
-    color: var(--danger-color);
+    gap: 16px;
     margin-bottom: 24px;
+    padding: 0 8px;
 }
-.error-container h1 {
-    font-size: 2rem;
-    margin-bottom: 8px;
-    color: var(--text-primary);
-}
-.error-container p {
-    color: var(--text-secondary);
-    margin-bottom: 24px;
+.search-box {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: var(--surface-color);
+    box-shadow: var(--shadow-sm);
     max-width: 400px;
 }
-
-/* ==========================================================================
-   CSS CHO BẢN IN
-   ========================================================================== */
-@media print {
-    body {
-        background-color: #fff; /* Nền trắng khi in */
-    }
-    .dashboard-container {
-        display: block; /* Chuyển về layout block bình thường */
-        padding: 0;
-        box-shadow: none;
-    }
-    .card {
-        box-shadow: none;
-        border: 1px solid #ccc;
-        margin-bottom: 20px;
-        break-inside: avoid; /* Tránh ngắt trang giữa card */
-    }
-    /* Ẩn các phần tử không cần thiết */
-    .actions-card, .add-service-form, .modal-overlay, .data-table .actions, .btn-icon, .prescription-card a {
-        display: none !important;
-    }
+.search-box input {
+    flex-grow: 1;
+    padding: 12px 16px;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    color: var(--text-primary);
+    font-size: 1rem;
 }
-
+.search-box input::placeholder {
+    color: var(--text-secondary);
+}
+.search-box button {
+    background-color: transparent;
+    border: none;
+    padding: 12px 16px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+.search-box button:hover {
+    color: var(--primary-color);
+}
+.create-btn {
+    white-space: nowrap;
+    background-color: var(--primary-color);
+    color: white;
+}
 
 /* ==========================================================================
    RESPONSIVE DESIGN
    ========================================================================== */
 @media (max-width: 1024px) {
     .dashboard-container {
-        grid-template-columns: repeat(1, 1fr);
+        grid-template-columns: 1fr;
         padding: 16px;
         gap: 16px;
     }
     .profile-card, .actions-card, .vitals-dashboard-card,
     .clinical-card, .services-card, .prescription-card {
-        grid-column: 1 / -1;
+        grid-column: auto;
     }
     .profile-card h1 {
         font-size: 2rem;
@@ -604,8 +856,17 @@ textarea.form-control {
         width: auto;
         flex-grow: 1;
     }
+    .search-and-create-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-box {
+        max-width: 100%;
+    }
+    .create-btn {
+        width: 100%;
+    }
 }
-
 @media (max-width: 768px) {
     .profile-card .info-list {
         flex-direction: column;
@@ -622,8 +883,5 @@ textarea.form-control {
     }
     .modal-footer .btn {
         width: 100%;
-    }
-    .clinical-item p {
-        padding-left: 0; /* Bỏ padding trên mobile */
     }
 }

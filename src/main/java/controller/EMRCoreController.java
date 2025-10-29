@@ -441,8 +441,10 @@ public class EMRCoreController extends HttpServlet {
             }
             phieuKhamService.updateEncounter(dto); // Giả sử Service có hàm update
 
+            //maPhieuKham để tìm kiếm
+            String maPhieuKham = request.getParameter("maPhieuKham");
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Cập nhật phiếu khám thành công!");
-            return "redirect:/MainController?action=listAllEncounters";
+            return "redirect:/MainController?action=listAllEncounters&keyword="+maPhieuKham;
 
         } catch (ValidationException e) {
             request.setAttribute("ERROR_MESSAGE", e.getMessage());

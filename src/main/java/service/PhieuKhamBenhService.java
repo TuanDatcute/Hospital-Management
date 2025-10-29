@@ -93,7 +93,6 @@ public class PhieuKhamBenhService {
         return entities.stream().map(this::toDTOForListing).collect(Collectors.toList());
     }
 
-
     /**
      * Chuyển đổi một Entity PhieuKhamBenh sang một DTO "gọn nhẹ", chỉ chứa các
      * thông tin cần thiết để hiển thị trên danh sách.
@@ -145,7 +144,7 @@ public class PhieuKhamBenhService {
         if (danhSachChiDinh != null && !danhSachChiDinh.isEmpty()) {
             // Dùng Stream API để kiểm tra xem "tất cả" có khớp điều kiện không
             boolean allServicesCompleted = danhSachChiDinh.stream()
-                    .allMatch(chiDinh -> "HOAN_THANH".equals(chiDinh.getTrangThai()));
+                    .allMatch(chiDinh -> ("HOAN_THANH".equals(chiDinh.getTrangThai())) || "DA_HUY".equals(chiDinh.getTrangThai()));
 
             if (!allServicesCompleted) {
                 throw new ValidationException("Không thể hoàn thành phiếu khám vì còn dịch vụ chưa hoàn tất.");
