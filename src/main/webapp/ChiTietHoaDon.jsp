@@ -7,7 +7,8 @@
         <title>Chi tiết Hóa đơn ${invoice.maHoaDon}</title>
         <%-- THÊM: Liên kết đến tệp CSS chi tiết --%>
         <link rel="stylesheet" href="css/ChiTietHoaDon.css">
-
+        <%-- THÊM: Liên kết đến tệp js chi tiết --%>
+        <script src="js/ChiTietHoaDon.js"></script>
         <%-- TÙY CHỌN: Bạn cũng có thể liên kết CSS chung ở đây
                  để dùng chung các lớp như .message
         <link rel="stylesheet" href="css/DanhSachHoaDon.css">
@@ -83,12 +84,6 @@
 
                 <%-- SỬA: Dùng <p> và <label> cho cấu trúc tốt hơn --%>
                 <p>
-                    <label for="soTien">Số tiền:</label>
-                    <input type="number" name="soTien" id="soTien" value="${invoice.tongTien}" required>
-                </p>
-
-                <%-- SỬA: Dùng <p> và <label> cho cấu trúc tốt hơn --%>
-                <p>
                     <label for="phuongThuc">Phương thức:</label>
                     <select name="phuongThuc" id="phuongThuc" onchange="toggleQrCode()">
                         <option value="TIEN_MAT">Tiền mặt</option>
@@ -114,7 +109,7 @@
 
                     <%-- TODO: Thay thế bằng đường dẫn ảnh QR của bạn --%>
                     <%-- SỬA: Đã xóa style="..." inline --%>
-                    <img src='https://img.vietqr.io/image/MBBank-0384011575-qr_only.png?amount=${invoice.tongTien}'/>
+                    <img src='https://img.vietqr.io/image/970422-0384011575-compact2.png?amount=${invoice.tongTien}&addInfo=Thanh toan hoa don ${invoice.maHoaDon}&accountName=TRAN NHUT QUANG'/>
                 </div>
                 <%-- ======================================================= --%>
 
@@ -163,44 +158,6 @@
         </a>
         <%-- ================== HẾT MỚI ================== --%>
 
-        <%-- JavaScript giữ nguyên --%>
-        <script>
-            function toggleQrCode() {
-                var methodSelect = document.getElementById("phuongThuc");
-                var qrContainer = document.getElementById("qrCodeContainer");
-                var soTienInput = document.getElementById("soTien");
-                var qrAmountSpan = document.getElementById("qrAmount");
-                var maHoaDon = "${invoice.maHoaDon}"; // Lấy mã hóa đơn từ JSTL
-                var qrContentSpan = document.getElementById("qrContent");
-
-                if (methodSelect.value === "CHUYEN_KHOAN") {
-                    // 1. Hiển thị khối QR
-                    qrContainer.style.display = "block";
-
-                    // 2. Cập nhật số tiền (lấy từ ô input, phòng trường hợp người dùng sửa)
-                    var soTien = parseFloat(soTienInput.value) || 0;
-                    // Dùng hàm của trình duyệt để format tiền tệ (hiện đại hơn JSTL)
-                    qrAmountSpan.innerText = soTien.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'});
-
-                    // 3. Cập nhật nội dung chuyển khoản
-                    qrContentSpan.innerText = "Thanh toan HD " + maHoaDon;
-
-                } else {
-                    // Ẩn khối QR
-                    qrContainer.style.display = "none";
-                }
-            }
-
-            // Bổ sung: Thêm sự kiện 'input' cho ô số tiền
-            // Để nếu người dùng sửa số tiền thì số tiền trên QR code cũng cập nhật theo
-            document.getElementById('soTien').addEventListener('input', function () {
-                // Chỉ cập nhật nếu QR code đang được hiển thị
-                if (document.getElementById('phuongThuc').value === 'CHUYEN_KHOAN') {
-                    var soTien = parseFloat(this.value) || 0;
-                    document.getElementById('qrAmount').innerText = soTien.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'});
-                }
-            });
-        </script>
 
     </body>
 </html>

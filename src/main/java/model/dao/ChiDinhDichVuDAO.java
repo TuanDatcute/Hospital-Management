@@ -108,8 +108,8 @@ public class ChiDinhDichVuDAO {
     }
 
     public List<ChiDinhDichVu> findByPhieuKhamId(int phieuKhamId, Session session) {
-        String hql = "FROM ChiDinhDichVu cddv WHERE cddv.phieuKham.id = :phieuKhamId";
-
+        String hql = "FROM ChiDinhDichVu cddv WHERE cddv.phieuKham.id = :phieuKhamId AND cddv.trangThai = 'HOAN_THANH'";
+        // Chỉ liệt kê DV đã hoàn thành
         Query<ChiDinhDichVu> query = session.createQuery(hql, ChiDinhDichVu.class);
         query.setParameter("phieuKhamId", phieuKhamId);
 
