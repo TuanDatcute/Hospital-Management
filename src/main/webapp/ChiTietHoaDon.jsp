@@ -84,12 +84,6 @@
 
                 <%-- SỬA: Dùng <p> và <label> cho cấu trúc tốt hơn --%>
                 <p>
-                    <label for="soTien">Số tiền:</label>
-                    <input type="number" name="soTien" id="soTien" value="${invoice.tongTien}" required>
-                </p>
-
-                <%-- SỬA: Dùng <p> và <label> cho cấu trúc tốt hơn --%>
-                <p>
                     <label for="phuongThuc">Phương thức:</label>
                     <select name="phuongThuc" id="phuongThuc" onchange="toggleQrCode()">
                         <option value="TIEN_MAT">Tiền mặt</option>
@@ -115,7 +109,7 @@
 
                     <%-- TODO: Thay thế bằng đường dẫn ảnh QR của bạn --%>
                     <%-- SỬA: Đã xóa style="..." inline --%>
-                    <img src='https://img.vietqr.io/image/MBBank-0384011575-qr_only.png?amount=${invoice.tongTien}'/>
+                    <img src='https://img.vietqr.io/image/970422-0384011575-compact2.png?amount=${invoice.tongTien}&addInfo=Thanh toan hoa don ${invoice.maHoaDon}&accountName=TRAN NHUT QUANG'/>
                 </div>
                 <%-- ======================================================= --%>
 
