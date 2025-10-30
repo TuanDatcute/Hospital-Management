@@ -7,7 +7,7 @@
         <title>Chi tiết Hóa đơn ${invoice.maHoaDon}</title>
         <%-- THÊM: Liên kết đến tệp CSS chi tiết --%>
         <link rel="stylesheet" href="css/ChiTietHoaDon.css">
-        
+
         <%-- TÙY CHỌN: Bạn cũng có thể liên kết CSS chung ở đây
                  để dùng chung các lớp như .message
         <link rel="stylesheet" href="css/DanhSachHoaDon.css">
@@ -114,7 +114,7 @@
 
                     <%-- TODO: Thay thế bằng đường dẫn ảnh QR của bạn --%>
                     <%-- SỬA: Đã xóa style="..." inline --%>
-                    <img src="images/QRCode.jpg" alt="Mã QR chuyển khoản">
+                    <img src='https://img.vietqr.io/image/MBBank-0384011575-qr_only.png?amount=${invoice.tongTien}'/>
                 </div>
                 <%-- ======================================================= --%>
 
@@ -153,13 +153,13 @@
                 </c:forEach>
             </tbody>
         </table>
-        
+
         <%-- ================== MỚI ================== --%>
         <%-- Thêm nút "In Hóa Đơn" --%>
         <%-- Nó gọi action 'printInvoice' mà chúng ta đã thêm vào Controller --%>
         <%-- target="_blank" sẽ mở trang in trong một tab mới --%>
         <a href="MainController?action=printInvoice&id=${invoice.id}" target="_blank" class="button-print">
-             &#128424; In Hóa Đơn
+            &#128424; In Hóa Đơn
         </a>
         <%-- ================== HẾT MỚI ================== --%>
 
