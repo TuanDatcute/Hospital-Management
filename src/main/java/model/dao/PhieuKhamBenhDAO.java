@@ -92,9 +92,7 @@ public class PhieuKhamBenhDAO {
                     + "LEFT JOIN FETCH pkb.danhSachChiDinh cdd "
                     + "LEFT JOIN FETCH pkb.benhNhan "
                     + "LEFT JOIN FETCH pkb.bacSi "
-                    + "LEFT JOIN FETCH pkb.donThuoc dt "
                     + "LEFT JOIN FETCH cdd.dichVu "
-                    + "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
                     + "WHERE pkb.id = :id",
                     PhieuKhamBenh.class
             );
@@ -151,6 +149,8 @@ public class PhieuKhamBenhDAO {
             return null;
         }
     }
+    
+    
 
     /**
      * PHƯƠNG THỨC GỌN NHẸ: Chỉ lấy thông tin cần thiết để hiển thị danh sách.
