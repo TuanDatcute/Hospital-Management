@@ -65,7 +65,11 @@
                             <button type="submit" class="btn btn-success"><i class="fas fa-check-circle"></i> Hoàn thành</button>
                         </form>
                     </c:if>
-                    <a href="javascript:window.print()" class="btn btn-primary"><i class="fas fa-print"></i> In Bệnh Án</a>                    <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại DS</a>
+                    <a href="<c:url value='/MainController?action=printEncounter&id=${phieuKham.id}'/>" 
+                       target="_blank" class="btn btn-primary">
+                        <i class="fas fa-print"></i> In Bệnh Án
+                    </a>
+                    <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại DS</a>
                 </div>
             </div>
 

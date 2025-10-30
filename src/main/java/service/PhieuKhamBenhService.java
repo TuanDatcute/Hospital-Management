@@ -159,7 +159,7 @@ public class PhieuKhamBenhService {
         phieuKhamDAO.update(existingEntity);
 
         // 5. Trả về DTO đã cập nhật
-        return toDTO(existingEntity); // Giả sử có hàm toDTO đầy đủ
+        return toDTOForUpdateStatus(existingEntity); // Giả sử có hàm toDTO đầy đủ
     }
 
     /**
@@ -277,6 +277,23 @@ public class PhieuKhamBenhService {
         entity.setBacSi(nhanVien);
 
         return entity;
+    }
+
+    private PhieuKhamBenhDTO toDTOForUpdateStatus(PhieuKhamBenh entity) {
+        if (entity == null) {
+            return null;
+        }
+        PhieuKhamBenhDTO dto = new PhieuKhamBenhDTO();
+        dto.setId(entity.getId());
+        dto.setMaPhieuKham(entity.getMaPhieuKham());
+        if (entity.getDanhSachChiDinh() != null && !entity.getDanhSachChiDinh().isEmpty()) {
+
+            List<ChiDinhDichVuDTO> chiDinhDTOs = entity.getDanhSachChiDinh().stream()
+                    .map(chiDinhService::toDTO)
+                    .collect(Collectors.toList());
+            dto.setDanhSachChiDinh(chiDinhDTOs);
+        }
+        return dto;
     }
 
     /**

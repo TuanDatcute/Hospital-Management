@@ -39,6 +39,7 @@ public class EMRCoreController extends HttpServlet {
     private static final String CREATE_ENCOUNTER_PAGE = "PhieuKhamBenh.jsp";
     private static final String ENCOUNTER_LIST_PAGE = "DanhSachPhieuKham.jsp";
     private static final String ENCOUNTER_DETAIL_PAGE = "ChiTietPhieuKham.jsp";
+    private static final String PRINT_ENCOUNTER_PAGE = "inBenhAn.jsp";
 
     // Khởi tạo các Service cần thiết ở cấp lớp để tái sử dụng
     private final PhieuKhamBenhService phieuKhamService = new PhieuKhamBenhService();
@@ -67,6 +68,9 @@ public class EMRCoreController extends HttpServlet {
             }
 
             switch (action) {
+                case "printEncounter":
+                    url = printEncounter(request);
+                    break;
                 case "getEncounterDetails":
                     url = showCreateForm(request);
                     break;
@@ -278,6 +282,20 @@ public class EMRCoreController extends HttpServlet {
     }
 
     /**
+     * Lấy dữ liệu phiếu khám và forward đến trang in.
+     */
+    private String printEncounter(HttpServletRequest request) throws Exception {
+        int id = Integer.parseInt(request.getParameter("id"));
+
+        PhieuKhamBenhDTO phieuKham = phieuKhamService.getEncounterById(id);
+        if (phieuKham == null) {
+            throw new Exception("Không tìm thấy phiếu khám để in.");
+        }
+        request.setAttribute("phieuKham", phieuKham);
+        return PRINT_ENCOUNTER_PAGE;
+    }
+
+    /**
      * Tải các dữ liệu cần thiết cho form tạo phiếu khám (danh sách bệnh nhân,
      * bác sĩ).
      */
@@ -444,7 +462,7 @@ public class EMRCoreController extends HttpServlet {
             //maPhieuKham để tìm kiếm
             String maPhieuKham = request.getParameter("maPhieuKham");
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Cập nhật phiếu khám thành công!");
-            return "redirect:/MainController?action=listAllEncounters&keyword="+maPhieuKham;
+            return "redirect:/MainController?action=listAllEncounters&keyword=" + maPhieuKham;
 
         } catch (ValidationException e) {
             request.setAttribute("ERROR_MESSAGE", e.getMessage());
