@@ -166,6 +166,7 @@ public class ChiDinhDichVuService {
         return dto;
     }
 
+
     public List<ChiDinhDichVuDTO> getByPhieuKhamId(int phieuKhamId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             List<ChiDinhDichVu> entities = chiDinhDAO.findByPhieuKhamId(phieuKhamId, session);

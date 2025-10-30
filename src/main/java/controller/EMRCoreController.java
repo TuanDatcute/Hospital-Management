@@ -247,13 +247,13 @@ public class EMRCoreController extends HttpServlet {
             // 2. Gọi tầng Service để thực hiện logic nghiệp vụ
             PhieuKhamBenhDTO result = phieuKhamService.createEncounter(newEncounterDTO);
 
-            int keyword = result.getId();
+            String keyword = result.getMaPhieuKham();
 //            // Cần mã hóa keyword để đảm bảo URL hợp lệ
-//            String encodedKeyword = java.net.URLEncoder.encode(keyword, "UTF-8");
+            String encodedKeyword = java.net.URLEncoder.encode(keyword, "UTF-8");
 
             // 3. Xử lý kết quả thành công
             request.setAttribute("SUCCESS_MESSAGE", "Tạo phiếu khám thành công! ID: " + result.getId());
-            return "redirect:/MainController?action=listAllEncounters&keyword=" + keyword;
+            return "redirect:/MainController?action=listAllEncounters&keyword=" + encodedKeyword;
 
         } catch (ValidationException e) {
             // Bắt lỗi nghiệp vụ (do người dùng nhập sai)
