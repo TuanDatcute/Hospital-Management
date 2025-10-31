@@ -1,5 +1,6 @@
 package model.dao;
 
+import java.util.Collections;
 import java.util.List;
 import model.Entity.DichVu;
 import org.hibernate.Session;
@@ -8,19 +9,20 @@ import org.hibernate.query.Query;
 import util.HibernateUtil;
 
 /**
- * Lớp DAO cho Dịch Vụ (Service).
- * Chịu trách nhiệm cho mọi thao tác CRUD với bảng DichVu trong CSDL.
+ * Lớp DAO cho Dịch Vụ (Service). Chịu trách nhiệm cho mọi thao tác CRUD với
+ * bảng DichVu trong CSDL.
  */
 public class DichVuDAO {
 
     /**
      * Thêm một dịch vụ mới vào CSDL.
+     *
      * @param dichVu Đối tượng DichVu (Entity) cần lưu.
      * @return Đối tượng DichVu sau khi đã được lưu (đã có ID).
      */
     public DichVu create(DichVu dichVu) {
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.save(dichVu);
             transaction.commit();
@@ -36,11 +38,12 @@ public class DichVuDAO {
 
     /**
      * Lấy thông tin một dịch vụ bằng ID.
+     *
      * @param id ID của dịch vụ cần tìm.
      * @return Đối tượng DichVu hoặc null nếu không tìm thấy.
      */
     public DichVu getById(int id) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(DichVu.class, id);
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,10 +53,11 @@ public class DichVuDAO {
 
     /**
      * Lấy tất cả các dịch vụ trong CSDL.
+     *
      * @return Danh sách các đối tượng DichVu.
      */
     public List<DichVu> getAll() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery("FROM DichVu", DichVu.class).list();
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,11 +67,12 @@ public class DichVuDAO {
 
     /**
      * Cập nhật thông tin một dịch vụ đã có.
+     *
      * @param dichVu Đối tượng DichVu chứa thông tin mới.
      */
     public void update(DichVu dichVu) {
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.update(dichVu);
             transaction.commit();
@@ -81,11 +86,12 @@ public class DichVuDAO {
 
     /**
      * Xóa một dịch vụ khỏi CSDL.
+     *
      * @param id ID của dịch vụ cần xóa.
      */
     public void delete(int id) {
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             DichVu dichVu = session.get(DichVu.class, id);
             if (dichVu != null) {
@@ -102,14 +108,15 @@ public class DichVuDAO {
 
     /**
      * Kiểm tra xem một tên dịch vụ đã tồn tại trong CSDL hay chưa.
+     *
      * @param tenDichVu Tên dịch vụ cần kiểm tra.
      * @return true nếu đã tồn tại, false nếu chưa.
      */
     public boolean isTenDichVuExisted(String tenDichVu) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<Long> query = session.createQuery(
-                "SELECT count(d.id) FROM DichVu d WHERE d.tenDichVu = :ten", 
-                Long.class
+                    "SELECT count(d.id) FROM DichVu d WHERE d.tenDichVu = :ten",
+                    Long.class
             );
             query.setParameter("ten", tenDichVu);
             return query.uniqueResult() > 0;
@@ -119,5 +126,33 @@ public class DichVuDAO {
             return true;
         }
     }
-    
+
+   public List<DichVu> searchByIdOrName(String keyword) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            
+            // --- BƯỚC 1: CỐ GẮNG CHUYỂN ĐỔI TỪ KHÓA THÀNH SỐ ---
+            int keywordAsId = 0; // Mặc định là một ID không tồn tại
+            try {
+                // Cố gắng parse chuỗi thành số nguyên
+                keywordAsId = Integer.parseInt(keyword);
+            } catch (NumberFormatException e) {
+                // Nếu không phải là số, không làm gì cả. keywordAsId vẫn là 0.
+            }
+
+            // --- BƯỚC 2: VIẾT CÂU HQL VỚI ĐIỀU KIỆN "OR" ---
+            // Tìm kiếm nếu 'tenDichVu' khớp với từ khóa HOẶC 'id' bằng với từ khóa (nếu là số)
+            String hql = "FROM DichVu d WHERE d.tenDichVu LIKE :keywordString OR d.id = :keywordId ORDER BY d.tenDichVu ASC";
+            Query<DichVu> query = session.createQuery(hql, DichVu.class);
+
+            // --- BƯỚC 3: TRUYỀN CẢ HAI THAM SỐ VÀO QUERY ---
+            query.setParameter("keywordString", "%" + keyword + "%"); // Luôn tìm theo tên
+            query.setParameter("keywordId", keywordAsId); // Tìm theo ID nếu từ khóa là số
+
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
 }

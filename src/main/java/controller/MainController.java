@@ -51,7 +51,7 @@ public class MainController extends HttpServlet {
 
         // 2. Nhóm các action cho từng controller
         String[] EMRCoreActions = {"printEncounter","completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
-        String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication"};
+        String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication","listAndSearchServices","updateService","showUpdateServiceForm","deleteService"};
         String[] userActions = {"login", "logout", "listUsers", "showUserCreateForm", "createUser", "showEditForm", "updateUserStatus"};
         String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa", "showKhoaEditForm", "updateKhoa", "deleteKhoa"};
         String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien", "showNhanVienEditForm", "updateNhanVien", "deleteNhanVien"};

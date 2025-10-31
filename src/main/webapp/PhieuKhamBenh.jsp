@@ -16,6 +16,8 @@
 
         <link rel="stylesheet" href="<c:url value='/css/pkb-style.css'/>">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     </head>
     <body>
         <div class="container">
@@ -25,7 +27,7 @@
             </c:choose>
             <c:if test="${not empty requestScope.ERROR_MESSAGE}"><div class="alert alert-danger"><strong>Lỗi!</strong> ${requestScope.ERROR_MESSAGE}</div></c:if>
 
-            <form action="<c:url value='/MainController'/>" method="POST">
+                <form action="<c:url value='/MainController'/>" method="POST">
                 <c:choose>
                     <c:when test="${empty phieuKham.id}"><input type="hidden" name="action" value="createEncounter"></c:when>
                     <c:otherwise>
@@ -37,9 +39,8 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="maPhieuKham">Mã Phiếu Khám</label>
-                        <%-- Cải thiện: Dùng c:if để code dễ đọc hơn so với toán tử 3 ngôi --%>
-                        <input type="text" id="maPhieuKham" name="maPhieuKham" class="form-control" value="${phieuKham.maPhieuKham}" 
-                               <c:if test="${not empty phieuKham.id}">readonly</c:if> required>
+                        <input type="text" id="maPhieuKham" name="maPhieuKham" class="form-control" 
+                               value="Tự động tạo" readonly>
                     </div>
 
                     <%-- BƯỚC 2: Chuẩn bị dữ liệu cho ô Thời Gian Khám --%>
@@ -120,7 +121,11 @@
                     </div>
 
                     <div class="button-group">
-                        <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="btn btn-secondary">Hủy</a>
+                        <c:choose>
+                            <c:when test="${empty phieuKham.id}"><a href="<c:url value='/MainController?action=listAllEncounters'/>" class="btn btn-secondary">Hủy</a></c:when>
+                            <c:otherwise><a href="<c:url value='MainController?action=viewEncounterDetails&id=${phieuKham.id}'/>" class="btn btn-secondary">Quay Lại</a></c:otherwise>
+                        </c:choose>
+
                         <c:choose>
                             <c:when test="${empty phieuKham.id}"><button type="submit" class="btn btn-primary">Tạo Mới</button></c:when>
                             <c:otherwise><button type="submit" class="btn btn-primary">Cập Nhật</button></c:otherwise>

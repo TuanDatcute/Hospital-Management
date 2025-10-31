@@ -4,100 +4,112 @@
 
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Danh Sách Thuốc</title>
-    
-    <%-- ✨ Link đến file CSS ngoài để dễ quản lý --%>
-    <link rel="stylesheet" href="<c:url value='/css/danhSach-style.css'/>">
-    
-    <%-- (Tùy chọn) Thêm font từ Google Fonts cho đẹp hơn --%>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quản lý Danh Sách Thuốc</title>
+        <link rel="stylesheet" href="<c:url value='/css/danhSachThuoc-style.css'/>">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <script src="js/darkmode.js"></script>
 
-    <div class="container">
-        <h1>Quản lý Thuốc</h1>
+    </head>
+    <body>
 
-        <%-- Hiển thị thông báo (nếu có) --%>
-        <c:if test="${not empty sessionScope.ERROR_MESSAGE}">
-            <div class="alert alert-danger">${sessionScope.ERROR_MESSAGE}</div>
-            <c:remove var="ERROR_MESSAGE" scope="session" />
-        </c:if>
-        <c:if test="${not empty sessionScope.SUCCESS_MESSAGE}">
-            <div class="alert alert-success">${sessionScope.SUCCESS_MESSAGE}</div>
-            <c:remove var="SUCCESS_MESSAGE" scope="session" />
-        </c:if>
-        
-        <%-- Khu vực điều khiển (Tìm kiếm và Thêm mới) --%>
-        <div class="header-controls">
-            <form action="<c:url value='/MainController'/>" method="GET" class="search-form">
-                <input type="hidden" name="action" value="listMedications">
-                <input type="text" name="keyword" class="form-control" placeholder="Nhập tên thuốc cần tìm..." value="${requestScope.searchKeyword}">
-                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-                <c:if test="${not empty requestScope.searchKeyword}">
-                     <a href="<c:url value='/MainController?action=listMedications'/>" class="btn btn-secondary">Xem tất cả</a>
-                </c:if>
-            </form>
-            <a href="<c:url value='/MainController?action=showMedicationForm'/>" class="btn btn-success">Thêm Thuốc Mới</a>
-        </div>
+        <div class="main-container">
+            <h1>Quản lý Thuốc</h1>
 
-        <%-- Bảng hiển thị danh sách thuốc --%>
-        <div class="table-responsive">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Tên Thuốc</th>
-                        <th>Hoạt Chất</th>
-                        <th>ĐVT</th>
-                        <th class="text-right">Đơn Giá</th>
-                        <th class="text-right">Tồn Kho</th>
-                        <th class="text-center">Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:choose>
-                        <c:when test="${not empty danhSachThuoc}">
-                            <c:forEach var="thuoc" items="${danhSachThuoc}">
+            <c:if test="${not empty sessionScope.ERROR_MESSAGE}">
+                <div class="alert alert-danger">${sessionScope.ERROR_MESSAGE}</div>
+                <c:remove var="ERROR_MESSAGE" scope="session" />
+            </c:if>
+            <c:if test="${not empty sessionScope.SUCCESS_MESSAGE}">
+                <div class="alert alert-success">${sessionScope.SUCCESS_MESSAGE}</div>
+                <c:remove var="SUCCESS_MESSAGE" scope="session" />
+            </c:if>
+
+            <div class="header-controls">
+                <form action="<c:url value='/MainController'/>" method="GET" class="search-form">
+                    <input type="hidden" name="action" value="listMedications">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" name="keyword" class="form-control" placeholder="Nhập tên thuốc cần tìm..." value="${requestScope.searchKeyword}">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Tìm kiếm</button>
+                    <c:if test="${not empty requestScope.searchKeyword}">
+                        <a href="<c:url value='/MainController?action=listMedications'/>" class="btn btn-secondary">Xem tất cả</a>
+                    </c:if>
+                </form>
+                <a href="<c:url value='/MainController?action=showMedicationForm'/>" class="btn btn-success"><i class="fas fa-plus"></i> Thêm Thuốc Mới</a>
+
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="theme-toggle">
+                        <input type="checkbox" id="theme-toggle" />
+                        <div class="slider round">
+
+                            <span class="sun-icon"><i class="fas fa-sun"></i></span>
+                            <span class="moon-icon"><i class="fas fa-moon"></i></span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên Thuốc</th>
+                            <th>Hoạt Chất</th>
+                            <th>ĐVT</th>
+                            <th class="text-right">Đơn Giá</th>
+                            <th class="text-right">Tồn Kho</th>
+                            <th class="text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:choose>
+                            <c:when test="${not empty danhSachThuoc}">
+                                <c:forEach var="thuoc" items="${danhSachThuoc}">
+                                    <tr>
+                                        <td>${thuoc.id}</td>
+                                        <td><strong>${thuoc.tenThuoc}</strong></td>
+                                        <td>${thuoc.hoatChat}</td>
+                                        <td>${thuoc.donViTinh}</td>
+                                        <td class="text-right"><fmt:formatNumber value="${thuoc.donGia}" type="currency" currencySymbol="đ" maxFractionDigits="0"/></td>
+                                        <td class="text-right">${thuoc.soLuongTonKho}</td>
+                                        <td class="actions text-center">
+                                            <a href="<c:url value='/MainController?action=showUpdateForm&id=${thuoc.id}'/>" class="btn btn-edit">
+                                                <i class="fas fa-pencil-alt"></i> Sửa
+                                            </a>
+                                            <form action="<c:url value='/MainController'/>" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa thuốc này?');">
+                                                <input type="hidden" name="action" value="deleteMedication">
+                                                <input type="hidden" name="id" value="${thuoc.id}">
+                                                <button type="submit" class="btn btn-delete">
+                                                    <i class="fas fa-trash"></i> Xóa
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
                                 <tr>
-                                    <td>${thuoc.id}</td>
-                                    <td><strong>${thuoc.tenThuoc}</strong></td>
-                                    <td>${thuoc.hoatChat}</td>
-                                    <td>${thuoc.donViTinh}</td>
-                                    <td class="text-right"><fmt:formatNumber value="${thuoc.donGia}" type="currency" currencySymbol="đ" maxFractionDigits="0"/></td>
-                                    <td class="text-right">${thuoc.soLuongTonKho}</td>
-                                    <td class="actions text-center">
-                                        <a href="<c:url value='/MainController?action=showUpdateForm&id=${thuoc.id}'/>" class="btn btn-edit">Sửa</a>
-                                        <%-- Form xóa  --%>
-                                        <form action="<c:url value='/MainController'/>" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa thuốc này?');">
-                                            <input type="hidden" name="action" value="deleteMedication">
-                                            <input type="hidden" name="id" value="${thuoc.id}">
-                                            <button type="submit" class="btn btn-delete">Xóa</button>
-                                        </form>
+                                    <td colspan="7" class="no-results">
+                                        <c:choose>
+                                            <c:when test="${not empty requestScope.searchKeyword}">
+                                                Không tìm thấy thuốc nào khớp với từ khóa "${requestScope.searchKeyword}".
+                                            </c:when>
+                                            <c:otherwise>
+                                                Chưa có dữ liệu thuốc nào trong hệ thống.
+                                            </c:otherwise>
+                                        </c:choose>
                                     </td>
                                 </tr>
-                            </c:forEach>
-                        </c:when>
-                        <c:otherwise>
-                            <tr>
-                                <td colspan="7" class="no-results">
-                                    <c:choose>
-                                        <c:when test="${not empty requestScope.searchKeyword}">
-                                            Không tìm thấy thuốc nào khớp với từ khóa "${requestScope.searchKeyword}".
-                                        </c:when>
-                                        <c:otherwise>
-                                            Chưa có dữ liệu thuốc nào trong hệ thống.
-                                        </c:otherwise>
-                                    </c:choose>
-                                </td>
-                            </tr>
-                        </c:otherwise>
-                    </c:choose>
-                </tbody>
-            </table>
+                            </c:otherwise>
+                        </c:choose>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-</body>
+
+    </body>
 </html>

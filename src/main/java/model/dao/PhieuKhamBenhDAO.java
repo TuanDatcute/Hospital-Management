@@ -4,6 +4,7 @@
  */
 package model.dao;
 
+import java.time.LocalDateTime;
 import model.Entity.PhieuKhamBenh;
 import java.util.Collections;
 import java.util.List;
@@ -149,8 +150,6 @@ public class PhieuKhamBenhDAO {
             return null;
         }
     }
-    
-    
 
     /**
      * PHƯƠNG THỨC GỌN NHẸ: Chỉ lấy thông tin cần thiết để hiển thị danh sách.
@@ -251,6 +250,29 @@ public class PhieuKhamBenhDAO {
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Đếm số lượng phiếu khám đã được tạo trong một khoảng thời gian. Thường
+     * dùng để đếm số phiếu trong ngày.
+     *
+     * @param start Thời điểm bắt đầu (ví dụ: 00:00:00 hôm nay).
+     * @param end Thời điểm kết thúc (ví dụ: 00:00:00 ngày mai).
+     * @return Số lượng phiếu khám.
+     */
+    public long countByDateRange(LocalDateTime start, LocalDateTime end) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<Long> query = session.createQuery(
+                    "SELECT count(p.id) FROM PhieuKhamBenh p WHERE p.thoiGianKham >= :start AND p.thoiGianKham < :end",
+                    Long.class
+            );
+            query.setParameter("start", start);
+            query.setParameter("end", end);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L; // Trả về 0 nếu có lỗi
         }
     }
 
