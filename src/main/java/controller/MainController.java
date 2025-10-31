@@ -46,7 +46,7 @@ public class MainController extends HttpServlet {
             "showUserCreateForm", "createUser",
             "showUserEditForm", "updateUserStatus",
             "showChangePasswordForm", "changePassword",
-            "showUserRegister", "register"};
+             "register"};
 
         String[] EMRCoreActions = {"showCreateForm", "createEncounter",
             "updateEncounterDetails", "getEncounterDetails",

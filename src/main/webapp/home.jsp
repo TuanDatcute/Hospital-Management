@@ -1,5 +1,5 @@
 <%--
-    Document   : home.jsp (Trang chủ Bệnh nhân / User chung)
+    Document   : home.jsp (Trang chủ Bệnh nhân)
     Created on : Oct 29, 2025
     Author     : ADMIN
 --%>
@@ -11,7 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Trang chủ - Quản lý Bệnh viện</title>
+        <title>Trang chủ Bệnh nhân</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
     </head>
@@ -35,21 +35,7 @@
 
             <div class="function-grid">
 
-                <%-- Chức năng Bác sĩ / Lễ tân --%>
-                <c:if test="${sessionScope.ROLE == 'BAC_SI' || sessionScope.ROLE == 'LE_TAN'}">
-                    <a href="MainController?action=listLichHen" class="function-card">
-                        <div class="icon"><i class="fas fa-calendar-check"></i></div>
-                        <span>Quản lý Lịch hẹn</span>
-                    </a>
-                    <a href="MainController?action=showCreateForm" class="function-card">
-                        <div class="icon"><i class="fas fa-file-medical"></i></div>
-                        <span>Tạo Phiếu khám</span>
-                    </a>
-                    <a href="MainController?action=listBenhNhan" class="function-card">
-                        <div class="icon"><i class="fas fa-user-injured"></i></div>
-                        <span>Danh sách Bệnh nhân</span>
-                    </a>
-                </c:if>
+                <%-- **KHỐI ADMIN VÀ BS/LT ĐÃ BỊ XÓA** --%>
 
                 <%-- Chức năng Bệnh nhân --%>
                 <c:if test="${sessionScope.ROLE == 'BENH_NHAN'}">
@@ -63,7 +49,7 @@
                     </a>
                 </c:if>
 
-                <%-- Chức năng chung --%>
+                <%-- Chức năng chung (Vẫn giữ cho Bệnh nhân) --%>
                 <a href="MainController?action=showChangePasswordForm" class="function-card">
                     <div class="icon"><i class="fas fa-key"></i></div>
                     <span>Đổi mật khẩu</span>

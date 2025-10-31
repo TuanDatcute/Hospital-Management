@@ -31,5 +31,4 @@ dist/
 target/
 
 # Bỏ qua file cấu hình bí mật
-config.properties
 hibernate.properties

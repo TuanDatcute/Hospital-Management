@@ -33,6 +33,9 @@ public class TaiKhoan {
 
     @Column(name = "trang_thai", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String trangThai;
+    
+    @Column(name = "trang_thai_mat_khau", nullable = false, columnDefinition = "NVARCHAR(MAX)")
+    private String trangThaiMatKhau;
 
     @CreationTimestamp //  TỰ ĐỘNG GÁN KHI TẠO MỚI
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -109,5 +112,13 @@ public class TaiKhoan {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    
+    public String getTrangThaiMatKhau() {
+        return trangThaiMatKhau;
+    }
+
+    public void setTrangThaiMatKhau(String trangThaiMatKhau) {
+        this.trangThaiMatKhau = trangThaiMatKhau;
     }
 }

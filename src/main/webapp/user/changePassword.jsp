@@ -1,5 +1,5 @@
 <%--
-    Document   : changePassword.jsp
+    Document   : changePassword.jsp (Đã sửa lỗi hiển thị)
     Created on : Oct 29, 2025
     Author     : ADMIN
 --%>
@@ -19,39 +19,51 @@
     </head>
     <body class="login-page-body"> <%-- Tái sử dụng class nền và căn giữa --%>
 
-        <div class="login-container" style="width: 500px;"> <%-- Tăng độ rộng 1 chút --%>
+        <%-- **THÊM CLASS 'single-form' VÀ SỬA STYLE WIDTH** --%>
+        <div class.login-container single-form" style="width: 480px;">
 
-            <%-- *** BẮT ĐẦU SỬA LỖI NÚT HOME *** --%>
-            <%-- Nút Home giờ sẽ kiểm tra vai trò (ROLE) --%>
+            <%-- Nút Home (Đã sửa logic 3 hướng) --%>
             <c:choose>
-                <%-- 1. Nếu là Admin, link về Dashboard --%>
                 <c:when test="${sessionScope.ROLE == 'QUAN_TRI'}">
                     <a href="${pageContext.request.contextPath}/admin/dashboard.jsp" class="home-link" title="Quay về Bảng điều khiển">
                         <i class="fas fa-home"></i>
                     </a>
                 </c:when>
-                <%-- 2. Nếu là vai trò khác (đã đăng nhập), link về home.jsp --%>
-                <c:when test="${not empty sessionScope.USER}">
+                <c:when test="${sessionScope.ROLE == 'BAC_SI' || sessionScope.ROLE == 'LE_TAN'}">
+                    <a href="${pageContext.request.contextPath}/staff/dashboard.jsp" class="home-link" title="Quay về Bảng điều khiển">
+                        <i class="fas fa-home"></i>
+                    </a>
+                </c:when>
+                <c:when test="${sessionScope.ROLE == 'BENH_NHAN'}">
                     <a href="${pageContext.request.contextPath}/home.jsp" class="home-link" title="Quay về Trang chủ">
                         <i class="fas fa-home"></i>
                     </a>
                 </c:when>
-                <%-- 3. Mặc định (chưa đăng nhập), link về index.jsp --%>
                 <c:otherwise>
                     <a href="${pageContext.request.contextPath}/index.jsp" class="home-link" title="Quay về Trang giới thiệu">
                         <i class="fas fa-home"></i>
                     </a>
                 </c:otherwise>
             </c:choose>
-            <%-- *** KẾT THÚC SỬA LỖI NÚT HOME *** --%>
 
-            <h2 class="section-title" style="margin-bottom: 25px;">Đổi mật khẩu</h2>
+            <%-- **SỬA LẠI: Dùng <h1> thay vì <h2>.section-title** --%>
+            <h1>Đổi mật khẩu</h1>
 
+            <%-- Hiển thị thông báo (Đã sửa logic) --%>
+            <c:if test="${not empty sessionScope.FORCE_CHANGE_PASS_MSG}">
+                <p class="error-message"> ${sessionScope.FORCE_CHANGE_PASS_MSG} </p>
+                <c:remove var="FORCE_CHANGE_PASS_MSG" scope="session" /> 
+            </c:if>
             <c:if test="${not empty requestScope.ERROR_MESSAGE}">
                 <p class="error-message">${requestScope.ERROR_MESSAGE}</p>
             </c:if>
+            <c:if test="${not empty sessionScope.SUCCESS_MESSAGE}">
+                <p class="success-message"> ${sessionScope.SUCCESS_MESSAGE} </p>
+                <c:remove var="SUCCESS_MESSAGE" scope="session" /> 
+            </c:if>
 
-            <form action="MainController" method="post" class="data-form" style="margin-top: 0; box-shadow: none; border: none; padding: 0;">
+            <%-- **SỬA LẠI: Dùng .data-form với style đã reset** --%>
+            <form action="MainController" method="post" class="data-form">
 
                 <input type="hidden" name="action" value="changePassword" />
 
@@ -72,13 +84,16 @@
 
                 <div class="form-actions">
                     <button type="submit" class="btn-submit">
-                        <i class="fas fa-save"></i> Cập nhật Mật khẩu
+                        <i class="fas fa-save"></i> Cập nhật
                     </button>
 
-                    <%-- Nút Hủy (Đã có logic đúng) --%>
+                    <%-- Nút Hủy (Đã sửa logic 3 hướng) --%>
                     <c:choose>
                         <c:when test="${sessionScope.ROLE == 'QUAN_TRI'}">
-                            <a href="${pageContext.request.contextPath}/admin/dashboard.jsp" class="btn-cancel">Hủy</a>
+<!--                            <a href="${pageContext.request.contextPath}/admin/dashboard.jsp" class="btn-cancel">Hủy</a>-->
+                        </c:when>
+                        <c:when test="${sessionScope.ROLE == 'BAC_SI' || sessionScope.ROLE == 'LE_TAN'}">
+<!--                            <a href="${pageContext.request.contextPath}/staff/dashboard.jsp" class="btn-cancel">Hủy</a>-->
                         </c:when>
                         <c:otherwise>
                             <a href="${pageContext.request.contextPath}/home.jsp" class="btn-cancel">Hủy</a>
@@ -87,7 +102,7 @@
                 </div>
             </form>
 
-        </div> <%-- Kết thúc .login-container --%>
+        </div>
 
     </body>
 </html>

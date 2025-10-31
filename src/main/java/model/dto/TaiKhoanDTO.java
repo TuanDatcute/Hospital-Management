@@ -17,18 +17,20 @@ public class TaiKhoanDTO implements Serializable { // <<< ĐÃ THÊM SERIALIZABL
     private String email;
     private String vaiTro;
     private String trangThai;
+    private String trangThaiMatKhau;
     private LocalDateTime createdAt;
 
     // Constructors
     public TaiKhoanDTO() {
     }
 
-    public TaiKhoanDTO(int id, String tenDangNhap, String email, String vaiTro, String trangThai, LocalDateTime createdAt) {
+    public TaiKhoanDTO(int id, String tenDangNhap, String email, String vaiTro, String trangThai, String trangThaiMatKhau, LocalDateTime createdAt) {
         this.id = id;
         this.tenDangNhap = tenDangNhap;
         this.email = email;
         this.vaiTro = vaiTro;
         this.trangThai = trangThai;
+        this.trangThaiMatKhau = trangThaiMatKhau;
         this.createdAt = createdAt;
     }
 
@@ -79,5 +81,13 @@ public class TaiKhoanDTO implements Serializable { // <<< ĐÃ THÊM SERIALIZABL
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    
+    public String getTrangThaiMatKhau() {
+        return trangThaiMatKhau;
+    }
+
+    public void setTrangThaiMatKhau(String trangThaiMatKhau) {
+        this.trangThaiMatKhau = trangThaiMatKhau;
     }
 }

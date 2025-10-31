@@ -12,6 +12,7 @@ public class BenhNhanDTO {
     private String diaChi;
     private String soDienThoai;
     private String nhomMau;
+    private String cccd;
     private String tienSuBenh;
     
     private Integer taiKhoanId;
@@ -20,7 +21,7 @@ public class BenhNhanDTO {
     public BenhNhanDTO() {
     }
 
-    public BenhNhanDTO(int id, String maBenhNhan, String hoTen, LocalDateTime ngaySinh, String gioiTinh, String diaChi, String soDienThoai, String nhomMau, String tienSuBenh, Integer taiKhoanId) { // <-- ĐÃ THAY ĐỔI
+    public BenhNhanDTO(int id, String maBenhNhan, String hoTen, LocalDateTime ngaySinh, String gioiTinh, String diaChi, String soDienThoai, String nhomMau, String cccd, String tienSuBenh, Integer taiKhoanId) {
         this.id = id;
         this.maBenhNhan = maBenhNhan;
         this.hoTen = hoTen;
@@ -29,11 +30,11 @@ public class BenhNhanDTO {
         this.diaChi = diaChi;
         this.soDienThoai = soDienThoai;
         this.nhomMau = nhomMau;
+        this.cccd = cccd;
         this.tienSuBenh = tienSuBenh;
         this.taiKhoanId = taiKhoanId;
     }
-    
-    // Getters and Setters
+
     public int getId() {
         return id;
     }
@@ -58,11 +59,11 @@ public class BenhNhanDTO {
         this.hoTen = hoTen;
     }
 
-    public LocalDateTime getNgaySinh() { 
+    public LocalDateTime getNgaySinh() {
         return ngaySinh;
     }
 
-    public void setNgaySinh(LocalDateTime ngaySinh) { 
+    public void setNgaySinh(LocalDateTime ngaySinh) {
         this.ngaySinh = ngaySinh;
     }
 
@@ -98,6 +99,14 @@ public class BenhNhanDTO {
         this.nhomMau = nhomMau;
     }
 
+    public String getCccd() {
+        return cccd;
+    }
+
+    public void setCccd(String cccd) {
+        this.cccd = cccd;
+    }
+
     public String getTienSuBenh() {
         return tienSuBenh;
     }
@@ -113,4 +122,6 @@ public class BenhNhanDTO {
     public void setTaiKhoanId(Integer taiKhoanId) {
         this.taiKhoanId = taiKhoanId;
     }
+
+   
 }
