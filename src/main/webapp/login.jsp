@@ -28,6 +28,11 @@
         <c:if test="${requestScope.formAction == 'register'}">
             <c:set var="containerClass" value="active" />
         </c:if>
+        
+        <%-- Hiển thị thông báo lỗi đăng nhập --%>
+        <c:if test="${not empty ERROR_MESSAGE}">
+            <div class="error-message">${ERROR_MESSAGE}</div>
+        </c:if>
 
         <div class="login-container ${containerClass}" id="container">
 
