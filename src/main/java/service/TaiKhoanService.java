@@ -1,175 +1,175 @@
 package service;
 
-import model.Entity.TaiKhoan;
+import exception.ValidationException; // Giữ nguyên import của bạn
+import model.Entity.TaiKhoan; 
 import model.dao.TaiKhoanDAO;
 import model.dto.TaiKhoanDTO;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
-// TODO: Import thư viện mã hóa mật khẩu của bạn ở đây
-// import util.PasswordHasher;
+import util.PasswordHasher;
 
 /**
  * Lớp Service chứa logic nghiệp vụ cho TaiKhoan.
- * @author ADMIN
  */
 public class TaiKhoanService {
 
-    // Khởi tạo DAO để Service có thể sử dụng
     private final TaiKhoanDAO taiKhoanDAO = new TaiKhoanDAO();
 
     /**
-     * Dịch vụ kiểm tra đăng nhập.
-     * @param tenDangNhap Tên đăng nhập
-     * @param matKhau Mật khẩu (chưa mã hóa)
-     * @return TaiKhoanDTO nếu thành công
-     * @throws Exception nếu sai tên, sai mật khẩu, hoặc tài khoản bị khóa
+     * Hàm login đã đúng, ném ValidationException
      */
-    public TaiKhoanDTO login(String tenDangNhap, String matKhau) throws Exception {
+    public TaiKhoanDTO login(String tenDangNhap, String matKhau) throws ValidationException {
         TaiKhoan entity = taiKhoanDAO.findByTenDangNhap(tenDangNhap);
-
         if (entity == null) {
-            throw new Exception("Tên đăng nhập không tồn tại.");
+            throw new ValidationException("Tài khoản hoặc mật khẩu không đúng");
         }
-
-        // ⚠️ TODO: BẮT BUỘC thay thế bằng hàm so sánh mật khẩu đã mã hóa
-        // boolean passwordMatches = PasswordHasher.check(matKhau, entity.getMatKhau());
-        boolean passwordMatches = entity.getMatKhau().equals(matKhau); // Tạm thời (KHÔNG AN TOÀN)
-
-        if (!passwordMatches) {
-            throw new Exception("Mật khẩu không chính xác.");
+        if (!PasswordHasher.checkPassword(matKhau, entity.getMatKhau())) {
+            throw new ValidationException("Tài khoản hoặc mật khẩu không đúng");
         }
-
         if ("BI_KHOA".equals(entity.getTrangThai())) {
-            throw new Exception("Tài khoản này đã bị khóa.");
+            throw new ValidationException("Tài khoản này đã bị khóa.");
         }
-
         return toDTO(entity);
     }
 
     /**
      * Dịch vụ tạo tài khoản mới.
-     * @param dto Thông tin tài khoản (trừ mật khẩu)
-     * @param matKhau Mật khẩu (dạng thô, chưa mã hóa)
-     * @return TaiKhoanDTO của tài khoản mới
-     * @throws Exception nếu validation thất bại (trùng tên, trùng email...)
+     * Đã cập nhật để ném ValidationException và set trangThaiMatKhau
      */
-    public TaiKhoanDTO createTaiKhoan(TaiKhoanDTO dto, String matKhau) throws Exception {
-
-        // --- VALIDATION ---
+    public TaiKhoanDTO createTaiKhoan(TaiKhoanDTO dto, String matKhau) throws ValidationException, Exception {
+        // --- BƯỚC 1: VALIDATION (Ném ValidationException) ---
         if (dto.getTenDangNhap() == null || dto.getTenDangNhap().trim().isEmpty()) {
-            throw new Exception("Tên đăng nhập không được để trống.");
+            throw new ValidationException("Tên đăng nhập không được để trống.");
         }
         if (dto.getEmail() == null || dto.getEmail().trim().isEmpty()) {
-            throw new Exception("Email không được để trống.");
+            throw new ValidationException("Email không được để trống.");
         }
         if (matKhau == null || matKhau.length() < 6) {
-            throw new Exception("Mật khẩu phải có ít nhất 6 ký tự.");
+            throw new ValidationException("Mật khẩu phải có ít nhất 6 ký tự.");
         }
         if (taiKhoanDAO.isTenDangNhapExisted(dto.getTenDangNhap())) {
-            throw new Exception("Tên đăng nhập '" + dto.getTenDangNhap() + "' đã tồn tại.");
+            throw new ValidationException("Tên đăng nhập '" + dto.getTenDangNhap() + "' đã tồn tại.");
         }
         if (taiKhoanDAO.isEmailExisted(dto.getEmail())) {
-            throw new Exception("Email '" + dto.getEmail() + "' đã tồn tại.");
+            throw new ValidationException("Email '" + dto.getEmail() + "' đã tồn tại.");
         }
 
-        // --- MÃ HÓA MẬT KHẨU ---
-        // ⚠️ TODO: BẮT BUỘC mã hóa mật khẩu
-        // String hashedMatKhau = PasswordHasher.hash(matKhau);
-        String hashedMatKhau = matKhau; // Tạm thời (KHÔNG AN TOÀN)
-
-        // --- MAP DTO -> ENTITY ---
+        // --- BƯỚC 2: CHUYỂN ĐỔI VÀ THÊM LOGIC MỚI ---
+        String hashedMatKhau = PasswordHasher.hashPassword(matKhau);
         TaiKhoan entity = toEntity(dto, hashedMatKhau);
         entity.setCreatedAt(LocalDateTime.now());
         entity.setUpdatedAt(LocalDateTime.now());
         if (dto.getTrangThai() == null || dto.getTrangThai().isEmpty()) {
-            entity.setTrangThai("HOAT_DONG"); // Mặc định
+            entity.setTrangThai("HOAT_DONG");
         }
 
-        // --- GỌI DAO ---
+        // --- **LOGIC MỚI: ÉP ĐỔI MẬT KHẨU** ---
+        String vaiTro = dto.getVaiTro();
+        if ("BENH_NHAN".equals(vaiTro)) {
+            // Bệnh nhân tự đăng ký -> Mật khẩu đã an toàn
+            entity.setTrangThaiMatKhau("DA_DOI"); 
+        } else {
+            // Admin, Bác sĩ, Lễ tân (do Admin tạo) -> Bị ép đổi
+            entity.setTrangThaiMatKhau("CAN_DOI");
+        }
+        // --- **KẾT THÚC LOGIC MỚI** ---
+
         TaiKhoan savedEntity = taiKhoanDAO.create(entity);
-
-        // --- TRẢ VỀ DTO ---
-        if (savedEntity != null) {
-            return toDTO(savedEntity);
-        }
-        return null;
+        return (savedEntity != null) ? toDTO(savedEntity) : null;
     }
 
     /**
-     * Lấy tài khoản bằng ID.
+     * Dịch vụ thay đổi mật khẩu.
+     * Đã cập nhật để ném ValidationException và set trangThaiMatKhau
      */
-    public TaiKhoanDTO getTaiKhoanById(int id) throws Exception {
+    public void changePassword(int id, String oldPassword, String newPassword) throws ValidationException, Exception {
         TaiKhoan entity = taiKhoanDAO.getById(id);
         if (entity == null) {
+            // Đây là lỗi hệ thống, không phải lỗi validation
             throw new Exception("Không tìm thấy tài khoản với ID: " + id);
+        }
+        if (!"HOAT_DONG".equals(entity.getTrangThai())) {
+            throw new ValidationException("Không thể đổi mật khẩu cho tài khoản đang bị khóa.");
+        }
+        if (!PasswordHasher.checkPassword(oldPassword, entity.getMatKhau())) {
+            throw new ValidationException("Mật khẩu cũ không chính xác.");
+        }
+        if (newPassword == null || newPassword.length() < 6) {
+            throw new ValidationException("Mật khẩu mới phải có ít nhất 6 ký tự.");
+        }
+        if (PasswordHasher.checkPassword(newPassword, entity.getMatKhau())) {
+            throw new ValidationException("Mật khẩu mới không được trùng với mật khẩu cũ.");
+        }
+        
+        String hashedNewPassword = PasswordHasher.hashPassword(newPassword);
+        entity.setMatKhau(hashedNewPassword);
+        entity.setUpdatedAt(LocalDateTime.now());
+
+        // --- **LOGIC MỚI: CẬP NHẬT TRẠNG THÁI MẬT KHẨU** ---
+        entity.setTrangThaiMatKhau("DA_DOI"); // Đánh dấu là đã đổi
+        
+        if (!taiKhoanDAO.update(entity)) {
+            throw new Exception("Cập nhật mật khẩu thất bại.");
+        }
+    }
+
+    public TaiKhoanDTO getTaiKhoanById(int id) throws ValidationException, Exception {
+        TaiKhoan entity = taiKhoanDAO.getById(id);
+        if (entity == null) {
+            throw new ValidationException("Không tìm thấy tài khoản với ID: " + id);
         }
         return toDTO(entity);
     }
 
-    /**
-     * Lấy tất cả tài khoản.
-     */
     public List<TaiKhoanDTO> getAllTaiKhoan() {
         List<TaiKhoan> entities = taiKhoanDAO.getAll();
         return entities.stream()
-                .map(this::toDTO)
+                .map(this::toDTO) // Sử dụng Method Reference (Java 8)
                 .collect(Collectors.toList());
     }
 
-    // --- CÁC HÀM CẬP NHẬT TRẠNG THÁI ---
-
-    /**
-     * Dịch vụ cập nhật trạng thái của một Tài khoản (Khóa hoặc Mở khóa).
-     * @param id ID của tài khoản cần cập nhật.
-     * @param newTrangThai Trạng thái mới ("HOAT_DONG" hoặc "BI_KHOA").
-     * @return TaiKhoanDTO đã được cập nhật.
-     * @throws Exception nếu ID không tồn tại, trạng thái không hợp lệ, hoặc lỗi cập nhật.
-     */
-    public TaiKhoanDTO updateTrangThaiTaiKhoan(int id, String newTrangThai) throws Exception {
+    public TaiKhoanDTO updateTrangThaiTaiKhoan(int id, String newTrangThai) throws ValidationException, Exception {
         if (!"HOAT_DONG".equals(newTrangThai) && !"BI_KHOA".equals(newTrangThai)) {
-            throw new Exception("Trạng thái mới không hợp lệ. Chỉ chấp nhận 'HOAT_DONG' hoặc 'BI_KHOA'.");
+            throw new ValidationException("Trạng thái mới không hợp lệ.");
         }
-
         TaiKhoan entity = taiKhoanDAO.getById(id);
         if (entity == null) {
-            throw new Exception("Không tìm thấy tài khoản với ID: " + id);
+            throw new ValidationException("Không tìm thấy tài khoản với ID: " + id);
         }
-
         if (!entity.getTrangThai().equals(newTrangThai)) {
             entity.setTrangThai(newTrangThai);
             entity.setUpdatedAt(LocalDateTime.now());
-
-            boolean success = taiKhoanDAO.update(entity);
-            if (!success) {
+            if (!taiKhoanDAO.update(entity)) {
                 throw new Exception("Cập nhật trạng thái tài khoản thất bại.");
             }
         }
         return toDTO(entity);
     }
 
-    /**
-     * Hàm tiện ích: Khóa tài khoản. Chính là Soft Delete.
-     */
     public TaiKhoanDTO khoaTaiKhoan(int id) throws Exception {
         return updateTrangThaiTaiKhoan(id, "BI_KHOA");
     }
 
-    /**
-     * Hàm tiện ích: Mở khóa tài khoản.
-     */
     public TaiKhoanDTO moKhoaTaiKhoan(int id) throws Exception {
         return updateTrangThaiTaiKhoan(id, "HOAT_DONG");
     }
 
-    // --- CÁC HÀM MAPPER (Chuyển đổi DTO <-> Entity) ---
+    public List<TaiKhoanDTO> getActiveAndUnassignedAccounts(String role) {
+        List<TaiKhoan> entities = taiKhoanDAO.findActiveAndUnassignedAccounts(role);
+        return entities.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
 
     /**
-     * Chuyển TaiKhoan (Entity) sang TaiKhoanDTO (Ẩn mật khẩu).
+     * Chuyển Entity sang DTO.
+     * Đã cập nhật để thêm trangThaiMatKhau
      */
     private TaiKhoanDTO toDTO(TaiKhoan entity) {
-        if (entity == null) return null; // Thêm kiểm tra null
+        if (entity == null) {
+            return null;
+        }
         TaiKhoanDTO dto = new TaiKhoanDTO();
         dto.setId(entity.getId());
         dto.setTenDangNhap(entity.getTenDangNhap());
@@ -177,12 +177,16 @@ public class TaiKhoanService {
         dto.setVaiTro(entity.getVaiTro());
         dto.setTrangThai(entity.getTrangThai());
         dto.setCreatedAt(entity.getCreatedAt());
+        
+        // --- **LOGIC MỚI: Thêm trường mới vào DTO** ---
+        dto.setTrangThaiMatKhau(entity.getTrangThaiMatKhau());
+        
         return dto;
     }
 
     /**
-     * Chuyển TaiKhoanDTO sang TaiKhoan (Entity) để lưu vào CSDL.
-     * Cần mật khẩu đã được xử lý (mã hóa).
+     * Chuyển DTO sang Entity.
+     * Đã cập nhật để thêm trangThaiMatKhau
      */
     private TaiKhoan toEntity(TaiKhoanDTO dto, String hashedMatKhau) {
         TaiKhoan entity = new TaiKhoan();
@@ -191,19 +195,12 @@ public class TaiKhoanService {
         entity.setVaiTro(dto.getVaiTro());
         entity.setTrangThai(dto.getTrangThai());
         entity.setMatKhau(hashedMatKhau);
-        // createdAt và updatedAt sẽ được set ở logic nghiệp vụ
+        
+        // --- **LOGIC MỚI: Thêm trường mới vào Entity** ---
+        // (Trường này sẽ được ghi đè trong hàm createTaiKhoan)
+        entity.setTrangThaiMatKhau(dto.getTrangThaiMatKhau()); 
+        
         return entity;
     }
     
-    /**
-     * Lấy danh sách các tài khoản đang hoạt động và chưa được gán.
-     * @param role (Tùy chọn) Lọc thêm theo vai trò (VD: "BENH_NHAN"). Bỏ trống để lấy tất cả.
-     * @return Danh sách TaiKhoanDTO phù hợp.
-     */
-    public List<TaiKhoanDTO> getActiveAndUnassignedAccounts(String role) {
-        List<TaiKhoan> entities = taiKhoanDAO.findActiveAndUnassignedAccounts(role);
-        return entities.stream()
-                       .map(this::toDTO) // Dùng lại hàm toDTO đã có
-                       .collect(Collectors.toList());
-    }
-} 
+}

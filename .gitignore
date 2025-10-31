@@ -30,5 +30,5 @@ build/
 dist/
 target/
 
-
+# Bỏ qua file cấu hình bí mật
 hibernate.properties
