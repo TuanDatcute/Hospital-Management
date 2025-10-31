@@ -31,17 +31,24 @@ public class ChiDinhDichVuDAO {
     }
 
     /**
-     * Lấy một chỉ định dịch vụ bằng ID của nó. Tương ứng với hàm findService
+     * Lấy một chỉ định dịch vụ bằng ID của nó. 
      * của bạn.
      */
     public ChiDinhDichVu getById(int id) {
-        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(ChiDinhDichVu.class, id);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        Query<ChiDinhDichVu> query = session.createQuery(
+            "SELECT cdd FROM ChiDinhDichVu cdd " +
+            "JOIN FETCH cdd.dichVu " + 
+            "WHERE cdd.id = :id", 
+            ChiDinhDichVu.class
+        );
+        query.setParameter("id", id);
+        return query.uniqueResult();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
     }
+}
 
     /**
      * Cập nhật một chỉ định dịch vụ đã có.
@@ -63,17 +70,16 @@ public class ChiDinhDichVuDAO {
     /**
      * Lấy tất cả các chỉ định dịch vụ thuộc về một phiếu khám.
      */
-    public List<ChiDinhDichVu> findByPhieuKhamId(int phieuKhamId) {
+    public List<ChiDinhDichVu> findByPhieuKhamId(int pkbId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<ChiDinhDichVu> query = session.createQuery(
-                    "FROM ChiDinhDichVu cddv WHERE cddv.phieuKham.id = :phieuKhamId",
+                    "FROM ChiDinhDichVu cdd "
+                    + "LEFT JOIN FETCH cdd.dichVu "
+                    + "WHERE cdd.phieuKham.id = :pkbId",
                     ChiDinhDichVu.class
             );
-            query.setParameter("phieuKhamId", phieuKhamId);
+            query.setParameter("pkbId", pkbId);
             return query.list();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Collections.emptyList(); // Trả về danh sách rỗng nếu có lỗi
         }
     }
 
@@ -102,8 +108,8 @@ public class ChiDinhDichVuDAO {
     }
 
     public List<ChiDinhDichVu> findByPhieuKhamId(int phieuKhamId, Session session) {
-        String hql = "FROM ChiDinhDichVu cddv WHERE cddv.phieuKham.id = :phieuKhamId";
-
+        String hql = "FROM ChiDinhDichVu cddv WHERE cddv.phieuKham.id = :phieuKhamId AND cddv.trangThai = 'HOAN_THANH'";
+        // Chỉ liệt kê DV đã hoàn thành
         Query<ChiDinhDichVu> query = session.createQuery(hql, ChiDinhDichVu.class);
         query.setParameter("phieuKhamId", phieuKhamId);
 

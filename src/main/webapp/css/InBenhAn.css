@@ -1,0 +1,340 @@
+/* ==========================================================================
+   BIẾN TOÀN CỤC & KIỂU DÁNG CHUNG (ĐỒNG BỘ VỚI CÁC TRANG KHÁC)
+   ========================================================================== */
+/* Trong file print-style.css */
+
+@page {
+    size: A4;
+    margin: 15mm;
+}
+
+@top-left { content: ""; }
+@top-center { content: ""; }
+@top-right { content: ""; }
+@bottom-left { content: ""; }
+@bottom-center { content: ""; }
+@bottom-right { content: ""; }
+
+/* 🎨 Chế độ SÁNG */
+:root {
+    --primary-color: #4a90e2;
+    --danger-color: #dc3545;
+    --bg-color: #f4f7f9;
+    --surface-color: #ffffff;
+    --border-color: #e9ecef;
+    --text-primary: #343a40;
+    --text-secondary: #6c757d;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+}
+
+/* 🎨 Chế độ TỐI "BẠC ĐEN" */
+body.dark-mode {
+    --primary-color: #77A5D9;
+    --danger-color: #e57373;
+    --bg-color: #121212;
+    --surface-color: #1E1E1E;
+    --border-color: #333333;
+    --text-primary: #E0E0E0;
+    --text-secondary: #888888;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* ==========================================================================
+   LAYOUT VÀ CÁC NÚT CHỨC NĂNG
+   ========================================================================== */
+.page-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: var(--surface-color);
+    box-shadow: var(--card-shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.action-buttons {
+    display: flex;
+    gap: 15px;
+}
+.btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease-in-out;
+}
+.btn:hover {
+    transform: translateY(-2px);
+}
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+.btn-secondary {
+    background-color: var(--text-secondary);
+    color: white;
+}
+
+.page-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+/* ==========================================================================
+   ĐỊNH DẠNG NỘI DUNG BỆNH ÁN
+   ========================================================================== */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.header h1 {
+    font-size: 2rem;
+    margin: 0 0 5px 0;
+    text-transform: uppercase;
+    color: var(--primary-color);
+}
+.header h2 {
+    font-size: 1.2rem;
+    margin: 0;
+    font-weight: normal;
+    color: var(--text-secondary);
+}
+
+.section {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: var(--card-shadow);
+}
+.section h3 {
+    font-size: 1.3rem;
+    margin: 0 0 20px 0;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.section h3 i {
+    color: var(--primary-color);
+}
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.info-item .label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.clinical-content {
+    margin-bottom: 15px;
+}
+.clinical-content h4 {
+    margin: 0 0 8px 0;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: underline;
+    color: var(--text-secondary);
+}
+.clinical-content p {
+    margin: 0;
+    line-height: 1.6;
+}
+.clinical-content .diagnosis {
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.vitals-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px 15px;
+    margin-left: 20px;
+}
+
+table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+table.data-table th, table.data-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+table.data-table thead th {
+    background-color: color-mix(in srgb, var(--surface-color) 90%, var(--bg-color));
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   FOOTER VÀ CHỮ KÝ
+   ========================================================================== */
+.footer {
+    margin-top: 50px;
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+}
+.signature {
+    width: 45%;
+}
+.signature .title {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+.signature .date, .signature .instruction {
+    color: var(--text-secondary);
+    margin-bottom: 60px;
+}
+.signature strong {
+    color: var(--text-primary);
+}
+
+.sig1{
+    margin-top: 80px
+}
+
+/* ==========================================================================
+   NÚT GẠT CHUYỂN CHẾ ĐỘ (ĐÃ SỬA LỖI)
+   ========================================================================== */
+.theme-switch-wrapper {
+    position: absolute;
+    top: 25px;
+    right: 30px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+}
+.theme-switch {
+    display: inline-block;
+    height: 30px;
+    position: relative;
+    width: 60px;
+}
+.theme-switch input {
+    display: none;
+}
+.slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 7px;
+}
+.slider:before {
+    background-color: #fff;
+    bottom: 4px;
+    content: "";
+    height: 22px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 22px;
+    border-radius: 50%;
+    z-index: 1; /* SỬA 1: Giảm z-index của nút tròn xuống 1 */
+}
+.sun-icon,
+.moon-icon {
+    font-size: 14px;
+    color: #f39c12;
+    transition: opacity 0.4s ease;
+    z-index: 2; /* SỬA 2: Tăng z-index của icon lên 2 để nó nổi lên trên */
+}
+.moon-icon {
+    color: var(--primary-color); /* SỬA 3: Đổi màu icon mặt trăng để thấy được trên nền trắng */
+    opacity: 0;
+}
+.sun-icon {
+    opacity: 1;
+}
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+input:checked + .slider:before {
+    transform: translateX(30px);
+}
+input:checked + .slider .sun-icon {
+    opacity: 0;
+}
+input:checked + .slider .moon-icon {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   CSS CHO BẢN IN (@media print)
+   ========================================================================== */
+@media print {
+    body {
+        background-color: #fff !important;
+        color: #000 !important;
+        font-family: 'Times New Roman', serif;
+        font-size: 12pt;
+    }
+    .page-controls {
+        display: none !important;
+    }
+    .page-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .section {
+        background: none !important;
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+        padding: 15px;
+        break-inside: avoid; /* Tránh ngắt trang giữa chừng một section */
+    }
+    .section h3 {
+        font-size: 14pt;
+        border-bottom: 1px solid #000;
+        color: #000 !important;
+    }
+    .section h3 i {
+        display: none;
+    }
+    table.data-table th, table.data-table td {
+        border: 1px solid #000 !important;
+    }
+    table.data-table thead th {
+        background-color: #eee !important;
+    }
+}

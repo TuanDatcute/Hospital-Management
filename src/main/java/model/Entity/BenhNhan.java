@@ -19,7 +19,7 @@ public class BenhNhan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
-
+   
     @Column(name = "ma_benh_nhan", nullable = false, unique = true, columnDefinition = "NVARCHAR(MAX)")
     private String maBenhNhan;
 
@@ -41,10 +41,10 @@ public class BenhNhan {
     @Column(name = "cccd", length = 20, unique = true, columnDefinition = "NVARCHAR(MAX)"   )
     private String cccd;
 
-    @Column(name = "nhom_mau", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "nhom_mau", columnDefinition = "NVARCHAR(MAX)",nullable = true)
     private String nhomMau;
 
-    @Column(name = "tien_su_benh", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "tien_su_benh", columnDefinition = "NVARCHAR(MAX)",nullable = true)
     private String tienSuBenh;
 
     @OneToOne(fetch = FetchType.LAZY, optional = true) 

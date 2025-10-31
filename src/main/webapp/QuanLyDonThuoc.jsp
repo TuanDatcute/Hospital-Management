@@ -9,7 +9,7 @@
         <title>Chi Tiết Đơn Thuốc</title>
 
         <%-- Link đến các file CSS --%>
-        <link rel="stylesheet" href="<c:url value='/css/style.css'/>">
+        <link rel="stylesheet" href="<c:url value='/css/danhSach-style.css'/>">
         <link rel="stylesheet" href="<c:url value='/css/qldt-style.css'/>">
 
         <%-- (Tùy chọn) Thêm font từ Google Fonts cho đẹp hơn --%>
@@ -23,7 +23,8 @@
                 <h1>Chi Tiết Đơn Thuốc #${donThuoc.id}</h1>
                 <div class="prescription-info">
                     <p><strong>Ngày kê đơn:</strong> ${donThuoc.ngayKeDonFormatted}</p>
-                    <p><strong>Phiếu khám liên quan:</strong> <a href="<c:url value='MainController?action=viewDetails&id=${donThuoc.phieuKhamId}'/>">ID #${donThuoc.phieuKhamId}</a></p>
+                    <p><strong>Tên bệnh nhân:</strong> ${donThuoc.tenBenhNhan}</p>
+                    <p><strong>Phiếu khám liên quan:</strong> <a style="text-decoration: none" href="<c:url value='MainController?action=viewEncounterDetails&id=${donThuoc.phieuKhamId}'/> ">ID: ${donThuoc.phieuKhamId}</a></p>
                     <p><strong>Lời dặn:</strong> ${donThuoc.loiDan}</p>
                 </div>
             </div>
@@ -38,9 +39,11 @@
                 <c:remove var="SUCCESS_MESSAGE" scope="session" />
             </c:if>
 
-            <div class="controls">
-                <button id="add-new-btn" class="btn btn-success">Thêm Thuốc vào Đơn</button>
-            </div>
+            <c:if test="${trangThaiPhieuKham ne 'HOAN_THANH'}">
+                <div class="controls">
+                    <button id="add-new-btn" class="btn btn-success">Thêm thuốc vào đơn</button>
+                </div>
+            </c:if>
 
             <div class="table-section">
                 <h2>Các thuốc đã kê</h2>
@@ -59,19 +62,23 @@
                                 <td><strong>${chiTiet.tenThuoc}</strong></td>
                                 <td class="text-right">${chiTiet.soLuong}</td>
                                 <td>${chiTiet.lieuDung}</td>
-                                <td class="actions text-center">
-                                    <button class="btn btn-edit edit-btn" 
-                                            data-id="${chiTiet.id}"
-                                            data-soluong="${chiTiet.soLuong}"
-                                            data-lieudung="${chiTiet.lieuDung}"
-                                            data-tenthuoc="${chiTiet.tenThuoc}">Sửa</button>
 
-                                    <form action="<c:url value='MainController'/>" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa thuốc \'${chiTiet.tenThuoc}\' khỏi đơn?');">
-                                        <input type="hidden" name="action" value="deleteDetail">
-                                        <input type="hidden" name="donThuocId" value="${donThuoc.id}">
-                                        <input type="hidden" name="chiTietId" value="${chiTiet.id}">
-                                        <button type="submit" class="btn btn-delete">Xóa</button>
-                                    </form>
+
+                                <td class="actions text-center">
+                                    <c:if test="${trangThaiPhieuKham ne 'HOAN_THANH'}">
+                                        <button class="btn btn-edit edit-btn" 
+                                                data-id="${chiTiet.id}"
+                                                data-soluong="${chiTiet.soLuong}"
+                                                data-lieudung="${chiTiet.lieuDung}"
+                                                data-tenthuoc="${chiTiet.tenThuoc}">Sửa</button>
+
+                                        <form action="<c:url value='MainController'/>" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa thuốc \'${chiTiet.tenThuoc}\' khỏi đơn?');">
+                                            <input type="hidden" name="action" value="deleteDetail">
+                                            <input type="hidden" name="donThuocId" value="${donThuoc.id}">
+                                            <input type="hidden" name="chiTietId" value="${chiTiet.id}">
+                                            <button type="submit" class="btn btn-delete">Xóa</button>
+                                        </form>
+                                    </c:if>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -81,6 +88,12 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div class="controls">
+            <button id="add-new-btn" class="btn btn-success"><a style="text-decoration: none" href="<c:url value='MainController?action=viewEncounterDetails&id=${donThuoc.phieuKhamId}'/> ">Quay lại</a></button>
+        </div>
+        <div class="controls">
+            <button id="add-new-btn" class="btn btn-success"><a style="text-decoration: none" href="<c:url value='MainController?action=listAll'/> ">Danh sách đơn thuốc</a></button>
         </div>
 
         <%-- ===== POPUP (MODAL) ĐA NĂNG (ẨN MẶC ĐỊNH) ===== --%>

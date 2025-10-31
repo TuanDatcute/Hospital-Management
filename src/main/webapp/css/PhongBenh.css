@@ -1,0 +1,263 @@
+/* === BIẾN MÀU (THEME PHÒNG KHÁM/QUẢN LÝ) === */
+:root {
+    --primary-color: #007bff; /* Xanh dương (chính, tin cậy) */
+    --secondary-color: #6c757d; /* Xám (phụ, nút hủy) */
+    --success-color: #28a745; /* Xanh lá (thành công) */
+    --error-color: #dc3545; /* Đỏ (lỗi, xóa) */
+    --info-color: #007bff; /* Xanh dương (cập nhật) */
+    --light-bg: #f8f9fa; /* Nền sáng (cho form, hàng chẵn) */
+    --border-color: #dee2e6; /* Viền */
+    --text-color: #212529; /* Màu chữ chính */
+    --white-color: #ffffff;
+}
+
+/* === CÀI ĐẶT CHUNG === */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--white-color);
+    color: var(--text-color);
+    margin: 20px;
+    line-height: 1.6;
+}
+
+h2 {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--light-bg);
+    padding-bottom: 10px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--border-color);
+    margin: 30px 0;
+}
+
+/* === FORM THÊM MỚI & CẬP NHẬT (method="POST") === */
+form[method="POST"] {
+    background-color: var(--light-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 600px; /* Giới hạn độ rộng của form */
+}
+
+/* Thiết lập cho các input, select trong form */
+form[method="POST"] input[type="text"],
+form[method="POST"] input[type="number"],
+form[method="POST"] select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    margin-top: 5px;
+    margin-bottom: 15px; /* Thay thế cho <br/> */
+    box-sizing: border-box;
+}
+
+/* Nút bấm (Thêm, Cập nhật) */
+form[method="POST"] button[type="submit"] {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    padding: 10px 18px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: opacity 0.2s ease;
+}
+
+form[method="POST"] button[type="submit"]:hover {
+    opacity: 0.85;
+}
+
+/* Nút Hủy (trong form Cập nhật) */
+form[method="POST"] a {
+    display: inline-block;
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+    padding: 10px 18px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-left: 10px;
+    transition: background-color 0.2s ease;
+}
+
+form[method="POST"] a:hover {
+    background-color: #5a6268;
+}
+
+/* === FORM TÌM KIẾM (method="GET") === */
+form[method="GET"] {
+    background-color: var(--light-bg);
+    padding: 15px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+form[method="GET"] input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    flex-grow: 1;
+    max-width: 400px;
+}
+
+form[method="GET"] button[type="submit"] {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: opacity 0.2s ease;
+}
+
+form[method="GET"] button[type="submit"]:hover {
+    opacity: 0.85;
+}
+
+form[method="GET"] a {
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+form[method="GET"] a:hover {
+    background-color: #5a6268;
+}
+
+/* === BẢNG DANH SÁCH === */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-color); /* Ghi đè border="1" */
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+    vertical-align: middle;
+}
+
+/* Tiêu đề bảng */
+thead th {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    letter-spacing: 0.5px;
+}
+
+/* Zebra striping cho các hàng */
+tbody tr:nth-child(even) {
+    background-color: var(--light-bg);
+}
+
+tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+/* === CỘT HÀNH ĐỘNG (SỬA, XÓA) === */
+td:last-child {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Tạo khoảng cách giữa "Sửa" và "Xóa" */
+    border-bottom: 1px solid var(--border-color); /* Cần thêm lại border do display:flex */
+}
+
+/* Nút Sửa (Link) */
+td:last-child a {
+    color: var(--primary-color);
+    font-weight: 500;
+    text-decoration: none;
+    margin: 0; /* Ghi đè style="margin-right: 10px;" */
+    transition: color 0.2s ease;
+}
+
+td:last-child a:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}
+
+/* Form Xóa (Ghi đè style inline) */
+td:last-child form {
+    margin: 0 !important;
+    display: inline-block !important;
+}
+
+/* Nút Xóa (Class từ JSP) */
+.delete-button {
+    background: none;
+    border: none;
+    color: var(--error-color);
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    font-size: 1em; /* Kế thừa font-size từ <td> */
+    font-weight: 500; /* Làm đậm giống nút Sửa */
+    transition: color 0.2s ease;
+}
+
+.delete-button:hover {
+    color: #a00; /* Màu đỏ đậm hơn khi hover */
+}
+
+
+/* === THÔNG BÁO (GHI ĐÈ INLINE STYLE) === */
+/* Đây là cách tạm thời để ghi đè <b style="...">.
+   Lý tưởng nhất là bạn nên đổi sang dùng class.
+*/
+b[style*="color:green"] {
+    display: block;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724 !important; /* Dùng !important để thắng inline style */
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+b[style*="color:red"] {
+    display: block;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24 !important;
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+b[style*="color:blue"] {
+    display: block;
+    background-color: #cce5ff;
+    border: 1px solid #b8daff;
+    color: #004085 !important;
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    font-weight: bold;
+}

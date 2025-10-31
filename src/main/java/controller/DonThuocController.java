@@ -15,9 +15,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.dto.ChiTietDonThuocDTO;
 import model.dto.DonThuocDTO;
+import model.dto.PhieuKhamBenhDTO;
 import model.dto.ThuocDTO;
 import service.ChiTietDonThuocService;
 import service.DonThuocService;
+import service.PhieuKhamBenhService;
 import service.ThuocService;
 
 /**
@@ -35,6 +37,7 @@ public class DonThuocController extends HttpServlet {
     private final DonThuocService donThuocService = new DonThuocService();
     private final ChiTietDonThuocService chiTietService = new ChiTietDonThuocService();
     private final ThuocService thuocService = new ThuocService();
+    private final PhieuKhamBenhService phieuKhamService = new PhieuKhamBenhService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -54,7 +57,7 @@ public class DonThuocController extends HttpServlet {
                 case "viewDetails":
                     url = viewDetails(request);
                     break;
-                case "showCreateThuocForm":
+                case "showCreateDonThuocForm":
                     url = showCreateForm(request);
                     break;
                 default:
@@ -149,10 +152,11 @@ public class DonThuocController extends HttpServlet {
 
         // Lấy danh sách tất cả các loại thuốc để điền vào dropdown
         List<ThuocDTO> danhSachThuoc = thuocService.getAllMedications();
+        PhieuKhamBenhDTO phieuKham = phieuKhamService.getEncounterById(donThuoc.getPhieuKhamId());
 
         request.setAttribute("donThuoc", donThuoc);
         request.setAttribute("danhSachThuoc", danhSachThuoc);
-
+        request.setAttribute("trangThaiPhieuKham", phieuKham.getTrangThai());
         // Kiểm tra xem có yêu cầu sửa một chi tiết cụ thể không
         String editIdStr = request.getParameter("editId");
         if (editIdStr != null) {
@@ -185,14 +189,26 @@ public class DonThuocController extends HttpServlet {
 
     private String updateDetail(HttpServletRequest request) throws ValidationException {
         ChiTietDonThuocDTO dto = new ChiTietDonThuocDTO();
-        dto.setId(Integer.parseInt(request.getParameter("chiTietId")));
-        dto.setSoLuong(Integer.parseInt(request.getParameter("soLuong")));
-        dto.setLieuDung(request.getParameter("lieuDung"));
-        chiTietService.updatePrescriptionDetail(dto);
+        try {
 
-        request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã cập nhật chi tiết thành công!");
+            dto.setId(Integer.parseInt(request.getParameter("chiTietId")));
+            dto.setSoLuong(Integer.parseInt(request.getParameter("soLuong")));
+            dto.setLieuDung(request.getParameter("lieuDung"));
+            
+            if (request.getParameter("chiTietId").equals("HOAN_THANH")) {
+                throw new ValidationException("không thể chỉnh sửa đơn thuốc với phiếu khám đã hoàn thành");
+            }
+            chiTietService.updatePrescriptionDetail(dto);
 
-        return "redirect:/MainController?action=viewDetails&id=" + request.getParameter("donThuocId");
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã cập nhật chi tiết thành công!");
+
+            return "redirect:/MainController?action=viewDetails&id=" + request.getParameter("donThuocId");
+        } catch (ValidationException e) {
+            log("Lỗi " + e.getMessage());
+            request.setAttribute("ERROR_MESSAGE", "Lỗi: " + e.getMessage());
+            return DON_THUOC_LIST_PAGE;
+        }
+
     }
 
     private String deleteDetail(HttpServletRequest request) throws ValidationException {
@@ -214,7 +230,7 @@ public class DonThuocController extends HttpServlet {
             String[] lieuDungs = request.getParameterValues("lieuDung");
             dto.setPhieuKhamId(Integer.parseInt(phieuKhamIdStr));
             dto.setLoiDan(request.getParameter("loiDan"));
-           
+
             List<ChiTietDonThuocDTO> chiTietList = new ArrayList<>();
             for (int i = 0; i < thuocIds.length; i++) {
                 ChiTietDonThuocDTO chiTietDTO = new ChiTietDonThuocDTO();
@@ -225,12 +241,11 @@ public class DonThuocController extends HttpServlet {
             }
             dto.setChiTietDonThuoc(chiTietList);
 
-           DonThuocDTO result= donThuocService.createPrescription(dto);
+            DonThuocDTO result = donThuocService.createPrescription(dto);
 
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã kê đơn thuốc thành công!");
 
-            // ✨ THAY ĐỔI: Trả về URL để redirect
-            return "redirect:/MainController?action=listAll&keyword=" + result.getTenBenhNhan();
+            return "redirect:/MainController?action=viewEncounterDetails&id=" + result.getPhieuKhamId();
 
         } catch (ValidationException | NumberFormatException e) {
             log("Lỗi khi tạo đơn thuốc: " + e.getMessage());

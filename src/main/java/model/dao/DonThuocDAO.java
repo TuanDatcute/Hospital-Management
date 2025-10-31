@@ -163,7 +163,7 @@ public class DonThuocDAO {
         // 'JOIN FETCH ctdt.thuoc' là rất quan trọng:
         // Nó yêu cầu Hibernate tải luôn thông tin của Entity Thuoc
         // trong cùng 1 câu query, tránh lỗi N+1.
-        String hql = "SELECT ctdt FROM ChiTietDonThuoc ctdt "
+        String hql = "SELECT DISTINCT ctdt FROM ChiTietDonThuoc ctdt "
                 + "JOIN FETCH ctdt.thuoc "
                 + "WHERE ctdt.donThuoc.phieuKham.id = :phieuKhamId";
 

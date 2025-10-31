@@ -46,7 +46,7 @@ public class MainController extends HttpServlet {
             "showUserCreateForm", "createUser",
             "showUserEditForm", "updateUserStatus",
             "showChangePasswordForm", "changePassword",
-             "register"};
+            "register"};
 
         String[] EMRCoreActions = {"showCreateForm", "createEncounter",
             "updateEncounterDetails", "getEncounterDetails",
@@ -68,12 +68,12 @@ public class MainController extends HttpServlet {
             "createMedication", "showMedicationForm", "showUpdateForm",
             "updateMedicationInfo", "updateStock", "listMedications",
             "deleteMedication"};
+        
+        String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm", "createPrescription"};
 
         String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate", "deleteRoom"};
 
         String[] GiuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed", "deleteBed", "updateBed", "getBedForUpdate"};
-
-        String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateThuocForm", "createPrescription"};
 
         String[] HoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice"};
 

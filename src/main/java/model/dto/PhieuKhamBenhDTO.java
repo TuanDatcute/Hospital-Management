@@ -36,6 +36,7 @@ public class PhieuKhamBenhDTO {
     private String tenBacSi;    // Tốt! Giữ lại để tiện hiển thị
     private Integer lichHenId;
 
+    private String trangThai;
     private DonThuocDTO donThuoc;
     private List<ChiDinhDichVuDTO> danhSachChiDinh;
 
@@ -65,6 +66,14 @@ public class PhieuKhamBenhDTO {
 
     public String getChanDoan() {
         return chanDoan;
+    }
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
     }
 
     public void setChanDoan(String chanDoan) {
@@ -159,25 +168,6 @@ public class PhieuKhamBenhDTO {
         this.lichHenId = lichHenId;
     }
 
-    public PhieuKhamBenhDTO(String maPhieuKham, LocalDateTime thoiGianKham, String trieuChung, String chanDoan, String ketLuan, LocalDateTime ngayTaiKham, BigDecimal nhietDo, String huyetAp, Integer nhipTim, Integer nhipTho, int benhNhanId, String tenBenhNhan, int bacSiId, String tenBacSi, Integer lichHenId, DonThuocDTO donThuoc, List<ChiDinhDichVuDTO> danhSachChiDinh) {
-        this.maPhieuKham = maPhieuKham;
-        this.thoiGianKham = thoiGianKham;
-        this.trieuChung = trieuChung;
-        this.chanDoan = chanDoan;
-        this.ketLuan = ketLuan;
-        this.ngayTaiKham = ngayTaiKham;
-        this.nhietDo = nhietDo;
-        this.huyetAp = huyetAp;
-        this.nhipTim = nhipTim;
-        this.nhipTho = nhipTho;
-        this.benhNhanId = benhNhanId;
-        this.tenBenhNhan = tenBenhNhan;
-        this.bacSiId = bacSiId;
-        this.tenBacSi = tenBacSi;
-        this.lichHenId = lichHenId;
-        this.donThuoc = donThuoc;
-        this.danhSachChiDinh = danhSachChiDinh;
-    }
 
     // --- Getters and Setters (Giữ nguyên như code của bạn) ---
     public int getId() {
