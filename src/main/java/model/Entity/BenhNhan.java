@@ -17,35 +17,39 @@ import javax.persistence.Table;
 @Table(name = "BenhNhan")
 public class BenhNhan implements Serializable { // <-- **SỬA 3: THÊM Serializable**
 
-    private static final long serialVersionUID = 1L; // Thêm dòng này
+private static final long serialVersionUID = 1L; 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
     
+    // Bắt buộc (NOT NULL)
     @Column(name = "ma_benh_nhan", nullable = false, unique = true, columnDefinition = "NVARCHAR(MAX)")
     private String maBenhNhan;
 
+    // Bắt buộc (NOT NULL)
     @Column(name = "ho_ten", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String hoTen;
 
-    // --- **SỬA 4: ĐỔI KIỂU DỮ LIỆU** ---
-    @Column(name = "ngay_sinh") // Sẽ được map sang kiểu DATE trong CSDL
+    // --- **BẮT ĐẦU SỬA (THÊM nullable = true)** ---
+    
+    @Column(name = "ngay_sinh", nullable = true) // <-- SỬA
     private LocalDate ngaySinh; 
-    // --- **KẾT THÚC SỬA** ---
-
-    @Column(name = "gioi_tinh", columnDefinition = "NVARCHAR(MAX)")
+    
+    @Column(name = "gioi_tinh", columnDefinition = "NVARCHAR(MAX)", nullable = true) // <-- SỬA
     private String gioiTinh;
 
-    @Column(name = "dia_chi", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "dia_chi", columnDefinition = "NVARCHAR(MAX)", nullable = true) // <-- SỬA
     private String diaChi;
 
-    @Column(name = "so_dien_thoai", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "so_dien_thoai", columnDefinition = "NVARCHAR(MAX)", nullable = true) // <-- SỬA
     private String soDienThoai;
     
-    @Column(name = "cccd", length = 20, unique = true, columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "cccd", length = 20, unique = true, columnDefinition = "NVARCHAR(MAX)", nullable = true) // <-- SỬA
     private String cccd;
+    
+    // --- **KẾT THÚC SỬA** ---
 
     @Column(name = "nhom_mau", columnDefinition = "NVARCHAR(MAX)", nullable = true)
     private String nhomMau;
