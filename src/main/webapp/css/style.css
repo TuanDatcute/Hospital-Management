@@ -815,80 +815,79 @@ footer {
     display: inline-block;
 }
 
-
-/* === F. STYLE CHO TRANG DANH SÁCH (Bảng dữ liệu) === */
+/* === F. STYLE CHO TRANG DANH SÁCH (Cách 2 - Dùng inline-block) === */
 
 .add-new-btn {
-    background-color: #198754;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: 600;
-    display: inline-block;
-    margin-top: 15px;
-    margin-bottom: 20px;
-    transition: background-color 0.3s ease;
+    background-color: #198754; color: white; padding: 10px 15px; border-radius: 5px;
+    text-decoration: none; font-weight: 600; display: inline-block;
+    margin-top: 15px; margin-bottom: 20px; transition: background-color 0.3s ease;
 }
-.add-new-btn i {
-    margin-right: 8px;
-}
-.add-new-btn:hover {
-    background-color: #157347;
-    color: white;
-    text-decoration: none;
-}
+.add-new-btn i { margin-right: 8px; }
+.add-new-btn:hover { background-color: #157347; color: white; text-decoration: none; }
 
 .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 0;
-    font-size: 14px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    background-color: #fff;
-    border-radius: 8px;
-    overflow: hidden;
+    width: 100%; border-collapse: collapse; margin-top: 0; font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); background-color: #fff;
+    border-radius: 8px; overflow: hidden;
 }
-.data-table th, .data-table td {
-    border: 1px solid #ddd;
-    padding: 12px 15px;
-    text-align: left;
-}
-.data-table th {
-    background-color: #0056b3;
-    color: white;
-    font-size: 15px;
-}
-.data-table tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
-.data-table tr:hover {
-    background-color: #e9ecef;
-}
+.data-table th, .data-table td { border: 1px solid #ddd; padding: 12px 15px; text-align: left; vertical-align: middle; }
+.data-table th { background-color: #0056b3; color: white; font-size: 15px; }
+.data-table tr:nth-child(even) { background-color: #f8f9fa; }
+.data-table tr:hover { background-color: #e9ecef; }
+.data-table .empty-cell { text-align: center; color: #6c757d; font-style: italic; padding: 20px; }
+
+
+/* --- **BẮT ĐẦU SỬA LỖI (Cách 2)** --- */
+
+/* 1. Style chung cho link <a> bên trong .actions */
 .data-table .actions a {
+    display: inline-block; /* Xếp ngang hàng */
+    vertical-align: middle; /* Căn giữa */
     margin-right: 12px;
     text-decoration: none;
     font-size: 1.1em;
 }
-.data-table .actions .edit-btn {
-    color: #0d6efd;
-}
-.data-table .actions .edit-btn:hover {
-    color: #0056b3;
-}
-.data-table .actions .delete-btn {
-    color: #dc3545;
-}
-.data-table .actions .delete-btn:hover {
-    color: #b02a37;
-}
-.data-table .empty-cell {
-    text-align: center;
-    color: #6c757d;
-    font-style: italic;
-    padding: 20px;
+
+/* 2. Style cho <form> bên trong .actions */
+.data-table .actions .table-form {
+    display: inline-block; /* Xếp ngang hàng */
+    vertical-align: middle; /* Căn giữa */
+    margin: 0;
+    padding: 0;
 }
 
+/* 3. Style cho <button> bên trong form */
+.actions .table-form button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 1.1em;
+    margin-right: 12px;
+    vertical-align: middle;
+    outline: none;
+}
+
+/* Gán màu (giống như link) */
+.data-table .actions a.edit-btn,
+.actions .table-form button.edit-btn {
+    color: #0d6efd;
+}
+.data-table .actions a.edit-btn:hover,
+.actions .table-form button.edit-btn:hover {
+    color: #0056b3;
+}
+
+.data-table .actions a.delete-btn,
+.actions .table-form button.delete-btn {
+    color: #dc3545;
+}
+.data-table .actions a.delete-btn:hover,
+.actions .table-form button.delete-btn:hover {
+    color: #b02a37;
+}
+
+/* --- **KẾT THÚC SỬA LỖI** --- */
 
 /* === G. STYLE CHO FORM CHUNG (formKhoa.jsp, formTaiKhoan.jsp...) === */
 

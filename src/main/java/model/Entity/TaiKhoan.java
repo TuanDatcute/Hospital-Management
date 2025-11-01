@@ -1,5 +1,6 @@
-package model.Entity;
+package model.Entity; // Giữ nguyên package của bạn (model.Entity)
 
+import java.io.Serializable; // Import Serializable (rất quan trọng cho Session)
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +13,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "TaiKhoan")
-public class TaiKhoan {
+public class TaiKhoan implements Serializable { // Thêm 'implements Serializable'
+
+    private static final long serialVersionUID = 1L; // Thêm dòng này
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +28,11 @@ public class TaiKhoan {
     @Column(name = "mat_khau", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String matKhau;
 
-    @Column(name = "email", nullable = false, unique = true, columnDefinition = "NVARCHAR(MAX)")
+    // --- **SỬA LỖI Ở ĐÂY** ---
+    // Cho phép email bị rỗng (null) và không cần duy nhất
+    @Column(name = "email", nullable = true, unique = false, columnDefinition = "NVARCHAR(MAX)")
     private String email;
+    // --- **KẾT THÚC SỬA LỖI** ---
 
     @Column(name = "vai_tro", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String vaiTro;
@@ -37,11 +43,11 @@ public class TaiKhoan {
     @Column(name = "trang_thai_mat_khau", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String trangThaiMatKhau;
 
-    @CreationTimestamp //  TỰ ĐỘNG GÁN KHI TẠO MỚI
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp //  TỰ ĐỘNG GÁN KHI CẬP NHẬT
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
@@ -49,7 +55,7 @@ public class TaiKhoan {
     public TaiKhoan() {
     }
 
-    // Getters and Setters
+    // Getters and Setters (Giữ nguyên toàn bộ getters/setters của bạn)
     public int getId() {
         return id;
     }

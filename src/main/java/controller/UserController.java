@@ -1,6 +1,6 @@
 package controller;
 
-import exception.ValidationException; // (Nếu bạn có Exception tùy chỉnh)
+import exception.ValidationException; 
 import java.io.IOException;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -19,16 +19,18 @@ import service.TaiKhoanService;
 @WebServlet(name = "UserController", urlPatterns = {"/UserController"})
 public class UserController extends HttpServlet {
 
+    // --- SỬA 1: Sửa lại hằng số HOME_PAGE ---
     private static final String LOGIN_PAGE = "login.jsp";
-    private static final String HOME_PAGE = "home.jsp"; // Trang của Bệnh nhân
-    private static final String ADMIN_DASHBOARD_PAGE = "admin/dashboard.jsp"; // Trang của Admin
-    private static final String STAFF_DASHBOARD_PAGE = "staff/dashboard.jsp"; // Trang của Nhân viên
+    private static final String HOME_PAGE = "home.jsp"; // <<< SỬA LỖI: Phải là home.jsp
 
+    // --- SỬA 2: Sửa lỗi chính tả 'dashBoard' ---
+    private static final String ADMIN_DASHBOARD_PAGE = "admin/dashboard.jsp"; // <<< SỬA LỖI: dashboard.jsp
+
+    private static final String STAFF_DASHBOARD_PAGE = "staff/dashboard.jsp"; // (Đã thêm ở bước phân luồng)
     private static final String USER_LIST_PAGE = "admin/danhSachTaiKhoan.jsp";
     private static final String USER_FORM_PAGE = "admin/formTaiKhoan.jsp";
     private static final String CHANGE_PASSWORD_PAGE = "user/changePassword.jsp";
-    // **SỬA 1: Trang đăng ký giờ chính là trang login**
-    private static final String REGISTER_PAGE = "login.jsp";
+    private static final String REGISTER_PAGE = "login.jsp"; // (Đã gộp)
     private static final String ERROR_PAGE = "error.jsp";
 
     private final TaiKhoanService taiKhoanService = new TaiKhoanService();
@@ -61,10 +63,7 @@ public class UserController extends HttpServlet {
                     case "showChangePasswordForm":
                         url = CHANGE_PASSWORD_PAGE;
                         break;
-                    // **SỬA 2: XÓA 'showUserRegister' vì không còn file jsp riêng**
-                    // case "showUserRegister":
-                    //     url = REGISTER_PAGE;
-                    //     break;
+                    // (case 'showUserRegister' đã bị xóa là đúng)
                     default:
                         request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho GET.");
                 }
@@ -92,20 +91,19 @@ public class UserController extends HttpServlet {
         boolean redirectAfterSuccess = false;
         String successRedirectUrl = null;
 
-        String errorFormPage = ERROR_PAGE; // Trang sẽ quay về nếu có lỗi Validation
+        String errorFormPage = ERROR_PAGE; // Trang quay về nếu lỗi Validation
 
         try {
             if (action == null || action.isEmpty()) {
                 throw new Exception("Hành động không được chỉ định.");
             }
 
-            // Xác định trang quay về nếu lỗi (TRƯỚC KHI CHẠY SWITCH)
+            // Xác định trang quay về nếu lỗi
             if ("login".equals(action)) {
                 errorFormPage = LOGIN_PAGE;
             } else if ("register".equals(action)) {
                 errorFormPage = REGISTER_PAGE;
-            } // (REGISTER_PAGE giờ cũng là login.jsp)
-            else if ("createUser".equals(action) || "updateUserStatus".equals(action)) {
+            } else if ("createUser".equals(action) || "updateUserStatus".equals(action)) {
                 errorFormPage = USER_FORM_PAGE;
             } else if ("changePassword".equals(action)) {
                 errorFormPage = CHANGE_PASSWORD_PAGE;
@@ -114,7 +112,7 @@ public class UserController extends HttpServlet {
             switch (action) {
                 case "login":
                     url = login(request, response);
-                    redirectAfterSuccess = (url.equals(HOME_PAGE) || url.equals(ADMIN_DASHBOARD_PAGE) || url.equals(STAFF_DASHBOARD_PAGE));
+                    redirectAfterSuccess = (url.equals(HOME_PAGE) || url.equals(ADMIN_DASHBOARD_PAGE) || url.equals(STAFF_DASHBOARD_PAGE) || url.equals(CHANGE_PASSWORD_PAGE));
                     successRedirectUrl = url;
                     break;
                 case "createUser":
@@ -145,52 +143,56 @@ public class UserController extends HttpServlet {
                 url = listUsers(request);
             }
 
-        } catch (Exception e) { // Bắt cả ValidationException và Exception chung
-            log("Lỗi tại UserController (doPost): " + e.getMessage(), e);
-
+        } catch (ValidationException e) { // <-- SỬA 3: Bắt ValidationException (lỗi người dùng)
+            log("Lỗi Validation tại UserController (doPost): " + e.getMessage());
             handleServiceException(request, e, action, errorFormPage);
             url = errorFormPage;
             redirectAfterSuccess = false;
+
+        } catch (Exception e) { // <-- SỬA 3: Bắt Exception chung (lỗi hệ thống)
+            log("Lỗi Hệ thống tại UserController (doPost): " + e.getMessage(), e);
+            request.setAttribute("ERROR_MESSAGE", "Lỗi hệ thống: " + e.getMessage());
+            url = ERROR_PAGE;
+            redirectAfterSuccess = false;
+
         } finally {
             if (redirectAfterSuccess) {
                 if (action.equals("register")) {
-                    // Đăng ký thành công, chuyển về login.jsp (không cần encode)
                     response.sendRedirect(successRedirectUrl);
                 } else {
-                    // Đăng nhập/Đổi MK thành công, chuyển về trang chủ (cần encode)
                     String finalUrl = request.getContextPath() + "/" + successRedirectUrl;
                     response.sendRedirect(response.encodeRedirectURL(finalUrl));
                 }
             } else {
-                // Lỗi (ví dụ: đăng nhập sai, đăng ký lỗi) -> Forward về trang form (đã gán url = errorFormPage)
+                // **SỬA 3: Forward đến 'url' (đã được 'try' hoặc 'catch' gán)**
                 request.getRequestDispatcher(url).forward(request, response);
             }
         }
     }
 
     /**
-     * Sửa hàm login
+     * Xử lý logic đăng nhập VÀ PHÂN LUỒNG.
      */
-    private String login(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    private String login(HttpServletRequest request, HttpServletResponse response)
+            throws ValidationException, Exception { // **SỬA 3: Ném Exception ra ngoài**
+
         String tenDangNhap = request.getParameter("username");
         String matKhau = request.getParameter("password");
 
+        // **SỬA 3: Bỏ try-catch. Ném lỗi ra ngoài để doPost bắt**
         TaiKhoanDTO user = taiKhoanService.login(tenDangNhap, matKhau);
         HttpSession session = request.getSession();
         session.setAttribute("USER", user);
         session.setAttribute("ROLE", user.getVaiTro());
 
-        // --- **LOGIC MỚI: KIỂM TRA ÉP BUỘC ĐỔI MẬT KHẨU** ---
+        // Logic ép buộc đổi mật khẩu
         if ("CAN_DOI".equals(user.getTrangThaiMatKhau())) {
-            // Nếu mật khẩu cần đổi, BẮT BUỘC chuyển đến trang đổi mật khẩu
-            // Thêm một thông báo đặc biệt vào session
             session.setAttribute("FORCE_CHANGE_PASS_MSG",
                     "Đây là lần đăng nhập đầu tiên. Vì lý do bảo mật, bạn phải đổi mật khẩu ngay lập tức.");
-            return CHANGE_PASSWORD_PAGE; // Chuyển đến trang Đổi mật khẩu
+            return CHANGE_PASSWORD_PAGE;
         }
-        // --- **KẾT THÚC LOGIC MỚI** ---
 
-        // (Logic phân luồng cũ)
+        // Logic phân luồng 3 hướng
         if ("QUAN_TRI".equals(user.getVaiTro())) {
             return ADMIN_DASHBOARD_PAGE;
         } else if ("BAC_SI".equals(user.getVaiTro()) || "LE_TAN".equals(user.getVaiTro())) {
@@ -203,7 +205,7 @@ public class UserController extends HttpServlet {
     /**
      * Xử lý logic thay đổi mật khẩu VÀ PHÂN LUỒNG 3 HƯỚNG.
      */
-    private String changePassword(HttpServletRequest request) throws Exception {
+    private String changePassword(HttpServletRequest request) throws ValidationException, Exception { // **SỬA 3: Ném Exception**
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("USER") == null) {
             throw new ValidationException("Bạn cần đăng nhập để thực hiện chức năng này.");
@@ -224,6 +226,8 @@ public class UserController extends HttpServlet {
         }
 
         taiKhoanService.changePassword(userId, oldPassword, newPassword);
+
+        session.removeAttribute("FORCE_CHANGE_PASS_MSG"); // Xóa cờ ép buộc (nếu có)
         session.setAttribute("SUCCESS_MESSAGE", "Đổi mật khẩu thành công!");
 
         // Phân luồng trả về
@@ -239,7 +243,7 @@ public class UserController extends HttpServlet {
     /**
      * Xử lý logic đăng ký tài khoản (cho Bệnh nhân).
      */
-    private String register(HttpServletRequest request) throws Exception {
+    private String register(HttpServletRequest request) throws ValidationException, Exception { // **SỬA 3: Ném Exception**
         String tenDangNhap = request.getParameter("username");
         String email = request.getParameter("email");
         String matKhau = request.getParameter("password");
@@ -272,17 +276,14 @@ public class UserController extends HttpServlet {
     private void handleServiceException(HttpServletRequest request, Exception e, String formAction, String errorFormPage) {
         request.setAttribute("ERROR_MESSAGE", e.getMessage());
 
-        // **SỬA LẠI LOGIC KHI ĐĂNG KÝ LỖI**
         if ("register".equals(formAction)) {
             request.setAttribute("username_register", request.getParameter("username"));
             request.setAttribute("email_register", request.getParameter("email"));
-            // **BÁO CHO JSP BIẾT ĐỂ MỞ ĐÚNG PANEL**
             request.setAttribute("formAction", "register");
         } else if ("createUser".equals(formAction) || "updateUserStatus".equals(formAction)) {
             request.setAttribute("USER_DATA", createDTOFromRequest(request));
             request.setAttribute("formAction", formAction);
         }
-        // (Nếu lỗi login, không cần làm gì thêm, doPost đã gán errorFormPage = LOGIN_PAGE)
     }
 
     // ... (Các hàm còn lại: logout, listUsers, showUserEditForm, createUser, updateUserStatus, createDTOFromRequest, getServletInfo... giữ nguyên) ...
