@@ -24,7 +24,7 @@ public class DichVu {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "ten_dich_vu", nullable = false, unique = true, columnDefinition = "NVARCHAR(255)")
     private String tenDichVu;
@@ -47,13 +47,14 @@ public class DichVu {
         this.donGia = donGia;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
+
 
     public String getTenDichVu() {
         return tenDichVu;

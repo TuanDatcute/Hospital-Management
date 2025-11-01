@@ -1,6 +1,9 @@
 package service;
 
 import exception.ValidationException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -40,14 +43,23 @@ public class PhieuKhamBenhService {
      * thấy bệnh nhân...).
      */
     public PhieuKhamBenhDTO createEncounter(PhieuKhamBenhDTO dto) throws ValidationException {
+        // --- BƯỚC 1: TẠO MÃ PHIẾU KHÁM TỰ ĐỘNG ---
+        LocalDate today = LocalDate.now();
+        // Định dạng ngày, ví dụ: 20251027
+        String dateStr = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-        // --- BƯỚC 1: LOGIC NGHIỆP VỤ (VALIDATION) ---
-        if (dto.getMaPhieuKham() == null || dto.getMaPhieuKham().trim().isEmpty()) {
-            throw new ValidationException("Mã phiếu khám không được để trống.");
-        }
-        if (phieuKhamDAO.isMaPhieuKhamExisted(dto.getMaPhieuKham())) {
-            throw new ValidationException("Mã phiếu khám '" + dto.getMaPhieuKham() + "' đã tồn tại.");
-        }
+        // Đếm số phiếu đã tạo trong ngày hôm nay
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
+        long count = phieuKhamDAO.countByDateRange(startOfDay, endOfDay);
+
+        // Tạo số thứ tự mới (ví dụ: 001, 002, 010)
+        String sequenceStr = String.format("%03d", count + 1);
+
+        // Ghép lại thành mã hoàn chỉnh
+        String newMaPhieuKham = "PK" + dateStr + sequenceStr;
+        dto.setMaPhieuKham(newMaPhieuKham); // Gán mã mới vào DTO
+
 
         BenhNhan benhNhanEntity = benhNhanDAO.getById(dto.getBenhNhanId());
         if (benhNhanEntity == null) {

@@ -29,6 +29,7 @@ public class CatalogController extends HttpServlet {
     private static final String CREATE_SERVICE_PAGE = "DichVu.jsp";
     private static final String CREATE_MEDICATION_PAGE = "Thuoc.jsp";
     private static final String THUOC_LIST_PAGE = "DanhSachThuoc.jsp";
+    private static final String DICH_VU_LIST_PAGE = "DanhSachDichVu.jsp";
 
     private static final DichVuService dichVuService = new DichVuService();
     private static final ThuocService thuocService = new ThuocService();
@@ -49,6 +50,12 @@ public class CatalogController extends HttpServlet {
             }
 
             switch (action) {
+                case "showUpdateServiceForm":
+                    url = showUpdateForm(request);
+                    break;
+                case "listAndSearchServices":
+                    url = listAndSearchServices(request);
+                    break;
                 //tạo 1 dịch vụ mới
                 case "showCreateServiceForm":
                     url = showServiceForm(request);
@@ -93,6 +100,9 @@ public class CatalogController extends HttpServlet {
             }
 
             switch (action) {
+                case "updateService":
+                    url = updateService(request);
+                    break;
                 case "createService":
                     url = createService(request);
                     break;
@@ -105,17 +115,25 @@ public class CatalogController extends HttpServlet {
                 case "updateStock":
                     url = updateMedicationStock(request);
                     break;
-                case "deleteMedication": 
-                    deleteMedication(request);
+                case "deleteMedication":
+                    url = deleteMedication(request);
+                    break;
+                case "deleteService":
+                    url = deleteService(request);
                     break;
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho phương thức POST.");
             }
+
+            if (url.startsWith("redirect:")) {
+                String redirectUrl = url.substring("redirect:".length());
+                response.sendRedirect(request.getContextPath() + redirectUrl);
+            } else {
+                request.getRequestDispatcher(url).forward(request, response);
+            }
         } catch (Exception e) {
             log("Lỗi tại EMRCoreController (doPost): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Đã có lỗi nghiêm trọng xảy ra: " + e.getMessage());
-        } finally {
-            request.getRequestDispatcher(url).forward(request, response);
         }
     }
 
@@ -183,11 +201,11 @@ public class CatalogController extends HttpServlet {
 
             // 3. GỌI TẦNG SERVICE ĐỂ XỬ LÝ NGHIỆP VỤ
             DichVuDTO result = dichVuService.createService(newServiceDTO);
-
+            String url = "/MainController?action=listAndSearchServices&keyword=" + result.getId();
             // 4. XỬ LÝ KẾT QUẢ THÀNH CÔNG
-            request.setAttribute("SUCCESS_MESSAGE", "Đã tạo dịch vụ '" + result.getTenDichVu() + "' thành công!");
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã tạo dịch vụ '" + result.getTenDichVu() + "' thành công!");
             // Có thể chuyển hướng về trang danh sách dịch vụ
-            return "index.jsp";
+            return "redirect:" + url;
 
         } catch (ValidationException e) {
             // Bắt lỗi nghiệp vụ (ví dụ: tên trùng) từ Service
@@ -311,7 +329,7 @@ public class CatalogController extends HttpServlet {
         return THUOC_LIST_PAGE; // Luôn quay về trang danh sách
     }
 
-    private void deleteMedication(HttpServletRequest request) throws Exception {
+    private String deleteMedication(HttpServletRequest request) throws Exception {
         try {
             int thuocId = Integer.parseInt(request.getParameter("id"));
 
@@ -321,14 +339,93 @@ public class CatalogController extends HttpServlet {
             // Đặt thông báo thành công
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã xóa thuốc thành công!");
 
+        } catch (ValidationException e) {
+            request.getSession().setAttribute("ERROR_MESSAGE", e.getMessage());
         } catch (NumberFormatException e) {
             throw new Exception("ID thuốc không hợp lệ.");
         }
+        return "redirect:/MainController?action=listAndSearchServices&keyword";
     }
 
+    // Thêm phương thức này và gọi nó trong doGet
+    private String listAndSearchServices(HttpServletRequest request) {
+        String keyword = request.getParameter("keyword");
+        List<DichVuDTO> danhSachDichVu;
+
+        try {
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                danhSachDichVu = dichVuService.searchServicesByName(keyword);
+                request.setAttribute("searchKeyword", keyword);
+            } else {
+                danhSachDichVu = dichVuService.getAllServices();
+            }
+            request.setAttribute("danhSachDichVu", danhSachDichVu);
+        } catch (Exception e) {
+            log("Lỗi khi lấy danh sách dịch vụ: ", e);
+            request.setAttribute("ERROR_MESSAGE", "Không thể tải danh sách dịch vụ.");
+        }
+        return DICH_VU_LIST_PAGE;
+    }
+
+    private String showUpdateForm(HttpServletRequest request) throws ValidationException, Exception {
+        try {
+            int serviceId = Integer.parseInt(request.getParameter("id"));
+            DichVuDTO service = dichVuService.getServiceById(serviceId);
+            if (service == null) {
+                throw new ValidationException("Không tìm thấy dịch vụ để cập nhật.");
+            }
+            request.setAttribute("SERVICE_DATA", service);
+            return CREATE_SERVICE_PAGE;
+        } catch (NumberFormatException e) {
+            throw new Exception("ID dịch vụ không hợp lệ.");
+        }
+
+    }
+
+    private String updateService(HttpServletRequest request) throws ValidationException {
+        int serviceId = Integer.parseInt(request.getParameter("id"));
+        String redirectUrl = "/MainController?action=listAndSearchServices&keyword=" + serviceId;
+        try {
+            DichVuDTO dto = new DichVuDTO();
+            dto.setId(serviceId);
+            dto.setTenDichVu(request.getParameter("tenDichVu"));
+            dto.setDonGia(new BigDecimal(request.getParameter("donGia")));
+            dto.setMoTa(request.getParameter("moTa"));
+
+            dichVuService.updateService(serviceId, dto);
+
+            request.getSession()
+                    .setAttribute("SUCCESS_MESSAGE", "Cập nhật dịch vụ thành công!");
+            // Gửi lại dữ liệu form trong trường hợp có lỗi validation
+            request.setAttribute("SERVICE_DATA", dto);
+        } catch (ValidationException e) {
+            request.getSession().setAttribute("ERROR_MESSAGE", e.getMessage());
+        }
+
+        return "redirect:" + redirectUrl;
+    }
+
+    private String deleteService(HttpServletRequest request) {
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+
+            // Gọi Service để thực hiện nghiệp vụ xóa
+            dichVuService.deleteService(id);
+
+            // Đặt thông báo thành công vào session
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã xóa dịch vụ thành công!");
+
+        } catch (ValidationException e) {
+            request.getSession().setAttribute("ERROR_MESSAGE", e.getMessage());
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("ERROR_MESSAGE", "ID dịch vụ không hợp lệ.");
+        }
+        return "redirect:/MainController?action=listAndSearchServices&keyword";
+    }
 
     @Override
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
 }

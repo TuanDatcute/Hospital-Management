@@ -209,8 +209,7 @@ public class EMRCoreController extends HttpServlet {
     private String createEncounter(HttpServletRequest request) {
         PhieuKhamBenhDTO newEncounterDTO = new PhieuKhamBenhDTO();
         try {
-            // 1. Lấy dữ liệu từ request và đóng gói vào DTO
-            newEncounterDTO.setMaPhieuKham(request.getParameter("maPhieuKham"));
+            
             newEncounterDTO.setTrieuChung(request.getParameter("trieuChung"));
             newEncounterDTO.setHuyetAp(request.getParameter("huyetAp"));
             newEncounterDTO.setChanDoan(request.getParameter("chanDoan"));
@@ -236,7 +235,7 @@ public class EMRCoreController extends HttpServlet {
                 newEncounterDTO.setNhipTim(Integer.parseInt(nhipTimStr));
             }
             String nhipThoStr = request.getParameter("nhipTho");
-            if (nhipTimStr != null && !nhipTimStr.isEmpty()) {
+            if (nhipTimStr != null && !nhipThoStr.isEmpty()) {
                 newEncounterDTO.setNhipTho(Integer.parseInt(nhipThoStr));
             }
 
@@ -256,7 +255,7 @@ public class EMRCoreController extends HttpServlet {
             String encodedKeyword = java.net.URLEncoder.encode(keyword, "UTF-8");
 
             // 3. Xử lý kết quả thành công
-            request.setAttribute("SUCCESS_MESSAGE", "Tạo phiếu khám thành công! ID: " + result.getId());
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Tạo phiếu khám thành công! ID: " + result.getId());
             return "redirect:/MainController?action=listAllEncounters&keyword=" + encodedKeyword;
 
         } catch (ValidationException e) {

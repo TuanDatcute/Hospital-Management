@@ -1,0 +1,246 @@
+/* ==========================================================================
+   BIẾN TOÀN CỤC & KIỂU DÁNG CHUNG (ĐỒNG BỘ)
+   ========================================================================== */
+
+/* 🎨 Chế độ SÁNG */
+:root {
+    --primary-color: #4a90e2;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+
+    --bg-color: #f4f7f9;
+    --surface-color: #ffffff;
+    --border-color: #e9ecef;
+    --text-primary: #343a40;
+    --text-secondary: #6c757d;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+}
+
+/* 🎨 Chế độ TỐI "BẠC ĐEN" */
+body.dark-mode {
+    --primary-color: #77A5D9;
+    --success-color: #3d8c5a;
+    --danger-color: #e57373;
+
+    --bg-color: #121212;
+    --surface-color: #1E1E1E;
+    --border-color: #333333;
+    --text-primary: #E0E0E0;
+    --text-secondary: #888888;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 20px;
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* ==========================================================================
+   LAYOUT CHÍNH & HEADER
+   ========================================================================== */
+.main-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 30px 40px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+}
+
+h1 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+
+.header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 20px;
+}
+
+.search-form {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.search-form .form-control {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 15px 10px 40px; /* Padding cho icon */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.2s ease-in-out;
+}
+.search-form .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+.search-form .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   BẢNG DỮ LIỆU
+   ========================================================================== */
+.table-responsive {
+    overflow-x: auto;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.data-table th, .data-table td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+    vertical-align: middle;
+}
+.data-table thead th {
+    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+.data-table tbody tr:hover {
+    background-color: color-mix(in srgb, var(--bg-color) 70%, var(--surface-color));
+}
+.text-center {
+    text-align: center;
+}
+.no-results {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 40px;
+}
+
+/* ==========================================================================
+   NÚT BẤM
+   ========================================================================== */
+.btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+}
+.btn:hover {
+    transform: translateY(-2px);
+}
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+.btn-secondary {
+    background-color: var(--text-secondary);
+    color: white;
+}
+.actions .btn {
+    padding: 8px 15px;
+}
+
+/* ==========================================================================
+   ALERT
+   ========================================================================== */
+.alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+}
+.alert-success {
+    background-color: color-mix(in srgb, var(--success-color) 15%, transparent);
+    color: var(--success-color);
+}
+body.dark-mode .alert-success {
+    color: #81c784;
+}
+
+/* ==========================================================================
+   NÚT GẠT CHUYỂN CHẾ ĐỘ
+   ========================================================================== */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+}
+.theme-switch {
+    display: inline-block;
+    height: 28px;
+    position: relative;
+    width: 54px;
+}
+.theme-switch input {
+    display: none;
+}
+.slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 28px;
+}
+.slider:before {
+    background-color: #fff;
+    bottom: 4px;
+    content: "";
+    height: 20px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 20px;
+    border-radius: 50%;
+}
+.slider::after {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: all .4s;
+}
+.slider::after {
+    content: "\f186";
+    color: #f1c40f;
+    right: 8px;
+}
+input:checked + .slider {
+    background-color: #555;
+}
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+input:checked + .slider::after {
+    content: "\f185";
+    color: #f39c12;
+    left: 8px;
+}

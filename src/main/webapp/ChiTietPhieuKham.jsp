@@ -332,6 +332,8 @@
                 }
 
                 updateVitalGauges();
+                
+                
                 // 1. Lấy ra các đối tượng cần thiết từ DOM
                 const themeToggle = document.getElementById('theme-toggle');
                 const body = document.body;
@@ -379,8 +381,6 @@
                     applyTheme(newTheme);
                 });
             });
-
-
         </script>
     </body>
 </html>
