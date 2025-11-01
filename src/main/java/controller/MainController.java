@@ -64,8 +64,11 @@ public class MainController extends HttpServlet {
         String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien",
             "showNhanVienEditForm", "updateNhanVien", "deleteNhanVien"};
 
+        // --- **BẮT ĐẦU SỬA: Thêm 'updateProfile'** ---
         String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan",
-            "showBenhNhanEditForm", "updateBenhNhan", "deleteBenhNhan"};
+            "showBenhNhanEditForm", "updateBenhNhan", "deleteBenhNhan",
+            "updateProfile"}; // <-- THÊM ACTION MỚI
+        // --- **KẾT THÚC SỬA** ---
 
         String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen",
             "updateLichHenStatus"};

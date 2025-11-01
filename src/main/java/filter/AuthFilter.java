@@ -13,34 +13,41 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import model.dto.BenhNhanDTO; // <-- **THÊM 1: IMPORT DTO BỆNH NHÂN**
+import model.dto.TaiKhoanDTO; // <-- **THÊM 2: IMPORT DTO TÀI KHOẢN**
+import service.BenhNhanService; // <-- **THÊM 3: IMPORT SERVICE BỆNH NHÂN**
 
 /**
  * Filter này kiểm tra xem người dùng đã đăng nhập (đã xác thực) chưa
- * trước khi cho phép truy cập các trang cần bảo vệ.
+ * VÀ kiểm tra xem Bệnh nhân đã hoàn tất hồ sơ chưa.
  */
 @WebFilter(filterName = "AuthFilter", urlPatterns = {"/*"}) // Áp dụng Filter cho TẤT CẢ request
 public class AuthFilter implements Filter {
 
     // Danh sách các tài nguyên (URL) công khai, không cần đăng nhập (Whitelist)
     private List<String> publicUrls;
+    private BenhNhanService benhNhanService; // <-- **THÊM 4: KHAI BÁO SERVICE**
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        // Khởi tạo Service 1 lần khi Filter bắt đầu
+        benhNhanService = new BenhNhanService();
+        
         // Khởi tạo danh sách các URL công khai
         publicUrls = new ArrayList<>();
         
         // --- CÁC TRANG JSP CÔNG KHAI ---
         publicUrls.add("/login.jsp");      
-        publicUrls.add("/register.jsp");   
+        // publicUrls.add("/register.jsp"); // **SỬA 5: Xóa vì đã gộp vào login.jsp**
         publicUrls.add("/index.jsp");     
         
         // --- THƯ MỤC CÔNG KHAI ---
-        // Giả sử các file CSS, JS, ảnh nằm ngoài WEB-INF (là public)
         publicUrls.add("/css/");         
         publicUrls.add("/images/");     
         publicUrls.add("/js/");
         
-        // Bất kỳ đường dẫn nào khác, nếu không có action, sẽ bị chặn.
+        // **THÊM 6: Trang điền hồ sơ (cần cho Bệnh nhân mới)**
+        publicUrls.add("/user/fillProfile.jsp"); 
     }
 
     /**
@@ -61,7 +68,7 @@ public class AuthFilter implements Filter {
         // 1. Kiểm tra xem người dùng đã đăng nhập chưa
         boolean loggedIn = (session != null && session.getAttribute("USER") != null);
 
-        // 2. Kiểm tra xem tài nguyên yêu cầu có nằm trong danh sách "công khai" không
+        // 2. Kiểm tra xem tài nguyên yêu cầu có phải là "công khai" không
         boolean isPublicResource = false;
         for (String publicUrl : publicUrls) {
             if (path.startsWith(publicUrl)) {
@@ -71,24 +78,66 @@ public class AuthFilter implements Filter {
         }
         
         // 3. Xử lý đặc biệt cho MainController
+        boolean isPublicAction = false;
         if (path.equals("/MainController")) {
             String action = request.getParameter("action");
             if (action != null) {
-                // Các action được phép truy cập công khai (chưa cần login)
-                if (action.equals("login") || action.equals("showUserRegister") || action.equals("register")) {
-                    isPublicResource = true;
+                // Các action công khai (chưa cần login)
+                if (action.equals("login") || action.equals("register")) {
+                    isPublicAction = true;
+                }
+                
+                // **THÊM 7: Cho phép action "updateProfile" (để Bệnh nhân mới có thể lưu)**
+                if (action.equals("updateProfile")) {
+                    isPublicAction = true;
                 }
             }
         }
+        
+        // --- BẮT ĐẦU LOGIC LỌC ---
 
-        // 4. Quyết định điều hướng
-        if (loggedIn || isPublicResource) {
-            // Đã đăng nhập HOẶC truy cập trang public -> Cho đi tiếp
+        if (loggedIn) {
+            // --- NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP ---
+            
+            TaiKhoanDTO user = (TaiKhoanDTO) session.getAttribute("USER");
+            
+            // 4. **LOGIC MỚI (Bước 8): KIỂM TRA HOÀN TẤT HỒ SƠ**
+            // Chỉ kiểm tra Bệnh nhân
+            if ("BENH_NHAN".equals(user.getVaiTro())) {
+                BenhNhanDTO benhNhan = benhNhanService.getBenhNhanByTaiKhoanId(user.getId());
+                
+                // Kiểm tra xem hồ sơ đã hoàn tất chưa (ví dụ: cccd là bắt buộc)
+                if (benhNhan == null || benhNhan.getCccd() == null || benhNhan.getCccd().isEmpty()) {
+                    
+                    // Hồ sơ CHƯA hoàn tất.
+                    // Kiểm tra xem họ có đang cố truy cập trang khác không
+                    boolean isGoingToFillProfile = path.equals("/user/fillProfile.jsp");
+                    boolean isSubmittingProfile = path.equals("/MainController") && "updateProfile".equals(request.getParameter("action"));
+
+                    if (isGoingToFillProfile || isSubmittingProfile) {
+                        // OK, họ đang ở đúng trang điền hồ sơ (hoặc đang nhấn nút Lưu)
+                        chain.doFilter(request, response);
+                    } else {
+                        // Nếu họ cố vào home.jsp hoặc trang khác -> Ép quay lại
+                        System.out.println("AuthFilter: Ép Bệnh nhân (ID: " + user.getId() + ") điền hồ sơ.");
+                        httpResponse.sendRedirect(contextPath + "/user/fillProfile.jsp");
+                    }
+                    return; // Dừng Filter tại đây
+                }
+            }
+            
+            // Nếu đã đăng nhập VÀ hồ sơ OK (hoặc là Admin/BS), cho đi tiếp
             chain.doFilter(request, response);
+
+        } else if (isPublicResource || isPublicAction) {
+            // --- CHƯA ĐĂNG NHẬP, NHƯNG TRUY CẬP TRANG CÔNG KHAI ---
+            chain.doFilter(request, response); // Cho đi tiếp
+            
         } else {
-            // Chưa đăng nhập VÀ cố gắng truy cập trang private (home.jsp, admin/...)
-            System.out.println("AuthFilter: Chặn truy cập trái phép vào: " + path);
-            httpResponse.sendRedirect(contextPath + "/login.jsp");
+            // --- CHƯA ĐĂNG NHẬP VÀ CỐ GẮNG TRUY CẬP TRANG PRIVATE ---
+            // (Ví dụ: gõ /home.jsp hoặc /admin/dashboard.jsp)
+            System.out.println("AuthFilter: Chặn truy cập trái phép (chưa đăng nhập) vào: " + path);
+            httpResponse.sendRedirect(contextPath + "/login.jsp"); // Đá về trang đăng nhập
         }
     }
 
@@ -96,6 +145,4 @@ public class AuthFilter implements Filter {
     public void destroy() {
         // Không cần làm gì
     }
-
-    // --- Các hàm boilerplate khác đã được lược bỏ ---
 }

@@ -1,13 +1,22 @@
 package model.dto;
 
-import java.time.LocalDateTime; 
+import java.io.Serializable; // <-- **THÊM 1: IMPORT**
+import java.time.LocalDate; // <-- **THÊM 2: IMPORT (thay cho LocalDateTime)**
 
-public class BenhNhanDTO {
+/**
+ * DTO (Data Transfer Object) cho BenhNhan.
+ * Dùng để truyền dữ liệu Bệnh nhân giữa View (JSP) và Controller/Service.
+ */
+public class BenhNhanDTO implements Serializable { // <-- **SỬA 3: THÊM Serializable**
+
+    private static final long serialVersionUID = 1L; // Bắt buộc phải có
 
     private int id;
     private String maBenhNhan;
     private String hoTen;
-    private LocalDateTime ngaySinh; 
+    
+    private LocalDate ngaySinh; // <-- **SỬA 4: Đổi kiểu dữ liệu**
+    
     private String gioiTinh;
     private String diaChi;
     private String soDienThoai;
@@ -21,7 +30,8 @@ public class BenhNhanDTO {
     public BenhNhanDTO() {
     }
 
-    public BenhNhanDTO(int id, String maBenhNhan, String hoTen, LocalDateTime ngaySinh, String gioiTinh, String diaChi, String soDienThoai, String nhomMau, String cccd, String tienSuBenh, Integer taiKhoanId) {
+    // Constructor đầy đủ (Đã sửa kiểu ngaySinh)
+    public BenhNhanDTO(int id, String maBenhNhan, String hoTen, LocalDate ngaySinh, String gioiTinh, String diaChi, String soDienThoai, String nhomMau, String cccd, String tienSuBenh, Integer taiKhoanId) {
         this.id = id;
         this.maBenhNhan = maBenhNhan;
         this.hoTen = hoTen;
@@ -35,6 +45,7 @@ public class BenhNhanDTO {
         this.taiKhoanId = taiKhoanId;
     }
 
+    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -59,13 +70,15 @@ public class BenhNhanDTO {
         this.hoTen = hoTen;
     }
 
-    public LocalDateTime getNgaySinh() {
+    // --- **SỬA 5: ĐỔI KIỂU GETTER/SETTER** ---
+    public LocalDate getNgaySinh() {
         return ngaySinh;
     }
 
-    public void setNgaySinh(LocalDateTime ngaySinh) {
+    public void setNgaySinh(LocalDate ngaySinh) {
         this.ngaySinh = ngaySinh;
     }
+    // --- **KẾT THÚC SỬA ĐỔI** ---
 
     public String getGioiTinh() {
         return gioiTinh;
@@ -122,6 +135,4 @@ public class BenhNhanDTO {
     public void setTaiKhoanId(Integer taiKhoanId) {
         this.taiKhoanId = taiKhoanId;
     }
-
-   
 }
