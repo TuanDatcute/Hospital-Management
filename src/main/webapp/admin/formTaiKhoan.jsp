@@ -1,5 +1,5 @@
 <%--
-    Document   : formTaiKhoan.jsp
+    Document   : formTaiKhoan.jsp (Đã đơn giản hóa cho Admin)
     Created on : Oct 29, 2025
     Author     : ADMIN
 --%>
@@ -12,7 +12,6 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
-    <%-- Đặt tiêu đề động (Thêm mới hoặc Cập nhật) --%>
     <c:set var="isCreating" value="${requestScope.formAction == 'createUser'}" />
     <title>${isCreating ? 'Thêm Tài khoản' : 'Cập nhật Tài khoản'}</title>
     
@@ -26,65 +25,60 @@
     <div class="container page-content" style="padding-top: 30px;">
         
         <h2 class="section-title">
-            <c:if test="${isCreating}">Thêm Tài khoản Mới</c:if>
-            <c:if test="${!isCreating}">Cập nhật Trạng thái/Vai trò</c:if>
+            <c:if test="${isCreating}">Thêm Tài khoản Nhân viên</c:if>
+            <c:if test="${!isCreating}">Cập nhật Trạng thái Tài khoản</c:if>
         </h2>
 
         <c:if test="${not empty requestScope.ERROR_MESSAGE}">
             <p class="error-message">${requestScope.ERROR_MESSAGE}</p>
         </c:if>
 
-        <%-- Form này dùng chung cho cả Create và Update --%>
         <form action="MainController" method="post" class="data-form">
             
-            <%-- Truyền action (createKhoa/updateKhoa) --%>
             <input type="hidden" name="action" value="${requestScope.formAction}" />
             
-            <%-- Truyền ID (chỉ khi cập nhật - formAction == 'updateUserStatus') --%>
             <c:if test="${!isCreating}">
                 <input type="hidden" name="id" value="${requestScope.USER_DATA.id}" />
             </c:if>
 
             <div class="form-group">
                 <label for="tenDangNhap">Tên đăng nhập:</label>
-                <%-- Nếu là cập nhật, không cho sửa tên đăng nhập --%>
                 <input type="text" id="tenDangNhap" name="tenDangNhap" 
                        value="<c:out value="${requestScope.USER_DATA.tenDangNhap}"/>" 
                        ${!isCreating ? 'readonly' : ''} 
                        required="required">
             </div>
 
+            <%-- **ĐÃ XÓA Ô EMAIL** --%>
+            <%-- (Bạn có thể thêm lại nếu muốn, nhưng bỏ 'required="required"') --%>
+            <%--
             <div class="form-group">
-                <label for="email">Email:</label>
+                <label for="email">Email (Tùy chọn):</label>
                 <input type="email" id="email" name="email" 
                        value="<c:out value="${requestScope.USER_DATA.email}"/>" 
-                       ${!isCreating ? 'readonly' : ''} 
-                       required="required">
+                       ${!isCreating ? 'readonly' : ''}>
             </div>
+            --%>
 
             <%-- Chỉ hiển thị ô nhập mật khẩu KHI TẠO MỚI --%>
             <c:if test="${isCreating}">
                 <div class="form-group">
-                    <label for="password">Mật khẩu:</label>
+                    <label for="password">Mật khẩu tạm thời:</label>
                     <input type="password" id="password" name="password" required="required">
                 </div>
-                <div class="form-group">
-                    <label for="confirmPassword">Xác nhận Mật khẩu:</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required="required">
-                </div>
+                <%-- **ĐÃ XÓA Ô XÁC NHẬN MẬT KHẨU** --%>
             </c:if>
 
             <div class="form-group">
                 <label for="vaiTro">Vai trò:</label>
-                <select id="vaiTro" name="vaiTro" ${!isCreating ? 'disabled' : ''}> <%-- Không cho sửa vai trò khi update (chỉ cho sửa status) --%>
-                    <option value="QUAN_TRI" ${requestScope.USER_DATA.vaiTro == 'QUAN_TRI' ? 'selected' : ''}>Quản trị (Admin)</option>
+                <select id="vaiTro" name="vaiTro" ${!isCreating ? 'disabled' : ''}>
+                    <%-- **ĐÃ GIỚI HẠN LẠI VAI TRÒ** --%>
                     <option value="BAC_SI" ${requestScope.USER_DATA.vaiTro == 'BAC_SI' ? 'selected' : ''}>Bác sĩ</option>
                     <option value="LE_TAN" ${requestScope.USER_DATA.vaiTro == 'LE_TAN' ? 'selected' : ''}>Lễ tân</option>
-                    <option value="BENH_NHAN" ${requestScope.USER_DATA.vaiTro == 'BENH_NHAN' ? 'selected' : ''}>Bệnh nhân</option>
                 </select>
             </div>
 
-            <%-- Chỉ hiển thị ô Trạng thái KHI CẬP NHẬT (action 'updateUserStatus') --%>
+            <%-- Chỉ hiển thị ô Trạng thái KHI CẬP NHẬT --%>
             <c:if test="${!isCreating}">
                  <div class="form-group">
                     <label for="trangThai">Trạng thái:</label>

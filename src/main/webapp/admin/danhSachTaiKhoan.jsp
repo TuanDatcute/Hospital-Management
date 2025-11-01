@@ -1,5 +1,5 @@
 <%--
-    Document   : danhSachTaiKhoan.jsp
+    Document   : danhSachTaiKhoan.jsp (Đã sửa lỗi GET/POST)
     Created on : Oct 29, 2025
     Author     : ADMIN
 --%>
@@ -13,21 +13,17 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Quản lý Tài khoản</title>
 
-        <%-- Nhúng CSS/Font chung --%>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
     </head>
     <body>
 
-        <%-- Nhúng Header --%>
         <jsp:include page="/WEB-INF/header.jsp" /> 
 
-        <%-- Nội dung chính --%>
         <div class="container page-content" style="padding-top: 30px;">
 
             <h2 class="section-title">Quản lý Tài khoản</h2>
 
-            <%-- Hiển thị thông báo (nếu có) --%>
             <c:if test="${not empty requestScope.SUCCESS_MESSAGE}">
                 <p class="success-message">${requestScope.SUCCESS_MESSAGE}</p>
             </c:if>
@@ -35,12 +31,10 @@
                 <p class="error-message">${requestScope.ERROR_MESSAGE}</p>
             </c:if>
 
-            <%-- Nút Thêm Mới --%>
-            <a href="MainController?action=showUserCreateForm" class="add-new-btn">
+            <a href="${pageContext.request.contextPath}/MainController?action=showUserCreateForm" class="add-new-btn">
                 <i class="fas fa-user-plus"></i> Thêm Tài khoản Mới
             </a>
 
-            <%-- Bảng Dữ liệu --%>
             <table class="data-table">
                 <thead>
                     <tr>
@@ -53,14 +47,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <%-- Dùng JSTL để lặp qua danh sách LIST_TAIKHOAN --%>
                     <c:forEach var="tk" items="${requestScope.LIST_TAIKHOAN}">
                         <tr>
                             <td>${tk.id}</td>
                             <td><c:out value="${tk.tenDangNhap}" /></td>
                             <td><c:out value="${tk.email}" /></td>
                             <td><c:out value="${tk.vaiTro}" /></td>
-
                             <td>
                                 <c:if test="${tk.trangThai == 'HOAT_DONG'}">
                                     <span style="color: green; font-weight: bold;">Hoạt động</span>
@@ -71,28 +63,44 @@
                             </td>
 
                             <td class="actions">
-                                <%-- Không cho admin tự khóa chính mình --%>
+                                <%-- Không cho admin tự khóa/sửa chính mình --%>
                                 <c:if test="${sessionScope.USER.id != tk.id}">
-                                    <%-- Link Sửa --%>
-                                    <a href="MainController?action=showUserEditForm&id=${tk.id}" class="edit-btn" title="Sửa Trạng thái/Vai trò">
+
+                                    <%-- Link Sửa (vẫn là GET vì nó chỉ HIỂN THỊ form) --%>
+                                    <a href="${pageContext.request.contextPath}/MainController?action=showUserEditForm&id=${tk.id}" class="edit-btn" title="Sửa Trạng thái">
                                         <i class="fas fa-edit"></i>
                                     </a>
 
-                                    <%-- Nút Khóa --%>
+                                    <%-- **SỬA LỖI: Dùng Form POST cho Nút Khóa** --%>
                                     <c:if test="${tk.trangThai == 'HOAT_DONG'}">
-                                        <a href="MainController?action=updateUserStatus&id=${tk.id}&trangThai=BI_KHOA" class="delete-btn" title="Khóa tài khoản"
-                                           onclick="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản này?');">
-                                            <i class="fas fa-lock"></i>
-                                        </a>
+                                        <form action="${pageContext.request.contextPath}/MainController" method="post" class="table-form" 
+                                              onsubmit="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản này?');">
+
+                                            <input type="hidden" name="action" value="updateUserStatus" />
+                                            <input type="hidden" name="id" value="${tk.id}" />
+                                            <input type="hidden" name="trangThai" value="BI_KHOA" />
+
+                                            <button type="submit" class="delete-btn" title="Khóa tài khoản">
+                                                <i class="fas fa-lock"></i>
+                                            </button>
+                                        </form>
                                     </c:if>
 
-                                    <%-- Nút Mở khóa --%>
+                                    <%-- **SỬA LỖI: Dùng Form POST cho Nút Mở khóa** --%>
                                     <c:if test="${tk.trangThai == 'BI_KHOA'}">
-                                        <a href="MainController?action=updateUserStatus&id=${tk.id}&trangThai=HOAT_DONG" class="edit-btn" title="Mở khóa tài khoản"
-                                           onclick="return confirm('Bạn có chắc chắn muốn MỞ KHÓA tài khoản này?');">
-                                            <i class="fas fa-lock-open"></i>
-                                        </a>
+                                        <form action="${pageContext.request.contextPath}/MainController" method="post" class="table-form" 
+                                              onsubmit="return confirm('Bạn có chắc chắn muốn MỞ KHÓA tài khoản này?');">
+
+                                            <input type="hidden" name="action" value="updateUserStatus" />
+                                            <input type="hidden" name="id" value="${tk.id}" />
+                                            <input type="hidden" name="trangThai" value="HOAT_DONG" />
+
+                                            <button type="submit" class="edit-btn" title="Mở khóa tài khoản">
+                                                <i class="fas fa-lock-open"></i>
+                                            </button>
+                                        </form>
                                     </c:if>
+
                                 </c:if>
 
                                 <c:if test="${sessionScope.USER.id == tk.id}">
@@ -110,9 +118,8 @@
                 </tbody>
             </table>
 
-        </div> <%-- Kết thúc .container.page-content --%>
+        </div> 
 
-        <%-- Nhúng Footer --%>
         <jsp:include page="/WEB-INF/footer.jsp" /> 
 
     </body>
