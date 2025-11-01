@@ -1,6 +1,6 @@
 package controller;
 
-import exception.ValidationException; 
+import exception.ValidationException; // (Giữ nguyên import của bạn)
 import java.io.IOException;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -19,14 +19,11 @@ import service.TaiKhoanService;
 @WebServlet(name = "UserController", urlPatterns = {"/UserController"})
 public class UserController extends HttpServlet {
 
-    // --- SỬA 1: Sửa lại hằng số HOME_PAGE ---
     private static final String LOGIN_PAGE = "login.jsp";
-    private static final String HOME_PAGE = "home.jsp"; // <<< SỬA LỖI: Phải là home.jsp
+    private static final String HOME_PAGE = "home.jsp"; // Trang của Bệnh nhân
+    private static final String ADMIN_DASHBOARD_PAGE = "admin/dashboard.jsp"; // Trang của Admin
+    private static final String STAFF_DASHBOARD_PAGE = "staff/dashboard.jsp"; // Trang của Nhân viên
 
-    // --- SỬA 2: Sửa lỗi chính tả 'dashBoard' ---
-    private static final String ADMIN_DASHBOARD_PAGE = "admin/dashboard.jsp"; // <<< SỬA LỖI: dashboard.jsp
-
-    private static final String STAFF_DASHBOARD_PAGE = "staff/dashboard.jsp"; // (Đã thêm ở bước phân luồng)
     private static final String USER_LIST_PAGE = "admin/danhSachTaiKhoan.jsp";
     private static final String USER_FORM_PAGE = "admin/formTaiKhoan.jsp";
     private static final String CHANGE_PASSWORD_PAGE = "user/changePassword.jsp";
@@ -116,7 +113,7 @@ public class UserController extends HttpServlet {
                     successRedirectUrl = url;
                     break;
                 case "createUser":
-                    url = createUser(request);
+                    url = createUser(request); // <-- SẼ GỌI HÀM ĐÃ SỬA
                     successRedirectUrl = USER_LIST_PAGE;
                     break;
                 case "updateUserStatus":
@@ -143,13 +140,13 @@ public class UserController extends HttpServlet {
                 url = listUsers(request);
             }
 
-        } catch (ValidationException e) { // <-- SỬA 3: Bắt ValidationException (lỗi người dùng)
+        } catch (ValidationException e) {
             log("Lỗi Validation tại UserController (doPost): " + e.getMessage());
             handleServiceException(request, e, action, errorFormPage);
             url = errorFormPage;
             redirectAfterSuccess = false;
 
-        } catch (Exception e) { // <-- SỬA 3: Bắt Exception chung (lỗi hệ thống)
+        } catch (Exception e) {
             log("Lỗi Hệ thống tại UserController (doPost): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Lỗi hệ thống: " + e.getMessage());
             url = ERROR_PAGE;
@@ -164,7 +161,6 @@ public class UserController extends HttpServlet {
                     response.sendRedirect(response.encodeRedirectURL(finalUrl));
                 }
             } else {
-                // **SỬA 3: Forward đến 'url' (đã được 'try' hoặc 'catch' gán)**
                 request.getRequestDispatcher(url).forward(request, response);
             }
         }
@@ -174,25 +170,22 @@ public class UserController extends HttpServlet {
      * Xử lý logic đăng nhập VÀ PHÂN LUỒNG.
      */
     private String login(HttpServletRequest request, HttpServletResponse response)
-            throws ValidationException, Exception { // **SỬA 3: Ném Exception ra ngoài**
+            throws ValidationException, Exception {
 
         String tenDangNhap = request.getParameter("username");
         String matKhau = request.getParameter("password");
 
-        // **SỬA 3: Bỏ try-catch. Ném lỗi ra ngoài để doPost bắt**
         TaiKhoanDTO user = taiKhoanService.login(tenDangNhap, matKhau);
         HttpSession session = request.getSession();
         session.setAttribute("USER", user);
         session.setAttribute("ROLE", user.getVaiTro());
 
-        // Logic ép buộc đổi mật khẩu
         if ("CAN_DOI".equals(user.getTrangThaiMatKhau())) {
             session.setAttribute("FORCE_CHANGE_PASS_MSG",
                     "Đây là lần đăng nhập đầu tiên. Vì lý do bảo mật, bạn phải đổi mật khẩu ngay lập tức.");
             return CHANGE_PASSWORD_PAGE;
         }
 
-        // Logic phân luồng 3 hướng
         if ("QUAN_TRI".equals(user.getVaiTro())) {
             return ADMIN_DASHBOARD_PAGE;
         } else if ("BAC_SI".equals(user.getVaiTro()) || "LE_TAN".equals(user.getVaiTro())) {
@@ -205,7 +198,7 @@ public class UserController extends HttpServlet {
     /**
      * Xử lý logic thay đổi mật khẩu VÀ PHÂN LUỒNG 3 HƯỚNG.
      */
-    private String changePassword(HttpServletRequest request) throws ValidationException, Exception { // **SỬA 3: Ném Exception**
+    private String changePassword(HttpServletRequest request) throws ValidationException, Exception {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("USER") == null) {
             throw new ValidationException("Bạn cần đăng nhập để thực hiện chức năng này.");
@@ -240,10 +233,29 @@ public class UserController extends HttpServlet {
         }
     }
 
+    // --- **BẮT ĐẦU SỬA HÀM createUser THEO YÊU CẦU** ---
+    /**
+     * Xử lý logic tạo mới một Tài khoản (Đã đơn giản hóa).
+     */
+    private String createUser(HttpServletRequest request) throws ValidationException, Exception {
+        TaiKhoanDTO newTaiKhoanDTO = createDTOFromRequest(request);
+        String plainPassword = request.getParameter("password");
+
+        if (plainPassword == null || plainPassword.length() < 6) {
+            throw new ValidationException("Mật khẩu tạm thời phải có ít nhất 6 ký tự.");
+        }
+
+        // --- **ĐÃ XÓA LOGIC KIỂM TRA 'confirmPassword'** ---
+        TaiKhoanDTO result = taiKhoanService.createTaiKhoan(newTaiKhoanDTO, plainPassword);
+        request.setAttribute("SUCCESS_MESSAGE", "Tạo tài khoản '" + result.getTenDangNhap() + "' thành công!");
+        return USER_LIST_PAGE;
+    }
+    // --- **KẾT THÚC SỬA HÀM createUser** ---
+
     /**
      * Xử lý logic đăng ký tài khoản (cho Bệnh nhân).
      */
-    private String register(HttpServletRequest request) throws ValidationException, Exception { // **SỬA 3: Ném Exception**
+    private String register(HttpServletRequest request) throws ValidationException, Exception {
         String tenDangNhap = request.getParameter("username");
         String email = request.getParameter("email");
         String matKhau = request.getParameter("password");
@@ -286,9 +298,8 @@ public class UserController extends HttpServlet {
         }
     }
 
-    // ... (Các hàm còn lại: logout, listUsers, showUserEditForm, createUser, updateUserStatus, createDTOFromRequest, getServletInfo... giữ nguyên) ...
+    // ... (Các hàm còn lại: logout, listUsers, showUserEditForm, updateUserStatus, createDTOFromRequest, getServletInfo... giữ nguyên) ...
     private String logout(HttpServletRequest request) {
-        /* ... */
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
@@ -297,14 +308,12 @@ public class UserController extends HttpServlet {
     }
 
     private String listUsers(HttpServletRequest request) throws Exception {
-        /* ... */
         List<TaiKhoanDTO> list = taiKhoanService.getAllTaiKhoan();
         request.setAttribute("LIST_TAIKHOAN", list);
         return USER_LIST_PAGE;
     }
 
     private String showUserEditForm(HttpServletRequest request) throws Exception {
-        /* ... */
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             TaiKhoanDTO taiKhoan = taiKhoanService.getTaiKhoanById(id);
@@ -316,24 +325,7 @@ public class UserController extends HttpServlet {
         }
     }
 
-    private String createUser(HttpServletRequest request) throws Exception {
-        /* ... */
-        TaiKhoanDTO newTaiKhoanDTO = createDTOFromRequest(request);
-        String plainPassword = request.getParameter("password");
-        if (plainPassword == null || plainPassword.length() < 6) {
-            throw new ValidationException("Mật khẩu khi tạo phải có ít nhất 6 ký tự.");
-        }
-        String confirmPassword = request.getParameter("confirmPassword");
-        if (!plainPassword.equals(confirmPassword)) {
-            throw new ValidationException("Mật khẩu và xác nhận mật khẩu không khớp.");
-        }
-        TaiKhoanDTO result = taiKhoanService.createTaiKhoan(newTaiKhoanDTO, plainPassword);
-        request.setAttribute("SUCCESS_MESSAGE", "Tạo tài khoản '" + result.getTenDangNhap() + "' thành công!");
-        return USER_LIST_PAGE;
-    }
-
     private String updateUserStatus(HttpServletRequest request) throws Exception {
-        /* ... */
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             String newTrangThai = request.getParameter("trangThai");
@@ -346,7 +338,6 @@ public class UserController extends HttpServlet {
     }
 
     private TaiKhoanDTO createDTOFromRequest(HttpServletRequest request) {
-        /* ... */
         TaiKhoanDTO dto = new TaiKhoanDTO();
         String idStr = request.getParameter("id");
         if (idStr != null && !idStr.isEmpty()) {

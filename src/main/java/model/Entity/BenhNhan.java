@@ -1,6 +1,8 @@
-package model.Entity;
+package model.Entity; // Gói của bạn
 
-import java.time.LocalDateTime; 
+import java.io.Serializable; // <-- **THÊM 1: IMPORT**
+import java.time.LocalDate; // <-- **THÊM 2: IMPORT (thay cho LocalDateTime)**
+import java.time.LocalDateTime; // (Giữ lại nếu bạn dùng cho các trường khác)
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,21 +15,25 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "BenhNhan")
-public class BenhNhan {
+public class BenhNhan implements Serializable { // <-- **SỬA 3: THÊM Serializable**
+
+    private static final long serialVersionUID = 1L; // Thêm dòng này
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
-   
+    
     @Column(name = "ma_benh_nhan", nullable = false, unique = true, columnDefinition = "NVARCHAR(MAX)")
     private String maBenhNhan;
 
     @Column(name = "ho_ten", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String hoTen;
 
-    @Column(name = "ngay_sinh")
-    private LocalDateTime ngaySinh; 
+    // --- **SỬA 4: ĐỔI KIỂU DỮ LIỆU** ---
+    @Column(name = "ngay_sinh") // Sẽ được map sang kiểu DATE trong CSDL
+    private LocalDate ngaySinh; 
+    // --- **KẾT THÚC SỬA** ---
 
     @Column(name = "gioi_tinh", columnDefinition = "NVARCHAR(MAX)")
     private String gioiTinh;
@@ -38,16 +44,16 @@ public class BenhNhan {
     @Column(name = "so_dien_thoai", columnDefinition = "NVARCHAR(MAX)")
     private String soDienThoai;
     
-    @Column(name = "cccd", length = 20, unique = true, columnDefinition = "NVARCHAR(MAX)"   )
+    @Column(name = "cccd", length = 20, unique = true, columnDefinition = "NVARCHAR(MAX)")
     private String cccd;
 
-    @Column(name = "nhom_mau", columnDefinition = "NVARCHAR(MAX)",nullable = true)
+    @Column(name = "nhom_mau", columnDefinition = "NVARCHAR(MAX)", nullable = true)
     private String nhomMau;
 
-    @Column(name = "tien_su_benh", columnDefinition = "NVARCHAR(MAX)",nullable = true)
+    @Column(name = "tien_su_benh", columnDefinition = "NVARCHAR(MAX)", nullable = true)
     private String tienSuBenh;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = true) 
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "tai_khoan_id", referencedColumnName = "id", nullable = true)
     private TaiKhoan taiKhoan;
     
@@ -80,13 +86,15 @@ public class BenhNhan {
         this.hoTen = hoTen;
     }
 
-    public LocalDateTime getNgaySinh() { // <-- ĐÃ THAY ĐỔI
+    // --- **SỬA 5: ĐỔI KIỂU GETTER/SETTER** ---
+    public LocalDate getNgaySinh() {
         return ngaySinh;
     }
 
-    public void setNgaySinh(LocalDateTime ngaySinh) { // <-- ĐÃ THAY ĐỔI
+    public void setNgaySinh(LocalDate ngaySinh) {
         this.ngaySinh = ngaySinh;
     }
+    // --- **KẾT THÚC SỬA** ---
 
     public String getGioiTinh() {
         return gioiTinh;

@@ -15,17 +15,16 @@ body, html {
 }
 
 body {
-    /* Font mặc định cho các trang nội dung (index, home, admin) */
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.6;
-    background-color: #f8f9fa; /* Nền xám rất nhạt */
+    background-color: #f8f9fa;
     color: #333;
 }
 
 a {
     text-decoration: none;
-    color: #0d6efd; /* Màu link mặc định */
+    color: #0d6efd;
 }
 a:hover {
     color: #0056b3;
@@ -36,7 +35,7 @@ ul {
     padding: 0;
     margin: 0;
 }
-.container { /* Lớp container để giới hạn chiều rộng */
+.container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 15px;
@@ -52,17 +51,17 @@ ul {
     font-weight: 600;
 }
 .success-message {
-    color: #0f5132; /* Màu chữ xanh lá đậm */
-    background-color: #d1e7dd; /* Nền xanh lá nhạt */
+    color: #0f5132;
+    background-color: #d1e7dd;
     border: 1px solid #badbcc;
     padding: 12px 15px;
     border-radius: 5px;
     text-align: center;
     margin-bottom: 20px;
     font-weight: 500;
-    font-family: 'Montserrat', sans-serif; /* Dùng font Montserrat */
+    font-family: 'Montserrat', sans-serif;
 }
-.error-message { /* Dùng chung cho Login và các lỗi khác */
+.error-message {
     color: #dc3545;
     background-color: #f8d7da;
     border: 1px solid #f5c6cb;
@@ -70,13 +69,12 @@ ul {
     border-radius: 4px;
     margin-bottom: 15px;
     text-align: center;
-    font-family: 'Montserrat', sans-serif; /* Dùng font Montserrat */
+    font-family: 'Montserrat', sans-serif;
 }
 
 
-/* === B. LOGIN PAGE STYLE (MỚI - Giao diện gộp 2-trong-1) === */
+/* === B. LOGIN PAGE STYLE (login.jsp, register.jsp, changePassword.jsp, fillProfile.jsp) === */
 
-/* Style cho body của trang login (căn giữa) */
 body.login-page-body {
     background-color: #c9d6ff;
     background: linear-gradient(to right, #e2e2e2, #c9d6ff);
@@ -85,26 +83,29 @@ body.login-page-body {
     justify-content: center;
     flex-direction: column;
     height: 100vh;
-    font-family: 'Montserrat', sans-serif; /* Áp dụng font này */
+    font-family: 'Montserrat', sans-serif;
+    /* **SỬA LỖI:** Thêm padding để form không bị che mất (nếu quá cao) */
+    padding: 20px 0;
+    height: auto; /* Cho phép cuộn nếu form quá dài */
+    min-height: 100vh;
 }
 
-/* Nút quay về Home */
 .home-link {
     position: absolute;
     top: 15px;
     right: 20px;
     font-size: 1.5em;
-    color: #333; /* Đổi màu cho dễ thấy trên nền trắng */
+    color: #333;
     text-decoration: none;
-    z-index: 100; /* Đảm bảo nó nằm trên form */
+    z-index: 100;
     transition: color 0.3s ease;
 }
 .home-link:hover {
-    color: #512da8; /* Đổi màu tím khi hover */
+    color: #512da8;
     text-decoration: none;
 }
 
-/* Container chính (lấy từ code bạn gửi) */
+/* Container chính (cho form gộp) */
 .login-container {
     background-color: #fff;
     border-radius: 30px;
@@ -114,19 +115,23 @@ body.login-page-body {
     width: 768px;
     max-width: 100%;
     min-height: 480px;
-
-    /* SỬA LỖI: Chiều cao linh hoạt (cho form Đổi mật khẩu) */
     height: auto;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Đặt lại style cho .login-container khi nó KHÔNG PHẢI là form gộp */
+/* Style cho form đơn (Đổi mật khẩu, Điền hồ sơ) */
 .login-container.single-form {
-    width: 480px; /* Độ rộng cố định cho form đơn (changePassword) */
+    width: 600px; /* **SỬA:** Tăng độ rộng cho fillProfile */
     min-height: auto; /* Bỏ chiều cao tối thiểu */
-    padding: 30px 40px;
+    padding: 30px 50px;
+}
+/* (Nếu form quá hẹp, giảm padding) */
+@media (max-width: 600px) {
+    .login-container.single-form {
+        padding: 30px 25px;
+    }
 }
 
 
@@ -136,11 +141,9 @@ body.login-page-body {
     letter-spacing: 0.3px;
     margin: 20px 0;
 }
-
 .login-container span {
     font-size: 12px;
 }
-
 .login-container a {
     color: #333;
     font-size: 13px;
@@ -148,9 +151,8 @@ body.login-page-body {
     margin: 15px 0 10px;
 }
 
-/* Nút bấm (Sign In/Sign Up) */
 .login-container button,
-.login-container input[type="submit"] { /* Áp dụng cho cả nút submit */
+.login-container input[type="submit"] {
     background-color: #512da8;
     color: #fff;
     font-size: 12px;
@@ -165,13 +167,14 @@ body.login-page-body {
     transition: background-color 0.3s ease;
 }
 .login-container input[type="submit"] {
-    width: 100%; /* Nút submit trong form nên rộng 100% */
+    width: 100%;
 }
-.login-container button.hidden { /* Nút ẩn trên overlay */
+.login-container button.hidden {
     background-color: transparent;
     border-color: #fff;
 }
 
+/* Form (của form gộp) */
 .login-container form {
     background-color: #fff;
     display: flex;
@@ -182,7 +185,6 @@ body.login-page-body {
     height: 100%;
 }
 
-/* Icon Social */
 .social-icons {
     margin: 20px 0;
 }
@@ -202,7 +204,7 @@ body.login-page-body {
     color: #512da8;
 }
 
-/* Ô nhập liệu (Đã bao gồm email, text, password) */
+/* Ô nhập liệu (của form gộp) */
 .login-container input[type="text"],
 .login-container input[type="password"],
 .login-container input[type="email"] {
@@ -316,14 +318,12 @@ body.login-page-body {
 
 
 /* === C. HEADER & FOOTER (Chung) === */
-
-/* Header Wrapper (Không cố định) */
+/* ... (Code Phần C giữ nguyên) ... */
 .header-wrapper {
-    background-color: #e7f1ff; /* Nền xanh nhạt */
+    background-color: #e7f1ff;
     position: relative;
     z-index: 1000;
 }
-/* Header Top Bar (Cuộn bình thường) */
 .header-top {
     padding: 6px 40px;
     display: flex;
@@ -389,17 +389,15 @@ body.login-page-body {
     border: 1px solid #ddd;
     border-radius: 3px;
 }
-
-/* Header Chính (Sticky) */
 .header-main {
     display: flex;
     align-items: center;
     padding: 12px 40px;
     background-color: #e7f1ff;
-    height: 60px; /* Chiều cao cố định */
+    height: 60px;
     box-sizing: border-box;
     position: sticky;
-    top: 0; /* Dính vào đỉnh khi cuộn */
+    top: 0;
     z-index: 999;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
@@ -458,11 +456,9 @@ body.login-page-body {
     margin-left: 3px;
     vertical-align: middle;
 }
-
-/* Marquee Banner (Sticky) */
 .marquee-banner {
     position: sticky;
-    top: 60px; /* Dính ngay dưới header-main */
+    top: 60px;
     left: 0;
     width: 100%;
     background-color: #0056b3;
@@ -479,8 +475,6 @@ body.login-page-body {
 .marquee-banner marquee {
     width: 100%;
 }
-
-/* Footer */
 footer {
     text-align: center;
     padding: 30px;
@@ -490,10 +484,11 @@ footer {
     border-top: 1px solid #d0e0ff;
 }
 
-/* === D. HOME PAGE STYLE (home.jsp, staff/dashboard.jsp) === */
 
+/* === D. HOME PAGE STYLE (home.jsp, staff/dashboard.jsp) === */
+/* ... (Code Phần D giữ nguyên) ... */
 .welcome-section {
-    padding: 15px 0; /* Chỉ padding top/bottom */
+    padding: 15px 0;
     border-bottom: 1px solid #dee2e6;
     margin-bottom: 20px;
     display: flex;
@@ -525,7 +520,6 @@ footer {
     color: #721c24;
     text-decoration: none;
 }
-
 .function-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -562,9 +556,9 @@ footer {
     font-size: 1.1em;
 }
 
-/* === E. INDEX PAGE STYLE (index.jsp) === */
 
-/* Hero Section */
+/* === E. INDEX PAGE STYLE (index.jsp) === */
+/* ... (Code Phần E giữ nguyên) ... */
 .hero {
     position: relative;
     padding: 100px 0 80px 0;
@@ -637,8 +631,6 @@ footer {
 .search-box button i {
     margin-right: 8px;
 }
-
-/* Features Section (Danh mục nổi bật) */
 .features-section {
     padding: 40px 0;
     background-color: #f0f8ff;
@@ -694,8 +686,6 @@ footer {
 .features-section .scroll-button {
     top: 50%;
 }
-
-/* Specialties Section (Chuyên khoa cuộn ngang) */
 .specialties-section {
     padding: 60px 0;
     background-color: #f8f9fa;
@@ -760,8 +750,6 @@ footer {
 .specialty-card .learn-more:hover {
     text-decoration: underline;
 }
-
-/* Nút bấm cuộn (Chung) */
 .scroll-button {
     position: absolute;
     top: 50%;
@@ -797,8 +785,6 @@ footer {
     cursor: not-allowed;
     pointer-events: none;
 }
-
-/* Section chung (About, Contact) */
 .section {
     padding: 40px 20px;
     max-width: 1000px;
@@ -815,81 +801,115 @@ footer {
     display: inline-block;
 }
 
-/* === F. STYLE CHO TRANG DANH SÁCH (Cách 2 - Dùng inline-block) === */
+
+/* === F. STYLE CHO TRANG DANH SÁCH (Bảng dữ liệu) === */
 
 .add-new-btn {
-    background-color: #198754; color: white; padding: 10px 15px; border-radius: 5px;
-    text-decoration: none; font-weight: 600; display: inline-block;
-    margin-top: 15px; margin-bottom: 20px; transition: background-color 0.3s ease;
+    background-color: #198754;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease;
 }
-.add-new-btn i { margin-right: 8px; }
-.add-new-btn:hover { background-color: #157347; color: white; text-decoration: none; }
+.add-new-btn i {
+    margin-right: 8px;
+}
+.add-new-btn:hover {
+    background-color: #157347;
+    color: white;
+    text-decoration: none;
+}
 
 .data-table {
-    width: 100%; border-collapse: collapse; margin-top: 0; font-size: 14px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); background-color: #fff;
-    border-radius: 8px; overflow: hidden;
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
 }
-.data-table th, .data-table td { border: 1px solid #ddd; padding: 12px 15px; text-align: left; vertical-align: middle; }
-.data-table th { background-color: #0056b3; color: white; font-size: 15px; }
-.data-table tr:nth-child(even) { background-color: #f8f9fa; }
-.data-table tr:hover { background-color: #e9ecef; }
-.data-table .empty-cell { text-align: center; color: #6c757d; font-style: italic; padding: 20px; }
-
-
-/* --- **BẮT ĐẦU SỬA LỖI (Cách 2)** --- */
-
-/* 1. Style chung cho link <a> bên trong .actions */
-.data-table .actions a {
-    display: inline-block; /* Xếp ngang hàng */
-    vertical-align: middle; /* Căn giữa */
-    margin-right: 12px;
+.data-table th, .data-table td {
+    border: 1px solid #ddd;
+    padding: 12px 15px;
+    text-align: left;
+    vertical-align: middle;
+}
+.data-table th {
+    background-color: #0056b3;
+    color: white;
+    font-size: 15px;
+}
+.data-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+.data-table tr:hover {
+    background-color: #e9ecef;
+}
+.data-table .actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.data-table .actions a,
+.data-table .actions .table-form button {
     text-decoration: none;
     font-size: 1.1em;
+    cursor: pointer;
 }
-
-/* 2. Style cho <form> bên trong .actions */
-.data-table .actions .table-form {
-    display: inline-block; /* Xếp ngang hàng */
-    vertical-align: middle; /* Căn giữa */
+.data-table .actions a.edit-btn {
+    color: #0d6efd;
+}
+.data-table .actions a.edit-btn:hover {
+    color: #0056b3;
+}
+.data-table .actions a.delete-btn {
+    color: #dc3545;
+}
+.data-table .actions a.delete-btn:hover {
+    color: #b02a37;
+}
+.actions .table-form {
     margin: 0;
     padding: 0;
+    display: inline;
 }
-
-/* 3. Style cho <button> bên trong form */
 .actions .table-form button {
     background: none;
     border: none;
     padding: 0;
-    cursor: pointer;
-    font-size: 1.1em;
-    margin-right: 12px;
+    margin: 0;
     vertical-align: middle;
     outline: none;
 }
-
-/* Gán màu (giống như link) */
-.data-table .actions a.edit-btn,
 .actions .table-form button.edit-btn {
     color: #0d6efd;
 }
-.data-table .actions a.edit-btn:hover,
 .actions .table-form button.edit-btn:hover {
     color: #0056b3;
 }
-
-.data-table .actions a.delete-btn,
 .actions .table-form button.delete-btn {
     color: #dc3545;
 }
-.data-table .actions a.delete-btn:hover,
 .actions .table-form button.delete-btn:hover {
     color: #b02a37;
 }
+.data-table .empty-cell {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 20px;
+}
 
-/* --- **KẾT THÚC SỬA LỖI** --- */
 
-/* === G. STYLE CHO FORM CHUNG (formKhoa.jsp, formTaiKhoan.jsp...) === */
+/* === G. STYLE CHO FORM CHUNG (formKhoa.jsp, formTaiKhoan.jsp, fillProfile.jsp...) === */
+/* (Phần này đã được gộp style của trang Đổi mật khẩu) */
 
 .data-form {
     max-width: 700px;
@@ -899,7 +919,6 @@ footer {
     border: 1px solid #dee2e6;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    /* **SỬA: Thêm để đồng bộ với login.jsp** */
     width: 100%;
     box-sizing: border-box;
 }
@@ -911,6 +930,8 @@ footer {
     border: none;
     box-shadow: none;
     background-color: transparent;
+    /* SỬA LỖI CANH GIỮA: Ghi đè align-items: center từ .login-container form */
+    align-items: stretch;
 }
 
 .data-form .form-group {
@@ -921,37 +942,48 @@ footer {
     margin-bottom: 8px;
     font-weight: 600;
     color: #343a40;
-    /* **SỬA: Thêm canh lề trái (cho changePassword)** */
-    text-align: left;
+    text-align: left; /* Canh lề trái cho label */
+    font-family: 'Montserrat', sans-serif;
 }
 
-/* Style chung cho input, textarea, select */
+/* Style chung cho input (đồng bộ với form login) */
 .data-form input[type="text"],
 .data-form input[type="email"],
 .data-form input[type="password"],
+.data-form input[type="date"], /* **ĐÃ THÊM type="date"** */
 .data-form input[type="datetime-local"],
 .data-form textarea,
 .data-form select {
     width: 100%;
-    padding: 10px 12px;
-    font-size: 15px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
+    border-radius: 8px;
     box-sizing: border-box;
-    background-color: #fff;
-
-    /* **SỬA: Đồng bộ style với login.jsp** */
     font-family: 'Montserrat', sans-serif;
     background-color: #eee;
     border: none;
     margin: 8px 0;
     padding: 10px 15px;
     font-size: 13px;
-    border-radius: 8px;
     outline: none;
+
+    /* Ghi đè lại style gốc (nếu cần) */
+    font-size: 15px;
+    padding: 10px 12px;
 }
 
-/* Style cho các trường bị vô hiệu hóa (readonly/disabled) */
+/* Ghi đè riêng cho các trang KHÔNG PHẢI login (nếu muốn) */
+
+.container .data-form input[type="text"],
+.container .data-form input[type="email"],
+.container .data-form input[type="password"],
+.container .data-form input[type="date"],
+.container .data-form input[type="datetime-local"],
+.container .data-form textarea,
+.container .data-form select {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+}
+
+
 .data-form input:read-only,
 .data-form select:disabled {
     background-color: #e9ecef;
@@ -959,35 +991,35 @@ footer {
     color: #6c757d;
 }
 
-/* Nút bấm trong form */
+/* Nút bấm trong form (Đồng bộ với form login) */
 .form-actions {
     margin-top: 30px;
     padding-top: 20px;
-    border-top: 1px solid #f1f3ff;
+    border-top: 1px solid #eee; /* Sửa màu viền */
     display: flex;
     justify-content: flex-end;
     align-items: center;
 }
 .form-actions .btn-submit {
-    background-color: #512da8; /* **SỬA: Đổi màu tím** */
+    background-color: #512da8;
     color: white;
     padding: 10px 20px;
     border: none;
-    border-radius: 8px; /* **SỬA: Bo góc** */
+    border-radius: 8px;
     font-weight: 600;
-    font-size: 12px; /* **SỬA: Đồng bộ font** */
+    font-size: 12px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     transition: background-color 0.3s ease;
-    text-transform: uppercase; /* **SỬA: Đồng bộ chữ** */
+    text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 .form-actions .btn-submit i {
     margin-right: 8px;
 }
 .form-actions .btn-submit:hover {
-    background-color: #6a4abc; /* **SỬA: Tím nhạt** */
+    background-color: #6a4abc; /* Tím nhạt */
 }
 .form-actions .btn-cancel {
     margin-left: 15px;
@@ -1003,26 +1035,24 @@ footer {
 /* === H. STYLE CHO FORM TRONG BẢNG (danhSachLichHen.jsp) === */
 
 .table-form {
-    display: flex; /* Sắp xếp các thành phần trên một hàng */
-    align-items: center; /* Căn giữa theo chiều dọc */
-    gap: 8px; /* Khoảng cách giữa các phần tử */
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
-
 .table-form .form-control-sm {
     padding: 4px 8px;
     font-size: 13px;
     border-radius: 4px;
     border: 1px solid #ced4da;
-    width: 130px; /* Đặt chiều rộng cố định cho ô select */
+    width: 130px;
 }
-
 .table-form .btn-sm {
     padding: 4px 8px;
     font-size: 13px;
     border-radius: 4px;
     border: none;
     cursor: pointer;
-    background-color: #0d6efd; /* Nút màu xanh */
+    background-color: #0d6efd;
     color: white;
 }
 .table-form .btn-sm:hover {

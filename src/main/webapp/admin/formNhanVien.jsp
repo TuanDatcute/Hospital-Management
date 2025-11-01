@@ -1,5 +1,5 @@
 <%--
-    Document   : formNhanVien.jsp
+    Document   : formNhanVien.jsp (Đã sửa Chuyên môn thành Dropdown)
     Created on : Oct 29, 2025
     Author     : ADMIN
 --%>
@@ -12,14 +12,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-        <%-- Đặt tiêu đề động --%>
         <c:set var="isCreating" value="${requestScope.formAction == 'createNhanVien'}" />
         <title>${isCreating ? 'Thêm Nhân viên' : 'Cập nhật Nhân viên'}</title>
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
 
-        <%-- Trang này sử dụng các class: .data-form, .form-group, .btn-submit, .btn-cancel --%>
     </head>
     <body>
 
@@ -32,25 +30,17 @@
                 <c:if test="${!isCreating}">Cập nhật Thông tin Nhân viên</c:if>
                 </h2>
 
-            <%-- Hiển thị lỗi (ví dụ: validation thất bại) --%>
             <c:if test="${not empty requestScope.ERROR_MESSAGE}">
                 <p class="error-message">${requestScope.ERROR_MESSAGE}</p>
             </c:if>
-            <%-- Hiển thị lỗi tải dữ liệu (nếu không tải được Khoa/Tài khoản) --%>
             <c:if test="${not empty requestScope.LOAD_FORM_ERROR}">
                 <p class="error-message">${requestScope.LOAD_FORM_ERROR}</p>
             </c:if>
 
-            <%-- 
-                Form này gửi đến MainController.
-                Action sẽ là 'createNhanVien' hoặc 'updateNhanVien' 
-                (được set bởi NhanVienController trong biến requestScope.formAction)
-            --%>
             <form action="MainController" method="post" class="data-form">
 
                 <input type="hidden" name="action" value="${requestScope.formAction}" />
 
-                <%-- Truyền ID (chỉ khi cập nhật) --%>
                 <c:if test="${!isCreating}">
                     <input type="hidden" name="id" value="${requestScope.NHANVIEN_DATA.id}" />
                 </c:if>
@@ -64,7 +54,6 @@
                 <div class="form-group">
                     <label for="taiKhoanId">Tài khoản liên kết:</label>
                     <c:choose>
-                        <%-- Khi TẠO MỚI: Hiển thị dropdown --%>
                         <c:when test="${isCreating}">
                             <select id="taiKhoanId" name="taiKhoanId" required="required">
                                 <option value="">-- Chọn tài khoản chưa gán --</option>
@@ -78,22 +67,36 @@
                                 <p style="color: red;">Không tìm thấy tài khoản hoạt động nào chưa được gán.</p>
                             </c:if>
                         </c:when>
-                        <%-- Khi CẬP NHẬT: Hiển thị dạng text (không cho sửa) --%>
                         <c:otherwise>
                             <input type="text" value="ID: ${requestScope.NHANVIEN_DATA.taiKhoanId} (Không thể thay đổi)" readonly="readonly" class="disabled-input">
                         </c:otherwise>
                     </c:choose>
                 </div>
 
+                <%-- *** BẮT ĐẦU SỬA LỖI: Chuyển 'chuyenMon' thành <select> *** --%>
                 <div class="form-group">
                     <label for="chuyenMon">Chuyên môn (Vai trò):</label>
-                    <input type="text" id="chuyenMon" name="chuyenMon" value="<c:out value="${requestScope.NHANVIEN_DATA.chuyenMon}"/>" placeholder="Ví dụ: Bác sĩ, Y tá, Lễ tân...">
+                    <%-- 
+                        Lưu ý: Bạn nên chọn <option value=""> để bắt buộc Admin phải chọn.
+                        Giá trị value (ví dụ: "Bác sĩ") phải khớp 100% với giá trị 
+                        mà NhanVienService (hàm findDoctorsBySpecialty) đang tìm kiếm.
+                    --%>
+                    <select id="chuyenMon" name="chuyenMon" required="required">
+                        <option value="">-- Chọn chuyên môn --</option>
+                        <option value="Bác sĩ" ${requestScope.NHANVIEN_DATA.chuyenMon == 'Bác sĩ' ? 'selected' : ''}>Bác sĩ</option>
+                        <option value="Y tá" ${requestScope.NHANVIEN_DATA.chuyenMon == 'Y tá' ? 'selected' : ''}>Y tá</option>
+                        <option value="Lễ tân" ${requestScope.NHANVIEN_DATA.chuyenMon == 'Lễ tân' ? 'selected' : ''}>Lễ tân</option>
+                        <option value="Dược sĩ" ${requestScope.NHANVIEN_DATA.chuyenMon == 'Dược sĩ' ? 'selected' : ''}>Dược sĩ</option>
+                        <option value="Kỹ thuật viên" ${requestScope.NHANVIEN_DATA.chuyenMon == 'Kỹ thuật viên' ? 'selected' : ''}>Kỹ thuật viên</option>
+                        <option value="Khác" ${requestScope.NHANVIEN_DATA.chuyenMon == 'Khác' ? 'selected' : ''}>Khác</option>
+                    </select>
                 </div>
+                <%-- *** KẾT THÚC SỬA LỖI *** --%>
 
                 <div class="form-group">
                     <label for="khoaId">Khoa:</label>
                     <select id="khoaId" name="khoaId">
-                        <option value="0">-- Không thuộc khoa nào --</option> <%-- Cho phép nhân viên (ví dụ: lễ tân) không có khoa --%>
+                        <option value="0">-- Không thuộc khoa nào --</option>
                         <c:forEach var="khoa" items="${requestScope.LIST_KHOA}">
                             <option value="${khoa.id}" ${requestScope.NHANVIEN_DATA.khoaId == khoa.id ? 'selected' : ''}>
                                 <c:out value="${khoa.tenKhoa}" />
@@ -107,13 +110,12 @@
                     <input type="text" id="soDienThoai" name="soDienThoai" value="<c:out value="${requestScope.NHANVIEN_DATA.soDienThoai}"/>">
                 </div>
 
-                <%-- Thêm các trường khác (Ngày sinh, Giới tính, Địa chỉ, Bằng cấp) nếu bạn muốn --%>
-                <%-- Ví dụ: --%>
-                <%-- 
                 <div class="form-group">
                     <label for="ngaySinh">Ngày sinh:</label>
-                    <input type="datetime-local" id="ngaySinh" name="ngaySinh" value="${requestScope.NHANVIEN_DATA.ngaySinh}">
+                    <c:set var="ngaySinhValue" value="${requestScope.NHANVIEN_DATA.ngaySinh}" />
+                    <input type="datetime-local" id="ngaySinh" name="ngaySinh" value="${ngaySinhValue}">
                 </div>
+
                 <div class="form-group">
                     <label for="gioiTinh">Giới tính:</label>
                     <select id="gioiTinh" name="gioiTinh">
@@ -122,13 +124,22 @@
                         <option value="Khác" ${requestScope.NHANVIEN_DATA.gioiTinh == 'Khác' ? 'selected' : ''}>Khác</option>
                     </select>
                 </div>
-                --%>
+
+                <div class="form-group">
+                    <label for="bangCap">Bằng cấp:</label>
+                    <input type="text" id="bangCap" name="bangCap" value="<c:out value="${requestScope.NHANVIEN_DATA.bangCap}"/>" placeholder="Ví dụ: Thạc sĩ Y khoa">
+                </div>
+
+                <div class="form-group">
+                    <label for="diaChi">Địa chỉ:</label>
+                    <input type="text" id="diaChi" name="diaChi" value="<c:out value="${requestScope.NHANVIEN_DATA.diaChi}"/>">
+                </div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn-submit">
                         <i class="fas fa-save"></i> ${isCreating ? 'Tạo mới' : 'Cập nhật'}
                     </button>
-                    <a href="MainController?action=listNhanVien" class="btn-cancel">Hủy</a>
+                    <a href="${pageContext.request.contextPath}/MainController?action=listNhanVien" class="btn-cancel">Hủy</a>
                 </div>
             </form>
 
