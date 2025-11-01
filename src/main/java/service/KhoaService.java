@@ -1,9 +1,11 @@
 package service;
 
+import exception.ValidationException; // --- THÊM MỚI ---
 import model.Entity.Khoa;
 import model.dao.KhoaDAO;
 import model.dto.KhoaDTO;
 import java.util.List;
+import java.util.regex.Pattern; // --- THÊM MỚI ---
 import java.util.stream.Collectors;
 
 /**
@@ -15,24 +17,45 @@ public class KhoaService {
 
     private final KhoaDAO khoaDAO = new KhoaDAO();
 
+    // --- THÊM MỚI: Regex cho Tên (Giống NhanVienService) ---
+    /**
+     * Regex cho Tên:
+     * - \p{L} : Bất kỳ chữ cái Unicode nào (bao gồm tiếng Việt).
+     * - Dấu cách, '.', ''', '-'.
+     * - Độ dài từ 2 đến 50 ký tự. (Bạn có thể tăng lên nếu tên khoa dài hơn)
+     */
+    private static final String NAME_REGEX = "^[\\p{L} .'-]{2,50}$";
+    // --- KẾT THÚC THÊM MỚI ---
+
     /**
      * Dịch vụ tạo một Khoa mới.
      *
      * @param dto DTO chứa thông tin khoa mới.
      * @return DTO của khoa đã được tạo (có ID).
-     * @throws Exception ném ra nếu tên khoa bị trùng hoặc để trống.
+     * @throws ValidationException ném ra nếu logic validation thất bại.
+     * @throws Exception ném ra nếu có lỗi hệ thống.
      */
-    public KhoaDTO createKhoa(KhoaDTO dto) throws Exception {
+    public KhoaDTO createKhoa(KhoaDTO dto) throws ValidationException, Exception {
 
         // --- BƯỚC 1: LOGIC NGHIỆP VỤ (VALIDATION) ---
         if (dto.getTenKhoa() == null || dto.getTenKhoa().trim().isEmpty()) {
-            throw new Exception("Tên khoa không được để trống.");
+            // --- CẬP NHẬT ---
+            throw new ValidationException("Tên khoa không được để trống.");
+            // --- KẾT THÚC CẬP NHẬT ---
         }
 
         String tenKhoa = dto.getTenKhoa().trim();
+        
+        // --- THÊM MỚI: Regex Validation ---
+        if (!Pattern.matches(NAME_REGEX, tenKhoa)) {
+            throw new ValidationException("Tên khoa không hợp lệ (chỉ chứa chữ cái, dấu cách, và dài 2-50 ký tự).");
+        }
+        // --- KẾT THÚC THÊM MỚI ---
 
         if (khoaDAO.isTenKhoaExisted(tenKhoa)) {
-            throw new Exception("Tên khoa '" + tenKhoa + "' đã tồn tại.");
+            // --- CẬP NHẬT ---
+            throw new ValidationException("Tên khoa '" + tenKhoa + "' đã tồn tại.");
+            // --- KẾT THÚC CẬP NHẬT ---
         }
 
         // --- BƯỚC 2: CHUYỂN ĐỔI (MAP) ---
@@ -46,31 +69,44 @@ public class KhoaService {
         if (savedEntity != null) {
             return toDTO(savedEntity);
         }
+        // Trả về null nếu DAO thất bại (hoặc ném Exception nếu create() ném lỗi)
         return null;
     }
 
     /**
      * Dịch vụ cập nhật thông tin Khoa.
      */
-    public KhoaDTO updateKhoa(int khoaId, KhoaDTO dto) throws Exception {
+    public KhoaDTO updateKhoa(int khoaId, KhoaDTO dto) throws ValidationException, Exception {
 
         // --- BƯỚC 1: LẤY ENTITY GỐC ---
         Khoa existingEntity = khoaDAO.getById(khoaId);
         if (existingEntity == null) {
-            throw new Exception("Không tìm thấy khoa với ID: " + khoaId);
+            // --- CẬP NHẬT ---
+            throw new ValidationException("Không tìm thấy khoa với ID: " + khoaId);
+            // --- KẾT THÚC CẬP NHẬT ---
         }
 
         // --- BƯỚC 2: VALIDATION ---
         if (dto.getTenKhoa() == null || dto.getTenKhoa().trim().isEmpty()) {
-            throw new Exception("Tên khoa không được để trống.");
+            // --- CẬP NHẬT ---
+            throw new ValidationException("Tên khoa không được để trống.");
+            // --- KẾT THÚC CẬP NHẬT ---
         }
 
         String newTenKhoa = dto.getTenKhoa().trim();
 
-        // Chỉ kiểm tra trùng tên NẾU tên mới khác tên cũ
+        // --- THÊM MỚI: Regex Validation ---
+        if (!Pattern.matches(NAME_REGEX, newTenKhoa)) {
+            throw new ValidationException("Tên khoa không hợp lệ (chỉ chứa chữ cái, dấu cách, và dài 2-50 ký tự).");
+        }
+        // --- KẾT THÚC THÊM MỚI ---
+
+        // Chỉ kiểm tra trùng tên NẾU tên mới khác tên cũ (Bỏ qua trường hợp hoa/thường)
         if (!newTenKhoa.equalsIgnoreCase(existingEntity.getTenKhoa())) {
             if (khoaDAO.isTenKhoaExisted(newTenKhoa)) {
-                throw new Exception("Tên khoa '" + newTenKhoa + "' đã tồn tại.");
+                // --- CẬP NHẬT ---
+                throw new ValidationException("Tên khoa '" + newTenKhoa + "' đã tồn tại.");
+                // --- KẾT THÚC CẬP NHẬT ---
             }
         }
 
@@ -81,6 +117,7 @@ public class KhoaService {
         // --- BƯỚC 4: GỌI DAO ĐỂ CẬP NHẬT ---
         boolean success = khoaDAO.update(existingEntity);
         if (!success) {
+            // Giữ nguyên Exception vì đây là lỗi hệ thống
             throw new Exception("Cập nhật khoa thất bại.");
         }
 
@@ -89,17 +126,19 @@ public class KhoaService {
     }
 
     /**
-     * Dịch vụ xóa một Khoa. (Lưu ý: CSDL của bạn có 'ON DELETE SET NULL', nên
-     * việc xóa Khoa sẽ tự động gán KhoaId = NULL cho các Nhân Viên liên quan)
+     * Dịch vụ xóa một Khoa.
      */
-    public void deleteKhoa(int khoaId) throws Exception {
+    public void deleteKhoa(int khoaId) throws ValidationException, Exception {
         Khoa existingEntity = khoaDAO.getById(khoaId);
         if (existingEntity == null) {
-            throw new Exception("Không tìm thấy khoa với ID: " + khoaId + " để xóa.");
+            // --- CẬP NHẬT ---
+            throw new ValidationException("Không tìm thấy khoa với ID: " + khoaId + " để xóa.");
+            // --- KẾT THÚC CẬP NHẬT ---
         }
 
         boolean success = khoaDAO.delete(khoaId);
         if (!success) {
+            // Giữ nguyên Exception vì đây là lỗi hệ thống
             throw new Exception("Xóa khoa thất bại.");
         }
     }
@@ -107,16 +146,19 @@ public class KhoaService {
     /**
      * Lấy khoa bằng ID.
      */
-    public KhoaDTO getKhoaById(int id) throws Exception {
+    public KhoaDTO getKhoaById(int id) throws ValidationException {
         Khoa entity = khoaDAO.getById(id);
         if (entity == null) {
-            throw new Exception("Không tìm thấy khoa với ID: " + id);
+            // --- CẬP NHẬT ---
+            throw new ValidationException("Không tìm thấy khoa với ID: " + id);
+            // --- KẾT THÚC CẬP NHẬT ---
         }
         return toDTO(entity);
     }
 
     /**
      * Lấy tất cả các khoa.
+     * (Giữ nguyên)
      */
     public List<KhoaDTO> getAllKhoa() {
         List<Khoa> entities = khoaDAO.getAll();
@@ -128,12 +170,14 @@ public class KhoaService {
     }
 
     // --- CÁC HÀM MAPPER (Chuyển đổi DTO <-> Entity) ---
+    // (Giữ nguyên)
+    
     /**
      * Chuyển Khoa (Entity) sang KhoaDTO.
      */
     private KhoaDTO toDTO(Khoa entity) {
         if (entity == null) {
-            return null; // Thêm dòng này
+            return null;
         }
         KhoaDTO dto = new KhoaDTO();
         dto.setId(entity.getId());
