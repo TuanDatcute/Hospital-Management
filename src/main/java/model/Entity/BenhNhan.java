@@ -37,6 +37,9 @@ public class BenhNhan {
 
     @Column(name = "so_dien_thoai", columnDefinition = "NVARCHAR(MAX)")
     private String soDienThoai;
+    
+    @Column(name = "cccd", length = 20, unique = true, columnDefinition = "NVARCHAR(MAX)"   )
+    private String cccd;
 
     @Column(name = "nhom_mau", columnDefinition = "NVARCHAR(MAX)",nullable = true)
     private String nhomMau;
@@ -131,5 +134,13 @@ public class BenhNhan {
 
     public void setTaiKhoan(TaiKhoan taiKhoan) {
         this.taiKhoan = taiKhoan;
+    }
+    
+    public String getCccd(){
+        return cccd;
+    }
+    
+    public void setCccd(String cccd){
+        this.cccd = cccd;
     }
 }

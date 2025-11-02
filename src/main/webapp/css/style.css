@@ -1,0 +1,1030 @@
+/* Đặt @import lên dòng ĐẦU TIÊN để tải font */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+/* css/style.css - TỔNG HỢP TẤT CẢ STYLE CHO ỨNG DỤNG */
+
+/* === A. GLOBAL & RESET === */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+    /* Font mặc định cho các trang nội dung (index, home, admin) */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    background-color: #f8f9fa; /* Nền xám rất nhạt */
+    color: #333;
+}
+
+a {
+    text-decoration: none;
+    color: #0d6efd; /* Màu link mặc định */
+}
+a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.container { /* Lớp container để giới hạn chiều rộng */
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+.page-content {
+    min-height: 100vh;
+}
+.section-title {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #0056b3;
+    font-size: 2em;
+    font-weight: 600;
+}
+.success-message {
+    color: #0f5132; /* Màu chữ xanh lá đậm */
+    background-color: #d1e7dd; /* Nền xanh lá nhạt */
+    border: 1px solid #badbcc;
+    padding: 12px 15px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 500;
+    font-family: 'Montserrat', sans-serif; /* Dùng font Montserrat */
+}
+.error-message { /* Dùng chung cho Login và các lỗi khác */
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-family: 'Montserrat', sans-serif; /* Dùng font Montserrat */
+}
+
+
+/* === B. LOGIN PAGE STYLE (MỚI - Giao diện gộp 2-trong-1) === */
+
+/* Style cho body của trang login (căn giữa) */
+body.login-page-body {
+    background-color: #c9d6ff;
+    background: linear-gradient(to right, #e2e2e2, #c9d6ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100vh;
+    font-family: 'Montserrat', sans-serif; /* Áp dụng font này */
+}
+
+/* Nút quay về Home */
+.home-link {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.5em;
+    color: #333; /* Đổi màu cho dễ thấy trên nền trắng */
+    text-decoration: none;
+    z-index: 100; /* Đảm bảo nó nằm trên form */
+    transition: color 0.3s ease;
+}
+.home-link:hover {
+    color: #512da8; /* Đổi màu tím khi hover */
+    text-decoration: none;
+}
+
+/* Container chính (lấy từ code bạn gửi) */
+.login-container {
+    background-color: #fff;
+    border-radius: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    position: relative;
+    overflow: hidden;
+    width: 768px;
+    max-width: 100%;
+    min-height: 480px;
+
+    /* SỬA LỖI: Chiều cao linh hoạt (cho form Đổi mật khẩu) */
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Đặt lại style cho .login-container khi nó KHÔNG PHẢI là form gộp */
+.login-container.single-form {
+    width: 480px; /* Độ rộng cố định cho form đơn (changePassword) */
+    min-height: auto; /* Bỏ chiều cao tối thiểu */
+    padding: 30px 40px;
+}
+
+
+.login-container p {
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.3px;
+    margin: 20px 0;
+}
+
+.login-container span {
+    font-size: 12px;
+}
+
+.login-container a {
+    color: #333;
+    font-size: 13px;
+    text-decoration: none;
+    margin: 15px 0 10px;
+}
+
+/* Nút bấm (Sign In/Sign Up) */
+.login-container button,
+.login-container input[type="submit"] { /* Áp dụng cho cả nút submit */
+    background-color: #512da8;
+    color: #fff;
+    font-size: 12px;
+    padding: 10px 45px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.login-container input[type="submit"] {
+    width: 100%; /* Nút submit trong form nên rộng 100% */
+}
+.login-container button.hidden { /* Nút ẩn trên overlay */
+    background-color: transparent;
+    border-color: #fff;
+}
+
+.login-container form {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 40px;
+    height: 100%;
+}
+
+/* Icon Social */
+.social-icons {
+    margin: 20px 0;
+}
+.social-icons a {
+    border: 1px solid #ccc;
+    border-radius: 20%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 3px;
+    width: 40px;
+    height: 40px;
+    transition: all 0.3s ease-in-out;
+}
+.social-icons a:hover {
+    border-color: #512da8;
+    color: #512da8;
+}
+
+/* Ô nhập liệu (Đã bao gồm email, text, password) */
+.login-container input[type="text"],
+.login-container input[type="password"],
+.login-container input[type="email"] {
+    background-color: #eee;
+    border: none;
+    margin: 8px 0;
+    padding: 10px 15px;
+    font-size: 13px;
+    border-radius: 8px;
+    width: 100%;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all 0.6s ease-in-out;
+}
+.sign-in {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+.login-container.active .sign-in {
+    transform: translateX(100%);
+}
+.sign-up {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+.login-container.active .sign-up {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: move 0.6s;
+}
+@keyframes move {
+    0%, 49.99% {
+        opacity: 0;
+        z-index: 1;
+    }
+    50%, 100% {
+        opacity: 1;
+        z-index: 5;
+    }
+}
+
+/* Phần Overlay trượt */
+.toggle-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: all 0.6s ease-in-out;
+    border-radius: 150px 0 0 100px;
+    z-index: 1000;
+}
+.login-container.active .toggle-container {
+    transform: translateX(-100%);
+    border-radius: 0 150px 100px 0;
+}
+.toggle {
+    background-color: #512da8;
+    height: 100%;
+    background: linear-gradient(to right, #5c6bc0, #512da8);
+    color: #fff;
+    position: relative;
+    left: -100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: all 0.6s ease-in-out;
+}
+.login-container.active .toggle {
+    transform: translateX(50%);
+}
+.toggle-panel {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 30px;
+    text-align: center;
+    top: 0;
+    transform: translateX(0);
+    transition: all 0.6s ease-in-out;
+}
+.toggle-left {
+    transform: translateX(-200%);
+}
+.login-container.active .toggle-left {
+    transform: translateX(0);
+}
+.toggle-right {
+    right: 0;
+    transform: translateX(0);
+}
+.login-container.active .toggle-right {
+    transform: translateX(200%);
+}
+
+/* === KẾT THÚC PHẦN B === */
+
+
+/* === C. HEADER & FOOTER (Chung) === */
+
+/* Header Wrapper (Không cố định) */
+.header-wrapper {
+    background-color: #e7f1ff; /* Nền xanh nhạt */
+    position: relative;
+    z-index: 1000;
+}
+/* Header Top Bar (Cuộn bình thường) */
+.header-top {
+    padding: 6px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #c0d0e0;
+    font-size: 13px;
+    color: #0056b3;
+}
+.header-top .social-links a {
+    color: #0056b3;
+    margin-right: 15px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 1.1em;
+}
+.header-top .social-links a i {
+    margin-right: 5px;
+}
+.header-top .social-links a:hover {
+    color: #0d6efd;
+}
+.header-top .top-actions {
+    display: flex;
+    align-items: center;
+}
+.header-top .btn {
+    padding: 5px 12px;
+    margin-left: 10px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+.header-top .btn i {
+    margin-right: 5px;
+}
+.header-top .btn-account {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+.header-top .btn-account:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    color: white;
+    text-decoration: none;
+}
+.header-top .language-selector {
+    margin-left: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+.header-top .language-selector img {
+    width: 28px;
+    height: 20px;
+    vertical-align: middle;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+/* Header Chính (Sticky) */
+.header-main {
+    display: flex;
+    align-items: center;
+    padding: 12px 40px;
+    background-color: #e7f1ff;
+    height: 60px; /* Chiều cao cố định */
+    box-sizing: border-box;
+    position: sticky;
+    top: 0; /* Dính vào đỉnh khi cuộn */
+    z-index: 999;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.header-main .logo img {
+    height: 38px;
+    vertical-align: middle;
+}
+.header-main .support-info {
+    display: flex;
+    align-items: center;
+    margin-left: 30px;
+    color: #dc3545;
+}
+.header-main .support-info i {
+    font-size: 2.2em;
+    margin-right: 8px;
+    color: #dc3545;
+}
+.header-main .support-info .text {
+    font-size: 13px;
+    line-height: 1.3;
+    color: #555;
+}
+.header-main .support-info .phone-number {
+    font-size: 1.5em;
+    font-weight: 700;
+    display: block;
+    color: #dc3545;
+}
+.header-main nav {
+    margin-left: auto;
+}
+.header-main nav ul {
+    display: flex;
+}
+.header-main nav li {
+    margin-left: 30px;
+}
+.header-main nav a {
+    color: #0056b3;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 15px 0;
+    display: inline-block;
+    border-bottom: 3px solid transparent;
+    transition: color 0.3s ease, border-color 0.3s ease;
+    text-decoration: none;
+}
+.header-main nav a:hover, .header-main nav a.active {
+    color: #0d6efd;
+    border-bottom-color: #0d6efd;
+    text-decoration: none;
+}
+.header-main nav a .dropdown-icon {
+    font-size: 0.7em;
+    margin-left: 3px;
+    vertical-align: middle;
+}
+
+/* Marquee Banner (Sticky) */
+.marquee-banner {
+    position: sticky;
+    top: 60px; /* Dính ngay dưới header-main */
+    left: 0;
+    width: 100%;
+    background-color: #0056b3;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 998;
+    display: flex;
+    align-items: center;
+    height: 34px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.marquee-banner marquee {
+    width: 100%;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 30px;
+    margin-top: 40px;
+    background-color: #e7f1ff;
+    color: #6c757d;
+    border-top: 1px solid #d0e0ff;
+}
+
+/* === D. HOME PAGE STYLE (home.jsp, staff/dashboard.jsp) === */
+
+.welcome-section {
+    padding: 15px 0; /* Chỉ padding top/bottom */
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.welcome-section p {
+    margin: 0;
+    font-size: 1.1em;
+}
+.welcome-section p strong {
+    color: #0056b3;
+}
+.welcome-section a {
+    color: #dc3545;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.welcome-section a i {
+    margin-right: 5px;
+}
+.welcome-section a:hover {
+    background-color: #f8d7da;
+    color: #721c24;
+    text-decoration: none;
+}
+
+.function-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+    padding: 30px 0;
+}
+.function-card {
+    background-color: #ffffff;
+    padding: 25px 20px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #e0eaf3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    display: block;
+    color: #333;
+}
+.function-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 123, 255, 0.15);
+    transform: translateY(-5px);
+    text-decoration: none;
+}
+.function-card .icon {
+    font-size: 2.8em;
+    color: #0d6efd;
+    margin-bottom: 15px;
+    height: 45px;
+    line-height: 45px;
+}
+.function-card span {
+    display: block;
+    font-weight: 600;
+    color: #0056b3;
+    font-size: 1.1em;
+}
+
+/* === E. INDEX PAGE STYLE (index.jsp) === */
+
+/* Hero Section */
+.hero {
+    position: relative;
+    padding: 100px 0 80px 0;
+    background-image: url('../images/hospital-hero-bg.jpg');
+    background-size: cover;
+    background-position: center center;
+    text-align: center;
+    color: white;
+}
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 86, 179, 0.65), rgba(0, 66, 139, 0.85));
+    z-index: 1;
+}
+.hero .container {
+    position: relative;
+    z-index: 2;
+}
+.hero h1 {
+    font-size: 2.8em;
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+.hero p.subtitle {
+    font-size: 1.15em;
+    color: #f0f8ff;
+    margin-bottom: 40px;
+    opacity: 0.95;
+}
+.search-box {
+    max-width: 700px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 50px;
+    padding: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+}
+.search-box input[type="text"] {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    padding: 12px 25px;
+    font-size: 1em;
+    background: transparent;
+    color: #333;
+}
+.search-box button {
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 30px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+}
+.search-box button:hover {
+    background-color: #0056b3;
+}
+.search-box button i {
+    margin-right: 8px;
+}
+
+/* Features Section (Danh mục nổi bật) */
+.features-section {
+    padding: 40px 0;
+    background-color: #f0f8ff;
+    position: relative;
+    overflow: hidden;
+}
+.features-scroll-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-x: auto;
+    position: relative;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.features-scroll-wrapper::-webkit-scrollbar {
+    display: none;
+}
+.features-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 15px;
+    padding: 10px 40px;
+    width: max-content;
+}
+.feature-item {
+    background-color: #ffffff;
+    padding: 20px 15px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #e0eaf3;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    width: 170px;
+    flex-shrink: 0;
+    display: block;
+    color: #333;
+}
+.feature-item:hover {
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.15);
+    transform: translateY(-4px);
+    text-decoration: none;
+}
+.feature-item img {
+    height: 45px;
+    margin-bottom: 12px;
+}
+.feature-item span {
+    display: block;
+    font-weight: 600;
+    color: #0056b3;
+    font-size: 14px;
+}
+.features-section .scroll-button {
+    top: 50%;
+}
+
+/* Specialties Section (Chuyên khoa cuộn ngang) */
+.specialties-section {
+    padding: 60px 0;
+    background-color: #f8f9fa;
+    position: relative;
+}
+.specialties-section .container-title {
+    max-width: 1200px;
+    margin: 0 auto 40px auto;
+    padding: 0 15px;
+    text-align: center;
+}
+.specialties-scroll-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-x: hidden;
+    position: relative;
+    scroll-behavior: smooth;
+}
+.specialty-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 20px;
+    padding: 10px 0;
+    width: max-content;
+}
+.specialty-card {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #e9ecef;
+    transition: box-shadow 0.3s ease;
+    width: 280px;
+    flex-shrink: 0;
+}
+.specialty-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+}
+.specialty-card .icon {
+    font-size: 2.5em;
+    color: #0d6efd;
+    margin-bottom: 15px;
+    height: 50px;
+    line-height: 50px;
+}
+.specialty-card h4 {
+    font-size: 1.25em;
+    color: #343a40;
+    margin-bottom: 10px;
+}
+.specialty-card p {
+    font-size: 0.95em;
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+.specialty-card .learn-more {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+.specialty-card .learn-more:hover {
+    text-decoration: underline;
+}
+
+/* Nút bấm cuộn (Chung) */
+.scroll-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 1.8em;
+    color: #333;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+.scroll-button:hover {
+    background-color: #fff;
+    color: #007bff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.scroll-button.left {
+    left: 5px;
+}
+.scroll-button.right {
+    right: 5px;
+}
+.scroll-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Section chung (About, Contact) */
+.section {
+    padding: 40px 20px;
+    max-width: 1000px;
+    margin: 0 auto 30px auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.section h3.section-title {
+    text-align: left;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 8px;
+    margin-bottom: 25px;
+    display: inline-block;
+}
+
+/* === F. STYLE CHO TRANG DANH SÁCH (Cách 2 - Dùng inline-block) === */
+
+.add-new-btn {
+    background-color: #198754; color: white; padding: 10px 15px; border-radius: 5px;
+    text-decoration: none; font-weight: 600; display: inline-block;
+    margin-top: 15px; margin-bottom: 20px; transition: background-color 0.3s ease;
+}
+.add-new-btn i { margin-right: 8px; }
+.add-new-btn:hover { background-color: #157347; color: white; text-decoration: none; }
+
+.data-table {
+    width: 100%; border-collapse: collapse; margin-top: 0; font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); background-color: #fff;
+    border-radius: 8px; overflow: hidden;
+}
+.data-table th, .data-table td { border: 1px solid #ddd; padding: 12px 15px; text-align: left; vertical-align: middle; }
+.data-table th { background-color: #0056b3; color: white; font-size: 15px; }
+.data-table tr:nth-child(even) { background-color: #f8f9fa; }
+.data-table tr:hover { background-color: #e9ecef; }
+.data-table .empty-cell { text-align: center; color: #6c757d; font-style: italic; padding: 20px; }
+
+
+/* --- **BẮT ĐẦU SỬA LỖI (Cách 2)** --- */
+
+/* 1. Style chung cho link <a> bên trong .actions */
+.data-table .actions a {
+    display: inline-block; /* Xếp ngang hàng */
+    vertical-align: middle; /* Căn giữa */
+    margin-right: 12px;
+    text-decoration: none;
+    font-size: 1.1em;
+}
+
+/* 2. Style cho <form> bên trong .actions */
+.data-table .actions .table-form {
+    display: inline-block; /* Xếp ngang hàng */
+    vertical-align: middle; /* Căn giữa */
+    margin: 0;
+    padding: 0;
+}
+
+/* 3. Style cho <button> bên trong form */
+.actions .table-form button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 1.1em;
+    margin-right: 12px;
+    vertical-align: middle;
+    outline: none;
+}
+
+/* Gán màu (giống như link) */
+.data-table .actions a.edit-btn,
+.actions .table-form button.edit-btn {
+    color: #0d6efd;
+}
+.data-table .actions a.edit-btn:hover,
+.actions .table-form button.edit-btn:hover {
+    color: #0056b3;
+}
+
+.data-table .actions a.delete-btn,
+.actions .table-form button.delete-btn {
+    color: #dc3545;
+}
+.data-table .actions a.delete-btn:hover,
+.actions .table-form button.delete-btn:hover {
+    color: #b02a37;
+}
+
+/* --- **KẾT THÚC SỬA LỖI** --- */
+
+/* === G. STYLE CHO FORM CHUNG (formKhoa.jsp, formTaiKhoan.jsp...) === */
+
+.data-form {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 30px;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    /* **SỬA: Thêm để đồng bộ với login.jsp** */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Reset style của data-form khi nó nằm trong login-container */
+.login-container .data-form {
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+}
+
+.data-form .form-group {
+    margin-bottom: 20px;
+}
+.data-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #343a40;
+    /* **SỬA: Thêm canh lề trái (cho changePassword)** */
+    text-align: left;
+}
+
+/* Style chung cho input, textarea, select */
+.data-form input[type="text"],
+.data-form input[type="email"],
+.data-form input[type="password"],
+.data-form input[type="datetime-local"],
+.data-form textarea,
+.data-form select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: #fff;
+
+    /* **SỬA: Đồng bộ style với login.jsp** */
+    font-family: 'Montserrat', sans-serif;
+    background-color: #eee;
+    border: none;
+    margin: 8px 0;
+    padding: 10px 15px;
+    font-size: 13px;
+    border-radius: 8px;
+    outline: none;
+}
+
+/* Style cho các trường bị vô hiệu hóa (readonly/disabled) */
+.data-form input:read-only,
+.data-form select:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    color: #6c757d;
+}
+
+/* Nút bấm trong form */
+.form-actions {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f3ff;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.form-actions .btn-submit {
+    background-color: #512da8; /* **SỬA: Đổi màu tím** */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px; /* **SỬA: Bo góc** */
+    font-weight: 600;
+    font-size: 12px; /* **SỬA: Đồng bộ font** */
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    transition: background-color 0.3s ease;
+    text-transform: uppercase; /* **SỬA: Đồng bộ chữ** */
+    letter-spacing: 0.5px;
+}
+.form-actions .btn-submit i {
+    margin-right: 8px;
+}
+.form-actions .btn-submit:hover {
+    background-color: #6a4abc; /* **SỬA: Tím nhạt** */
+}
+.form-actions .btn-cancel {
+    margin-left: 15px;
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+}
+.form-actions .btn-cancel:hover {
+    text-decoration: underline;
+}
+
+/* === H. STYLE CHO FORM TRONG BẢNG (danhSachLichHen.jsp) === */
+
+.table-form {
+    display: flex; /* Sắp xếp các thành phần trên một hàng */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    gap: 8px; /* Khoảng cách giữa các phần tử */
+}
+
+.table-form .form-control-sm {
+    padding: 4px 8px;
+    font-size: 13px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    width: 130px; /* Đặt chiều rộng cố định cho ô select */
+}
+
+.table-form .btn-sm {
+    padding: 4px 8px;
+    font-size: 13px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    background-color: #0d6efd; /* Nút màu xanh */
+    color: white;
+}
+.table-form .btn-sm:hover {
+    background-color: #0056b3;
+}
