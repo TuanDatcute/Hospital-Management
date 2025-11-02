@@ -42,12 +42,10 @@ public class MainController extends HttpServlet {
         String url = LOGIN_PAGE; // Mặc định chuyển về trang login nếu action không hợp lệ
 
         // 2. Nhóm các action cho từng controller
-        String[] EMRCoreActions = {"printEncounter","completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
-        String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication","listAndSearchServices","updateService","showUpdateServiceForm","deleteService"};
-       
-       
+        String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
+        String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deleteService"};
+
         String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus"};
-        String url = LOGIN_PAGE; // Mặc định về trang login
 
         // 2. Định nghĩa danh sách action cho từng Controller
         String[] userActions = {"login", "logout", "listUsers",
@@ -55,8 +53,6 @@ public class MainController extends HttpServlet {
             "showUserEditForm", "updateUserStatus",
             "showChangePasswordForm", "changePassword",
             "register"};
-
-       
 
         String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa",
             "showKhoaEditForm", "updateKhoa", "deleteKhoa"};
@@ -70,11 +66,6 @@ public class MainController extends HttpServlet {
             "updateProfile"}; // <-- THÊM ACTION MỚI
         // --- **KẾT THÚC SỬA** ---
 
-        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen",
-            "updateLichHenStatus"};
-
-    
-        
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm", "createPrescription"};
 
         String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate", "deleteRoom"};
