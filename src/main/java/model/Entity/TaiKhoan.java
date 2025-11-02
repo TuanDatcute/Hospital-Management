@@ -28,11 +28,8 @@ public class TaiKhoan implements Serializable { // Thêm 'implements Serializabl
     @Column(name = "mat_khau", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String matKhau;
 
-    // --- **SỬA LỖI Ở ĐÂY** ---
-    // Cho phép email bị rỗng (null) và không cần duy nhất
     @Column(name = "email", nullable = true, unique = false, columnDefinition = "NVARCHAR(MAX)")
     private String email;
-    // --- **KẾT THÚC SỬA LỖI** ---
 
     @Column(name = "vai_tro", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String vaiTro;
@@ -50,6 +47,23 @@ public class TaiKhoan implements Serializable { // Thêm 'implements Serializabl
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    // --- BẮT ĐẦU THÊM MỚI (CHO XÁC THỰC EMAIL) ---
+    
+    /**
+     * Lưu mã token duy nhất (UUID) gửi cho người dùng.
+     * Sẽ là null nếu tài khoản đã được xác thực.
+     */
+    @Column(name = "verification_token", nullable = true)
+    private String verificationToken;
+
+    /**
+     * Lưu thời điểm mà token này hết hạn (ví dụ: 24 giờ sau khi tạo).
+     */
+    @Column(name = "token_expiry_date", nullable = true)
+    private LocalDateTime tokenExpiryDate; 
+    
+    // --- KẾT THÚC THÊM MỚI ---
 
     // Constructors
     public TaiKhoan() {
@@ -127,4 +141,23 @@ public class TaiKhoan implements Serializable { // Thêm 'implements Serializabl
     public void setTrangThaiMatKhau(String trangThaiMatKhau) {
         this.trangThaiMatKhau = trangThaiMatKhau;
     }
+    
+    // --- THÊM GETTERS/SETTERS MỚI ---
+    
+    public String getVerificationToken() {
+        return verificationToken;
+    }
+
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
+    }
+
+    public LocalDateTime getTokenExpiryDate() {
+        return tokenExpiryDate;
+    }
+
+    public void setTokenExpiryDate(LocalDateTime tokenExpiryDate) {
+        this.tokenExpiryDate = tokenExpiryDate;
+    }
+    // --- KẾT THÚC THÊM MỚI ---
 }

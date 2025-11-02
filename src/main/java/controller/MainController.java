@@ -42,11 +42,15 @@ public class MainController extends HttpServlet {
         String url = LOGIN_PAGE; // Mặc định về trang login
 
         // 2. Định nghĩa danh sách action cho từng Controller
+        
+        // --- **BẮT ĐẦU SỬA (BƯỚC 5/6)** ---
         String[] userActions = {"login", "logout", "listUsers",
             "showUserCreateForm", "createUser",
             "showUserEditForm", "updateUserStatus",
             "showChangePasswordForm", "changePassword",
-            "register"};
+            "register", 
+            "verify"}; // <-- **THÊM "verify" VÀO ĐÂY**
+        // --- **KẾT THÚC SỬA** ---
 
         String[] EMRCoreActions = {"showCreateForm", "createEncounter",
             "updateEncounterDetails", "getEncounterDetails",
@@ -58,11 +62,10 @@ public class MainController extends HttpServlet {
         String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien",
             "showNhanVienEditForm", "updateNhanVien", "deleteNhanVien"};
 
-        // --- **BẮT ĐẦU SỬA: Thêm 'updateProfile'** ---
+        // (Bạn đã thêm 'updateProfile' ở đây, điều này là đúng)
         String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan",
             "showBenhNhanEditForm", "updateBenhNhan", "deleteBenhNhan",
-            "updateProfile"}; // <-- THÊM ACTION MỚI
-        // --- **KẾT THÚC SỬA** ---
+            "updateProfile"}; 
 
         String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen",
             "updateLichHenStatus"};
@@ -86,7 +89,7 @@ public class MainController extends HttpServlet {
         if (action == null || action.isEmpty()) {
             url = LOGIN_PAGE;
         } else if (Arrays.asList(userActions).contains(action)) {
-            url = USER_CONTROLLER;
+            url = USER_CONTROLLER; // <-- Sẽ chuyển "verify" đến UserController
         } else if (Arrays.asList(EMRCoreActions).contains(action)) {
             url = EMRCORE_CONTROLLER;
         } else if (Arrays.asList(khoaActions).contains(action)) {
