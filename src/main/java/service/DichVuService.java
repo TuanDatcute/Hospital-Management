@@ -4,6 +4,7 @@ import exception.ValidationException;
 import model.dto.DichVuDTO;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import model.Entity.DichVu;
 import model.dao.ChiDinhDichVuDAO;
 import model.dao.DichVuDAO;
@@ -116,7 +117,6 @@ public class DichVuService {
      */
     public void deleteService(int id) throws ValidationException {
 //         --- Logic nghiệp vụ: Kiểm tra xem dịch vụ có đang được sử dụng không ---
-//         (Bạn cần thêm một phương thức trong ChiDinhDichVuDAO để kiểm tra điều này)
         ChiDinhDichVuDAO check = new ChiDinhDichVuDAO();
         if (check.isServiceInUse(id)) {
             throw new ValidationException("Không thể xóa dịch vụ này vì nó đang được sử dụng trong các phiếu khám.");
@@ -124,6 +124,12 @@ public class DichVuService {
         // --- Gọi DAO để xóa ---
         dichVuDAO.delete(id);
     }
+
+    public List<DichVuDTO> searchServicesByName(String keyword) {
+        return dichVuDAO.searchByIdOrName(keyword).stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+
 
     // --- CÁC PHƯƠNG THỨC CHUYỂN ĐỔI (HELPER METHODS) ---
     /**

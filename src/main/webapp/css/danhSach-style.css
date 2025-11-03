@@ -159,6 +159,8 @@ body.dark-mode .alert-danger {
     transition: all 0.2s ease-in-out;
 }
 
+
+
 /* --- Icon bên trái (chỉ hiện khi focus) --- */
 .search-icon-left {
     position: absolute;
@@ -413,6 +415,140 @@ input:checked + .slider .sun-icon {
 
 input:checked + .slider .moon-icon {
     opacity: 1;
+}
+/* ==========================================================================
+   ✨ NÚT CHUYỂN ĐỔI GIAO DIỆN (GRID/LIST) ✨
+   ========================================================================== */
+.view-toggle {
+    display: flex;
+    align-items: center;
+    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid var(--border-color);
+}
+.view-btn {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 6px 10px;
+    font-size: 1rem;
+    line-height: 1;
+    transition: all 0.2s ease-in-out;
+}
+.view-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+body.dark-mode .view-btn.active {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* ==========================================================================
+   ✨ ĐỊNH DẠNG GIAO DIỆN DẠNG DANH SÁCH (LIST VIEW) ✨
+   ========================================================================== */
+
+/* Khi class .list-view được thêm vào, thay đổi cách hiển thị */
+.card-grid.list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Khoảng cách giữa các hàng */
+}
+
+/* Biến mỗi card thành một hàng ngang */
+.card-grid.list-view .encounter-card {
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+}
+
+/* Bỏ các đường viền và nền của header/footer cũ */
+.card-grid.list-view .card-header,
+.card-grid.list-view .card-footer {
+    border: none;
+    padding: 0;
+    background: none;
+}
+
+/* Sắp xếp lại các phần tử bên trong card */
+.card-grid.list-view .card-header {
+    flex-basis: 200px; /* Chiều rộng cố định cho ID và Trạng thái */
+    flex-shrink: 0;
+    padding: 20px;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.card-grid.list-view .card-body {
+    flex-grow: 1; /* Phần thân chiếm không gian còn lại */
+    padding: 15px 20px;
+}
+.card-grid.list-view .patient-name {
+    font-size: 1.2rem;
+}
+.card-grid.list-view .doctor-name {
+    margin-bottom: 10px;
+}
+.card-grid.list-view .info-item {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 8px;
+}
+.card-grid.list-view .info-item .label {
+    margin-bottom: 0;
+    text-transform: none; /* Bỏ uppercase */
+}
+
+.card-grid.list-view .card-footer {
+    flex-basis: 180px; /* Chiều rộng cố định cho nút "Xem Chi Tiết" */
+    flex-shrink: 0;
+    padding: 20px;
+    text-align: right;
+}
+
+/* Responsive cho list-view */
+@media (max-width: 768px) {
+    .card-grid.list-view .encounter-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .card-grid.list-view .card-header {
+        flex-direction: row;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .card-grid.list-view .card-footer {
+        text-align: center;
+    }
+}
+
+
+/* ==========================================================================
+   ✨ CẬP NHẬT THANH TÌM KIẾM ĐỂ CÓ NÚT "XEM TẤT CẢ" ✨
+   ========================================================================== */
+
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 15px; 
+}
+
+
+.search-form {
+    flex-grow: 1;
+}
+
+
+.btn-clear-search {
+    background-color: var(--text-secondary);
+    color: white;
+    white-space: nowrap; 
 }
 
 /* --- Kết thúc đoạn mã đã chỉnh sửa --- */

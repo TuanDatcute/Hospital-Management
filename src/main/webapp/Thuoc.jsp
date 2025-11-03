@@ -80,7 +80,7 @@
             </c:if>
 
             <div class="button-group">
-                <a href="<c:url value='/DanhMucController?action=listMedications'/>" class="btn btn-secondary">Hủy</a>
+                <a href="<c:url value='/MainController?action=listMedications'/>" class="btn btn-secondary" style="text-decoration: none">Hủy</a>
                 <c:choose>
                     <c:when test="${empty MEDICATION_DATA.id}">
                         <button type="submit" class="btn btn-primary">Tạo Mới</button>

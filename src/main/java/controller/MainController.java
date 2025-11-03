@@ -39,6 +39,14 @@ public class MainController extends HttpServlet {
 
         // 1. Lấy action từ request
         String action = request.getParameter("action");
+        String url = LOGIN_PAGE; // Mặc định chuyển về trang login nếu action không hợp lệ
+
+        // 2. Nhóm các action cho từng controller
+        String[] EMRCoreActions = {"printEncounter","completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
+        String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication","listAndSearchServices","updateService","showUpdateServiceForm","deleteService"};
+       
+       
+        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus"};
         String url = LOGIN_PAGE; // Mặc định về trang login
 
         // 2. Định nghĩa danh sách action cho từng Controller
@@ -52,9 +60,7 @@ public class MainController extends HttpServlet {
             "verify"}; // <-- **THÊM "verify" VÀO ĐÂY**
         // --- **KẾT THÚC SỬA** ---
 
-        String[] EMRCoreActions = {"showCreateForm", "createEncounter",
-            "updateEncounterDetails", "getEncounterDetails",
-            "listAllEncounters", "viewEncounterDetails", "addServiceRequest"};
+       
 
         String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa",
             "showKhoaEditForm", "updateKhoa", "deleteKhoa"};
@@ -70,10 +76,7 @@ public class MainController extends HttpServlet {
         String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen",
             "updateLichHenStatus"};
 
-        String[] CatalogActions = {"createService", "showCreateServiceForm",
-            "createMedication", "showMedicationForm", "showUpdateForm",
-            "updateMedicationInfo", "updateStock", "listMedications",
-            "deleteMedication"};
+    
         
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm", "createPrescription"};
 

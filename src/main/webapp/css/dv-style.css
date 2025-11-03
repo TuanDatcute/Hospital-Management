@@ -13,7 +13,7 @@
 
 /* --- Thiết lập chung --- */
 body {
-    font-family: 'Roboto', Arial, sans-serif;
+    font-family: 'Be Vietnam Pro', sans-serif;
     background-color: var(--background-color);
     margin: 0;
     padding: 40px 20px;
@@ -23,6 +23,7 @@ body {
     min-height: 100vh;
     box-sizing: border-box;
 }
+
 
 /* --- Container chính (dạng thẻ) --- */
 .form-container {
@@ -137,3 +138,4 @@ textarea.form-control {
     background-color: #d4edda;
     border-color: #c3e6cb;
 }
+
