@@ -1,6 +1,6 @@
 package service;
 
-import exception.ValidationException;
+import exception.ValidationException; // <-- Giữ import của bạn
 import model.Entity.BenhNhan;
 import model.Entity.TaiKhoan;
 import model.dao.BenhNhanDAO;
@@ -10,69 +10,51 @@ import model.dto.TaiKhoanDTO;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.regex.Pattern;
+import java.util.regex.Pattern; // <-- **THÊM IMPORT REGEX**
 
 /**
  * Lớp Service chứa logic nghiệp vụ cho BenhNhan.
- * @author ADMIN (Đã cập nhật logic unique check)
+ * @author ADMIN (Đã cập nhật)
  */
 public class BenhNhanService {
 
     private final BenhNhanDAO benhNhanDAO = new BenhNhanDAO();
     private final TaiKhoanDAO taiKhoanDAO = new TaiKhoanDAO();
     
+    // **ĐỊNH NGHĨA REGEX CHO SỐ ĐIỆN THOẠI VIỆT NAM**
     private static final Pattern PHONE_REGEX = Pattern.compile("^0[35789]\\d{8}$");
+    // **ĐỊNH NGHĨA REGEX CHO CCCD**
     private static final Pattern CCCD_REGEX = Pattern.compile("^(\\d{9}|\\d{12})$");
-    private static final Pattern MA_BENHNHAN_REGEX = Pattern.compile("^BN-\\d+$");
 
     /**
-     * Dịch vụ tạo một Bệnh Nhân mới.
-     * **ĐÃ CẬP NHẬT:** Thêm kiểm tra unique cho CCCD và SĐT.
+     * Dịch vụ tạo một Bệnh Nhân mới (do Admin/Lễ tân tạo).
      */
     public BenhNhanDTO createBenhNhan(BenhNhanDTO dto) throws ValidationException, Exception {
+        // --- VALIDATION (Sử dụng ValidationException) ---
         if (dto.getHoTen() == null || dto.getHoTen().trim().isEmpty()) {
             throw new ValidationException("Họ tên bệnh nhân không được để trống.");
         }
-
-        String maBenhNhan = dto.getMaBenhNhan();
-        
-        if (maBenhNhan == null || maBenhNhan.trim().isEmpty()) {
-            // Luồng Bệnh nhân tự đăng ký (tự động tạo mã)
-            String newMa = benhNhanDAO.generateNewMaBenhNhan();
-            if (newMa == null) {
-                newMa = "BN-10001";
-            }
-            dto.setMaBenhNhan(newMa);
-            
-        } else {
-            // Luồng Admin/Lễ tân tạo (phải nhập mã)
-            if (!MA_BENHNHAN_REGEX.matcher(maBenhNhan).matches()) {
-                throw new ValidationException("Định dạng Mã Bệnh Nhân không hợp lệ. Phải có dạng 'BN-xxxxx' (ví dụ: BN-10001).");
-            }
-            if (benhNhanDAO.isMaBenhNhanExisted(maBenhNhan)) {
-                throw new ValidationException("Mã bệnh nhân '" + maBenhNhan + "' đã tồn tại.");
-            }
+        if (dto.getMaBenhNhan() == null || dto.getMaBenhNhan().trim().isEmpty()) {
+            throw new ValidationException("Mã bệnh nhân không được để trống.");
+        }
+        if (benhNhanDAO.isMaBenhNhanExisted(dto.getMaBenhNhan())) {
+            throw new ValidationException("Mã bệnh nhân '" + dto.getMaBenhNhan() + "' đã tồn tại.");
         }
         
-        // --- **BẮT ĐẦU CẬP NHẬT (KIỂM TRA UNIQUE)** ---
+        // --- VALIDATION REGEX SĐT (Nếu có nhập) ---
         if (dto.getSoDienThoai() != null && !dto.getSoDienThoai().trim().isEmpty()) {
             if (!PHONE_REGEX.matcher(dto.getSoDienThoai()).matches()) {
                 throw new ValidationException("Định dạng số điện thoại không hợp lệ. Phải là 10 số (ví dụ: 0912345678).");
             }
-            if (benhNhanDAO.isSoDienThoaiExisted(dto.getSoDienThoai())) {
-                throw new ValidationException("Số điện thoại này đã được sử dụng bởi một bệnh nhân khác.");
-            }
         }
+        // --- VALIDATION REGEX CCCD (Nếu có nhập) ---
         if (dto.getCccd() != null && !dto.getCccd().trim().isEmpty()) {
             if (!CCCD_REGEX.matcher(dto.getCccd()).matches()) {
                 throw new ValidationException("Định dạng CCCD không hợp lệ. Phải là 9 hoặc 12 chữ số.");
             }
-            if (benhNhanDAO.isCccdExisted(dto.getCccd())) {
-                throw new ValidationException("Số CCCD này đã được sử dụng bởi một bệnh nhân khác.");
-            }
         }
-        // --- **KẾT THÚC CẬP NHẬT** ---
 
+        // --- KIỂM TRA TÀI KHOẢN LIÊN KẾT ---
         TaiKhoan taiKhoanEntity = null;
         if (dto.getTaiKhoanId() != null && dto.getTaiKhoanId() > 0) {
             taiKhoanEntity = taiKhoanDAO.getById(dto.getTaiKhoanId());
@@ -92,15 +74,11 @@ public class BenhNhanService {
         entity.setTaiKhoan(taiKhoanEntity);
         
         BenhNhan savedEntity = benhNhanDAO.create(entity);
-        if (savedEntity == null) {
-            throw new Exception("Tạo bệnh nhân thất bại (DAO trả về null).");
-        }
         return toDTO(savedEntity);
     }
 
     /**
-     * Dịch vụ cập nhật thông tin Bệnh Nhân. (Admin/Lễ tân dùng)
-     * **ĐÃ CẬP NHẬT:** Thêm kiểm tra unique cho CCCD và SĐT.
+     * Dịch vụ cập nhật thông tin Bệnh Nhân.
      */
     public BenhNhanDTO updateBenhNhan(int benhNhanId, BenhNhanDTO dto) throws ValidationException, Exception {
         BenhNhan existingEntity = benhNhanDAO.getByIdWithRelations(benhNhanId);
@@ -114,43 +92,29 @@ public class BenhNhanService {
         if (dto.getHoTen() == null || dto.getHoTen().trim().isEmpty()) {
             throw new ValidationException("Họ tên không được để trống.");
         }
-        
         String newMaBenhNhan = dto.getMaBenhNhan();
-        if (newMaBenhNhan == null || newMaBenhNhan.trim().isEmpty()) {
-             throw new ValidationException("Mã bệnh nhân không được để trống khi cập nhật.");
-        }
-        if (!MA_BENHNHAN_REGEX.matcher(newMaBenhNhan).matches()) {
-            throw new ValidationException("Định dạng Mã Bệnh Nhân không hợp lệ. Phải có dạng 'BN-xxxxx'.");
-        }
-        if (!newMaBenhNhan.equals(existingEntity.getMaBenhNhan())) {
+        if (newMaBenhNhan != null && !newMaBenhNhan.equals(existingEntity.getMaBenhNhan())) {
             if (benhNhanDAO.isMaBenhNhanExisted(newMaBenhNhan)) {
                 throw new ValidationException("Mã bệnh nhân '" + newMaBenhNhan + "' đã tồn tại.");
             }
         }
 
-        // --- **BẮT ĐẦU CẬP NHẬT (KIỂM TRA UNIQUE)** ---
+        // --- VALIDATION REGEX SĐT (Nếu có nhập) ---
         if (dto.getSoDienThoai() != null && !dto.getSoDienThoai().trim().isEmpty()) {
             if (!PHONE_REGEX.matcher(dto.getSoDienThoai()).matches()) {
-                throw new ValidationException("Định dạng số điện thoại không hợp lệ.");
-            }
-            // Chỉ kiểm tra SĐT nếu nó thay đổi
-            if (!dto.getSoDienThoai().equals(existingEntity.getSoDienThoai()) && benhNhanDAO.isSoDienThoaiExisted(dto.getSoDienThoai())) {
-                throw new ValidationException("Số điện thoại này đã được sử dụng bởi một bệnh nhân khác.");
+                throw new ValidationException("Định dạng số điện thoại không hợp lệ. Phải là 10 số (ví dụ: 0912345678).");
             }
         }
+        // --- VALIDATION REGEX CCCD (Nếu có nhập) ---
         if (dto.getCccd() != null && !dto.getCccd().trim().isEmpty()) {
             if (!CCCD_REGEX.matcher(dto.getCccd()).matches()) {
-                throw new ValidationException("Định dạng CCCD không hợp lệ.");
-            }
-            // Chỉ kiểm tra CCCD nếu nó thay đổi
-            if (!dto.getCccd().equals(existingEntity.getCccd()) && benhNhanDAO.isCccdExisted(dto.getCccd())) {
-                throw new ValidationException("Số CCCD này đã được sử dụng bởi một bệnh nhân khác.");
+                throw new ValidationException("Định dạng CCCD không hợp lệ. Phải là 9 hoặc 12 chữ số.");
             }
         }
-        // --- **KẾT THÚC CẬP NHẬT** ---
 
         existingEntity = toEntity(dto, existingEntity);
 
+        // Xử lý cập nhật tài khoản (logic cũ của bạn đã đúng)
         Integer newTaiKhoanId = dto.getTaiKhoanId();
         TaiKhoan newTaiKhoanEntity = null;
         if (newTaiKhoanId != null && newTaiKhoanId > 0) {
@@ -167,25 +131,51 @@ public class BenhNhanService {
 
         boolean success = benhNhanDAO.update(existingEntity);
         if (!success) {
-            throw new Exception("Cập nhật bệnh nhân thất bại.");
+            throw new Exception("Cập nhật bệnh nhân thất bại."); // Lỗi hệ thống
         }
+
         BenhNhan updatedEntity = benhNhanDAO.getByIdWithRelations(benhNhanId);
         return toDTO(updatedEntity);
     }
+
+    // --- CÁC HÀM MỚI CHO LUỒNG ĐĂNG KÝ (USER TỰ LÀM) ---
+
+    /**
+     * **HÀM MỚI (Bước 3.1):** Tạo một hồ sơ Bệnh nhân rỗng liên kết với tài khoản.
+     */
+    public BenhNhanDTO createBenhNhanFromTaiKhoan(TaiKhoanDTO taiKhoanDTO) throws ValidationException, Exception {
+        if (taiKhoanDTO == null || taiKhoanDTO.getId() == 0) {
+            throw new ValidationException("Tài khoản DTO không hợp lệ.");
+        }
+        
+        TaiKhoan taiKhoanEntity = taiKhoanDAO.getById(taiKhoanDTO.getId());
+        if (taiKhoanEntity == null) {
+            throw new Exception("Không tìm thấy tài khoản (ID: " + taiKhoanDTO.getId() + ") để liên kết.");
+        }
+
+        BenhNhan newBenhNhan = new BenhNhan();
+        newBenhNhan.setTaiKhoan(taiKhoanEntity);
+        
+        newBenhNhan.setHoTen(taiKhoanDTO.getTenDangNhap()); // Dùng Tên đăng nhập làm Họ tên tạm thời
+        newBenhNhan.setMaBenhNhan("BN-" + taiKhoanDTO.getId() + System.currentTimeMillis() % 10000); // Mã tạm thời
+        
+        BenhNhan savedEntity = benhNhanDAO.create(newBenhNhan);
+        return toDTO(savedEntity);
+    }
     
     /**
-     * Cập nhật hồ sơ cá nhân (sau khi đăng ký).
-     * **ĐÃ CẬP NHẬT:** Thêm kiểm tra unique cho CCCD và SĐT.
+     * **HÀM MỚI (Bước 3.2):** Cập nhật hồ sơ cá nhân (sau khi đăng ký).
      */
     public BenhNhanDTO updateProfile(int benhNhanId, BenhNhanDTO dto) throws ValidationException, Exception {
         
         BenhNhan existingBenhNhan = benhNhanDAO.getByIdWithRelations(benhNhanId);
         
         if (existingBenhNhan == null) {
-            throw new ValidationException("Không tìm thấy hồ sơ bệnh nhân (ID: " + benhNhanId + ") để cập nhật.");
+            throw new Exception("Không tìm thấy hồ sơ bệnh nhân (ID: " + benhNhanId + ") để cập nhật.");
         }
 
-        // --- VALIDATION (Các trường bắt buộc) ---
+        // --- VALIDATION (Các trường bắt buộc - Dùng ValidationException) ---
+        
         if (dto.getHoTen() == null || dto.getHoTen().trim().isEmpty()) { 
             throw new ValidationException("Họ tên không được để trống."); 
         }
@@ -196,10 +186,6 @@ public class BenhNhanService {
         }
         if (!CCCD_REGEX.matcher(cccd).matches()) {
             throw new ValidationException("Định dạng CCCD không hợp lệ. Phải là 9 hoặc 12 chữ số.");
-        }
-        // --- **CẬP NHẬT: Chỉ kiểm tra CCCD nếu nó thay đổi** ---
-        if (!cccd.equals(existingBenhNhan.getCccd()) && benhNhanDAO.isCccdExisted(cccd)) {
-             throw new ValidationException("Số CCCD này đã tồn tại.");
         }
         
         if (dto.getNgaySinh() == null) { 
@@ -214,38 +200,27 @@ public class BenhNhanService {
             throw new ValidationException("Số điện thoại không được để trống."); 
         }
         if (!PHONE_REGEX.matcher(sdt).matches()) {
-            throw new ValidationException("Định dạng số điện thoại không hợp lệ.");
-        }
-        // --- **CẬP NHẬT: Chỉ kiểm tra SĐT nếu nó thay đổi** ---
-        if (!sdt.equals(existingBenhNhan.getSoDienThoai()) && benhNhanDAO.isSoDienThoaiExisted(sdt)) {
-            throw new ValidationException("Số điện thoại này đã tồn tại.");
+            throw new ValidationException("Định dạng số điện thoại không hợp lệ. Phải là 10 số (ví dụ: 0912345678).");
         }
         
         if (dto.getDiaChi() == null || dto.getDiaChi().trim().isEmpty()) { 
             throw new ValidationException("Địa chỉ không được để trống."); 
         }
-        
-        // --- **SỬA LỖI LẦN TRƯỚC (Map thủ công)** ---
-        existingBenhNhan.setHoTen(dto.getHoTen());
-        existingBenhNhan.setCccd(dto.getCccd());
-        existingBenhNhan.setNgaySinh(dto.getNgaySinh());
-        existingBenhNhan.setGioiTinh(dto.getGioiTinh());
-        existingBenhNhan.setSoDienThoai(dto.getSoDienThoai());
-        existingBenhNhan.setDiaChi(dto.getDiaChi());
-        existingBenhNhan.setNhomMau(dto.getNhomMau());
-        existingBenhNhan.setTienSuBenh(dto.getTienSuBenh());
-        // (Không map maBenhNhan)
+        // --- KẾT THÚC VALIDATION ---
 
+        // Map dữ liệu mới từ DTO vào Entity
+        existingBenhNhan = toEntity(dto, existingBenhNhan);
+        
         // Cập nhật CSDL
         boolean success = benhNhanDAO.update(existingBenhNhan);
         if (!success) {
-            throw new Exception("Cập nhật hồ sơ thất bại do lỗi hệ thống CSDL.");
+            throw new Exception("Cập nhật hồ sơ thất bại."); // Lỗi hệ thống
         }
         return toDTO(existingBenhNhan);
     }
 
     /**
-     * Tìm BenhNhan DTO bằng TaiKhoan ID
+     * **HÀM MỚI (Bước 3.3):** Tìm BenhNhan DTO bằng TaiKhoan ID
      */
     public BenhNhanDTO getBenhNhanByTaiKhoanId(int taiKhoanId) {
         BenhNhan entity = benhNhanDAO.findByTaiKhoanId(taiKhoanId);
@@ -276,20 +251,23 @@ public class BenhNhanService {
     public List<BenhNhanDTO> getAllBenhNhan() {
         List<BenhNhan> entities = benhNhanDAO.getAllWithRelations();
         return entities.stream()
-                        .filter(bn -> bn.getTaiKhoan() == null || "HOAT_DONG".equals(bn.getTaiKhoan().getTrangThai()))
-                        .map(this::toDTO)
-                        .collect(Collectors.toList());
+                       .filter(bn -> bn.getTaiKhoan() == null || "HOAT_DONG".equals(bn.getTaiKhoan().getTrangThai()))
+                       .map(this::toDTO)
+                       .collect(Collectors.toList());
     }
     
     public List<BenhNhanDTO> getBenhNhanChuaCoGiuong() {
         List<BenhNhan> entities = benhNhanDAO.getBenhNhanChuaCoGiuongWithRelations();
         return entities.stream()
-                        .map(this::toDTO)
-                        .collect(Collectors.toList());
+                       .map(this::toDTO)
+                       .collect(Collectors.toList());
     }
 
     // --- CÁC HÀM MAPPER (Chuyển đổi DTO <-> Entity) ---
 
+    /**
+     * **CẬP NHẬT:** Chuyển Entity sang DTO
+     */
     private BenhNhanDTO toDTO(BenhNhan entity) {
         if (entity == null) return null;
         
@@ -311,6 +289,9 @@ public class BenhNhanService {
         return dto;
     }
 
+    /**
+     * **CẬP NHẬT:** Chuyển DTO sang Entity (để Cập nhật)
+     */
     private BenhNhan toEntity(BenhNhanDTO dto, BenhNhan entity) {
         if (entity == null) {
             entity = new BenhNhan();
