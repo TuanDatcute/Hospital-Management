@@ -16,7 +16,7 @@ import java.util.Optional; // --- THÊM IMPORT MỚI ---
 
 /**
  *
- * @author ADMIN (Đã CẬP NHẬT logic xác thực email)
+ * @author ADMIN (Đã CẬP NHẬT logic xác thực email & quên mật khẩu)
  */
 public class TaiKhoanDAO {
 
@@ -51,32 +51,24 @@ public class TaiKhoanDAO {
 
     /**
      * Cập nhật thông tin một tài khoản.
-     * **CẬP NHẬT:** Chuyển sang 'throw' để đồng bộ với 'create'.
-     * Service layer cần biết khi update thất bại để rollback transaction.
      */
-    public void update(TaiKhoan taiKhoan) { // <-- Đổi thành void
+    public void update(TaiKhoan taiKhoan) { 
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.update(taiKhoan); // Hoặc merge(taiKhoan) nếu cần
+            session.update(taiKhoan); 
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
             e.printStackTrace(); // Nên dùng logger
-            
-            // --- **SỬA LẠI (Quan trọng)** ---
-            // Ném lỗi để Service layer bắt được
             throw new RuntimeException("Lỗi khi cập nhật tài khoản: " + e.getMessage(), e);
-            // --- **KẾT THÚC SỬA** ---
         }
     }
 
-    // --- **BẮT ĐẦU THÊM MỚI (Hàm 'delete' theo yêu cầu)** ---
     /**
      * HÀM MỚI: Xóa một tài khoản khỏi CSDL.
-     * Dùng khi token xác thực hết hạn.
      */
     public void delete(TaiKhoan taiKhoan) {
         Transaction transaction = null;
@@ -89,15 +81,12 @@ public class TaiKhoanDAO {
                 transaction.rollback();
             }
             e.printStackTrace(); // Nên dùng logger
-            // Ném lỗi để Service layer bắt được, đồng bộ với create/update
             throw new RuntimeException("Lỗi khi xóa tài khoản: " + e.getMessage(), e);
         }
     }
-    // --- **KẾT THÚC THÊM MỚI** ---
 
     /**
      * Lấy thông tin tài khoản bằng ID.
-     * (Giữ nguyên)
      */
     public TaiKhoan getById(int id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -110,7 +99,6 @@ public class TaiKhoanDAO {
 
     /**
      * Tìm một tài khoản bằng Tên đăng nhập (dùng cho Service login).
-     * (Giữ nguyên)
      */
     public TaiKhoan findByTenDangNhap(String tenDangNhap) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -126,7 +114,6 @@ public class TaiKhoanDAO {
 
     /**
      * Lấy tất cả tài khoản trong CSDL.
-     * (Giữ nguyên)
      */
     public List<TaiKhoan> getAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -135,13 +122,12 @@ public class TaiKhoanDAO {
             return query.list();
         } catch (Exception e) {
             e.printStackTrace(); // Nên dùng logger
-            return Collections.emptyList(); // Trả về danh sách rỗng nếu có lỗi
+            return Collections.emptyList(); 
         }
     }
 
     /**
      * Kiểm tra xem Tên đăng nhập đã tồn tại chưa (dùng cho Service đăng ký).
-     * (Giğ nguyên)
      */
     public boolean isTenDangNhapExisted(String tenDangNhap) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -157,7 +143,6 @@ public class TaiKhoanDAO {
 
     /**
      * Kiểm tra xem Email đã tồn tại chưa (dùng cho Service đăng ký).
-     * (Giữ nguyên)
      */
     public boolean isEmailExisted(String email) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -173,7 +158,6 @@ public class TaiKhoanDAO {
 
     /**
      * Tìm các tài khoản đang hoạt động và chưa được gán.
-     * (Giữ nguyên)
      */
     public List<TaiKhoan> findActiveAndUnassignedAccounts(String role) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -196,33 +180,30 @@ public class TaiKhoanDAO {
             return query.list();
         } catch (Exception e) {
             e.printStackTrace(); // Nên dùng logger
-            return Collections.emptyList(); // Trả về list rỗng nếu lỗi
+            return Collections.emptyList(); 
         }
     }
 
 
-    // --- **BẮT ĐẦU CẬP NHẬT (Kích hoạt và cải tiến)** ---
+    // --- **CÁC HÀM CHO XÁC THỰC/RESET (Đã cập nhật)** ---
     
     /**
-     * HÀM MỚI (Kích hoạt): Tìm tài khoản bằng token xác thực.
-     * Trả về Optional<TaiKhoan> để Service xử lý an toàn (tránh NullPointerException).
+     * HÀM MỚI (Kích hoạt): Tìm tài khoản bằng token xác thực/reset.
      */
     public Optional<TaiKhoan> findByVerificationToken(String token) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM TaiKhoan t WHERE t.verificationToken = :token";
             Query<TaiKhoan> query = session.createQuery(hql, TaiKhoan.class);
             query.setParameter("token", token);
-            // uniqueResultOptional() là cách an toàn để lấy 0 hoặc 1 kết quả
             return query.uniqueResultOptional();
         } catch (Exception e) {
             e.printStackTrace(); 
-            return Optional.empty(); // Trả về rỗng nếu có lỗi
+            return Optional.empty(); 
         }
     }
     
     /**
-     * HÀM MỚI: Lấy token bằng email.
-     * Dùng để Controller lấy token và gửi email sau khi Service đã tạo user.
+     * HÀM MỚI: Lấy token bằng email (dùng cho Xác thực Email).
      */
     public Optional<String> findVerificationTokenByEmail(String email) {
          try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -236,7 +217,23 @@ public class TaiKhoanDAO {
         }
     }
     
-    // --- **KẾT THÚC CẬP NHẬT** ---
+    // --- **BẮT ĐẦU THÊM MỚI (Cho 'Quên Mật khẩu')** ---
+    /**
+     * HÀM MỚI: Tìm một tài khoản bằng Email (dùng cho Quên mật khẩu).
+     * Trả về Optional<TaiKhoan> để Service có thể lấy entity và cập nhật token.
+     */
+    public Optional<TaiKhoan> findByEmail(String email) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "FROM TaiKhoan t WHERE t.email = :email";
+            Query<TaiKhoan> query = session.createQuery(hql, TaiKhoan.class);
+            query.setParameter("email", email);
+            return query.uniqueResultOptional(); // An toàn, trả về Optional.empty() nếu không tìm thấy
+        } catch (Exception e) {
+            e.printStackTrace(); // Nên dùng logger
+            return Optional.empty(); // Trả về rỗng nếu có lỗi
+        }
+    }
+    // --- **KẾT THÚC THÊM MỚI** ---
 
 
     // ============================================
