@@ -13,9 +13,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "TaiKhoan")
-public class TaiKhoan implements Serializable { // Thêm 'implements Serializable'
+public class TaiKhoan implements Serializable { // Giữ nguyên 'implements Serializable'
 
-    private static final long serialVersionUID = 1L; // Thêm dòng này
+    private static final long serialVersionUID = 1L; // Giữ nguyên
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,28 +48,29 @@ public class TaiKhoan implements Serializable { // Thêm 'implements Serializabl
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    // --- BẮT ĐẦU THÊM MỚI (CHO XÁC THỰC EMAIL) ---
+    // --- BẮT ĐẦU CẬP NHẬT (Kích hoạt các trường mới) ---
     
     /**
-     * Lưu mã token duy nhất (UUID) gửi cho người dùng.
-     * Sẽ là null nếu tài khoản đã được xác thực.
+     * Lưu chuỗi token ngẫu nhiên để gửi qua email.
+     * Thêm unique = true vì mỗi token phải là duy nhất.
+     * Thêm columnDefinition để khớp với style của bạn.
      */
-    @Column(name = "verification_token", nullable = true)
+    @Column(name = "verification_token", nullable = true, unique = true, columnDefinition = "NVARCHAR(MAX)")
     private String verificationToken;
-
+    
     /**
-     * Lưu thời điểm mà token này hết hạn (ví dụ: 24 giờ sau khi tạo).
+     * Lưu thời điểm token này sẽ hết hạn.
      */
     @Column(name = "token_expiry_date", nullable = true)
     private LocalDateTime tokenExpiryDate; 
     
-    // --- KẾT THÚC THÊM MỚI ---
+    // --- KẾT THÚC CẬP NHẬT ---
 
     // Constructors
     public TaiKhoan() {
     }
 
-    // Getters and Setters (Giữ nguyên toàn bộ getters/setters của bạn)
+    // Getters and Setters (Giữ nguyên toàn bộ getters/setters cũ của bạn)
     public int getId() {
         return id;
     }
@@ -142,22 +143,23 @@ public class TaiKhoan implements Serializable { // Thêm 'implements Serializabl
         this.trangThaiMatKhau = trangThaiMatKhau;
     }
     
-    // --- THÊM GETTERS/SETTERS MỚI ---
+    // --- BẮT ĐẦU CẬP NHẬT (Kích hoạt getters/setters mới) ---
     
     public String getVerificationToken() {
         return verificationToken;
     }
-
+    
     public void setVerificationToken(String verificationToken) {
         this.verificationToken = verificationToken;
     }
-
+    
     public LocalDateTime getTokenExpiryDate() {
         return tokenExpiryDate;
     }
-
+    
     public void setTokenExpiryDate(LocalDateTime tokenExpiryDate) {
         this.tokenExpiryDate = tokenExpiryDate;
     }
-    // --- KẾT THÚC THÊM MỚI ---
+    
+    // --- KẾT THÚC CẬP NHẬT ---
 }

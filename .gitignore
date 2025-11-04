@@ -31,4 +31,5 @@ dist/
 target/
 
 # Bỏ qua file cấu hình bí mật
+mail.properties
 hibernate.properties
