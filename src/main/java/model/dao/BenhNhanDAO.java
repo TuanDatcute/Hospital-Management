@@ -15,13 +15,13 @@ import java.util.List;
 
 /**
  *
- * @author ADMIN (Đã sửa lỗi generateNewMaBenhNhan)
+ * @author ADMIN (Đã cập nhật Giai đoạn 2)
  */
 public class BenhNhanDAO {
 
     /**
-     * Thêm một bệnh nhân mới vào CSDL. CẬP NHẬT: Ném RuntimeException để báo
-     * lỗi gốc.
+     * Thêm một bệnh nhân mới vào CSDL.
+     * **CẬP NHẬT:** Ném RuntimeException để báo lỗi hệ thống (lỗi gốc).
      */
     public BenhNhan create(BenhNhan benhNhan) {
         Transaction transaction = null;
@@ -31,25 +31,21 @@ public class BenhNhanDAO {
             transaction.commit();
             return benhNhan;
         } catch (Exception e) {
-
-            System.out.println("!!!!!!!!!!!!!! LỖI GỐC KHI CREATE BENHNHAN !!!!!!!!!!!!!!");
-            e.printStackTrace();
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
             if (transaction != null) {
                 try {
                     transaction.rollback();
                 } catch (Exception rollbackEx) {
-                    System.out.println("Lỗi khi rollback (đã dự đoán): " + rollbackEx.getMessage());
+                    System.err.println("Lỗi khi rollback (kết nối có thể đã đóng): " + rollbackEx.getMessage());
                 }
             }
-            throw new RuntimeException("Lỗi DAO khi tạo BenhNhan (Xem LỖI GỐC ở trên): " + e.getMessage(), e);
+            // Ném lỗi gốc ra ngoài để Service/Controller biết
+            throw new RuntimeException("Lỗi DAO khi tạo BenhNhan: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Cập nhật thông tin một bệnh nhân. CẬP NHẬT: Ném RuntimeException để báo
-     * lỗi gốc.
+     * Cập nhật thông tin một bệnh nhân.
+     * **CẬP NHẬT:** Ném RuntimeException để báo lỗi hệ thống (lỗi gốc).
      */
     public boolean update(BenhNhan benhNhan) {
         Transaction transaction = null;
@@ -59,24 +55,22 @@ public class BenhNhanDAO {
             transaction.commit();
             return true;
         } catch (Exception e) {
-
-            System.out.println("!!!!!!!!!!!!!! LỖI GỐC KHI UPDATE BENHNHAN !!!!!!!!!!!!!!");
-            e.printStackTrace();
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
             if (transaction != null) {
                 try {
                     transaction.rollback();
                 } catch (Exception rollbackEx) {
-                    System.out.println("Lỗi khi rollback (đã dự đoán): " + rollbackEx.getMessage());
+                    System.err.println("Lỗi khi rollback (kết nối có thể đã đóng): " + rollbackEx.getMessage());
                 }
             }
-            throw new RuntimeException("Lỗi DAO khi cập nhật BenhNhan (Xem LỖI GỐC ở trên): " + e.getMessage(), e);
+            // Ném lỗi gốc ra ngoài để Service/Controller biết
+            throw new RuntimeException("Lỗi DAO khi cập nhật BenhNhan: " + e.getMessage(), e);
         }
     }
 
-    // (Giữ nguyên các hàm: getById, getByIdWithRelations, getAll, getAllWithRelations, isMaBenhNhanExisted, isTaiKhoanIdLinked, findByMaBenhNhan, findByTaiKhoanId)
-    // ...
+    /**
+     * Lấy thông tin bệnh nhân bằng ID (không tải thông tin Tài Khoản).
+     * (Giữ nguyên)
+     */
     public BenhNhan getById(int id) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(BenhNhan.class, id);
@@ -86,6 +80,10 @@ public class BenhNhanDAO {
         }
     }
 
+    /**
+     * Lấy thông tin bệnh nhân bằng ID (tải kèm thông tin Tài Khoản).
+     * (Giữ nguyên)
+     */
     public BenhNhan getByIdWithRelations(int id) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan WHERE bn.id = :id";
@@ -98,6 +96,10 @@ public class BenhNhanDAO {
         }
     }
 
+    /**
+     * Lấy tất cả bệnh nhân trong CSDL (không tải Tài Khoản).
+     * (Giữ nguyên)
+     */
     public List<BenhNhan> getAll() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM BenhNhan";
@@ -109,6 +111,10 @@ public class BenhNhanDAO {
         }
     }
 
+    /**
+     * Lấy tất cả bệnh nhân trong CSDL (tải kèm thông tin Tài Khoản).
+     * (Giữ nguyên)
+     */
     public List<BenhNhan> getAllWithRelations() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan";
@@ -120,6 +126,10 @@ public class BenhNhanDAO {
         }
     }
 
+    /**
+     * Kiểm tra xem Mã Bệnh Nhân đã tồn tại chưa.
+     * (Giữ nguyên)
+     */
     public boolean isMaBenhNhanExisted(String maBenhNhan) {
         if (maBenhNhan == null || maBenhNhan.trim().isEmpty()) {
             return false;
@@ -135,6 +145,10 @@ public class BenhNhanDAO {
         }
     }
 
+    /**
+     * Kiểm tra xem TaiKhoan ID đã được liên kết với Bệnh nhân nào chưa.
+     * (Giữ nguyên)
+     */
     public boolean isTaiKhoanIdLinked(int taiKhoanId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "SELECT count(bn.id) FROM BenhNhan bn WHERE bn.taiKhoan.id = :tkId";
@@ -147,6 +161,10 @@ public class BenhNhanDAO {
         }
     }
 
+    /**
+     * Tìm bệnh nhân bằng Mã Bệnh Nhân.
+     * (Giữ nguyên)
+     */
     public BenhNhan findByMaBenhNhan(String maBenhNhan) {
         if (maBenhNhan == null || maBenhNhan.trim().isEmpty()) {
             return null;
@@ -162,6 +180,10 @@ public class BenhNhanDAO {
         }
     }
 
+    /**
+     * Tìm bệnh nhân bằng ID Tài khoản.
+     * (Giữ nguyên)
+     */
     public BenhNhan findByTaiKhoanId(int taiKhoanId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan WHERE bn.taiKhoan.id = :tkId";
@@ -173,56 +195,68 @@ public class BenhNhanDAO {
             return null;
         }
     }
+    
+    // --- **BẮT ĐẦU THÊM MỚI (CHO GIAI ĐOẠN 2)** ---
 
-    // --- **BẮT ĐẦU SỬA (Logic tạo mã an toàn hơn)** ---
     /**
-     * Tự động tạo Mã Bệnh Nhân mới (ví dụ: BN-10001) **CẬP NHẬT:** Dùng logic
-     * Java để tìm số lớn nhất, an toàn hơn HQL CAST.
-     *
-     * @return Một Mã Bệnh Nhân mới (String).
+     * Tự động tạo Mã Bệnh Nhân mới (ví dụ: BN-10001)
+     * Dùng cho Kịch bản B (tạo hồ sơ mới)
      */
     public String generateNewMaBenhNhan() {
         String defaultMa = "BN-10001";
-
+        
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-
-            // 1. Lấy tất cả các mã BN hiện có (dạng String)
             String hql = "SELECT bn.maBenhNhan FROM BenhNhan bn WHERE bn.maBenhNhan LIKE 'BN-%'";
             Query<String> query = session.createQuery(hql, String.class);
             List<String> allMaBN = query.list();
 
             if (allMaBN.isEmpty()) {
-                return defaultMa; // Nếu bảng rỗng, trả về mã đầu tiên
+                return defaultMa; 
             }
 
-            // 2. Dùng Java Stream để tìm số lớn nhất
             int maxNum = allMaBN.stream()
-                    .map(ma -> ma.substring(3)) // Cắt bỏ "BN-"
-                    .mapToInt(numStr -> {
-                        try {
-                            return Integer.parseInt(numStr); // Chuyển "10001" thành 10001
-                        } catch (NumberFormatException e) {
-                            return 0; // Bỏ qua nếu mã bị hỏng (ví dụ: "BN-abc")
-                        }
-                    })
-                    .max() // Tìm số lớn nhất
-                    .orElse(10000); // Nếu không có số nào, bắt đầu từ 10000
+                .map(ma -> ma.substring(3)) 
+                .mapToInt(numStr -> {
+                    try {
+                        return Integer.parseInt(numStr); 
+                    } catch (NumberFormatException e) {
+                        return 0; 
+                    }
+                })
+                .max() 
+                .orElse(10000); 
 
-            // 3. Tạo mã mới
             int nextNum = maxNum + 1;
             return "BN-" + nextNum;
 
         } catch (Exception e) {
-            // Nếu toàn bộ try-catch bị lỗi (ví dụ: CSDL mất kết nối)
             e.printStackTrace();
-            // Trả về mã dự phòng (failsafe) dựa trên thời gian (rất khó trùng)
             return "BN-" + (System.currentTimeMillis() % 100000);
         }
     }
-    // --- **KẾT THÚC SỬA** ---
 
-    // (Giữ nguyên các hàm: isCccdExisted, isSoDienThoaiExisted, getBenhNhanChuaCoGiuongWithRelations)
-    // ...
+    /**
+     * HÀM MỚI: Tìm bệnh nhân bằng CCCD (duy nhất).
+     * Dùng cho Kịch bản A (kiểm tra liên kết tài khoản).
+     */
+    public BenhNhan findByCccd(String cccd) {
+        if (cccd == null || cccd.trim().isEmpty()) {
+            return null;
+        }
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan WHERE bn.cccd = :cccd";
+            Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
+            query.setParameter("cccd", cccd);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    /**
+     * HÀM MỚI: Kiểm tra xem CCCD đã tồn tại chưa (cho Kịch bản B).
+     */
     public boolean isCccdExisted(String cccd) {
         if (cccd == null || cccd.trim().isEmpty()) {
             return false;
@@ -238,6 +272,9 @@ public class BenhNhanDAO {
         }
     }
 
+    /**
+     * HÀM MỚI: Kiểm tra xem Số Điện Thoại đã tồn tại chưa (cho Kịch bản B).
+     */
     public boolean isSoDienThoaiExisted(String soDienThoai) {
         if (soDienThoai == null || soDienThoai.trim().isEmpty()) {
             return false;
@@ -252,10 +289,15 @@ public class BenhNhanDAO {
             return true; // Failsafe
         }
     }
+    
+    // --- **KẾT THÚC THÊM MỚI** ---
 
+    /**
+     * Lấy tất cả bệnh nhân CHƯA được gán vào giường bệnh.
+     * (Giữ nguyên)
+     */
     public List<BenhNhan> getBenhNhanChuaCoGiuongWithRelations() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-
             Query<BenhNhan> query = session.createQuery(
                     "FROM BenhNhan bn "
                     + "LEFT JOIN FETCH bn.taiKhoan "
@@ -270,7 +312,7 @@ public class BenhNhanDAO {
             return query.list();
         } catch (Exception e) {
             e.printStackTrace();
-            return Collections.emptyList();
+            return Collections.emptyList(); 
         }
     }
 }

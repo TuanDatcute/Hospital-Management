@@ -1,7 +1,7 @@
 <%--
-    Document   : home.jsp (Trang chủ Bệnh nhân)
+    Document    : home.jsp (Trang chủ Bệnh nhân)
     Created on : Oct 29, 2025
-    Author     : ADMIN
+    Author      : ADMIN (Đã cập nhật link Hồ sơ)
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -35,10 +35,14 @@
 
             <div class="function-grid">
 
-                <%-- **KHỐI ADMIN VÀ BS/LT ĐÃ BỊ XÓA** --%>
 
                 <%-- Chức năng Bệnh nhân --%>
                 <c:if test="${sessionScope.ROLE == 'BENH_NHAN'}">
+
+                    <a href="MainController?action=showProfile" class="function-card">
+                        <div class="icon"><i class="fas fa-id-card"></i></div>
+                        <span>Hồ sơ của tôi</span>
+                    </a>
                     <a href="#" class="function-card">
                         <div class="icon"><i class="fas fa-history"></i></div>
                         <span>Xem Lịch sử khám</span>

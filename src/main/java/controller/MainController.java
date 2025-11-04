@@ -45,14 +45,13 @@ public class MainController extends HttpServlet {
         String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deleteService"};
 
-        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus","showCreateAppointmentForm","createAppointment"};
+        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus", "showCreateAppointmentForm", "createAppointment"};
 
-        // 2. Định nghĩa danh sách action cho từng Controller
+        // (userActions của bạn đã có "verify", nhưng logic trong UserController đã bị vô hiệu hóa, nên vẫn an toàn)
         String[] userActions = {"login", "logout", "listUsers",
             "showUserCreateForm", "createUser",
             "showUserEditForm", "updateUserStatus",
-            "showChangePasswordForm", "changePassword",
-            "register"};
+            "showChangePasswordForm", "changePassword", "register", "verify"};
 
         String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa",
             "showKhoaEditForm", "updateKhoa", "deleteKhoa"};
@@ -60,20 +59,19 @@ public class MainController extends HttpServlet {
         String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien",
             "showNhanVienEditForm", "updateNhanVien", "deleteNhanVien"};
 
-        // --- **BẮT ĐẦU SỬA: Thêm 'updateProfile'** ---
+        // --- **BẮT ĐẦU SỬA (Giai đoạn 2 - Bước 5/5)** ---
+        // Thêm 2 action mới cho luồng nghiệp vụ "Hoàn tất Hồ sơ"
         String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan",
             "showBenhNhanEditForm", "updateBenhNhan", "deleteBenhNhan",
-            "updateProfile"}; // <-- THÊM ACTION MỚI
+            "updateProfile", // (Action này bạn đã có)
+            "showProfile", // <-- THÊM ACTION NÀY (cho doGet)
+            "saveProfile"};  // <-- THÊM ACTION NÀY (cho doPost)
         // --- **KẾT THÚC SỬA** ---
 
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm", "createPrescription"};
-
         String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate", "deleteRoom"};
-
         String[] GiuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed", "deleteBed", "updateBed", "getBedForUpdate"};
-
         String[] HoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice"};
-
         String[] ThongBaoActions = {"getThongBaoForUpdate", "createThongBao", "updateThongBao", "deleteThongBao", "listNotifications"};
 
         // 3. Điều hướng dựa trên action
@@ -88,6 +86,7 @@ public class MainController extends HttpServlet {
         } else if (Arrays.asList(nhanVienActions).contains(action)) {
             url = NHANVIEN_CONTROLLER;
         } else if (Arrays.asList(benhNhanActions).contains(action)) {
+            // **CẬP NHẬT:** Giờ đây 'showProfile' và 'saveProfile' sẽ được chuyển đến BenhNhanController
             url = BENHNHAN_CONTROLLER;
         } else if (Arrays.asList(lichHenActions).contains(action)) {
             url = LICHHEN_CONTROLLER;
@@ -104,7 +103,6 @@ public class MainController extends HttpServlet {
         } else if (Arrays.asList(ThongBaoActions).contains(action)) {
             url = THONG_BAO_CONTROLLER;
         }
-        // (Nếu action không khớp, url vẫn là LOGIN_PAGE)
 
         // 4. Forward đến controller tương ứng
         request.getRequestDispatcher(url).forward(request, response);
