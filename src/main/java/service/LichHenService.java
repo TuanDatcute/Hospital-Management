@@ -286,4 +286,55 @@ public class LichHenService {
         return toDTO(savedEntity);
     }
 
+    /**
+     * Đánh dấu một lịch hẹn là đã được xử lý (ví dụ: ĐÃ KHÁM).
+     *
+     * @param lichHenId ID của lịch hẹn cần cập nhật.
+     * @param newStatus Trạng thái mới (ví dụ: "DA_KHAM").
+     */
+    public void updateAppointmentStatus(Integer lichHenId, String newStatus) throws ValidationException {
+        if (lichHenId == null) {
+            return; // Không làm gì cả nếu không có lịch hẹn ID
+        }
+
+        LichHen lichHen = lichHenDAO.getById(lichHenId);
+        if (lichHen != null) {
+            lichHen.setTrangThai(newStatus);
+            lichHenDAO.update(lichHen);
+        } else {
+            throw new ValidationException("Không tìm thấy lịch hẹn với ID: " + lichHenId);
+        }
+    }
+
+    /**
+     * Lấy tất cả các lịch hẹn đang ở trạng thái chờ khám (chưa hoàn thành).
+     *
+     * @return Danh sách LichHenDTO.
+     */
+    public List<LichHenDTO> getAllPendingAppointments() {
+        // 1. Gọi DAO (đã tạo ở bước trước)
+        List<LichHen> entities = lichHenDAO.getAllPendingAppointments();
+
+        // 2. Chuyển đổi danh sách Entity sang DTO
+        return entities.stream()
+                .map(this::toDTO) // Áp dụng hàm toDTO cho mỗi phần tử
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Lấy tất cả các lịch hẹn đang chờ của một bác sĩ cụ thể.
+     *
+     * @param bacSiId ID của bác sĩ.
+     * @return Danh sách LichHenDTO.
+     */
+    public List<LichHenDTO> getPendingAppointmentsForDoctor(int bacSiId) {
+        // 1. Gọi DAO với ID bác sĩ
+        List<LichHen> entities = lichHenDAO.getPendingAppointmentsForDoctor(bacSiId);
+
+        // 2. Chuyển đổi danh sách Entity sang DTO
+        return entities.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
 }

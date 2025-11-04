@@ -60,9 +60,11 @@ public class LichHenController extends HttpServlet {
                     request.setAttribute("formAction", "createLichHen");
                     url = LICHHEN_FORM_PAGE;
                     break;
+                    //===Dat=====
                 case "showCreateAppointmentForm":
                     url = loadAppointmentFormDependencies(request);
                     break;
+                    //====end dat=====
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho GET.");
                     url = ERROR_PAGE;
@@ -278,7 +280,7 @@ public class LichHenController extends HttpServlet {
     private String loadAppointmentFormDependencies(HttpServletRequest request) {
         try {
             List<BenhNhanDTO> danhSachBenhNhan = benhNhanService.getAllBenhNhan();
-            List<NhanVienDTO> danhSachBacSi = nhanVienService.findDoctorsBySpecialty(); // Hoặc hàm getAllDoctors
+            List<NhanVienDTO> danhSachBacSi = nhanVienService.findDoctorsBySpecialty(); 
 
             request.setAttribute("danhSachBenhNhan", danhSachBenhNhan);
             request.setAttribute("danhSachBacSi", danhSachBacSi);

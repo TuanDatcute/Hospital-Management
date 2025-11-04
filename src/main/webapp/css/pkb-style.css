@@ -1,196 +1,290 @@
 /* ==========================================================================
-   BIẾN TOÀN CỤC & THIẾT LẬP CƠ BẢN
+   BIẾN TOÀN CỤC & KIỂU DÁNG CHUNG (ĐỒNG BỘ)
    ========================================================================== */
+
+/* 🎨 Chế độ SÁNG */
 :root {
-    --primary-color: #007bff;
-    --secondary-color: #6c757d;
+    --primary-color: #4a90e2;
     --success-color: #28a745;
     --danger-color: #dc3545;
-    --background-color: #f4f7f6;
-    --text-color: #212529;
-    --border-color: #ced4da;
-    --border-radius: 8px;
-    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --font-family: 'Be Vietnam Pro', sans-serif;
 
+    --bg-color: #f4f7f9;
+    --surface-color: #ffffff;
+    --border-color: #e9ecef;
+    --text-primary: #343a40;
+    --text-secondary: #6c757d;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+/* 🎨 Chế độ TỐI "BẠC ĐEN" */
+body.dark-mode {
+    --primary-color: #77A5D9;
+    --success-color: #3d8c5a;
+    --danger-color: #e57373;
+
+    --bg-color: #121212;
+    --surface-color: #1E1E1E;
+    --border-color: #333333;
+    --text-primary: #E0E0E0;
+    --text-secondary: #888888;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
 body {
-    font-family: var(--font-family);
-    background-color: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.6;
-    padding: 20px;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    padding-top: 60px; /* Khoảng trống cho thanh user bar */
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
 }
 
 /* ==========================================================================
-   LAYOUT CHÍNH VÀ TIÊU ĐỀ
+   THANH THÔNG TIN USER (ĐẦU TRANG)
+   ========================================================================== */
+.user-info-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background-color: var(--surface-color);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+    z-index: 1001;
+}
+body.dark-mode .user-info-bar {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.user-details {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.user-details i {
+    font-size: 1.8rem;
+    color: var(--text-secondary);
+}
+.user-text {
+    display: flex;
+    flex-direction: column;
+}
+.user-text strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+.user-text span {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-transform: capitalize;
+}
+
+/* ==========================================================================
+   LAYOUT FORM CHÍNH
    ========================================================================== */
 .container {
-    max-width: 960px;
-    margin: 20px auto;
-    background-color: #fff;
+    max-width: 900px;
+    margin: 30px auto;
     padding: 30px 40px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    position: relative;
 }
-
-.container h1 {
+h1 {
     text-align: center;
-    font-size: 2rem;
-    color: var(--primary-color);
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
+    color: var(--text-primary);
+    margin-top: 0;
+    margin-bottom: 30px;
 }
 
 /* ==========================================================================
-   BỐ CỤC LƯỚI CHO FORM
+   FORM GRID & CÁC TRƯỜNG NHẬP LIỆU
    ========================================================================== */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 25px;
+    gap: 20px 25px;
 }
-
 .form-group {
     display: flex;
     flex-direction: column;
 }
-
-.full-width {
-    grid-column: 1 / -1; /* Trải dài toàn bộ chiều rộng của grid */
+.form-group.full-width {
+    grid-column: 1 / -1;
 }
-
-/* ==========================================================================
-   CÁC THÀNH PHẦN CỦA FORM
-   ========================================================================== */
-label {
+.form-group label {
     margin-bottom: 8px;
     font-weight: 500;
-    color: #495057;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
 }
-
 .form-control {
     width: 100%;
-    padding: 12px 15px;
-    font-size: 1rem;
-    font-family: var(--font-family);
+    box-sizing: border-box;
+    padding: 12px;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background-color: #fff;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 8px;
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+    transition: all 0.2s ease-in-out;
 }
-
 .form-control:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
 }
-
-/* Style cho các ô input bị khóa (readonly) */
-input[readonly].form-control {
-    background-color: #e9ecef;
-    cursor: not-allowed;
-}
-
 textarea.form-control {
     resize: vertical;
-    min-height: 80px;
+}
+.form-control.readonly-input,
+.form-control:disabled {
+    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
+    color: var(--text-secondary);
 }
 
 /* ==========================================================================
-   NÚT BẤM (BUTTONS)
+   NÚT BẤM
    ========================================================================== */
 .button-group {
-    grid-column: 1 / -1;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: flex-end;
     gap: 15px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
 }
-
 .btn {
-    display: inline-block;
-    padding: 12px 25px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
     border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 500;
-    text-decoration: none;
-    text-align: center;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease-in-out;
 }
-
 .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
-
 .btn-primary {
     background-color: var(--primary-color);
     color: white;
 }
-.btn-primary:hover {
-    background-color: #0069d9;
-}
-
 .btn-secondary {
-    background-color: var(--secondary-color);
+    background-color: var(--text-secondary);
     color: white;
 }
-.btn-secondary:hover {
-    background-color: #5a6268;
-}
-
 
 /* ==========================================================================
-   THÔNG BÁO LỖI (ALERT)
+   ALERT
    ========================================================================== */
 .alert {
     padding: 15px;
+    border-radius: 8px;
     margin-bottom: 20px;
-    border-radius: 5px;
-    font-weight: 500;
     border: 1px solid transparent;
 }
 .alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border-color: #f5c6cb;
+    background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
+    color: var(--danger-color);
+}
+body.dark-mode .alert-danger {
+    color: #f79494;
 }
 
 /* ==========================================================================
-   RESPONSIVE DESIGN
+   NÚT GẠT CHUYỂN CHẾ ĐỘ
+   ========================================================================== */
+.theme-switch-wrapper {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+}
+.theme-switch {
+    display: inline-block;
+    height: 30px;
+    position: relative;
+    width: 60px;
+}
+.theme-switch input {
+    display: none;
+}
+.slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 7px;
+}
+.slider:before {
+    background-color: #fff;
+    content: "";
+    height: 22px;
+    width: 22px;
+    border-radius: 50%;
+    position: absolute;
+    left: 4px;
+    bottom: 4px;
+    transition: .4s;
+    z-index: 1;
+}
+.sun-icon, .moon-icon {
+    font-size: 14px;
+    transition: opacity 0.4s ease;
+    z-index: 2;
+}
+.sun-icon {
+    color: #f39c12;
+    opacity: 1;
+}
+.moon-icon {
+    color: #4a90e2;
+    opacity: 0;
+}
+input:checked + .slider {
+    background-color: #555;
+}
+input:checked + .slider:before {
+    transform: translateX(30px);
+}
+input:checked + .slider .sun-icon {
+    opacity: 0;
+}
+input:checked + .slider .moon-icon {
+    opacity: 1;
+    color: #77A5D9;
+}
+
+/* ==========================================================================
+   RESPONSIVE
    ========================================================================== */
 @media (max-width: 768px) {
-    body {
-        padding: 10px;
+    .form-grid {
+        grid-template-columns: 1fr; /* Stack các cột */
     }
-
     .container {
         padding: 20px;
-        margin: 10px auto;
     }
-
-    .form-grid {
-        grid-template-columns: 1fr; /* Chuyển thành 1 cột trên màn hình nhỏ */
-    }
-
-    .button-group {
-        flex-direction: column;
-    }
-
-    .btn {
-        width: 100%;
+    .theme-switch-wrapper {
+        top: 20px;
+        right: 20px;
     }
 }
