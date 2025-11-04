@@ -1,7 +1,6 @@
 <%--
-    Document   : fillProfile.jsp (Bắt buộc điền thông tin sau khi đăng ký)
-    Created on : Oct 29, 2025
-    Author     : ADMIN
+    Document   : fillProfile.jsp
+    (Đã cập nhật để gửi ID bệnh nhân nếu có)
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -17,12 +16,8 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
     </head>
-    <body class="login-page-body"> <%-- Vẫn giữ class này để có nền và căn giữa --%>
+    <body class="login-page-body"> 
 
-        <%-- 
-            **SỬA:** Đổi tên class để tránh xung đột với style của form đăng nhập gộp.
-            Bây giờ nó là một container độc lập.
-        --%>
         <div class="standalone-form-container" style="max-width: 600px;">
 
             <h1 class="form-title">Hoàn tất Hồ sơ</h1>
@@ -37,8 +32,12 @@
 
             <form action="${pageContext.request.contextPath}/MainController" method="post" class="data-form">
 
-                <input type="hidden" name="action" value="updateProfile" />
+                <%-- Action đã sửa từ bước trước --%>
+                <input type="hidden" name="action" value="saveProfile" />
 
+                <c:if test="${not empty requestScope.BENHNHAN_DATA.id}">
+                    <input type="hidden" name="id" value="${requestScope.BENHNHAN_DATA.id}" />
+                </c:if>
                 <div class="form-group">
                     <label for="hoTen">Họ và Tên (*):</label>
                     <input type="text" id="hoTen" name="hoTen" value="<c:out value='${requestScope.BENHNHAN_DATA.hoTen}'/>" required="required">
