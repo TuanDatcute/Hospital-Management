@@ -11,6 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import model.dto.BenhNhanDTO;
 import model.dto.ChiTietDonThuocDTO;
 import model.dto.DichVuDTO;
@@ -18,6 +19,7 @@ import model.dto.DonThuocDTO;
 import model.dto.LichHenDTO;
 import model.dto.NhanVienDTO;
 import model.dto.PhieuKhamBenhDTO;
+import model.dto.TaiKhoanDTO;
 import service.BenhNhanService;   // Import các Service cần thiết
 import service.ChiDinhDichVuService;
 import service.DichVuService;
@@ -71,9 +73,6 @@ public class EMRCoreController extends HttpServlet {
                 case "printEncounter":
                     url = printEncounter(request);
                     break;
-                case "getEncounterDetails":
-                    url = showCreateForm(request);
-                    break;
                 case "listAllEncounters":
                     url = listAllEncounters(request);
                     break;
@@ -81,9 +80,6 @@ public class EMRCoreController extends HttpServlet {
                     url = viewEncounterDetails(request);
                     break;
                 case "showCreateEncounterForm":
-                    url = showCreateForm(request);
-                    break;
-                case "showCreateDonThuocForm":
                     url = showCreateForm(request);
                     break;
                 case "showUpdateEncounterForm":
@@ -132,12 +128,14 @@ public class EMRCoreController extends HttpServlet {
                     url = completeEncounter(request);
                     break;
             }
+
             if (url.startsWith("redirect:")) {
                 String redirectUrl = url.substring("redirect:".length());
                 response.sendRedirect(request.getContextPath() + redirectUrl);
             } else {
                 request.getRequestDispatcher(url).forward(request, response);
             }
+
         } catch (Exception e) {
             log("Lỗi tại EMRCoreController (doPost): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Đã có lỗi nghiêm trọng xảy ra: " + e.getMessage());
@@ -146,22 +144,46 @@ public class EMRCoreController extends HttpServlet {
     }
 
     /**
-     * Lấy danh sách tất cả phiếu khám và hiển thị có tìm kiếm.
+     * Lấy danh sách tất cả phiếu khám(theo bác sĩ) và hiển thị có tìm kiếm.
      */
     private String listAllEncounters(HttpServletRequest request) {
-        String keyword = request.getParameter("keyword"); // Lấy từ khóa từ URL
+        String keyword = request.getParameter("keyword");
         List<PhieuKhamBenhDTO> danhSachPhieuKham;
 
         try {
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                // Nếu có từ khóa -> gọi hàm tìm kiếm
-                danhSachPhieuKham = phieuKhamService.searchEncounters(keyword);
-                request.setAttribute("searchKeyword", keyword); // Gửi lại từ khóa để hiển thị
+            // 1. Lấy thông tin người dùng từ session
+            HttpSession session = request.getSession(false);
+            // Nhớ dùng đúng tên biến bạn đã đặt khi đăng nhập
+            TaiKhoanDTO currentUserAccount = (TaiKhoanDTO) session.getAttribute("LOGIN_ACCOUNT");
+            NhanVienDTO currentUserInfo = (NhanVienDTO) session.getAttribute("LOGIN_USER_INFO");
+
+            // 2. Kiểm tra vai trò và gọi Service tương ứng
+            if (currentUserAccount != null && "BAC_SI".equals(currentUserAccount.getVaiTro())) {
+                // --- KỊCH BẢN BÁC SĨ ---
+                int bacSiId = currentUserInfo.getId();
+                if (keyword != null && !keyword.trim().isEmpty()) {
+                    // Tìm kiếm CỦA Bác sĩ
+                    danhSachPhieuKham = phieuKhamService.searchEncountersForDoctor(keyword, bacSiId);
+                    request.setAttribute("searchKeyword", keyword);
+                } else {
+                    // Lấy tất cả CỦA Bác sĩ
+                    danhSachPhieuKham = phieuKhamService.getAllEncountersForDoctor(bacSiId);
+                }
             } else {
-                // Nếu không có từ khóa -> gọi hàm lấy tất cả
-                danhSachPhieuKham = phieuKhamService.getAllEncounters();
+                // --- KỊCH BẢN ADMIN / Y TÁ (hoặc vai trò khác) ---
+                if (keyword != null && !keyword.trim().isEmpty()) {
+                    // Tìm kiếm TẤT CẢ
+                    danhSachPhieuKham = phieuKhamService.searchEncounters(keyword);
+                    request.setAttribute("searchKeyword", keyword);
+                } else {
+                    // Lấy TẤT CẢ
+                    danhSachPhieuKham = phieuKhamService.getAllEncounters();
+                }
             }
+
+            // 3. Gửi danh sách đã lọc đến JSP
             request.setAttribute("danhSachPhieuKham", danhSachPhieuKham);
+
         } catch (Exception e) {
             log("Lỗi khi lấy danh sách phiếu khám: ", e);
             request.setAttribute("ERROR_MESSAGE", "Không thể tải danh sách phiếu khám.");
@@ -209,7 +231,7 @@ public class EMRCoreController extends HttpServlet {
     private String createEncounter(HttpServletRequest request) {
         PhieuKhamBenhDTO newEncounterDTO = new PhieuKhamBenhDTO();
         try {
-            
+
             newEncounterDTO.setTrieuChung(request.getParameter("trieuChung"));
             newEncounterDTO.setHuyetAp(request.getParameter("huyetAp"));
             newEncounterDTO.setChanDoan(request.getParameter("chanDoan"));
@@ -235,7 +257,7 @@ public class EMRCoreController extends HttpServlet {
                 newEncounterDTO.setNhipTim(Integer.parseInt(nhipTimStr));
             }
             String nhipThoStr = request.getParameter("nhipTho");
-            if (nhipTimStr != null && !nhipThoStr.isEmpty()) {
+            if (nhipThoStr != null && !nhipThoStr.isEmpty()) {
                 newEncounterDTO.setNhipTho(Integer.parseInt(nhipThoStr));
             }
 
@@ -302,11 +324,30 @@ public class EMRCoreController extends HttpServlet {
         try {
             List<BenhNhanDTO> danhSachBenhNhan = benhNhanService.getAllBenhNhan();
             List<NhanVienDTO> danhSachBacSi = nhanVienService.findDoctorsBySpecialty();
-            List<LichHenDTO> danhSachLichHen = lichHenService.getAllLichHen();
+
+            HttpSession session = request.getSession(false);
+            NhanVienDTO currentUser = (NhanVienDTO) session.getAttribute("LOGIN_USER_INFO");
+
+            List<LichHenDTO> danhSachLichHen;
+
+            // Kiểm tra xem người dùng có phải là Bác sĩ không
+            if (currentUser != null && "BAC_SI".equals(currentUser.getVaiTro())) {
+                // Nếu là Bác sĩ, chỉ lấy lịch hẹn của chính họ
+                danhSachLichHen = lichHenService.getPendingAppointmentsForDoctor(currentUser.getId());
+            } else {
+                // Nếu là Y tá hoặc Admin, lấy lịch hẹn của tất cả (hoặc bạn có thể tạo hàm riêng)
+                // Tạm thời dùng lại hàm cũ nếu có
+                danhSachLichHen = lichHenService.getAllPendingAppointments();
+
+                // Hoặc đơn giản là không tải gì cả nếu y tá không có quyền này
+//                danhSachLichHen = new ArrayList<>();
+            }
 
             request.setAttribute("danhSachLichHen", danhSachLichHen);
             request.setAttribute("danhSachBenhNhan", danhSachBenhNhan);
             request.setAttribute("danhSachBacSi", danhSachBacSi);
+
+            request.setAttribute("danhSachLichHen", danhSachLichHen);
         } catch (Exception e) {
             log("Không thể tải dữ liệu cho form tạo phiếu khám: " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Không thể tải danh sách bệnh nhân và bác sĩ.");
@@ -448,7 +489,7 @@ public class EMRCoreController extends HttpServlet {
                 dto.setNhipTim(Integer.parseInt(nhipTimStr));
             }
             String nhipThoStr = request.getParameter("nhipTho");
-            if (nhipTimStr != null && !nhipTimStr.isEmpty()) {
+            if (nhipThoStr != null && !nhipThoStr.isEmpty()) {
                 dto.setNhipTho(Integer.parseInt(nhipThoStr));
             }
 
@@ -456,12 +497,12 @@ public class EMRCoreController extends HttpServlet {
             if (lichHenStr != null && !lichHenStr.isEmpty()) {
                 dto.setLichHenId(Integer.parseInt(lichHenStr));
             }
-            phieuKhamService.updateEncounter(dto); // Giả sử Service có hàm update
+            PhieuKhamBenhDTO result = phieuKhamService.updateEncounter(dto);
+            String keyword = result.getMaPhieuKham();
+            String encodedKeyword = java.net.URLEncoder.encode(keyword, "UTF-8");
 
-            //maPhieuKham để tìm kiếm
-            String maPhieuKham = request.getParameter("maPhieuKham");
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Cập nhật phiếu khám thành công!");
-            return "redirect:/MainController?action=listAllEncounters&keyword=" + maPhieuKham;
+            return "redirect:/MainController?action=listAllEncounters&keyword=" + encodedKeyword;
 
         } catch (ValidationException e) {
             request.setAttribute("ERROR_MESSAGE", e.getMessage());

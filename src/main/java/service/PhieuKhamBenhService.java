@@ -60,7 +60,6 @@ public class PhieuKhamBenhService {
         String newMaPhieuKham = "PK" + dateStr + sequenceStr;
         dto.setMaPhieuKham(newMaPhieuKham); // Gán mã mới vào DTO
 
-
         BenhNhan benhNhanEntity = benhNhanDAO.getById(dto.getBenhNhanId());
         if (benhNhanEntity == null) {
             throw new ValidationException("Không tìm thấy bệnh nhân với ID: " + dto.getBenhNhanId());
@@ -82,7 +81,18 @@ public class PhieuKhamBenhService {
         // --- BƯỚC 3: GỌI DAO ĐỂ LƯU ---
         PhieuKhamBenh savedEntity = phieuKhamDAO.create(entity);
 
-        // --- BƯỚC 4: CHUYỂN ĐỔI ENTITY -> DTO ĐỂ TRẢ VỀ ---
+        // --- BƯỚC 4: CẬP NHẬT TRẠNG THÁI LỊCH HẸN (NẾU CÓ) ✨ ---
+        if (dto.getLichHenId() != null) {
+            try {
+                // Giả sử LichHenService được tiêm vào (hoặc new)
+                LichHenService lichHenService = new LichHenService();
+                lichHenService.updateAppointmentStatus(dto.getLichHenId(), "DA_DEN_KHAM");
+            } catch (ValidationException e) {
+                // Ghi log lỗi cập nhật lịch hẹn, nhưng không làm sập giao dịch chính
+                throw new ValidationException("Lỗi khi cập nhật trạng thái Lịch hẹn: " + e.getMessage());
+            }
+        }
+        // --- BƯỚC 5: CHUYỂN ĐỔI ENTITY -> DTO ĐỂ TRẢ VỀ ---
         return toDTO(savedEntity);
     }
 
@@ -265,6 +275,26 @@ public class PhieuKhamBenhService {
 
         // Trả về danh sách DTO đã hoàn chỉnh
         return dtos;
+    }
+
+    /**
+     * Lấy tất cả phiếu khám cho một bác sĩ cụ thể.
+     */
+    public List<PhieuKhamBenhDTO> getAllEncountersForDoctor(int bacSiId) {
+        List<PhieuKhamBenh> entities = phieuKhamDAO.getAllForDoctor(bacSiId);
+        return entities.stream()
+                .map(this::toDTOForListing) 
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Tìm kiếm phiếu khám cho một bác sĩ cụ thể.
+     */
+    public List<PhieuKhamBenhDTO> searchEncountersForDoctor(String keyword, int bacSiId) {
+        List<PhieuKhamBenh> entities = phieuKhamDAO.searchForDoctor(keyword, bacSiId);
+        return entities.stream()
+                .map(this::toDTOForListing) 
+                .collect(Collectors.toList());
     }
 
     /**

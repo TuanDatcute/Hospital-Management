@@ -42,18 +42,16 @@ public class MainController extends HttpServlet {
         String url = LOGIN_PAGE; // Mặc định chuyển về trang login nếu action không hợp lệ
 
         // 2. Nhóm các action cho từng controller
-        // (Các mảng action khác của bạn... giữ nguyên)
         String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deleteService"};
-        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus"};
+
+        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus", "showCreateAppointmentForm", "createAppointment"};
 
         // (userActions của bạn đã có "verify", nhưng logic trong UserController đã bị vô hiệu hóa, nên vẫn an toàn)
         String[] userActions = {"login", "logout", "listUsers",
             "showUserCreateForm", "createUser",
             "showUserEditForm", "updateUserStatus",
-            "showChangePasswordForm", "changePassword",
-            "register",
-            "verify"};
+            "showChangePasswordForm", "changePassword", "register", "verify"};
 
         String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa",
             "showKhoaEditForm", "updateKhoa", "deleteKhoa"};

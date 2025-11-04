@@ -8,13 +8,6 @@
     margin: 15mm;
 }
 
-@top-left { content: ""; }
-@top-center { content: ""; }
-@top-right { content: ""; }
-@bottom-left { content: ""; }
-@bottom-center { content: ""; }
-@bottom-right { content: ""; }
-
 /* 🎨 Chế độ SÁNG */
 :root {
     --primary-color: #4a90e2;

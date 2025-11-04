@@ -317,6 +317,50 @@ public class PhieuKhamBenhDAO {
         }
     }
 
+    /**
+     * Lấy tất cả phiếu khám của MỘT bác sĩ cụ thể.
+     */
+    public List<PhieuKhamBenh> getAllForDoctor(int bacSiId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<PhieuKhamBenh> query = session.createQuery(
+                    "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb "
+                    + "LEFT JOIN FETCH pkb.benhNhan "
+                    + "LEFT JOIN FETCH pkb.bacSi "
+                    + "WHERE pkb.bacSi.id = :bacSiId "
+                    + "ORDER BY pkb.trangThai ASC, pkb.thoiGianKham DESC",
+                    PhieuKhamBenh.class
+            );
+            query.setParameter("bacSiId", bacSiId);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Tìm kiếm phiếu khám của MỘT bác sĩ cụ thể.
+     */
+    public List<PhieuKhamBenh> searchForDoctor(String keyword, int bacSiId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<PhieuKhamBenh> query = session.createQuery(
+                    "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb "
+                    + "JOIN FETCH pkb.benhNhan bn "
+                    + "JOIN FETCH pkb.bacSi "
+                    + "WHERE pkb.bacSi.id = :bacSiId "
+                    + "AND (pkb.maPhieuKham LIKE :keyword OR bn.hoTen LIKE :keyword OR bn.maBenhNhan LIKE :keyword) "
+                    + "ORDER BY pkb.trangThai ASC, pkb.thoiGianKham DESC",
+                    PhieuKhamBenh.class
+            );
+            query.setParameter("bacSiId", bacSiId);
+            query.setParameter("keyword", "%" + keyword + "%");
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
     // Hàm này cần cho Service tạo hóa đơn
     public PhieuKhamBenh getById(int id, Session session) {
         return session.get(PhieuKhamBenh.class, id);
