@@ -10,49 +10,48 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-// --- THÊM MỚI ---
-import model.dto.BenhNhanDTO; // (Giữ nguyên)
+import model.Entity.TaiKhoan;
+import model.dto.BenhNhanDTO;
 import model.dto.TaiKhoanDTO;
 import service.BenhNhanService;
 import service.TaiKhoanService;
-import util.EmailUtils; // <-- **THÊM IMPORT MỚI**
-// --- KẾT THÚC THÊM MỚI ---
+import util.EmailUtils;
 
 /**
- * Controller xử lý các nghiệp vụ liên quan đến người dùng.
- * **ĐÃ CẬP NHẬT (Giai đoạn 3):** Kích hoạt logic Xác thực Email.
+ * Controller xử lý các nghiệp vụ liên quan đến người dùng. **ĐÃ CẬP NHẬT (Giai
+ * đoạn 5):** Cập nhật logic Login để trỏ đến 'showEditProfile'.
  */
 @WebServlet(name = "UserController", urlPatterns = {"/UserController"})
 public class UserController extends HttpServlet {
 
     // (Các hằng số trang JSP... giữ nguyên)
     private static final String LOGIN_PAGE = "login.jsp";
-    private static final String HOME_PAGE = "home.jsp"; 
-    private static final String ADMIN_DASHBOARD_PAGE = "admin/dashboard.jsp"; 
-    private static final String STAFF_DASHBOARD_PAGE = "staff/dashboard.jsp"; 
+    private static final String HOME_PAGE = "home.jsp";
+    private static final String ADMIN_DASHBOARD_PAGE = "admin/dashboard.jsp";
+    private static final String STAFF_DASHBOARD_PAGE = "staff/dashboard.jsp";
 
     private static final String USER_LIST_PAGE = "admin/danhSachTaiKhoan.jsp";
     private static final String USER_FORM_PAGE = "admin/formTaiKhoan.jsp";
     private static final String CHANGE_PASSWORD_PAGE = "user/changePassword.jsp";
-    private static final String REGISTER_PAGE = "login.jsp"; 
+    private static final String REGISTER_PAGE = "login.jsp"; // Lỗi register quay về login
     private static final String ERROR_PAGE = "error.jsp";
-    
-    // --- **THÊM HẰNG SỐ MỚI (CLEAN CODE)** ---
+
+    private static final String VERIFY_EMAIL_PAGE = "verifyEmail.jsp";
+
+    // (Các hằng số ACTION... giữ nguyên)
     private static final String ACTION_LOGIN = "login";
     private static final String ACTION_REGISTER = "register";
     private static final String ACTION_CREATE_USER = "createUser";
     private static final String ACTION_UPDATE_STATUS = "updateUserStatus";
     private static final String ACTION_CHANGE_PASSWORD = "changePassword";
     private static final String ROLE_BENH_NHAN = "BENH_NHAN";
-    // --- **KẾT THÚC THÊM HẰNG SỐ** ---
+    private static final String ACTION_RESEND_VERIFICATION = "resendVerification";
 
     private final TaiKhoanService taiKhoanService = new TaiKhoanService();
     private final BenhNhanService benhNhanService = new BenhNhanService();
 
-
     /**
-     * (doGet... đã vô hiệu hóa 'verify', giữ nguyên)
-     * LƯU Ý: case "verify" đã được chuyển sang VerifyController mới.
+     * (doGet... giữ nguyên)
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -82,15 +81,6 @@ public class UserController extends HttpServlet {
                     case "showChangePasswordForm":
                         url = CHANGE_PASSWORD_PAGE;
                         break;
-
-                    // --- (CASE "verify" KHÔNG CÒN Ở ĐÂY) ---
-                    /*
-                     case "verify":
-                         // Logic này đã được chuyển qua VerifyController
-                         break; 
-                    */
-                    // --- KẾT THÚC VÔ HIỆU HÓA ---
-
                     default:
                         request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho GET.");
                 }
@@ -99,7 +89,7 @@ public class UserController extends HttpServlet {
             log("Lỗi Validation tại UserController (doGet): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Lỗi nghiệp vụ: " + e.getMessage());
             url = ERROR_PAGE;
-            
+
         } catch (Exception e) {
             log("Lỗi Hệ thống tại UserController (doGet): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
@@ -113,12 +103,12 @@ public class UserController extends HttpServlet {
     }
 
     /**
-     * (doPost... đã cập nhật)
+     * (doPost... giữ nguyên)
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
 
@@ -127,18 +117,19 @@ public class UserController extends HttpServlet {
         boolean redirectAfterSuccess = false;
         String successRedirectUrl = null;
 
-        String errorFormPage = ERROR_PAGE; 
+        String errorFormPage = ERROR_PAGE;
 
         try {
             if (action == null || action.isEmpty()) {
                 throw new Exception("Hành động không được chỉ định.");
             }
 
-            // Dùng hằng số
             if (ACTION_LOGIN.equals(action)) {
                 errorFormPage = LOGIN_PAGE;
             } else if (ACTION_REGISTER.equals(action)) {
                 errorFormPage = REGISTER_PAGE;
+            } else if (ACTION_RESEND_VERIFICATION.equals(action)) {
+                errorFormPage = VERIFY_EMAIL_PAGE;
             } else if (ACTION_CREATE_USER.equals(action) || ACTION_UPDATE_STATUS.equals(action)) {
                 errorFormPage = USER_FORM_PAGE;
             } else if (ACTION_CHANGE_PASSWORD.equals(action)) {
@@ -146,42 +137,58 @@ public class UserController extends HttpServlet {
             }
 
             switch (action) {
-                case ACTION_LOGIN: // Dùng hằng số
+                case ACTION_LOGIN:
                     url = login(request, response);
-                    redirectAfterSuccess = (url.equals(HOME_PAGE) || url.equals(ADMIN_DASHBOARD_PAGE) || url.equals(STAFF_DASHBOARD_PAGE) || url.equals(CHANGE_PASSWORD_PAGE));
-                    successRedirectUrl = url;
+
+                    if (url.startsWith("BenhNhanController")) {
+                        redirectAfterSuccess = true;
+                        successRedirectUrl = url;
+                    } else {
+                        redirectAfterSuccess = (url.equals(HOME_PAGE) || url.equals(ADMIN_DASHBOARD_PAGE) || url.equals(STAFF_DASHBOARD_PAGE) || url.equals(CHANGE_PASSWORD_PAGE));
+                        successRedirectUrl = url;
+                    }
                     break;
-                case ACTION_CREATE_USER: // Dùng hằng số
+                case ACTION_CREATE_USER:
                     url = createUser(request);
                     successRedirectUrl = USER_LIST_PAGE;
+                    redirectAfterSuccess = true;
                     break;
-                case ACTION_UPDATE_STATUS: // Dùng hằng số
+                case ACTION_UPDATE_STATUS:
                     url = updateUserStatus(request);
                     successRedirectUrl = USER_LIST_PAGE;
+                    redirectAfterSuccess = true;
                     break;
-                case ACTION_CHANGE_PASSWORD: // Dùng hằng số
+                case ACTION_CHANGE_PASSWORD:
                     url = changePassword(request);
                     redirectAfterSuccess = (url.equals(HOME_PAGE) || url.equals(ADMIN_DASHBOARD_PAGE) || url.equals(STAFF_DASHBOARD_PAGE));
                     successRedirectUrl = url;
                     break;
-                case ACTION_REGISTER: // Dùng hằng số
-                    url = register(request); // <-- GỌI HÀM REGISTER ĐÃ SỬA THEO LOGIC MỚI
-                    if (url.equals(LOGIN_PAGE)) {
-                        redirectAfterSuccess = true;
-                        successRedirectUrl = "login.jsp"; 
-                    }
+                case ACTION_REGISTER:
+                    url = register(request);
+                    break;
+                case ACTION_RESEND_VERIFICATION:
+                    url = resendVerification(request);
                     break;
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho POST.");
             }
 
-            if (!redirectAfterSuccess && !url.equals(ERROR_PAGE) && !url.equals(USER_FORM_PAGE) && !url.equals(CHANGE_PASSWORD_PAGE) && !url.equals(REGISTER_PAGE)) {
+            if (!redirectAfterSuccess && !url.equals(ERROR_PAGE) && !url.equals(USER_FORM_PAGE)
+                    && !url.equals(CHANGE_PASSWORD_PAGE) && !url.equals(REGISTER_PAGE)
+                    && !url.equals(VERIFY_EMAIL_PAGE)) {
                 url = listUsers(request);
             }
 
         } catch (ValidationException e) {
             log("Lỗi Validation tại UserController (doPost): " + e.getMessage());
-            handleServiceException(request, e, action, errorFormPage);
+
+            if (ACTION_RESEND_VERIFICATION.equals(action)) {
+                request.setAttribute("ERROR_MESSAGE", e.getMessage());
+                request.setAttribute("email", request.getParameter("email"));
+            } else {
+                handleServiceException(request, e, action, errorFormPage);
+            }
+
             url = errorFormPage;
             redirectAfterSuccess = false;
 
@@ -193,48 +200,69 @@ public class UserController extends HttpServlet {
 
         } finally {
             if (redirectAfterSuccess) {
-                if (action.equals(ACTION_REGISTER)) { // Dùng hằng số
-                    response.sendRedirect(successRedirectUrl);
-                } else {
-                    String finalUrl = request.getContextPath() + "/" + successRedirectUrl;
-                    response.sendRedirect(response.encodeRedirectURL(finalUrl));
-                }
+                String finalUrl = request.getContextPath() + "/" + successRedirectUrl;
+                response.sendRedirect(response.encodeRedirectURL(finalUrl));
             } else {
                 request.getRequestDispatcher(url).forward(request, response);
             }
         }
     }
 
-    
+    // --- **BẮT ĐẦU SỬA HÀM login (LOGIC ÉP ĐIỀN HỒ SƠ)** ---
+    /**
+     * Xử lý đăng nhập. **ĐÃ CẬP NHẬT:** * Nếu Bệnh nhân chưa có hồ sơ, chuyển
+     * hướng đến 'showEditProfile'.
+     */
     private String login(HttpServletRequest request, HttpServletResponse response)
             throws ValidationException, Exception {
+
         String tenDangNhap = request.getParameter("username");
         String matKhau = request.getParameter("password");
-        
-        // **CẬP NHẬT:** Không cần comment. 
-        // Service sẽ ném ValidationException nếu 'CHUA_XAC_THUC'.
-        // Khối catch trong doPost sẽ bắt lỗi này và hiển thị trên LOGIN_PAGE.
-        TaiKhoanDTO user = taiKhoanService.login(tenDangNhap, matKhau); 
 
+        TaiKhoanDTO user = taiKhoanService.login(tenDangNhap, matKhau);
         HttpSession session = request.getSession();
         session.setAttribute("USER", user);
         session.setAttribute("ROLE", user.getVaiTro());
+
+        // 1. Kiểm tra ép đổi mật khẩu (Ưu tiên cao nhất)
         if ("CAN_DOI".equals(user.getTrangThaiMatKhau())) {
             session.setAttribute("FORCE_CHANGE_PASS_MSG",
                     "Đây là lần đăng nhập đầu tiên. Vì lý do bảo mật, bạn phải đổi mật khẩu ngay lập tức.");
             return CHANGE_PASSWORD_PAGE;
         }
+
+        // 2. Phân luồng theo vai trò (Admin, Staff)
         if ("QUAN_TRI".equals(user.getVaiTro())) {
             return ADMIN_DASHBOARD_PAGE;
         } else if ("BAC_SI".equals(user.getVaiTro()) || "LE_TAN".equals(user.getVaiTro())) {
             return STAFF_DASHBOARD_PAGE;
+
+            // 3. Phân luồng cho Bệnh nhân (Logic mới)
         } else {
-            return HOME_PAGE; // Bệnh nhân
+            // Đây là Bệnh nhân (ROLE_BENH_NHAN). 
+            // Kiểm tra xem họ đã có hồ sơ (BenhNhan) liên kết chưa.
+            BenhNhanDTO profile = null;
+            try {
+                profile = benhNhanService.getBenhNhanByTaiKhoanId(user.getId());
+            } catch (Exception e) {
+                log("Lỗi khi kiểm tra hồ sơ bệnh nhân lúc login (ID: " + user.getId() + "): " + e.getMessage());
+            }
+
+            if (profile == null) {
+                // **KỊCH BẢN A: CHƯA CÓ HỒ SƠ**
+                // Ép họ đến trang SỬA hồ sơ (editProfile.jsp)
+                return "BenhNhanController?action=showEditProfile"; // <-- **SỬA Ở ĐÂY**
+            } else {
+                // **KỊCH BẢN B: ĐÃ CÓ HỒ SƠ**
+                // Cho họ vào trang chủ bình thường.
+                return HOME_PAGE;
+            }
         }
     }
-    
-    // (changePassword, createUser giữ nguyên)
-    private String changePassword(HttpServletRequest request) throws ValidationException, Exception { 
+    // --- **KẾT THÚC SỬA HÀM login** ---
+
+    // (changePassword... giữ nguyên)
+    private String changePassword(HttpServletRequest request) throws ValidationException, Exception {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("USER") == null) {
             throw new ValidationException("Bạn cần đăng nhập để thực hiện chức năng này.");
@@ -262,25 +290,21 @@ public class UserController extends HttpServlet {
             return HOME_PAGE;
         }
     }
-    private String createUser(HttpServletRequest request) throws ValidationException, Exception { 
+
+    // (createUser... giữ nguyên)
+    private String createUser(HttpServletRequest request) throws ValidationException, Exception {
         TaiKhoanDTO newTaiKhoanDTO = createDTOFromRequest(request);
         String plainPassword = request.getParameter("password");
         if (plainPassword == null || plainPassword.length() < 6) {
             throw new ValidationException("Mật khẩu tạm thời phải có ít nhất 6 ký tự.");
         }
-        // Service sẽ tự set trạng thái và token
         TaiKhoanDTO result = taiKhoanService.createTaiKhoan(newTaiKhoanDTO, plainPassword);
         request.setAttribute("SUCCESS_MESSAGE", "Tạo tài khoản '" + result.getTenDangNhap() + "' thành công!");
         return USER_LIST_PAGE;
     }
 
-
-    // --- **BẮT ĐẦU SỬA HÀM register (GIAI ĐOẠN 3)** ---
     /**
-     * Xử lý logic đăng ký.
-     * **ĐÃ CẬP NHẬT:** * 1. Không set trạng thái (Service sẽ set 'CHUA_XAC_THUC').
-     * 2. Gọi EmailUtils để gửi mail xác thực.
-     * 3. Thay đổi thông báo thành công.
+     * (Hàm register... giữ nguyên)
      */
     private String register(HttpServletRequest request) throws ValidationException, Exception {
         String tenDangNhap = request.getParameter("username");
@@ -288,7 +312,6 @@ public class UserController extends HttpServlet {
         String matKhau = request.getParameter("password");
         String confirmMatKhau = request.getParameter("confirmPassword");
 
-        // --- VALIDATION (Giữ nguyên) ---
         if (tenDangNhap == null || email == null || matKhau == null || confirmMatKhau == null
                 || tenDangNhap.trim().isEmpty() || email.trim().isEmpty() || matKhau.isEmpty()) {
             throw new ValidationException("Vui lòng điền đầy đủ thông tin.");
@@ -297,77 +320,83 @@ public class UserController extends HttpServlet {
             throw new ValidationException("Mật khẩu và xác nhận mật khẩu không khớp.");
         }
 
-        // --- BƯỚC 1: TẠO TÀI KHOẢN (Service sẽ set 'CHUA_XAC_THUC') ---
         TaiKhoanDTO dto = new TaiKhoanDTO();
         dto.setTenDangNhap(tenDangNhap);
         dto.setEmail(email);
-        dto.setVaiTro(ROLE_BENH_NHAN); // Dùng hằng số
-        
-        // **XÓA BỎ DÒNG NÀY:**
-        // dto.setTrangThai("HOAT_DONG"); 
-        // Service (createTaiKhoan) sẽ tự động set 'CHUA_XAC_THUC' và tạo token
-        
+        dto.setVaiTro(ROLE_BENH_NHAN);
+
         TaiKhoanDTO savedTaiKhoan = taiKhoanService.createTaiKhoan(dto, matKhau);
-        if (savedTaiKhoan == null || savedTaiKhoan.getId() <= 0) { 
-            throw new Exception("Tạo tài khoản thất bại (Service trả về null)."); 
+        if (savedTaiKhoan == null || savedTaiKhoan.getId() <= 0) {
+            throw new Exception("Tạo tài khoản thất bại (Service trả về null).");
         }
 
-        // --- BƯỚC 2: (ĐÃ XÓA - Logic BenhNhan) ---
-        
-        // --- BƯỚC 3: GỬI EMAIL (KÍCH HOẠT) ---
         try {
-            // Lấy token mà Service vừa tạo (thông qua hàm mới của Service)
             String token = taiKhoanService.findVerificationTokenByEmail(email);
-            
-            // --- **BẮT ĐẦU SỬA (FIX LỖI CỦA TÔI)** ---
-            // Gọi tiện ích gửi mail với 3 tham số (email, tenDangNhap, token)
             EmailUtils.sendVerificationEmail(email, tenDangNhap, token);
-            // --- **KẾT THÚC SỬA** ---
-            
         } catch (Exception e) {
-            // QUAN TRỌNG: Không ném lỗi ra ngoài. 
-            // Việc đăng ký đã thành công, chỉ là gửi mail thất bại.
-            // Log lại để admin kiểm tra (vd: sai mật khẩu email, server mail down)
             log("LỖI NGHIÊM TRỌNG KHI GỬI EMAIL: " + e.getMessage(), e);
         }
-        
-        // --- BƯỚC 4: TRẢ VỀ TRANG LOGIN VỚI THÔNG BÁO MỚI ---
-        HttpSession session = request.getSession(true);
-        // **THAY ĐỔI THÔNG BÁO**
-        session.setAttribute("SUCCESS_MESSAGE", "Đăng ký gần hoàn tất! Vui lòng kiểm tra email (cả mục Spam) để kích hoạt tài khoản.");
-        return LOGIN_PAGE;
+
+        request.setAttribute("email", email);
+        return VERIFY_EMAIL_PAGE;
     }
-    // --- **KẾT THÚC SỬA HÀM register** ---
 
+    // (resendVerification... giữ nguyên)
+    private String resendVerification(HttpServletRequest request) throws ValidationException, Exception {
+        String email = request.getParameter("email");
 
-    // --- (Hàm verifyAccount đã bị xóa, chuyển sang VerifyController) ---
+        try {
+            TaiKhoan taiKhoan = taiKhoanService.resendVerificationEmail(email);
 
-    
-    // (Các hàm còn lại: handleServiceException, logout, listUsers, v.v... giữ nguyên)
-    private void handleServiceException(HttpServletRequest request, Exception e, String formAction, String errorFormPage) { 
+            EmailUtils.sendVerificationEmail(
+                    taiKhoan.getEmail(),
+                    taiKhoan.getTenDangNhap(),
+                    taiKhoan.getVerificationToken()
+            );
+
+            request.setAttribute("SUCCESS_MESSAGE", "Đã gửi lại email thành công!");
+
+        } catch (ValidationException e) {
+            throw e;
+        } catch (Exception e) {
+            log("LỖI GỬI LẠI EMAIL: " + e.getMessage(), e);
+            throw new ValidationException("Gửi lại email thất bại. Vui lòng thử lại sau.");
+        }
+
+        request.setAttribute("email", email);
+        return VERIFY_EMAIL_PAGE;
+    }
+
+    // (Các hàm helper còn lại... giữ nguyên)
+    private void handleServiceException(HttpServletRequest request, Exception e, String formAction, String errorFormPage) {
         request.setAttribute("ERROR_MESSAGE", e.getMessage());
-        if (ACTION_REGISTER.equals(formAction)) { // Dùng hằng số
+        if (ACTION_REGISTER.equals(formAction)) {
             request.setAttribute("username_register", request.getParameter("username"));
             request.setAttribute("email_register", request.getParameter("email"));
             request.setAttribute("formAction", ACTION_REGISTER);
-        } else if (ACTION_CREATE_USER.equals(formAction) || ACTION_UPDATE_STATUS.equals(formAction)) { 
+        } else if (ACTION_RESEND_VERIFICATION.equals(formAction)) {
+            request.setAttribute("email", request.getParameter("email"));
+        } else if (ACTION_CREATE_USER.equals(formAction) || ACTION_UPDATE_STATUS.equals(formAction)) {
             request.setAttribute("USER_DATA", createDTOFromRequest(request));
             request.setAttribute("formAction", formAction);
         }
     }
-    private String logout(HttpServletRequest request) { 
+
+    private String logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
         }
-        return LOGIN_PAGE;  
+        return LOGIN_PAGE;
     }
-    private String listUsers(HttpServletRequest request) throws Exception { 
+
+    private String listUsers(HttpServletRequest request) throws Exception {
         List<TaiKhoanDTO> list = taiKhoanService.getAllTaiKhoan();
         request.setAttribute("LIST_TAIKHOAN", list);
         return USER_LIST_PAGE;
     }
-    private String showUserEditForm(HttpServletRequest request) throws Exception { 
+
+    private String showUserEditForm(HttpServletRequest request) throws Exception {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             TaiKhoanDTO taiKhoan = taiKhoanService.getTaiKhoanById(id);
@@ -378,7 +407,8 @@ public class UserController extends HttpServlet {
             throw new ValidationException("ID Tài khoản không hợp lệ.");
         }
     }
-    private String updateUserStatus(HttpServletRequest request) throws Exception { 
+
+    private String updateUserStatus(HttpServletRequest request) throws Exception {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             String newTrangThai = request.getParameter("trangThai");
@@ -389,7 +419,8 @@ public class UserController extends HttpServlet {
             throw new ValidationException("ID Tài khoản không hợp lệ khi cập nhật trạng thái.");
         }
     }
-    private TaiKhoanDTO createDTOFromRequest(HttpServletRequest request) { 
+
+    private TaiKhoanDTO createDTOFromRequest(HttpServletRequest request) {
         TaiKhoanDTO dto = new TaiKhoanDTO();
         String idStr = request.getParameter("id");
         if (idStr != null && !idStr.isEmpty()) {
@@ -404,8 +435,9 @@ public class UserController extends HttpServlet {
         dto.setTrangThai(request.getParameter("trangThai"));
         return dto;
     }
+
     @Override
-    public String getServletInfo() { 
+    public String getServletInfo() {
         return "Controller xử lý đăng nhập, đăng xuất và quản lý người dùng.";
     }
 }

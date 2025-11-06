@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet điều hướng chính (Front Controller). Chịu trách nhiệm nhận tất cả
- * request và chuyển đến Controller phù hợp dựa vào tham số 'action'.
+ * Servlet điều hướng chính (Front Controller). **ĐÃ CẬP NHẬT:** Thêm các action
+ * cho luồng Xác nhận Hồ sơ.
  *
  * @author tungi (đã chỉnh sửa)
  */
@@ -18,78 +18,102 @@ import javax.servlet.http.HttpServletResponse;
 public class MainController extends HttpServlet {
 
     // --- Khai báo URL Controller ---
-    private static final String LOGIN_PAGE = "login.jsp"; // Trang mặc định nếu action không hợp lệ
+    private static final String LOGIN_PAGE = "login.jsp";
     private static final String USER_CONTROLLER = "UserController";
     private static final String EMRCORE_CONTROLLER = "EMRCoreController";
     private static final String KHOA_CONTROLLER = "KhoaController";
     private static final String NHANVIEN_CONTROLLER = "NhanVienController";
     private static final String BENHNHAN_CONTROLLER = "BenhNhanController";
     private static final String LICHHEN_CONTROLLER = "LichHenController";
-    private static final String CATALOG_CONTROLLER = "CatalogController"; // Quản lý Dịch vụ & Thuốc
+    private static final String CATALOG_CONTROLLER = "CatalogController";
     private static final String PHONG_BENH_CONTROLLER = "PhongBenhController";
     private static final String GIUONG_BENH_CONTROLLER = "GiuongBenhController";
     private static final String DON_THUOC_CONTROLLER = "DonThuocController";
     private static final String HOA_DON_GIAO_DICH_THANH_TOAN_CONTROLLER = "HoaDon_GiaoDichThanhToanController";
     private static final String THONG_BAO_CONTROLLER = "ThongBaoController";
 
+    // --- **THÊM MỚI (Controller Xác thực)** ---
+    // (Chúng ta sẽ cần 2 Controller mới cho luồng Xác thực/Reset)
+    private static final String VERIFY_CONTROLLER = "VerifyController";
+    private static final String SECURITY_CONTROLLER = "SecurityController";
+    private static final String RESET_CONTROLLER = "PasswordResetController";
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        request.setCharacterEncoding("UTF-8"); // Đảm bảo xử lý tiếng Việt
+        request.setCharacterEncoding("UTF-8");
 
-        // 1. Lấy action từ request
         String action = request.getParameter("action");
-        String url = LOGIN_PAGE; // Mặc định chuyển về trang login nếu action không hợp lệ
+        String url = LOGIN_PAGE;
 
         // 2. Nhóm các action cho từng controller
-        // (Các mảng action khác của bạn... giữ nguyên)
+        // (Các mảng EMRCoreActions, CatalogActions, lichHenActions... giữ nguyên)
         String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deleteService"};
         String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus"};
-
-        // (userActions của bạn đã có "verify", nhưng logic trong UserController đã bị vô hiệu hóa, nên vẫn an toàn)
-        String[] userActions = {"login", "logout", "listUsers",
-            "showUserCreateForm", "createUser",
-            "showUserEditForm", "updateUserStatus",
-            "showChangePasswordForm", "changePassword",
-            "register",
-            "verify"};
-
         String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa",
             "showKhoaEditForm", "updateKhoa", "deleteKhoa"};
-
         String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien",
             "showNhanVienEditForm", "updateNhanVien", "deleteNhanVien"};
-
-        // --- **BẮT ĐẦU SỬA (Giai đoạn 2 - Bước 5/5)** ---
-        // Thêm 2 action mới cho luồng nghiệp vụ "Hoàn tất Hồ sơ"
-        String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan",
-            "showBenhNhanEditForm", "updateBenhNhan", "deleteBenhNhan",
-            "updateProfile", // (Action này bạn đã có)
-            "showProfile", // <-- THÊM ACTION NÀY (cho doGet)
-            "saveProfile"};  // <-- THÊM ACTION NÀY (cho doPost)
-        // --- **KẾT THÚC SỬA** ---
-
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm", "createPrescription"};
         String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate", "deleteRoom"};
         String[] GiuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed", "deleteBed", "updateBed", "getBedForUpdate"};
         String[] HoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice"};
         String[] ThongBaoActions = {"getThongBaoForUpdate", "createThongBao", "updateThongBao", "deleteThongBao", "listNotifications"};
 
+        // --- **BẮT ĐẦU CẬP NHẬT MẢNG ACTIONS** ---
+        // (userActions: Thêm 'resendVerification' mà chúng ta đã tạo)
+        String[] userActions = {"login", "logout", "listUsers",
+            "showUserCreateForm", "createUser",
+            "showUserEditForm", "updateUserStatus",
+            "showChangePasswordForm", "changePassword",
+            "register", "resendVerification"
+    // "verify" sẽ do VerifyController xử lý (xem bên dưới)
+        };
+
+        // (benhNhanActions: Thêm các action mới của bạn)
+        String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan",
+            "showBenhNhanEditForm", "updateBenhNhan", "deleteBenhNhan",
+            "showProfile", // (Xem hồ sơ)
+            "showEditProfile", // (Sửa hồ sơ)
+            "saveProfile", // (Lưu hồ sơ)
+            "confirmAndLink", // (MỚI: Nút "Liên kết ngay")
+            "showEditProfileWithExisting", // (MỚI: Nút "Cần cập nhật")
+            "updateAndLink" // (MỚI: Lưu sau khi "Cần cập nhật")
+    };
+
+        // (Các action cho các Servlet mới)
+        String[] verifyActions = {"verify"}; // Chỉ xử lý 'verify'
+        String[] resetActions = {"requestReset", "performReset"}; // Chỉ xử lý 'Quên MK'
+        String[] securityActions = {"showConfirmPassword", "confirmPassword",
+            "showEditPhone", "savePhone",
+            "showEditCCCD", "saveCCCD",
+            "showEditName", "saveName",
+            "showEditDOB", "saveDOB"
+        };
+
+        // --- **KẾT THÚC CẬP NHẬT MẢNG ACTIONS** ---
         // 3. Điều hướng dựa trên action
         if (action == null || action.isEmpty()) {
             url = LOGIN_PAGE;
         } else if (Arrays.asList(userActions).contains(action)) {
             url = USER_CONTROLLER;
+        } // --- **THÊM ĐIỀU HƯỚNG MỚI** ---
+        else if (Arrays.asList(verifyActions).contains(action)) {
+            url = VERIFY_CONTROLLER; // -> VerifyController
+        } else if (Arrays.asList(resetActions).contains(action)) {
+            url = RESET_CONTROLLER; // -> PasswordResetController
+        } else if (Arrays.asList(securityActions).contains(action)) {
+            url = SECURITY_CONTROLLER; // -> SecurityController
+        } // --- **KẾT THÚC THÊM MỚI** ---
+        else if (Arrays.asList(benhNhanActions).contains(action)) {
+            url = BENHNHAN_CONTROLLER;
         } else if (Arrays.asList(EMRCoreActions).contains(action)) {
             url = EMRCORE_CONTROLLER;
         } else if (Arrays.asList(khoaActions).contains(action)) {
             url = KHOA_CONTROLLER;
         } else if (Arrays.asList(nhanVienActions).contains(action)) {
             url = NHANVIEN_CONTROLLER;
-        } else if (Arrays.asList(benhNhanActions).contains(action)) {
-            // **CẬP NHẬT:** Giờ đây 'showProfile' và 'saveProfile' sẽ được chuyển đến BenhNhanController
-            url = BENHNHAN_CONTROLLER;
         } else if (Arrays.asList(lichHenActions).contains(action)) {
             url = LICHHEN_CONTROLLER;
         } else if (Arrays.asList(CatalogActions).contains(action)) {

@@ -52,12 +52,12 @@
             <%-- **ĐÃ XÓA Ô EMAIL** --%>
             <%-- (Bạn có thể thêm lại nếu muốn, nhưng bỏ 'required="required"') --%>
             <%--
-            <div class="form-group">
+--%>            <div class="form-group">
                 <label for="email">Email (Tùy chọn):</label>
                 <input type="email" id="email" name="email" 
                        value="<c:out value="${requestScope.USER_DATA.email}"/>" 
                        ${!isCreating ? 'readonly' : ''}>
-            </div>
+            </div><%--
             --%>
 
             <%-- Chỉ hiển thị ô nhập mật khẩu KHI TẠO MỚI --%>
