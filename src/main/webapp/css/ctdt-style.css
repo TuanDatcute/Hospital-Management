@@ -70,9 +70,14 @@ body.dark-mode .empty-state {
 /* --- Bắt đầu đoạn mã đã chỉnh sửa để căn chỉnh và đổi màu icon --- */
 
 .theme-switch-wrapper {
+    
+    position: fixed; /* Cố định vị trí trên màn hình */
+    top: 20px;       /* Cách lề trên 20px */
+    right: 20px;      /* Cách lề phải 20px */
+    z-index: 1001;   /* Đảm bảo nó nổi lên trên các thành phần khác */
+
     display: flex;
     align-items: center;
-    gap: 10px;
 }
 
 .theme-switch {
@@ -80,6 +85,7 @@ body.dark-mode .empty-state {
     height: 24px;
     position: relative;
     width: 50px;
+
 }
 
 .theme-switch input {
