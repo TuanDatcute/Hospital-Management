@@ -2,224 +2,178 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<html>
-<head>
-    <title>Quản lý Thông báo</title>
-    <style>
-        .delete-button { background: none; border: none; color: red; text-decoration: underline; cursor: pointer; padding: 0; font-family: inherit; font-size: inherit; }
-        .form-section { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; background-color: #f9f9f9; }
-        label { display: inline-block; width: 100px; margin-bottom: 5px;}
-        input[type=text], textarea, select { width: 300px; margin-bottom: 10px; }
-        textarea { height: 80px; }
-    </style>
-</head>
-<body>
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <title>Quản lý Thông báo</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <h1>Quản lý Thông báo</h1>
+        <%-- BẮT BUỘC: Thêm Font Awesome cho icon --%>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
-    <%-- ============================================= --%>
-    <%--        THÊM MỚI / CẬP NHẬT FORM             --%>
-    <%-- ============================================= --%>
-    <div class="form-section">
-        <c:choose>
-            <%-- FORM CẬP NHẬT --%>
-            <c:when test="${not empty notificationToUpdate}">
-                <h2>Cập nhật Thông báo</h2>
-                <form action="MainController" method="POST">
-                    <input type="hidden" name="action" value="updateThongBao">
-                    <input type="hidden" name="id" value="${notificationToUpdate.id}">
-                    
-                    <div>
-                        <label for="updateTieuDe">Tiêu đề:</label>
-                        <input type="text" id="updateTieuDe" name="tieuDe" value="<c:out value='${notificationToUpdate.tieuDe}'/>" required><br/>
-                    </div>
-                    <div>
-                        <label for="updateNoiDung">Nội dung:</label>
-                        <textarea id="updateNoiDung" name="noiDung" required><c:out value='${notificationToUpdate.noiDung}'/></textarea><br/>
-                    </div>
-                    <%-- Không cho sửa người nhận khi cập nhật --%>
-                    <div>
-                         <label>Người nhận:</label>
-                         <span>Tài khoản ID: ${notificationToUpdate.taiKhoanId}</span>
-                    </div>
+        <%-- BẮT BUỘC: Nhúng file CSS chung TRƯỚC --%>
+        <%-- (Đây là file DanhSachHoaDon.css đã được gộp, hoặc file base.css) --%>
+        <link rel="stylesheet" href="<c:url value='/css/StyleChungCuaQuang.css'/>"> 
 
-                    <button type="submit">Lưu thay đổi</button>
-                    <a href="MainController?action=listNotifications">Hủy</a>
-                </form>
-                <%-- Hiển thị lỗi nếu update thất bại --%>
-                <c:if test="${not empty param.updateError && param.id == notificationToUpdate.id}">
-                     <b style="color:red;">Lỗi cập nhật: <c:out value="${param.updateError}"/></b>
-                </c:if>
-            </c:when>
-            
-            <%-- FORM THÊM MỚI --%>
-            <c:otherwise>
-                <h2>Tạo Thông báo Mới</h2>
+        <%-- (MỚI) Nhúng file CSS cụ thể cho trang này SAU --%>
+        <link rel="stylesheet" href="<c:url value='/css/ThongBao.css'/>">
+
+        <script src="<c:url value='/js/darkmode.js'/>" defer></script>
+    </head>
+    <body>
+
+        <%-- Bọc toàn bộ trang trong .container --%>
+        <div class="container">
+
+            <div class="page-header">
+                <%-- Đặt H1 và Dark mode toggle vào header --%>
+                <h1>Quản lý Thông báo</h1>
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="theme-toggle">
+                        <input type="checkbox" id="theme-toggle" />
+                        <span class="slider">
+                            <i class="fa-solid fa-sun sun-icon"></i>
+                            <i class="fa-solid fa-moon moon-icon"></i>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+
+            <%-- Hiển thị thông báo bằng component .alert --%>
+            <c:if test="${not empty param.createSuccess}">
+                <div class="alert alert-success">Tạo thông báo thành công!</div>
+            </c:if>
+            <c:if test="${not empty param.createError}">
+                <div class="alert alert-danger">Lỗi tạo thông báo: <c:out value="${param.createError}"/></div>
+            </c:if>
+            <c:if test="${not empty error}">
+                 <div class="alert alert-danger">Lỗi: ${error}</div>
+            </c:if>
+
+            <%-- Dùng thẻ H3 và class .form-card --%>
+            <div class="form-card">
+                <h3>Tạo Thông báo Mới</h3>
                 <form action="MainController" method="POST" id="createForm">
                     <input type="hidden" name="action" value="createThongBao">
-                    
-                    <div>
+
+                    <%-- Áp dụng cấu trúc .form-group và class .form-control --%>
+                    <div class="form-group">
                         <label for="createTieuDe">Tiêu đề:</label>
-                        <input type="text" id="createTieuDe" name="tieuDe" required><br/>
+                        <input type="text" id="createTieuDe" name="tieuDe" class="form-control" required>
                     </div>
-                    <div>
+
+                    <div class="form-group">
                         <label for="createNoiDung">Nội dung:</label>
-                        <textarea id="createNoiDung" name="noiDung" required></textarea><br/>
+                        <textarea id="createNoiDung" name="noiDung" class="form-control" required></textarea>
                     </div>
-                    
-                    <div>
+
+                    <div class="form-group">
                         <label>Gửi đến:</label>
-                        <input type="radio" name="targetType" value="ALL" id="targetAll" checked onchange="toggleTargetValue()"> Tất cả &nbsp;
-                        <input type="radio" name="targetType" value="ROLE" id="targetRole" onchange="toggleTargetValue()"> Vai trò &nbsp;
-                        <input type="radio" name="targetType" value="USER" id="targetUser" onchange="toggleTargetValue()"> Tài khoản cụ thể
-                        <br/>
+                        <%-- Áp dụng style cho radio buttons (đã xóa onchange) --%>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="targetType" value="ALL" checked>
+                                <span>Tất cả</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="targetType" value="ROLE">
+                                <span>Theo vai trò</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="targetType" value="USER">
+                                <span>Tài khoản cụ thể</span>
+                            </label>
+                        </div>
                     </div>
 
-                    <%-- Input thay đổi tùy theo lựa chọn trên --%>
-                    <div id="targetValueDiv">
-                        <%-- Mặc định ẩn, sẽ hiện khi chọn Vai trò hoặc User --%>
-                        <label id="targetValueLabel" for="targetValueInput">Chọn:</label> 
-                        <select name="targetValue" id="targetValueInput" style="display:none;">
-                            <%-- Options sẽ được thêm bằng Javascript --%>
-                        </select>
+                    <div class="form-group" id="targetValueDiv" style="display:none;">
+                        <label id="targetValueLabel" for="targetValueInput">Chọn:</label>
+                        <select name="targetValue" id="targetValueInput" class="form-control"></select>
                     </div>
 
-                    <button type="submit">Gửi Thông báo</button>
+                    <%-- Áp dụng .form-actions và các class .btn --%>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-paper-plane"></i> Gửi Thông báo
+                        </button>
+                    </div>
                 </form>
-                 <%-- Hiển thị lỗi nếu create thất bại --%>
-                <c:if test="${not empty param.createError}">
-                     <b style="color:red;">Lỗi tạo: <c:out value="${param.createError}"/></b>
-                </c:if>
-            </c:otherwise>
-        </c:choose>
-    </div>
+            </div>
 
-    <hr>
-    <h2>Danh sách Thông báo đang hoạt động</h2>
 
-    <%-- Form Tìm kiếm --%>
-    <form action="MainController" method="GET">
-        <input type="hidden" name="action" value="listNotifications"> 
-        Tìm kiếm:
-        <input type="text" 
-               name="searchKeyword" 
-               value="<c:out value='${param.searchKeyword}'/>" 
-               placeholder="Nhập tiêu đề, nội dung...">
-        <button type="submit">Tìm</button>
-        <a href="MainController?action=listNotifications">Xóa lọc</a>
-    </form>
-    <br> 
+            <h3>Danh sách Thông báo đã gửi</h3>
 
-    <%-- Hiển thị thông báo thành công --%>
-    <c:if test="${not empty param.createSuccess}"> <b style="color:green;">Tạo thông báo thành công!</b> </c:if>
-    <c:if test="${not empty param.updateSuccess}"> <b style="color:blue;">Cập nhật thông báo thành công!</b> </c:if>
-    <c:if test="${not empty param.deleteSuccess}"> <b style="color:green;">Xóa thông báo thành công!</b> </c:if>
-    <c:if test="${not empty param.deleteError}"> <b style="color:red;">Lỗi xóa: <c:out value="${param.deleteError}"/></b> </c:if>
-    <c:if test="${not empty error}"> <b style="color:red;">Lỗi: ${error}</b> </c:if>
+            <%-- Thanh tìm kiếm chuẩn --%>
+            <div class="page-header">
+                <div class="search-container">
+                    <form action="MainController" method="GET" class="search-form">
+                        <input type="hidden" name="action" value="listNotifications">
+                        <i class="fa-solid fa-magnifying-glass search-icon-left"></i>
+                        <input type="text"
+                               name="searchKeyword"
+                               class="form-control"
+                               value="<c:out value='${param.searchKeyword}'/>"
+                               placeholder="Tìm theo tiêu đề, nội dung...">
+                        <button type="submit" class="search-button">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </form>
+                     <c:if test="${not empty param.searchKeyword}">
+                        <a href="MainController?action=listNotifications" class="btn btn-clear-search">
+                           <i class="fa-solid fa-times"></i> Xóa lọc
+                        </a>
+                     </c:if>
+                </div>
+            </div>
 
-    <%-- Bảng Danh sách --%>
-    <table border="1" style="width:100%;">
-        <thead>
-            <tr>
-                <th style="width: 5%">ID</th>
-                <th style="width: 20%">Tiêu đề</th>
-                <th style="width: 40%">Nội dung</th>
-                <th style="width: 10%">Người nhận (ID)</th> <%-- Hiển thị ID người nhận --%>
-                <th style="width: 15%">Thời gian gửi</th>
-                <th style="width: 10%">Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            <c:forEach var="noti" items="${notificationList}">
-                <tr>
-                    <td>${noti.id}</td>
-                    <td><c:out value="${noti.tieuDe}"/></td>
-                    <td><c:out value="${noti.noiDung}"/></td>
-                    <td>${noti.taiKhoanId}</td> 
-                    <td><c:out value="${noti.thoiGianGui}"/></td> 
-                    <td>
-                        <%-- Link Sửa --%>
-                        <a href="MainController?action=getThongBaoForUpdate&id=${noti.id}" style="margin-right: 10px; display: inline-block;">Sửa</a>
-                        
-                        <%-- Form Xóa mềm --%>
-                        <form action="MainController" method="POST" style="margin:0; display: inline-block;" 
-                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa thông báo này?');">
-                            <input type="hidden" name="action" value="deleteThongBao">
-                            <input type="hidden" name="id" value="${noti.id}">
-                            <button type="submit" class="delete-button">Xóa</button>
-                        </form>
-                    </td>
-                </tr>
-            </c:forEach>
-        </tbody>
-    </table>
-    
-    <%-- Javascript để xử lý form tạo mới --%>
-    <script>
-        // Dữ liệu từ Controller (cần được escape đúng cách nếu tên có ký tự đặc biệt)
-        const roles = [<c:forEach var="role" items="${roles}" varStatus="loop">'${role}'<c:if test="${!loop.last}">, </c:if></c:forEach>];
-        const accounts = [<c:forEach var="acc" items="${accountList}" varStatus="loop">{ id: ${acc.id}, username: '${acc.tenDangNhap}' }<c:if test="${!loop.last}">, </c:if></c:forEach>];
+            <%-- Bảng được bọc trong .table-responsive --%>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tiêu đề</th>
+                            <th>Nội dung</th>
+                            <th>Gửi đến</th>
+                            <th>Số lượng</th>
+                            <th>Thời gian gửi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="noti" items="${notificationList}">
+                            <tr>
+                                <td><c:out value="${noti.tieuDe}"/></td>
+                                <td><c:out value="${noti.noiDung}"/></td>
+                                <td><c:out value="${noti.nguoiNhanDisplay}"/></td>
+                                <td>${noti.soLuongNguoiNhan} người</td>
+                                <td><c:out value="${noti.thoiGianGui}"/></td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty notificationList}">
+                            <tr>
+                                <td colspan="5">Không tìm thấy thông báo nào.</td>
+                            </tr>
+                        </c:if>
+                    </tbody>
+                </table>
+            </div>
 
-        function toggleTargetValue() {
-            const targetType = document.querySelector('input[name="targetType"]:checked').value;
-            const targetValueDiv = document.getElementById('targetValueDiv');
-            const targetValueLabel = document.getElementById('targetValueLabel');
-            const targetValueInput = document.getElementById('targetValueInput'); // Đây là thẻ select
+        </div> <%-- End .container --%>
 
-            targetValueInput.innerHTML = ''; // Xóa các option cũ
+        <%-- ========================================================== --%>
+        <%-- (QUAN TRỌNG) Phần Script đã được tách biệt --%>
+        <%-- ========================================================== --%>
 
-            if (targetType === 'ALL') {
-                targetValueDiv.style.display = 'none'; // Ẩn hoàn toàn div
-                targetValueInput.removeAttribute('required'); // Không bắt buộc
-                // Tạo một input hidden để gửi giá trị 'ALL'
-                 let hiddenInput = document.getElementById('hiddenTargetValue');
-                 if (!hiddenInput) {
-                     hiddenInput = document.createElement('input');
-                     hiddenInput.type = 'hidden';
-                     hiddenInput.name = 'targetValue';
-                     hiddenInput.id = 'hiddenTargetValue';
-                     document.getElementById('createForm').appendChild(hiddenInput);
-                 }
-                 hiddenInput.value = 'ALL';
-                 targetValueInput.name = ''; // Bỏ name của select để không bị gửi đi
-            } else {
-                 // Xóa input hidden nếu có
-                 let hiddenInput = document.getElementById('hiddenTargetValue');
-                 if (hiddenInput) {
-                     hiddenInput.remove();
-                 }
-                 targetValueInput.name = 'targetValue'; // Trả lại name cho select
+        <%-- Bước 1: Khởi tạo dữ liệu động từ JSTL cho JS --%>
+        <script>
+            const roles = [<c:forEach var="role" items="${roles}" varStatus="loop">'${role}'<c:if test="${!loop.last}">, </c:if></c:forEach>];
+            const accounts = [<c:forEach var="acc" items="${accountList}" varStatus="loop">{ id: ${acc.id}, username: '${acc.tenDangNhap}' }<c:if test="${!loop.last}">, </c:if></c:forEach>];
+        </script>
 
-                targetValueDiv.style.display = 'block'; // Hiện div
-                targetValueInput.style.display = 'inline-block'; // Hiện select
-                targetValueInput.setAttribute('required', 'required'); // Bắt buộc chọn
+        <%-- Bước 2: Tải file JS logic (defer để chạy sau khi DOM tải) --%>
+        <script src="<c:url value='/js/ThongBao.js'/>" defer></script>
 
-                if (targetType === 'ROLE') {
-                    targetValueLabel.textContent = 'Chọn vai trò:';
-                    roles.forEach(role => {
-                        const option = document.createElement('option');
-                        option.value = role;
-                        option.textContent = role;
-                        targetValueInput.appendChild(option);
-                    });
-                } else if (targetType === 'USER') {
-                    targetValueLabel.textContent = 'Chọn tài khoản:';
-                     const defaultOption = document.createElement('option');
-                     defaultOption.value = '';
-                     defaultOption.textContent = '-- Chọn tài khoản --';
-                     targetValueInput.appendChild(defaultOption);
-                    accounts.forEach(acc => {
-                        const option = document.createElement('option');
-                        option.value = acc.id; // Gửi đi ID
-                        option.textContent = acc.username + ' (ID: ' + acc.id + ')';
-                        targetValueInput.appendChild(option);
-                    });
-                }
-            }
-        }
-        // Gọi lần đầu để khởi tạo
-        toggleTargetValue();
-    </script>
-
-</body>
+    </body>
 </html>

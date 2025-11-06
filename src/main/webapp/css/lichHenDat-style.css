@@ -1,12 +1,11 @@
 /* ==========================================================================
-   BIẾN TOÀN CỤC & KIỂU DÁNG CHUNG (DỰA TRÊN STYLE CỦA BẠN)
+   BIẾN TOÀN CỤC & KIỂU DÁNG CHUNG (ĐỒNG BỘ)
    ========================================================================== */
 
-/* 🎨 Chế độ SÁNG (Mặc định) */
+/* 🎨 Chế độ SÁNG */
 :root {
     --primary-color: #4a90e2;
     --success-color: #28a745;
-    --warning-color: #ffc107;
     --danger-color: #dc3545;
 
     --bg-color: #f4f7f9;
@@ -14,15 +13,13 @@
     --border-color: #e9ecef;
     --text-primary: #343a40;
     --text-secondary: #6c757d;
-
     --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
 }
 
-/* 🎨 Chế độ TỐI "BẠC ĐEN" (Silver-Black) */
+/* 🎨 Chế độ TỐI "BẠC ĐEN" */
 body.dark-mode {
     --primary-color: #77A5D9;
     --success-color: #3d8c5a;
-    --warning-color: #c7811a;
     --danger-color: #e57373;
 
     --bg-color: #121212;
@@ -30,12 +27,11 @@ body.dark-mode {
     --border-color: #333333;
     --text-primary: #E0E0E0;
     --text-secondary: #888888;
-
     --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
 body {
-    font-family: 'Be Vietnam Pro', sans-serif;
+    font-family: 'Roboto', sans-serif;
     background-color: var(--bg-color);
     margin: 0;
     padding: 20px;
@@ -44,111 +40,95 @@ body {
 }
 
 /* ==========================================================================
-   FORM KÊ ĐƠN THUỐC
+   LAYOUT FORM CHÍNH
    ========================================================================== */
-
 .form-container {
-    max-width: 900px;
+    max-width: 800px;
     margin: 40px auto;
     padding: 30px 40px;
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     box-shadow: var(--card-shadow);
+    position: relative;
 }
-
-.form-container h1 {
+h1 {
     text-align: center;
-    margin-top: 0;
-    margin-bottom: 10px;
     color: var(--text-primary);
-}
-.form-container p {
-    text-align: center;
+    margin-top: 0;
     margin-bottom: 30px;
-    color: var(--text-secondary);
-    font-size: 1.1rem;
-}
-.form-container hr {
-    border: none;
-    height: 1px;
-    background-color: var(--border-color);
-    margin: 30px 0;
-}
-.form-container h3 {
-    margin-bottom: 20px;
 }
 
+/* ==========================================================================
+   FORM GRID & CÁC TRƯỜNG NHẬP LIỆU
+   ========================================================================== */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 25px;
+}
 .form-group {
-    margin-bottom: 15px;
     display: flex;
     flex-direction: column;
 }
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
 .form-group label {
     margin-bottom: 8px;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.9rem;
     color: var(--text-secondary);
 }
-
 .form-control {
     width: 100%;
     box-sizing: border-box;
-    padding: 12px 16px;
+    padding: 12px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     background-color: var(--surface-color);
     color: var(--text-primary);
     font-size: 1rem;
-    outline: none;
+    font-family: 'Roboto', sans-serif;
     transition: all 0.2s ease-in-out;
 }
 .form-control:focus {
+    outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color) 15%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+textarea.form-control {
+    resize: vertical;
 }
 
-.medication-row {
+/* ==========================================================================
+   NÚT BẤM
+   ========================================================================== */
+.button-group {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
     display: flex;
+    justify-content: flex-end;
     gap: 15px;
-    align-items: flex-end;
-    margin-bottom: 15px;
+    grid-column: 1 / -1; /* Đảm bảo nhóm nút luôn ở dưới cùng */
 }
-.medication-row .form-group {
-    margin-bottom: 0;
-}
-/* Chia layout cho các cột */
-.medication-row .ten-thuoc {
-    flex: 3;
-}
-.medication-row .so-luong {
-    flex: 1;
-    min-width: 100px;
-}
-.medication-row .lieu-dung {
-    flex: 4;
-}
-
-
-/* --- Nút bấm --- */
 .btn {
-    padding: 12px 24px;
-    font-size: 1rem;
+    padding: 10px 20px;
+    font-size: 0.9rem;
     font-weight: 600;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.2s ease-in-out;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
     gap: 8px;
+    transition: all 0.2s ease-in-out;
 }
 .btn:hover {
     transform: translateY(-2px);
 }
-
 .btn-primary {
     background-color: var(--primary-color);
     color: white;
@@ -157,53 +137,31 @@ body {
     background-color: var(--text-secondary);
     color: white;
 }
-.btn-delete {
-    background-color: var(--danger-color);
-    color: white;
-    padding: 12px;
-    min-width: 45px; /* Đảm bảo nút vuông */
-}
 
-#add-med-btn {
-    margin-top: 10px;
-    margin-bottom: 30px;
-}
-.button-group {
-    text-align: center;
-    margin-top: 20px;
-}
-.remove-btn {
-    flex-shrink: 0;
-}
-.btn-secondary{
-    margin-right: 10px;
-    
-}
-/* --- ALERT --- */
+/* ==========================================================================
+   ALERT
+   ========================================================================== */
 .alert {
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
+    border: 1px solid transparent;
 }
 .alert-danger {
     background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
     color: var(--danger-color);
-    border: 1px solid var(--danger-color);
 }
 body.dark-mode .alert-danger {
     color: #f79494;
 }
 
 /* ==========================================================================
-   NÚT GẠT CHUYỂN CHẾ ĐỘ (ĐÃ SỬA LỖI)
+   NÚT GẠT CHUYỂN CHẾ ĐỘ
    ========================================================================== */
 .theme-switch-wrapper {
     position: absolute;
-    top: 25px;
-    right: 30px;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
+    top: 30px;
+    right: 40px;
 }
 .theme-switch {
     display: inline-block;
@@ -269,18 +227,17 @@ input:checked + .slider .moon-icon {
 }
 
 /* ==========================================================================
-   RESPONSIVE DESIGN CHO FORM
+   RESPONSIVE
    ========================================================================== */
 @media (max-width: 768px) {
-    .medication-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
-        border: 1px solid var(--border-color);
-        padding: 15px;
-        border-radius: 8px;
+    .form-grid {
+        grid-template-columns: 1fr; /* Stack các cột */
     }
-    .form-container {
+    .container {
         padding: 20px;
+    }
+    .theme-switch-wrapper {
+        top: 20px;
+        right: 20px;
     }
 }

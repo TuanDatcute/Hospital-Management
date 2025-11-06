@@ -10,16 +10,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+// --- **MERGE:** Thêm tất cả import cần thiết từ cả 2 nhánh ---
 import model.Entity.TaiKhoan;
 import model.dto.BenhNhanDTO;
+import model.dto.NhanVienDTO; // <-- Từ nhánh 'main'
 import model.dto.TaiKhoanDTO;
 import service.BenhNhanService;
+import service.NhanVienService; // <-- Từ nhánh 'main'
 import service.TaiKhoanService;
 import util.EmailUtils;
+// --- **KẾT THÚC MERGE** ---
 
 /**
  * Controller xử lý các nghiệp vụ liên quan đến người dùng. **ĐÃ CẬP NHẬT (Giai
- * đoạn 5):** Cập nhật logic Login để trỏ đến 'showEditProfile'.
+ * đoạn 5):** Đã merge logic Auth và logic NhanVienInfo.
  */
 @WebServlet(name = "UserController", urlPatterns = {"/UserController"})
 public class UserController extends HttpServlet {
@@ -33,9 +37,10 @@ public class UserController extends HttpServlet {
     private static final String USER_LIST_PAGE = "admin/danhSachTaiKhoan.jsp";
     private static final String USER_FORM_PAGE = "admin/formTaiKhoan.jsp";
     private static final String CHANGE_PASSWORD_PAGE = "user/changePassword.jsp";
-    private static final String REGISTER_PAGE = "login.jsp"; // Lỗi register quay về login
+    private static final String REGISTER_PAGE = "login.jsp";
     private static final String ERROR_PAGE = "error.jsp";
 
+    // **MERGE:** Giữ hằng số từ nhánh của bạn
     private static final String VERIFY_EMAIL_PAGE = "verifyEmail.jsp";
 
     // (Các hằng số ACTION... giữ nguyên)
@@ -49,9 +54,11 @@ public class UserController extends HttpServlet {
 
     private final TaiKhoanService taiKhoanService = new TaiKhoanService();
     private final BenhNhanService benhNhanService = new BenhNhanService();
+    // **MERGE:** Thêm NhanVienService từ nhánh 'main'
+    private final NhanVienService nhanVienService = new NhanVienService();
 
     /**
-     * (doGet... giữ nguyên)
+     * (doGet... giữ nguyên từ nhánh của bạn)
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -103,7 +110,7 @@ public class UserController extends HttpServlet {
     }
 
     /**
-     * (doPost... giữ nguyên)
+     * (doPost... đã merge)
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -124,6 +131,7 @@ public class UserController extends HttpServlet {
                 throw new Exception("Hành động không được chỉ định.");
             }
 
+            // **MERGE:** Giữ logic gán errorFormPage từ nhánh của bạn
             if (ACTION_LOGIN.equals(action)) {
                 errorFormPage = LOGIN_PAGE;
             } else if (ACTION_REGISTER.equals(action)) {
@@ -163,6 +171,7 @@ public class UserController extends HttpServlet {
                     redirectAfterSuccess = (url.equals(HOME_PAGE) || url.equals(ADMIN_DASHBOARD_PAGE) || url.equals(STAFF_DASHBOARD_PAGE));
                     successRedirectUrl = url;
                     break;
+                // **MERGE:** Giữ logic 'register' và 'resend' từ nhánh của bạn
                 case ACTION_REGISTER:
                     url = register(request);
                     break;
@@ -182,6 +191,7 @@ public class UserController extends HttpServlet {
         } catch (ValidationException e) {
             log("Lỗi Validation tại UserController (doPost): " + e.getMessage());
 
+            // **MERGE:** Giữ logic xử lý lỗi từ nhánh của bạn
             if (ACTION_RESEND_VERIFICATION.equals(action)) {
                 request.setAttribute("ERROR_MESSAGE", e.getMessage());
                 request.setAttribute("email", request.getParameter("email"));
@@ -208,10 +218,9 @@ public class UserController extends HttpServlet {
         }
     }
 
-    // --- **BẮT ĐẦU SỬA HÀM login (LOGIC ÉP ĐIỀN HỒ SƠ)** ---
     /**
-     * Xử lý đăng nhập. **ĐÃ CẬP NHẬT:** * Nếu Bệnh nhân chưa có hồ sơ, chuyển
-     * hướng đến 'showEditProfile'.
+     * Xử lý đăng nhập. **ĐÃ MERGE:** Kết hợp logic lấy NhanVienDTO (từ 'main')
+     * và logic "Ép điền hồ sơ" (từ nhánh của bạn).
      */
     private String login(HttpServletRequest request, HttpServletResponse response)
             throws ValidationException, Exception {
@@ -219,28 +228,46 @@ public class UserController extends HttpServlet {
         String tenDangNhap = request.getParameter("username");
         String matKhau = request.getParameter("password");
 
+        // --- (Logic từ 'main') ---
         TaiKhoanDTO user = taiKhoanService.login(tenDangNhap, matKhau);
+
+        // **MERGE:** Lấy NhanVienDTO (logic của nhánh 'main')
+        NhanVienDTO userInfo = null;
+        try {
+            // Chỉ lấy thông tin nhân viên nếu họ không phải là bệnh nhân
+            if (!ROLE_BENH_NHAN.equals(user.getVaiTro())) {
+                userInfo = nhanVienService.getNhanVienByTaiKhoanId(user.getId());
+            }
+        } catch (Exception e) {
+            log("Lỗi khi lấy NhanVienDTO cho TaiKhoan ID: " + user.getId() + ". " + e.getMessage());
+            // (Không ném lỗi, chỉ log lại, vẫn cho phép đăng nhập)
+        }
+
         HttpSession session = request.getSession();
+
         session.setAttribute("USER", user);
         session.setAttribute("ROLE", user.getVaiTro());
 
-        // 1. Kiểm tra ép đổi mật khẩu (Ưu tiên cao nhất)
+        // **MERGE:** Thêm các thuộc tính session từ nhánh 'main'
+        session.setAttribute("LOGIN_USER_INFO", userInfo); // (Có thể là null nếu là Bệnh nhân)
+        session.setAttribute("LOGIN_ACCOUNT", user);
+
+        // --- (Logic từ nhánh của bạn) ---
+        // 1. Kiểm tra ép đổi mật khẩu
         if ("CAN_DOI".equals(user.getTrangThaiMatKhau())) {
             session.setAttribute("FORCE_CHANGE_PASS_MSG",
                     "Đây là lần đăng nhập đầu tiên. Vì lý do bảo mật, bạn phải đổi mật khẩu ngay lập tức.");
             return CHANGE_PASSWORD_PAGE;
         }
 
-        // 2. Phân luồng theo vai trò (Admin, Staff)
+        // 2. Phân luồng theo vai trò
         if ("QUAN_TRI".equals(user.getVaiTro())) {
             return ADMIN_DASHBOARD_PAGE;
         } else if ("BAC_SI".equals(user.getVaiTro()) || "LE_TAN".equals(user.getVaiTro())) {
             return STAFF_DASHBOARD_PAGE;
 
-            // 3. Phân luồng cho Bệnh nhân (Logic mới)
+            // 3. Phân luồng cho Bệnh nhân (Logic ép điền hồ sơ của bạn)
         } else {
-            // Đây là Bệnh nhân (ROLE_BENH_NHAN). 
-            // Kiểm tra xem họ đã có hồ sơ (BenhNhan) liên kết chưa.
             BenhNhanDTO profile = null;
             try {
                 profile = benhNhanService.getBenhNhanByTaiKhoanId(user.getId());
@@ -250,16 +277,13 @@ public class UserController extends HttpServlet {
 
             if (profile == null) {
                 // **KỊCH BẢN A: CHƯA CÓ HỒ SƠ**
-                // Ép họ đến trang SỬA hồ sơ (editProfile.jsp)
-                return "BenhNhanController?action=showEditProfile"; // <-- **SỬA Ở ĐÂY**
+                return "BenhNhanController?action=showEditProfile"; // (Đúng)
             } else {
                 // **KỊCH BẢN B: ĐÃ CÓ HỒ SƠ**
-                // Cho họ vào trang chủ bình thường.
                 return HOME_PAGE;
             }
         }
     }
-    // --- **KẾT THÚC SỬA HÀM login** ---
 
     // (changePassword... giữ nguyên)
     private String changePassword(HttpServletRequest request) throws ValidationException, Exception {
@@ -304,7 +328,7 @@ public class UserController extends HttpServlet {
     }
 
     /**
-     * (Hàm register... giữ nguyên)
+     * (Hàm register... giữ nguyên từ nhánh của bạn)
      */
     private String register(HttpServletRequest request) throws ValidationException, Exception {
         String tenDangNhap = request.getParameter("username");
@@ -341,7 +365,9 @@ public class UserController extends HttpServlet {
         return VERIFY_EMAIL_PAGE;
     }
 
-    // (resendVerification... giữ nguyên)
+    /**
+     * (resendVerification... giữ nguyên từ nhánh của bạn)
+     */
     private String resendVerification(HttpServletRequest request) throws ValidationException, Exception {
         String email = request.getParameter("email");
 
@@ -367,7 +393,9 @@ public class UserController extends HttpServlet {
         return VERIFY_EMAIL_PAGE;
     }
 
-    // (Các hàm helper còn lại... giữ nguyên)
+    /**
+     * (handleServiceException... giữ nguyên từ nhánh của bạn)
+     */
     private void handleServiceException(HttpServletRequest request, Exception e, String formAction, String errorFormPage) {
         request.setAttribute("ERROR_MESSAGE", e.getMessage());
         if (ACTION_REGISTER.equals(formAction)) {

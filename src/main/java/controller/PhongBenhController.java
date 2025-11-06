@@ -25,48 +25,75 @@ public class PhongBenhController extends HttpServlet {
     }
 
     /**
-     * doGet (KHÔNG THAY ĐỔI)
-     * Hàm 'searchPhongBenh' ở Service sẽ tự động lọc bỏ
-     * các phòng đã bị xóa mềm ('NGUNG_HOAT_DON').
+     * === ĐÃ CẬP NHẬT LOGIC doGet ===
+     * Phương thức này giờ đây sẽ điều hướng (forward) đến các trang JSP
+     * khác nhau dựa trên 'action':
+     * - "listRooms": Tải danh sách phòng và đi đến PhongBenh.jsp
+     * - "showCreateRoomForm": Tải danh sách khoa và đi đến PhongBenhForm.jsp
+     * - "getRoomForUpdate": Tải phòng cần sửa + danh sách khoa và đi đến PhongBenhForm.jsp
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        request.setCharacterEncoding("UTF-8"); // Đảm bảo đọc UTF-8
-        
+        request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
-        if (action == null) action = "listRooms";
+        if (action == null) action = "listRooms"; // Action mặc định
 
-        String searchKeyword = request.getParameter("searchKeyword");
-
+        String url = "PhongBenh.jsp"; // Trang mặc định
+        
         try {
-            // 1. Luôn tải danh sách khoa (cho form)
-            List<KhoaDTO> khoaList = khoaService.getAllKhoa();
-            request.setAttribute("khoaList", khoaList);
-            
-            // 2. Tải danh sách phòng (ĐÃ LỌC)
-            // Service sẽ chỉ trả về các phòng 'HOAT_DONG'
-            List<PhongBenhDTO> roomList = phongBenhService.searchPhongBenh(searchKeyword);
-            request.setAttribute("roomList", roomList);
-
-            // 3. Xử lý nếu có action 'getRoomForUpdate' (Giữ nguyên)
-            if (action.equals("getRoomForUpdate")) {
-                int roomId = Integer.parseInt(request.getParameter("roomId"));
-                PhongBenhDTO roomToUpdate = phongBenhService.getPhongBenhById(roomId); 
-                request.setAttribute("roomToUpdate", roomToUpdate);
+            switch (action) {
+                case "showCreateRoomForm":
+                    // 1. Chỉ cần tải danh sách Khoa cho form
+                    List<KhoaDTO> khoaList = khoaService.getAllKhoa();
+                    request.setAttribute("khoaList", khoaList);
+                    // 2. Chuyển đến trang form
+                    url = "PhongBenhForm.jsp";
+                    break;
+                    
+                case "getRoomForUpdate":
+                    // 1. Lấy ID phòng
+                    int roomId = Integer.parseInt(request.getParameter("roomId"));
+                    // 2. Tải thông tin phòng cần sửa
+                    PhongBenhDTO roomToUpdate = phongBenhService.getPhongBenhById(roomId);
+                    // 3. Tải danh sách Khoa cho dropdown
+                    List<KhoaDTO> khoaListForUpdate = khoaService.getAllKhoa(); 
+                    
+                    // 4. Gửi cả hai qua request
+                    request.setAttribute("roomToUpdate", roomToUpdate);
+                    request.setAttribute("khoaList", khoaListForUpdate);
+                    // 5. Chuyển đến trang form
+                    url = "PhongBenhForm.jsp";
+                    break;
+                    
+                case "listRooms":
+                default:
+                    // 1. Lấy từ khóa tìm kiếm
+                    String searchKeyword = request.getParameter("searchKeyword");
+                    // 2. Tải danh sách phòng đã lọc
+                    List<PhongBenhDTO> roomList = phongBenhService.searchPhongBenh(searchKeyword);
+                    // 3. Gửi danh sách qua request
+                    request.setAttribute("roomList", roomList);
+                    // 4. Chuyển đến trang danh sách (url mặc định đã đúng)
+                    url = "PhongBenh.jsp";
+                    break;
             }
-            
         } catch (Exception e) {
             request.setAttribute("error", "Lỗi tải dữ liệu: " + e.getMessage());
-        } finally {
-            // 4. Luôn forward đến JSP
-            request.getRequestDispatcher("PhongBenh.jsp").forward(request, response);
+            // Nếu có lỗi, vẫn quay về trang danh sách để hiển thị
+            url = "PhongBenh.jsp"; 
+            e.printStackTrace();
         }
+        
+        // Chuyển hướng (forward) đến trang JSP đã chọn
+        request.getRequestDispatcher(url).forward(request, response);
     }
 
     /**
-     * CẬP NHẬT: Thêm case "deleteRoom"
+     * === KHÔNG CẦN THAY ĐỔI ===
+     * Logic doPost của bạn đã rất chuẩn (dùng switch, gọi hàm riêng, 
+     * và sendRedirect) nên được giữ nguyên.
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -86,7 +113,6 @@ public class PhongBenhController extends HttpServlet {
             case "updateRoom":
                 updateRoom(request, response);
                 break;
-            // === THÊM MỚI ===
             case "deleteRoom":
                 deleteRoom(request, response);
                 break;
@@ -94,7 +120,7 @@ public class PhongBenhController extends HttpServlet {
     }
 
     /**
-     * HÀM MỚI: Xử lý yêu cầu xóa mềm phòng bệnh
+     * HÀM MỚI: Xử lý yêu cầu xóa mềm phòng bệnh (GIỮ NGUYÊN)
      */
     private void deleteRoom(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -103,8 +129,6 @@ public class PhongBenhController extends HttpServlet {
             int roomId = Integer.parseInt(request.getParameter("roomId"));
             
             // 1. Gọi service để thực hiện logic nghiệp vụ
-            // (Service sẽ kiểm tra giường 'DANG_SU_DUNG',
-            //  xóa mềm giường con, và cuối cùng xóa mềm phòng)
             phongBenhService.softDeletePhongBenh(roomId);
             
             // 2. Gửi thông báo thành công
@@ -162,7 +186,7 @@ public class PhongBenhController extends HttpServlet {
             roomToUpdate.setLoaiPhong(loaiPhong);
             roomToUpdate.setSucChua(sucChua);
             roomToUpdate.setKhoaId(khoaId);
-            roomToUpdate.setTrangThai("HOAT_DONG");
+            roomToUpdate.setTrangThai("HOAT_DONG"); // Giữ nguyên logic cũ
 
             phongBenhService.updatePhongBenh(roomToUpdate);
             

@@ -1,22 +1,23 @@
 package model.dto;
 
-import java.time.LocalDateTime; 
+import java.time.LocalDateTime;
 
 public class NhanVienDTO {
 
     private int id;
     private String hoTen;
-    private LocalDateTime ngaySinh; 
+    private LocalDateTime ngaySinh;
     private String gioiTinh;
     private String diaChi;
     private String soDienThoai;
     private String chuyenMon;
     private String bangCap;
-    
-    private int taiKhoanId;
-    private Integer khoaId; 
 
+    private int taiKhoanId;
+    private Integer khoaId;
+    private String vaiTro; // new from dat
     // Constructors
+
     public NhanVienDTO() {
     }
 
@@ -38,6 +39,14 @@ public class NhanVienDTO {
         return id;
     }
 
+    public String getVaiTro() {
+        return vaiTro;
+    }
+
+    public void setVaiTro(String vaiTro) {
+        this.vaiTro = vaiTro;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -50,11 +59,11 @@ public class NhanVienDTO {
         this.hoTen = hoTen;
     }
 
-    public LocalDateTime getNgaySinh() { 
+    public LocalDateTime getNgaySinh() {
         return ngaySinh;
     }
 
-    public void setNgaySinh(LocalDateTime ngaySinh) { 
+    public void setNgaySinh(LocalDateTime ngaySinh) {
         this.ngaySinh = ngaySinh;
     }
 

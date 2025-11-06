@@ -16,10 +16,12 @@ public class LichHenDTO {
     private String trangThai; // Dùng String để khớp CSDL
     private String ghiChu; // Thêm trường bị thiếu
     
-    // Làm phẳng quan hệ
+    // =====DAT=======
     private int benhNhanId;
     private int bacSiId; // Đổi tên từ nhanVienId thành bacSiId cho khớp
-
+    private String tenBenhNhan;
+    private String tenBacSi;
+    //================datend===
     public LichHenDTO() {
     }
 
@@ -32,6 +34,22 @@ public class LichHenDTO {
         this.ghiChu = ghiChu;
         this.benhNhanId = benhNhanId;
         this.bacSiId = bacSiId;
+    }
+
+    public String getTenBenhNhan() {
+        return tenBenhNhan;
+    }
+
+    public void setTenBenhNhan(String tenBenhNhan) {
+        this.tenBenhNhan = tenBenhNhan;
+    }
+
+    public String getTenBacSi() {
+        return tenBacSi;
+    }
+
+    public void setTenBacSi(String tenBacSi) {
+        this.tenBacSi = tenBacSi;
     }
 
     // Getters and Setters

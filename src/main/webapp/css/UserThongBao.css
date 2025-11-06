@@ -1,0 +1,101 @@
+/* ==========================================================================
+    CSS CỤ THỂ CHO TRANG THÔNG BÁO NGƯỜI DÙNG (ThongBaoUser.css)
+========================================================================== */
+
+.notification-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.notification-item {
+    display: flex;
+    flex-wrap: wrap; /* Cho phép xuống dòng trên mobile */
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    margin-bottom: 15px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.2s ease-out;
+}
+
+.notification-item:hover {
+    box-shadow: var(--card-hover-shadow);
+    transform: translateY(-3px);
+}
+
+/* Style cho thông báo CHƯA ĐỌC */
+.notification-item.unread {
+    /* Dùng màu primary pha nhạt, tự động đổi màu theo dark/light mode */
+    background-color: color-mix(in srgb, var(--primary-color) 10%, var(--surface-color));
+    border-left: 5px solid var(--primary-color);
+}
+body.dark-mode .notification-item.unread {
+    background-color: color-mix(in srgb, var(--primary-color) 20%, var(--surface-color));
+}
+
+.notification-content {
+    flex-grow: 1;
+    flex-basis: 400px; /* Cho phép co giãn */
+}
+
+.notification-content h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    font-size: 1.3rem;
+}
+
+.notification-item.unread h4 {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.notification-content p {
+    margin: 0 0 10px 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.notification-time {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+.notification-time i {
+    margin-right: 5px;
+}
+
+/* Nhóm các nút hành động */
+.notification-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0; /* Không cho co lại */
+}
+
+.notification-actions form {
+    margin: 0;
+}
+
+/* Style khi không có thông báo */
+.notification-item-empty {
+    padding: 40px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    font-style: italic;
+    background-color: var(--surface-color);
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+}
+.notification-item-empty i {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 15px;
+}

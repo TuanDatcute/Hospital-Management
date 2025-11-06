@@ -15,18 +15,18 @@
     </head>
     <body>
 
-        <div class="theme-switch-wrapper">
-            <label class="theme-switch" for="theme-toggle">
-                <input type="checkbox" id="theme-toggle" />
-                <div class="slider round">
-                    <span class="sun-icon"><i class="fas fa-sun"></i></span>
-                    <span class="moon-icon"><i class="fas fa-moon"></i></span>
-                </div>
-            </label>
-        </div>
-
         <div class="main-container">
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="theme-toggle">
+                    <input type="checkbox" id="theme-toggle" />
+                    <div class="slider round">
+                        <span class="sun-icon"><i class="fas fa-sun"></i></span>
+                        <span class="moon-icon"><i class="fas fa-moon"></i></span>
+                    </div>
+                </label>
+            </div>
             <div class="header-section">
+
                 <h1>Chi Tiết Đơn Thuốc #${donThuoc.id}</h1>
                 <div class="prescription-info">
                     <p><strong>Ngày kê đơn:</strong> ${donThuoc.ngayKeDonFormatted}</p>

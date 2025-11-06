@@ -391,7 +391,7 @@ body.dark-mode .alert-danger {
     color: #FFD700; /* Màu vàng mặt trời */
     opacity: 1;
     /* Điều chỉnh vị trí của icon mặt trời */
-    margin-left: 1.10px; /* Đẩy icon mặt trời vào trong một chút */
+    margin-left: 0.6px; /* Đẩy icon mặt trời vào trong một chút */
 }
 
 .moon-icon {

@@ -1,6 +1,6 @@
 package util;
 
-import java.io.InputStream; 
+import java.io.InputStream;
 import java.util.Properties;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
@@ -10,16 +10,17 @@ import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import model.dto.PhieuKhamBenhDTO;
 
 /**
- * Lớp Tiện ích (Utils) để gửi email.
- * **ĐÃ CẬP NHẬT:** Thêm logic Gửi email Quên Mật khẩu.
+ * Lớp Tiện ích (Utils) để gửi email. **ĐÃ CẬP NHẬT:** Thêm logic Gửi email Quên
+ * Mật khẩu.
  */
 public class EmailUtils {
 
     // Tên file cấu hình
     private static final String PROPS_FILE = "mail.properties";
-    
+
     // Khai báo các biến static
     private static final Properties props = new Properties();
     private static final String FROM_EMAIL;
@@ -28,18 +29,17 @@ public class EmailUtils {
     private static final Session session; // Session được tạo 1 lần và tái sử dụng
 
     /**
-     * Khối static: 
-     * Tự động chạy 1 LẦN khi lớp được tải.
-     * (Giữ nguyên logic tải .properties)
+     * Khối static: Tự động chạy 1 LẦN khi lớp được tải. (Giữ nguyên logic tải
+     * .properties)
      */
     static {
-        try (InputStream input = EmailUtils.class.getClassLoader().getResourceAsStream(PROPS_FILE)) {
-            
+        try ( InputStream input = EmailUtils.class.getClassLoader().getResourceAsStream(PROPS_FILE)) {
+
             if (input == null) {
                 System.err.println("!!! LỖI NGHIÊM TRỌNG: Không tìm thấy file " + PROPS_FILE + " trong classpath.");
                 throw new RuntimeException("Không tìm thấy file " + PROPS_FILE);
             }
-            
+
             props.load(input);
             FROM_EMAIL = props.getProperty("mail.smtp.user");
             APP_PASSWORD = props.getProperty("mail.smtp.password");
@@ -56,7 +56,7 @@ public class EmailUtils {
                 }
             };
             session = Session.getInstance(props, auth);
-            
+
             System.out.println("EmailUtils: Đã tải cấu hình email thành công cho " + FROM_EMAIL);
 
         } catch (Exception e) {
@@ -72,31 +72,104 @@ public class EmailUtils {
     }
 
     /**
-     * HÀM CÔNG KHAI (Public):
-     * Gửi email XÁC THỰC tài khoản.
-     * (Giữ nguyên hàm này)
+     * HÀM NỘI BỘ (Private): Phương thức tĩnh cốt lõi để gửi email. (Giữ nguyên
+     * hàm này)
+     */
+    private static void private_sendEmail(String toEmail, String subject, String htmlContent) throws MessagingException {
+
+        System.out.println("Đang chuẩn bị gửi email tới: " + toEmail);
+        MimeMessage message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(FROM_EMAIL));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+        message.setSubject(subject, "UTF-8");
+        message.setContent(htmlContent, "text/html; charset=utf-8");
+        Transport.send(message);
+        System.out.println("Gửi email thành công!");
+    }
+
+    /**
+     *  Gửi email thông báo KHI PHIẾU KHÁM HOÀN THÀNH.
+     *
+     * @param toEmail Email của bệnh nhân.
+     * @param phieuKham DTO chứa thông tin phiếu khám.
+     * @throws MessagingException
+     */
+    public static void sendEncounterCompletedEmail(String toEmail, PhieuKhamBenhDTO phieuKham) throws MessagingException {
+        // 1. Xây dựng Tiêu đề
+        String subject = "Thông báo hoàn thành Phiếu khám #" + phieuKham.getMaPhieuKham();
+
+        // 2. Xây dựng Nội dung HTML
+        String htmlContent = buildEncounterEmailHtml(phieuKham);
+
+        // 3. Gọi hàm gửi
+        private_sendEmail(toEmail, subject, htmlContent);
+    }
+
+    /**
+     * HÀM NỘI BỘ (Private): Xây dựng nội dung HTML cho email thông báo phiếu
+     * khám.
+     */
+    private static String buildEncounterEmailHtml(PhieuKhamBenhDTO phieuKham) {
+        // (Đây là nội dung email tóm tắt, không phải file in bệnh án đầy đủ)
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html><body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>");
+        sb.append("<div style='width: 90%; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>");
+
+        sb.append("<h2 style='color: #4a90e2; margin-top: 0;'>Kết quả Phiếu khám bệnh của bạn đã có</h2>");
+        sb.append("<p>Xin chào <strong>").append(phieuKham.getTenBenhNhan()).append("</strong>,</p>");
+        sb.append("<p>Phiếu khám của bạn (mã: <strong>").append(phieuKham.getMaPhieuKham()).append("</strong>) đã được bác sĩ xử lý và hoàn thành.</p>");
+        sb.append("<hr style='border: 0; border-top: 1px solid #eee;'>");
+
+        sb.append("<h3 style='color: #4a90e2;'>Tóm tắt Phiếu khám</h3>");
+        sb.append("<ul style='list-style: none; padding-left: 0;'>");
+        sb.append("<li><strong>Bác sĩ khám:</strong> ").append(phieuKham.getTenBacSi()).append("</li>");
+        sb.append("<li><strong>Thời gian:</strong> ").append(phieuKham.getThoiGianKhamFormatted()).append("</li>");
+        sb.append("</ul>");
+
+        sb.append("<h4>Chẩn đoán của bác sĩ</h4>");
+        sb.append("<p style='background: #f4f7f9; padding: 15px; border-radius: 5px;'><i>");
+        sb.append(phieuKham.getChanDoan() != null ? phieuKham.getChanDoan() : "Không có chẩn đoán").append("</i></p>");
+
+        sb.append("<h4>Kết luận & Dặn dò</h4>");
+        sb.append("<p style='background: #f4f7f9; padding: 15px; border-radius: 5px;'>");
+        sb.append(phieuKham.getKetLuan() != null ? phieuKham.getKetLuan() : "Không có dặn dò cụ thể.").append("</p>");
+
+        sb.append("<hr style='border: 0; border-top: 1px solid #eee;'>");
+        sb.append("<p style='text-align: center; margin-top: 20px;'>Vui lòng đăng nhập vào hệ thống của chúng tôi (sử dụng liên kết bên dưới) để xem chi tiết đơn thuốc và các kết quả dịch vụ.</p>");
+
+        sb.append("<div style='text-align: center; margin: 30px 0;'>");
+        sb.append("<a href='").append(APP_BASE_URL).append("' style='background-color: #4a90e2; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Đăng nhập hệ thống</a>");
+        sb.append("</div>");
+
+        sb.append("<p style='font-size: 0.9em; color: #777; text-align: center;'>Trân trọng,<br>Bệnh viện HospitalManagement</p>");
+        sb.append("</div></body></html>");
+
+        return sb.toString();
+    }
+
+    /**
+     * HÀM CÔNG KHAI (Public): Gửi email XÁC THỰC tài khoản. (Giữ nguyên hàm
+     * này)
      */
     public static void sendVerificationEmail(String toEmail, String tenDangNhap, String token) throws MessagingException {
-        
+
         // 1. Xây dựng Link (Lấy từ file config)
         String verificationLink = APP_BASE_URL + "/verify?token=" + token;
-        
+
         // 2. Xây dựng Tiêu đề
         String subject = "Kích hoạt tài khoản của bạn tại Bệnh viện";
-        
+
         // 3. Xây dựng Nội dung HTML
         String htmlContent = buildVerificationEmailHtml(tenDangNhap, verificationLink);
-        
+
         // 4. Gọi hàm gửi
         private_sendEmail(toEmail, subject, htmlContent);
     }
-    
-    
-    // --- **BẮT ĐẦU THÊM MỚI (Quên Mật khẩu)** ---
 
+    // --- **BẮT ĐẦU THÊM MỚI (Quên Mật khẩu)** ---
     /**
-     * **HÀM CÔNG KHAI (Public) MỚI:**
-     * Gửi email đặt lại mật khẩu.
+     * **HÀM CÔNG KHAI (Public) MỚI:** Gửi email đặt lại mật khẩu.
      *
      * @param toEmail Email người nhận
      * @param tenNguoiDung Tên người dùng (để chào)
@@ -104,44 +177,25 @@ public class EmailUtils {
      * @throws MessagingException
      */
     public static void sendPasswordResetEmail(String toEmail, String tenNguoiDung, String token) throws MessagingException {
-        
+
         // 1. Xây dựng Link (Lấy từ file config)
         // **Quan trọng:** Dùng đường dẫn "/reset" (cho PasswordResetController)
-        String resetLink = APP_BASE_URL + "/reset?token=" + token; 
-        
+        String resetLink = APP_BASE_URL + "/reset?token=" + token;
+
         // 2. Xây dựng Tiêu đề
         String subject = "Yêu cầu đặt lại mật khẩu Bệnh viện";
-        
+
         // 3. Xây dựng Nội dung HTML
         String htmlContent = buildPasswordResetEmailHtml(tenNguoiDung, resetLink);
-        
+
         // 4. Gọi hàm gửi
         private_sendEmail(toEmail, subject, htmlContent);
     }
 
     // --- **KẾT THÚC THÊM MỚI** ---
-    
-    
     /**
-     * HÀM NỘI BỘ (Private):
-     * Phương thức tĩnh cốt lõi để gửi email.
-     * (Giữ nguyên hàm này)
-     */
-    private static void private_sendEmail(String toEmail, String subject, String htmlContent) throws MessagingException {
-        
-        System.out.println("Đang chuẩn bị gửi email tới: " + toEmail);
-        MimeMessage message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(FROM_EMAIL));
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
-        message.setSubject(subject, "UTF-8"); 
-        message.setContent(htmlContent, "text/html; charset=utf-8");
-        Transport.send(message);
-        System.out.println("Gửi email thành công!");
-    }
-
-    /**
-     * Hàm tiện ích để tạo nội dung HTML cho email XÁC THỰC.
-     * (Giữ nguyên hàm này)
+     * Hàm tiện ích để tạo nội dung HTML cho email XÁC THỰC. (Giữ nguyên hàm
+     * này)
      */
     private static String buildVerificationEmailHtml(String username, String verificationLink) {
         return "<html lang='vi'>"
@@ -191,12 +245,11 @@ public class EmailUtils {
     // --- **KẾT THÚC THÊM MỚI** ---
 
     /**
-     * **HÀM TEST (THỬ NGHIỆM)**
-     * **CẬP NHẬT:** Test cả 2 hàm.
+     * **HÀM TEST (THỬ NGHIỆM)** **CẬP NHẬT:** Test cả 2 hàm.
      */
     public static void main(String[] args) {
-        String testRecipientEmail = "gabokan02564@gmail.com"; 
-        
+        String testRecipientEmail = "gabokan02564@gmail.com";
+
         try {
             System.out.println("--- 1. Đang test email XÁC THỰC TÀI KHOẢN ---");
             sendVerificationEmail(testRecipientEmail, "Bệnh Nhân Test (Xác thực)", "abc_token_xac_thuc");
@@ -205,14 +258,14 @@ public class EmailUtils {
             System.out.println("\n--- 2. Đang test email QUÊN MẬT KHẨU ---");
             sendPasswordResetEmail(testRecipientEmail, "Bệnh Nhân Test (Quên MK)", "xyz_token_reset_mk");
             System.out.println("-> Test 2 THÀNH CÔNG.");
-            
+
             System.out.println("\n--- TEST HOÀN TẤT ---");
             System.out.println("Kiểm tra hòm thư của: " + testRecipientEmail);
 
         } catch (Exception e) {
             System.err.println("--- !!! TEST THẤT BẠI !!! ---");
             e.printStackTrace();
-            
+
             // (Phân tích lỗi của bạn, giữ nguyên)
             if (e instanceof MessagingException) {
                 Exception nextException = ((MessagingException) e).getNextException();
@@ -221,12 +274,12 @@ public class EmailUtils {
                 }
             }
             if (e.getMessage() != null && e.getMessage().contains("AuthenticationFailedException")) {
-                 System.err.println("\n*** LỖI GỢI Ý: XÁC THỰC THẤT BẠI. (AuthenticationFailedException) ***");
-                 System.err.println("-> Nguyên nhân: 'mail.smtp.user' hoặc 'mail.smtp.password' trong file mail.properties bị sai.");
+                System.err.println("\n*** LỖI GỢI Ý: XÁC THỰC THẤT BẠI. (AuthenticationFailedException) ***");
+                System.err.println("-> Nguyên nhân: 'mail.smtp.user' hoặc 'mail.smtp.password' trong file mail.properties bị sai.");
             }
-             if (e.getMessage() != null && e.getMessage().contains("jakarta.mail.internet.AddressException")) {
-                 System.err.println("\n*** LỖI GỢI Ý: ĐỊA CHỈ EMAIL KHÔNG HỢP LỆ. (AddressException) ***");
-             }
+            if (e.getMessage() != null && e.getMessage().contains("jakarta.mail.internet.AddressException")) {
+                System.err.println("\n*** LỖI GỢI Ý: ĐỊA CHỈ EMAIL KHÔNG HỢP LỆ. (AddressException) ***");
+            }
         }
     }
 }
