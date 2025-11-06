@@ -44,8 +44,7 @@ public class PatientLichHenController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession(false);
-        // SỬA: Dùng "user" theo code bạn gửi lần trước
-        TaiKhoanDTO currentUser = (session != null) ? (TaiKhoanDTO) session.getAttribute("user") : null;
+        TaiKhoanDTO currentUser = (session != null) ? (TaiKhoanDTO) session.getAttribute("USER") : null;
 
         if (currentUser == null || !"BENH_NHAN".equals(currentUser.getVaiTro())) {
             response.sendRedirect("login.jsp");
@@ -87,7 +86,7 @@ public class PatientLichHenController extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         // SỬA: Dùng "user"
-        TaiKhoanDTO currentUser = (session != null) ? (TaiKhoanDTO) session.getAttribute("user") : null;
+        TaiKhoanDTO currentUser = (session != null) ? (TaiKhoanDTO) session.getAttribute("USER") : null;
 
         if (currentUser == null || !"BENH_NHAN".equals(currentUser.getVaiTro())) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Bạn cần đăng nhập với vai trò Bệnh nhân.");
