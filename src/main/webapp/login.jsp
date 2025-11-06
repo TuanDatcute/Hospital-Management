@@ -157,9 +157,9 @@
             </c:if>
 
             // Tự động mở panel Đăng ký nếu URL có #register
-            if (window.location.hash === '#register') {
-                container.classList.add("active");
-            }
+//            if (window.location.hash === '#register') {
+//                container.classList.add("active");
+//            }
         </script>
     </body>
 </html>

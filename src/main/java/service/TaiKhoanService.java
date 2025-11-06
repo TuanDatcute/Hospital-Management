@@ -1,36 +1,31 @@
 package service;
 
 import exception.ValidationException;
-import model.Entity.TaiKhoan; // Đảm bảo đúng package 'model.Entity' (E hoa)
+import model.Entity.TaiKhoan;
 import model.dao.TaiKhoanDAO;
 import model.dto.TaiKhoanDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional; // --- THÊM IMPORT MỚI ---
-import java.util.UUID; // --- THÊM IMPORT MỚI ---
+import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import model.Entity.BenhNhan;
-import model.dao.BenhNhanDAO;
+import model.Entity.BenhNhan; // <-- MERGE: Lấy import từ nhánh 'main'
+import model.dao.BenhNhanDAO; // <-- MERGE: Lấy import từ nhánh 'main'
 import util.PasswordHasher;
 
 /**
  * Lớp Service chứa logic nghiệp vụ cho TaiKhoan. **ĐÃ CẬP NHẬT:** Kích hoạt
- * Logic Xác thực Email & Quên Mật khẩu.
-=======
- * Lớp Service chứa logic nghiệp vụ cho TaiKhoan. Đã cập nhật: Thêm Regex cho
- * validation.
- * Lớp Service chứa logic nghiệp vụ cho TaiKhoan.
- * **ĐÃ CẬP NHẬT:** Kích hoạt Logic Xác thực Email & Quên Mật khẩu.
-
+ * Logic Xác thực, Quên Mật khẩu, Gửi lại. (Đã merge code từ 'main')
  */
 public class TaiKhoanService {
 
     private final TaiKhoanDAO taiKhoanDAO = new TaiKhoanDAO();
+    // **MERGE:** Thêm BenhNhanDAO (từ nhánh 'main', cần cho hàm 'getTaiKhoanByBenhNhanId')
     private final BenhNhanDAO benhNhanDAO = new BenhNhanDAO();
 
-    // --- THÊM HẰNG SỐ TRẠNG THÁI ---
+    // --- HẰNG SỐ TRẠNG THÁI (Clean Code) ---
     private static final String TRANG_THAI_CHUA_XAC_THUC = "CHUA_XAC_THUC";
     private static final String TRANG_THAI_HOAT_DONG = "HOAT_DONG";
     private static final String TRANG_THAI_BI_KHOA = "BI_KHOA";
@@ -41,7 +36,7 @@ public class TaiKhoanService {
     private static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d).{6,}$";
 
     /**
-     * **CẬP NHẬT:** ĐÃ KÍCH HOẠT logic chặn đăng nhập.
+     * Logic đăng nhập (Đã kích hoạt chặn 'CHUA_XAC_THUC')
      */
     public TaiKhoanDTO login(String tenDangNhap, String matKhau) throws ValidationException {
         TaiKhoan entity = taiKhoanDAO.findByTenDangNhap(tenDangNhap);
@@ -52,11 +47,9 @@ public class TaiKhoanService {
             throw new ValidationException("Tài khoản hoặc mật khẩu không đúng");
         }
 
-        // --- **BẮT ĐẦU KÍCH HOẠT** ---
         if (TRANG_THAI_CHUA_XAC_THUC.equals(entity.getTrangThai())) {
             throw new ValidationException("Tài khoản này chưa được kích hoạt. Vui lòng kiểm tra email của bạn (cả mục Spam) để xác thực.");
         }
-        // --- **KẾT THÚC KÍCH HOẠT** ---
 
         if (TRANG_THAI_BI_KHOA.equals(entity.getTrangThai())) {
             throw new ValidationException("Tài khoản này đã bị khóa.");
@@ -64,19 +57,18 @@ public class TaiKhoanService {
         return toDTO(entity);
     }
 
-
+    /**
+     * Dịch vụ tạo tài khoản mới. **MERGE:** Đã kết hợp logic token.
+     */
     public TaiKhoanDTO createTaiKhoan(TaiKhoanDTO dto, String matKhau) throws ValidationException, Exception {
 
-        // (Toàn bộ logic validation của bạn giữ nguyên...)
+        // (Validation... giữ nguyên)
         if (dto.getTenDangNhap() == null || dto.getTenDangNhap().trim().isEmpty()) {
             throw new ValidationException("Tên đăng nhập không được để trống.");
         }
         if (!Pattern.matches(USERNAME_REGEX, dto.getTenDangNhap())) {
             throw new ValidationException("Tên đăng nhập không hợp lệ (chỉ gồm chữ, số, '_', '.', '-'; dài 4-30 ký tự).");
         }
-        // --- KẾT THÚC CẬP NHẬT ---
-
-        // --- CẬP NHẬT: Thêm Regex cho Mật khẩu ---
         if (matKhau == null || !Pattern.matches(PASSWORD_REGEX, matKhau)) {
             throw new ValidationException("Mật khẩu phải có ít nhất 6 ký tự, bao gồm ít nhất 1 chữ cái và 1 số.");
         }
@@ -84,8 +76,6 @@ public class TaiKhoanService {
             throw new ValidationException("Tên đăng nhập '" + dto.getTenDangNhap() + "' đã tồn tại.");
         }
         if (dto.getEmail() != null && !dto.getEmail().trim().isEmpty()) {
-
-            // --- CẬP NHẬT: Thêm Regex cho Email ---
             if (!Pattern.matches(EMAIL_REGEX, dto.getEmail())) {
                 throw new ValidationException("Định dạng Email không hợp lệ.");
             }
@@ -96,18 +86,17 @@ public class TaiKhoanService {
             throw new ValidationException("Email là bắt buộc để đăng ký.");
         }
 
-        // (Logic chuyển đổi và thêm mới)
         String hashedMatKhau = PasswordHasher.hashPassword(matKhau);
         TaiKhoan entity = toEntity(dto, hashedMatKhau);
 
-        // --- **BẮT ĐẦU CẬP NHẬT LOGIC TOKEN** ---
+        // --- **MERGE:** Lấy khối logic token từ nhánh 'main' (có comment) ---
         String token = UUID.randomUUID().toString();
         entity.setVerificationToken(token);
         entity.setTokenExpiryDate(LocalDateTime.now().plusHours(24)); // Hết hạn sau 24h
 
         // Set trạng thái mặc định là CHUA_XAC_THUC
         entity.setTrangThai(TRANG_THAI_CHUA_XAC_THUC);
-        // --- **KẾT THÚC CẬP NHẬT LOGIC TOKEN** ---
+        // --- **KẾT THÚC MERGE** ---
 
         entity.setCreatedAt(LocalDateTime.now());
         entity.setUpdatedAt(LocalDateTime.now());
@@ -123,15 +112,13 @@ public class TaiKhoanService {
             TaiKhoan savedEntity = taiKhoanDAO.create(entity);
             return (savedEntity != null) ? toDTO(savedEntity) : null;
         } catch (RuntimeException e) {
-            // Bắt lỗi từ DAO (ví dụ: unique constraint)
             throw new Exception("Lỗi CSDL khi tạo tài khoản: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Dịch vụ thay đổi mật khẩu. Đã cập nhật: Thêm Regex validation cho mật
-     * khẩu mới.
-     * Dịch vụ thay đổi mật khẩu (cho người đã đăng nhập).
+     * Dịch vụ thay đổi mật khẩu (cho người đã đăng nhập). (Đã merge Javadoc từ
+     * 'main')
      */
     public void changePassword(int id, String oldPassword, String newPassword) throws ValidationException, Exception {
         TaiKhoan entity = taiKhoanDAO.getById(id);
@@ -155,16 +142,16 @@ public class TaiKhoanService {
         entity.setMatKhau(hashedNewPassword);
         entity.setUpdatedAt(LocalDateTime.now());
         entity.setTrangThaiMatKhau("DA_DOI");
+
         try {
-            taiKhoanDAO.update(entity); // Hàm update mới là void
+            taiKhoanDAO.update(entity);
         } catch (RuntimeException e) {
-            // Bắt lỗi RuntimeException từ DAO
             throw new Exception("Cập nhật mật khẩu thất bại do lỗi CSDL: " + e.getMessage(), e);
         }
     }
 
     // =================================================================
-    // CÁC HÀM XÁC THỰC EMAIL (Giữ nguyên)
+    // CÁC HÀM XÁC THỰC EMAIL (Từ nhánh của bạn)
     // =================================================================
     public String findVerificationTokenByEmail(String email) throws ValidationException {
         return taiKhoanDAO.findVerificationTokenByEmail(email)
@@ -205,16 +192,45 @@ public class TaiKhoanService {
         }
     }
 
+    // --- **MERGE:** Lấy hàm 'resendVerificationEmail' từ nhánh của bạn (HEAD) ---
+    /**
+     * **HÀM MỚI (Gửi lại Xác thực):** Tạo token MỚI cho user CHUA_XAC_THUC.
+     */
+    public TaiKhoan resendVerificationEmail(String email) throws ValidationException, Exception {
+        if (email == null || email.trim().isEmpty()) {
+            throw new ValidationException("Email không được để trống.");
+        }
+
+        Optional<TaiKhoan> optEntity = taiKhoanDAO.findByEmail(email);
+
+        if (!optEntity.isPresent()) {
+            throw new ValidationException("Lỗi: Không tìm thấy tài khoản với email này.");
+        }
+
+        TaiKhoan entity = optEntity.get();
+
+        if (!TRANG_THAI_CHUA_XAC_THUC.equals(entity.getTrangThai())) {
+            throw new ValidationException("Tài khoản này đã được kích hoạt. Vui lòng đăng nhập.");
+        }
+
+        String token = UUID.randomUUID().toString();
+        entity.setVerificationToken(token);
+        entity.setTokenExpiryDate(LocalDateTime.now().plusHours(24));
+        entity.setUpdatedAt(LocalDateTime.now());
+
+        try {
+            taiKhoanDAO.update(entity);
+            return entity; // Trả về entity đã được cập nhật
+        } catch (RuntimeException e) {
+            throw new Exception("Lỗi CSDL khi tạo token gửi lại: " + e.getMessage(), e);
+        }
+    }
+
     // =================================================================
-    // **BẮT ĐẦU THÊM MỚI: CÁC HÀM QUÊN MẬT KHẨU**
+    // CÁC HÀM QUÊN MẬT KHẨU (Từ cả 2 nhánh, đã merge Javadoc)
     // =================================================================
     /**
-     * **HÀM MỚI (Quên Mật khẩu - Giai đoạn 1):** Tạo và lưu token reset khi
-     * người dùng yêu cầu.
-     *
-     * @param email Email người dùng nhập
-     * @return Toàn bộ Entity TaiKhoan (để Controller lấy tên và token)
-     * @throws ValidationException nếu email rỗng
+     * **HÀM MỚI (Quên Mật khẩu - Giai đoạn 1):** Tạo và lưu token reset.
      */
     public TaiKhoan generatePasswordResetToken(String email) throws ValidationException, Exception {
         if (email == null || email.trim().isEmpty()) {
@@ -227,34 +243,27 @@ public class TaiKhoanService {
         Optional<TaiKhoan> optEntity = taiKhoanDAO.findByEmail(email);
 
         if (!optEntity.isPresent()) {
-            // MẸO BẢO MẬT: Không báo lỗi "Email không tồn tại".
-            // Chúng ta chỉ âm thầm không làm gì cả và trả về null.
-            // Controller sẽ luôn báo "Nếu email tồn tại..."
+            // MẸO BẢO MẬT: Không báo lỗi, chỉ trả về null.
             return null;
         }
 
         TaiKhoan entity = optEntity.get();
 
-        // Tạo token và đặt hạn 1 giờ
         String token = UUID.randomUUID().toString();
         entity.setVerificationToken(token);
-        entity.setTokenExpiryDate(LocalDateTime.now().plusHours(1)); // Chỉ cho 1 giờ
+        entity.setTokenExpiryDate(LocalDateTime.now().plusHours(1)); // 1 giờ
         entity.setUpdatedAt(LocalDateTime.now());
 
         try {
             taiKhoanDAO.update(entity);
-            return entity; // Trả về entity đã được cập nhật
+            return entity;
         } catch (RuntimeException e) {
             throw new Exception("Lỗi CSDL khi tạo token reset: " + e.getMessage(), e);
         }
     }
 
     /**
-     * **HÀM MỚI (Quên Mật khẩu - Giai đoạn 2, GET):** Chỉ kiểm tra token có
-     * hợp lệ để hiển thị form hay không.
-     *
-     * @param token Token từ link email
-     * @throws ValidationException nếu token/hết hạn
+     * **HÀM MỚI (Quên Mật khẩu - Giai đoạn 2, GET):** Kiểm tra token.
      */
     public void validatePasswordResetToken(String token) throws ValidationException {
         if (token == null || token.isEmpty()) {
@@ -270,17 +279,10 @@ public class TaiKhoanService {
         if (entity.getTokenExpiryDate() != null && entity.getTokenExpiryDate().isBefore(LocalDateTime.now())) {
             throw new ValidationException("Link đặt lại mật khẩu đã hết hạn. Vui lòng yêu cầu lại.");
         }
-        // Nếu không ném lỗi -> Token hợp lệ
     }
 
     /**
-     * **HÀM MỚI (Quên Mật khẩu - Giai đoạn 2, POST):** Xác thực token và đặt
-     * mật khẩu mới.
-     *
-     * @param token Token từ link email
-     * @param newPassword Mật khẩu mới (dạng thô)
-     * @param confirmPassword Mật khẩu xác nhận (dạng thô)
-     * @throws ValidationException nếu token/mật khẩu không hợp lệ
+     * **HÀM MỚI (Quên Mật khẩu - Giai đoạn 2, POST):** Thực hiện reset.
      */
     public void performPasswordReset(String token, String newPassword, String confirmPassword) throws ValidationException, Exception {
 
@@ -295,7 +297,7 @@ public class TaiKhoanService {
             throw new ValidationException("Mật khẩu mới phải có ít nhất 6 ký tự, bao gồm ít nhất 1 chữ cái và 1 số.");
         }
 
-        // 2. Validate token (Kiểm tra lại 1 lần nữa)
+        // 2. Validate token
         Optional<TaiKhoan> optEntity = taiKhoanDAO.findByVerificationToken(token);
         if (!optEntity.isPresent()) {
             throw new ValidationException("Link đặt lại mật khẩu không hợp lệ hoặc đã được sử dụng.");
@@ -303,15 +305,15 @@ public class TaiKhoanService {
 
         TaiKhoan entity = optEntity.get();
 
-        // 3. Check hết hạn (Kiểm tra lại 1 lần nữa)
+        // 3. Check hết hạn
         if (entity.getTokenExpiryDate() != null && entity.getTokenExpiryDate().isBefore(LocalDateTime.now())) {
             throw new ValidationException("Link đặt lại mật khẩu đã hết hạn. Vui lòng yêu cầu lại.");
         }
 
-        // 4. Mọi thứ hợp lệ -> Đặt mật khẩu mới
+        // 4. Mọi thứ OK -> Đặt mật khẩu mới
         entity.setMatKhau(PasswordHasher.hashPassword(newPassword));
 
-        // 5. VÔ HIỆU HÓA token (Rất quan trọng - dùng 1 lần)
+        // 5. VÔ HIỆU HÓA token
         entity.setVerificationToken(null);
         entity.setTokenExpiryDate(null);
         entity.setUpdatedAt(LocalDateTime.now());
@@ -378,16 +380,15 @@ public class TaiKhoanService {
                 .collect(Collectors.toList());
     }
 
-    // === THÊM HÀM MỚI ===
+    // --- **MERGE:** Lấy hàm 'getDistinctRoles' từ nhánh 'main' ---
     /**
      * Lấy danh sách các vai trò duy nhất từ CSDL.
-     *
-     * @return List<String> các tên vai trò.
+     * @return 
      */
     public List<String> getDistinctRoles() {
         return taiKhoanDAO.getDistinctVaiTro();
     }
-    // ======================
+    // --- **KẾT THÚC MERGE** ---
 
     /**
      * Chuyển Entity sang DTO.
@@ -404,28 +405,24 @@ public class TaiKhoanService {
         dto.setTrangThai(entity.getTrangThai());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setTrangThaiMatKhau(entity.getTrangThaiMatKhau());
+
         // Không map verificationToken và tokenExpiryDate ra DTO
         return dto;
     }
 
-    /**
-     * Chuyển DTO sang Entity.
-     */
     private TaiKhoan toEntity(TaiKhoanDTO dto, String hashedMatKhau) {
         TaiKhoan entity = new TaiKhoan();
         entity.setTenDangNhap(dto.getTenDangNhap());
         entity.setEmail(dto.getEmail());
         entity.setVaiTro(dto.getVaiTro());
-
-        entity.setTrangThai(dto.getTrangThai());
-
+        entity.setTrangThai(dto.getTrangThai()); // (Sẽ được ghi đè bởi createTaiKhoan)
         entity.setMatKhau(hashedMatKhau);
         entity.setTrangThaiMatKhau(dto.getTrangThaiMatKhau());
 
         return entity;
     }
 
-
+    // --- **MERGE:** Lấy hàm 'getTaiKhoanByBenhNhanId' từ nhánh 'main' ---
     public TaiKhoanDTO getTaiKhoanByBenhNhanId(int benhNhanId) {
         // 1. Gọi BenhNhanDAO để tìm bệnh nhân và tài khoản của họ
         BenhNhan benhNhan = benhNhanDAO.getByIdWithRelations(benhNhanId);
@@ -437,4 +434,5 @@ public class TaiKhoanService {
         // 2. Trích xuất Entity TaiKhoan và chuyển đổi sang DTO
         return toDTO(benhNhan.getTaiKhoan());
     }
+    // --- **KẾT THÚC MERGE** ---
 }

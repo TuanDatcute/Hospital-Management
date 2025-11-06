@@ -2,6 +2,7 @@
     Document   : formTaiKhoan.jsp (Đã đơn giản hóa cho Admin)
     Created on : Oct 29, 2025
     Author     : ADMIN
+    (Đã merge/gỡ rối logic 'hidden fields' và 'removed fields')
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -27,7 +28,7 @@
             <h2 class="section-title">
                 <c:if test="${isCreating}">Thêm Tài khoản Nhân viên</c:if>
                 <c:if test="${!isCreating}">Cập nhật Trạng thái Tài khoản</c:if>
-                </h2>
+            </h2>
 
             <c:if test="${not empty requestScope.ERROR_MESSAGE}">
                 <p class="error-message">${requestScope.ERROR_MESSAGE}</p>
@@ -35,11 +36,12 @@
 
             <form action="MainController" method="post" class="data-form">
 
+                <%-- **MERGE:** Lấy các trường 'hidden' (Rất quan trọng) --%>
                 <input type="hidden" name="action" value="${requestScope.formAction}" />
-
                 <c:if test="${!isCreating}">
                     <input type="hidden" name="id" value="${requestScope.USER_DATA.id}" />
                 </c:if>
+                <%-- **KẾT THÚC MERGE** --%>
 
                 <div class="form-group">
                     <label for="tenDangNhap">Tên đăng nhập:</label>
@@ -48,31 +50,28 @@
                            ${!isCreating ? 'readonly' : ''} 
                            required="required">
                 </div>
-
-                <%-- **ĐÃ XÓA Ô EMAIL** --%>
-                <%-- (Bạn có thể thêm lại nếu muốn, nhưng bỏ 'required="required"') --%>
-                <%--
                 
-                --%>
+                <%-- **MERGE:** Giữ lại ô Email (Tùy chọn) --%>
                 <div class="form-group">
                     <label for="email">Email (Tùy chọn):</label>
                     <input type="email" id="email" name="email" 
                            value="<c:out value="${requestScope.USER_DATA.email}"/>" 
                            ${!isCreating ? 'readonly' : ''}>
                 </div>
+                
                 <%-- Chỉ hiển thị ô nhập mật khẩu KHI TẠO MỚI --%>
                 <c:if test="${isCreating}">
                     <div class="form-group">
                         <label for="password">Mật khẩu tạm thời:</label>
                         <input type="password" id="password" name="password" required="required">
                     </div>
-                    <%-- **ĐÃ XÓA Ô XÁC NHẬN MẬT KHẨU** --%>
                 </c:if>
 
                 <div class="form-group">
                     <label for="vaiTro">Vai trò:</label>
+                    <%-- **MERGE:** Giữ logic 'disabled' khi CẬP NHẬT --%>
                     <select id="vaiTro" name="vaiTro" ${!isCreating ? 'disabled' : ''}>
-                        <%-- **ĐÃ GIỚI HẠN LẠI VAI TRÒ** --%>
+                        <%-- Giới hạn lại vai trò --%>
                         <option value="BAC_SI" ${requestScope.USER_DATA.vaiTro == 'BAC_SI' ? 'selected' : ''}>Bác sĩ</option>
                         <option value="LE_TAN" ${requestScope.USER_DATA.vaiTro == 'LE_TAN' ? 'selected' : ''}>Lễ tân</option>
                     </select>

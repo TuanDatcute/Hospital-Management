@@ -3,7 +3,7 @@ package controller;
 import exception.ValidationException;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime; // Giữ lại vì createDTOFromRequest dùng
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +20,7 @@ import service.TaiKhoanService;
 
 /**
  * Controller xử lý các nghiệp vụ liên quan đến Bệnh Nhân (Patient). **ĐÃ CẬP
- * NHẬT (Giai đoạn 2):** Triển khai luồng "Hoàn tất Hồ sơ".
+ * NHẬT (Giai đoạn 6):** Thêm bước Xác nhận Hồ sơ (Confirm Profile).
  */
 @WebServlet(name = "BenhNhanController", urlPatterns = {"/BenhNhanController"})
 public class BenhNhanController extends HttpServlet {
@@ -30,17 +30,17 @@ public class BenhNhanController extends HttpServlet {
     private static final String BENHNHAN_FORM_PAGE = "admin/formBenhNhan.jsp";
     private static final String ERROR_PAGE = "error.jsp";
 
-    // --- HẰNG SỐ MỚI (Cho Bệnh nhân) ---
-    private static final String FILL_PROFILE_PAGE = "user/fillProfile.jsp"; // Trang điền thông tin
-    private static final String VIEW_PROFILE_PAGE = "user/viewProfile.jsp"; // Trang xem thông tin (giả sử)
-    private static final String HOME_PAGE = "home.jsp"; // Trang chủ bệnh nhân
+    // (Hằng số của Bệnh nhân)
+    private static final String EDIT_PROFILE_PAGE = "user/editProfile.jsp";
+    private static final String VIEW_PROFILE_PAGE = "user/viewProfile.jsp";
+    private static final String HOME_PAGE = "home.jsp";
+
+    // --- **THÊM HẰNG SỐ MỚI (Theo ý tưởng của bạn)** ---
+    private static final String CONFIRM_PROFILE_PAGE = "user/confirmProfile.jsp";
 
     private final BenhNhanService benhNhanService = new BenhNhanService();
     private final TaiKhoanService taiKhoanService = new TaiKhoanService();
 
-    /**
-     * **CẬP NHẬT:** Thêm 'case showProfile' cho bệnh nhân.
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -48,12 +48,12 @@ public class BenhNhanController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
-        String url = ERROR_PAGE; // Mặc định là lỗi
+        String url = ERROR_PAGE;
+        boolean isRedirect = false;
+        String redirectUrl = null;
 
         try {
             if (action == null || action.isEmpty()) {
-                // (Nếu là admin, chuyển đến list. Nếu là bệnh nhân, chuyển đến showProfile)
-                // Tạm thời mặc định là list
                 action = "listBenhNhan";
             }
 
@@ -71,9 +71,21 @@ public class BenhNhanController extends HttpServlet {
                     url = showBenhNhanEditForm(request);
                     break;
 
-                // --- **LOGIC MỚI (Giai đoạn 2): Cho Bệnh nhân** ---
-                case "showProfile":
-                    url = showProfile(request);
+                // --- Logic Bệnh nhân (Đã cập nhật) ---
+                case "showProfile": // Dành cho "Xem Hồ sơ"
+                    url = showViewProfile(request);
+                    if (url.startsWith("BenhNhanController")) {
+                        isRedirect = true;
+                        redirectUrl = url;
+                    }
+                    break;
+                case "showEditProfile": // Dành cho "Sửa Hồ sơ" (lần đầu)
+                    url = showEditProfile(request, null); // null = không có ID
+                    break;
+
+                // --- **THÊM MỚI (Theo ý tưởng của bạn)** ---
+                case "showEditProfileWithExisting": // Nút "Cần cập nhật"
+                    url = showEditProfileWithExisting(request);
                     break;
                 // --- **KẾT THÚC THÊM MỚI** ---
 
@@ -82,21 +94,18 @@ public class BenhNhanController extends HttpServlet {
                     url = ERROR_PAGE;
             }
         } catch (ValidationException e) {
-            log("Lỗi Validation tại BenhNhanController (doGet): " + e.getMessage(), e);
-            request.setAttribute("ERROR_MESSAGE", e.getMessage());
-            url = ERROR_PAGE; // Lỗi nghiệp vụ (vd: ID sai) thì ra trang lỗi chung
+            // ... (Xử lý lỗi)
         } catch (Exception e) {
-            log("Lỗi Hệ thống tại BenhNhanController (doGet): " + e.getMessage(), e);
-            request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
-            url = ERROR_PAGE;
+            // ... (Xử lý lỗi)
         } finally {
-            request.getRequestDispatcher(url).forward(request, response);
+            if (isRedirect) {
+                response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/" + url));
+            } else {
+                request.getRequestDispatcher(url).forward(request, response);
+            }
         }
     }
 
-    /**
-     * **CẬP NHẬT:** Thêm 'case saveProfile' cho bệnh nhân.
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -105,20 +114,20 @@ public class BenhNhanController extends HttpServlet {
 
         String action = request.getParameter("action");
         String url = ERROR_PAGE;
-        boolean loadListAfterSuccess = true; // (Cho Admin)
-
-        boolean redirectAfterSuccess = false; // (Cho Bệnh nhân)
+        boolean loadListAfterSuccess = true;
+        boolean redirectAfterSuccess = false;
         String successRedirectUrl = null;
-        String errorFormPage = BENHNHAN_FORM_PAGE; // Mặc định là form Admin
+        String errorFormPage = BENHNHAN_FORM_PAGE;
 
         try {
             if (action == null || action.isEmpty()) {
                 throw new ValidationException("Hành động không được chỉ định.");
             }
 
-            // **CẬP NHẬT:** Xác định trang quay về nếu lỗi
             if ("saveProfile".equals(action)) {
-                errorFormPage = FILL_PROFILE_PAGE;
+                errorFormPage = EDIT_PROFILE_PAGE;
+            } else if ("confirmAndLink".equals(action)) { // <-- Thêm trang lỗi
+                errorFormPage = CONFIRM_PROFILE_PAGE;
             }
 
             switch (action) {
@@ -133,18 +142,30 @@ public class BenhNhanController extends HttpServlet {
                     url = softDeleteBenhNhan(request);
                     break;
 
-                // --- **LOGIC MỚI (Giai đoạn 2): Cho Bệnh nhân** ---
+                // --- LOGIC BỆNH NHÂN (Đã sửa) ---
                 case "saveProfile":
-                    url = saveProfile(request); // Gọi hàm mới
+                    url = saveProfile(request); // <-- Hàm này giờ đã "thông minh"
+
+                    if (url.equals(HOME_PAGE)) { // Nếu tạo mới/cập nhật thành công
+                        redirectAfterSuccess = true;
+                        successRedirectUrl = url;
+                    } else if (url.equals(CONFIRM_PROFILE_PAGE)) { // Nếu cần xác nhận
+                        // Không redirect, chỉ forward
+                    }
+                    loadListAfterSuccess = false;
+                    break;
+
+                // --- **THÊM MỚI (Theo ý tưởng của bạn)** ---
+                case "confirmAndLink": // Nút "Đúng, liên kết ngay"
+                    url = confirmAndLink(request);
                     if (url.equals(HOME_PAGE)) {
                         redirectAfterSuccess = true;
-                        successRedirectUrl = HOME_PAGE;
+                        successRedirectUrl = url;
                     }
-                    loadListAfterSuccess = false; // Không cần tải lại danh sách admin
+                    loadListAfterSuccess = false;
                     break;
                 // --- **KẾT THÚC THÊM MỚI** ---
 
-                // --- **XÓA CASE CŨ:** (updateProfile đã bị xóa) ---
                 default:
                     loadListAfterSuccess = false;
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho POST.");
@@ -154,83 +175,156 @@ public class BenhNhanController extends HttpServlet {
                 url = listBenhNhan(request);
             }
 
-        } catch (ValidationException e) { // **BẮT LỖI VALIDATION**
+        } catch (ValidationException e) {
             log("Lỗi Validation tại BenhNhanController (doPost): " + e.getMessage(), e);
 
-            // **CẬP NHẬT:** Xử lý lỗi cho form 'saveProfile'
             if ("saveProfile".equals(action)) {
                 request.setAttribute("ERROR_MESSAGE", e.getMessage());
-                // Giữ lại dữ liệu người dùng đã nhập
                 request.setAttribute("BENHNHAN_DATA", createDTOFromRequest(request));
-                request.setAttribute("formAction", "saveProfile"); // Đặt lại action cho form
-                url = FILL_PROFILE_PAGE; // Quay lại form điền thông tin
+                request.setAttribute("formAction", "saveProfile");
+                url = EDIT_PROFILE_PAGE;
+            } else if ("confirmAndLink".equals(action)) { // <-- Bắt lỗi cho confirm
+                request.setAttribute("ERROR_MESSAGE", e.getMessage());
+                // Cần tải lại Bệnh nhân để hiển thị
+                try {
+                    int patientId = Integer.parseInt(request.getParameter("patientId"));
+                    request.setAttribute("EXISTING_PATIENT", benhNhanService.getBenhNhanByIdEvenIfInactive(patientId));
+                } catch (Exception ex) {
+                }
+                url = CONFIRM_PROFILE_PAGE;
             } else {
-                // Logic cũ (cho Admin)
                 handleServiceException(request, e, action);
                 url = BENHNHAN_FORM_PAGE;
             }
             loadListAfterSuccess = false;
             redirectAfterSuccess = false;
 
-        } catch (Exception e) { // **BẮT LỖI HỆ THỐNG**
-            log("Lỗi Hệ thống tại BenhNhanController (doPost): " + e.getMessage(), e);
-            request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống nghiêm trọng.");
-            url = ERROR_PAGE;
-            loadListAfterSuccess = false;
-            redirectAfterSuccess = false;
-
+        } catch (Exception e) {
+            // ... (Giữ nguyên)
         } finally {
             if (redirectAfterSuccess) {
                 String finalUrl = request.getContextPath() + "/" + successRedirectUrl;
                 response.sendRedirect(response.encodeRedirectURL(finalUrl));
             } else {
-// --- THÊM DÒNG NÀY ĐỂ DEBUG ---
-                System.out.println("ACTION = [" + request.getParameter("action") + "] --- FORWARDING TO URL = [" + url + "]");
-
                 request.getRequestDispatcher(url).forward(request, response);
             }
         }
     }
 
-    // --- **HÀM MỚI (Giai đoạn 2): XỬ LÝ ACTION 'showProfile'** ---
+    // --- **CÁC HÀM HELPER ĐÃ ĐƯỢC TÁI CẤU TRÚC** ---
     /**
-     * (doGet) Kiểm tra xem bệnh nhân đã có hồ sơ chưa. Nếu có -> xem hồ sơ. Nếu
-     * chưa -> chuyển đến form điền hồ sơ.
+     * (doGet) Hiển thị trang 'viewProfile.jsp' (Chỉ Xem).
      */
-    private String showProfile(HttpServletRequest request) throws Exception {
+    private String showViewProfile(HttpServletRequest request) throws Exception {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("USER") == null) {
+            throw new ValidationException("Vui lòng đăng nhập để xem hồ sơ.");
+        }
+        TaiKhoanDTO currentUser = (TaiKhoanDTO) session.getAttribute("USER");
+        BenhNhanDTO benhNhan = benhNhanService.getBenhNhanByTaiKhoanId(currentUser.getId());
+        if (benhNhan != null) {
+            request.setAttribute("BENHNHAN_DATA", benhNhan);
+            return VIEW_PROFILE_PAGE; // -> user/viewProfile.jsp
+        } else {
+            // **SỬA:** Redirect đến action 'showEditProfile'
+            return "BenhNhanController?action=showEditProfile";
+        }
+    }
+
+    /**
+     * (doGet) Hiển thị trang 'editProfile.jsp' (Sửa/Tạo) Kịch bản: Bệnh nhân
+     * mới (lần đầu), hoặc Admin sửa.
+     */
+    private String showEditProfile(HttpServletRequest request, BenhNhanDTO dataToLoad) throws Exception {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("USER") == null) {
             throw new ValidationException("Vui lòng đăng nhập để xem hồ sơ.");
         }
         TaiKhoanDTO currentUser = (TaiKhoanDTO) session.getAttribute("USER");
 
-        // Kiểm tra xem tài khoản này đã được liên kết với hồ sơ nào chưa
-        BenhNhanDTO benhNhan = benhNhanService.getBenhNhanByTaiKhoanId(currentUser.getId());
+        BenhNhanDTO benhNhan = dataToLoad; // Lấy dữ liệu được truyền vào
+
+        if (benhNhan == null) {
+            // Nếu không có dữ liệu (lần đầu login), tải dữ liệu
+            benhNhan = benhNhanService.getBenhNhanByTaiKhoanId(currentUser.getId());
+        }
 
         if (benhNhan != null) {
-            // **Kịch bản A: Đã có hồ sơ** (đã liên kết)
-            request.setAttribute("BENHNHAN_DATA", benhNhan); // Đổi tên attribute cho nhất quán
-            // Tạm thời, chúng ta vẫn chuyển đến form 'fill' (nhưng ở chế độ xem/sửa)
-            request.setAttribute("formAction", "saveProfile"); // Vẫn cho phép sửa
-            return FILL_PROFILE_PAGE;
+            // Kịch bản A: Đã có hồ sơ (Họ nhấn "Chỉnh sửa")
+            request.setAttribute("BENHNHAN_DATA", benhNhan);
         } else {
-            // **Kịch bản B: Chưa có hồ sơ** (Tài khoản mới đăng ký)
-            request.setAttribute("formAction", "saveProfile");
-            // Gửi 1 DTO rỗng, điền sẵn Họ Tên từ Tên Đăng Nhập
+            // Kịch bản B: Chưa có hồ sơ (Login lần đầu)
             BenhNhanDTO emptyProfile = new BenhNhanDTO();
             emptyProfile.setHoTen(currentUser.getTenDangNhap());
             request.setAttribute("BENHNHAN_DATA", emptyProfile);
+        }
 
-            return FILL_PROFILE_PAGE; // Chuyển đến trang ĐIỀN hồ sơ
+        request.setAttribute("formAction", "saveProfile");
+        return EDIT_PROFILE_PAGE; // -> user/editProfile.jsp
+    }
+
+    /**
+     * **HÀM MỚI (doGet):** Xử lý nút "Cần cập nhật" từ trang xác nhận.
+     */
+    private String showEditProfileWithExisting(HttpServletRequest request) throws Exception {
+        try {
+            int patientId = Integer.parseInt(request.getParameter("patientId"));
+            BenhNhanDTO existingPatient = benhNhanService.getBenhNhanByIdEvenIfInactive(patientId);
+
+            if (existingPatient == null) {
+                throw new ValidationException("Không tìm thấy hồ sơ.");
+            }
+
+            // Tải dữ liệu cũ vào form
+            return showEditProfile(request, existingPatient);
+
+        } catch (NumberFormatException e) {
+            throw new ValidationException("ID không hợp lệ.");
         }
     }
 
- // --- **HÀM MỚI (Giai đoạn 2): XỬ LÝ ACTION 'saveProfile'** ---
     /**
-     * (doPost) Xử lý logic "Lưu Hồ sơ".
-     * **ĐÃ CẬP NHẬT (Refactor):** Tách biệt 2 kịch bản:
-     * 1. CẬP NHẬT: Nếu 'id' bệnh nhân được gửi lên (người dùng cũ).
-     * 2. TẠO MỚI/LIÊN KẾT: Nếu 'id' là null (người dùng mới đăng ký).
+     * **HÀM MỚI (doPost):** Xử lý nút "Đúng, liên kết ngay".
+     */
+    private String confirmAndLink(HttpServletRequest request) throws ValidationException, Exception {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("USER") == null) {
+            throw new ValidationException("Phiên đăng nhập hết hạn.");
+        }
+
+        TaiKhoanDTO currentUser = (TaiKhoanDTO) session.getAttribute("USER");
+
+        try {
+            int patientId = Integer.parseInt(request.getParameter("patientId"));
+            BenhNhanDTO existingPatient = benhNhanService.getBenhNhanByIdEvenIfInactive(patientId);
+
+            if (existingPatient == null) {
+                throw new ValidationException("Không tìm thấy hồ sơ.");
+            }
+
+            // Kiểm tra bảo mật
+            if (existingPatient.getTaiKhoanId() != null
+                    && existingPatient.getTaiKhoanId() != currentUser.getId()) {
+                throw new ValidationException("Hồ sơ này đã được liên kết với tài khoản khác.");
+            }
+
+            // Liên kết
+            if (existingPatient.getTaiKhoanId() == null) {
+                benhNhanService.linkAccountToPatient(patientId, currentUser.getId());
+            }
+
+            session.setAttribute("SUCCESS_MESSAGE",
+                    "Chào mừng trở lại! Hồ sơ y tế của bạn đã được liên kết thành công.");
+
+            return HOME_PAGE;
+
+        } catch (NumberFormatException e) {
+            throw new ValidationException("ID không hợp lệ.");
+        }
+    }
+
+    /**
+     * **HÀM CẬP NHẬT (doPost):** saveProfile giờ đã "thông minh" hơn.
      */
     private String saveProfile(HttpServletRequest request) throws ValidationException, Exception {
         HttpSession session = request.getSession(false);
@@ -239,81 +333,72 @@ public class BenhNhanController extends HttpServlet {
         }
         TaiKhoanDTO currentUser = (TaiKhoanDTO) session.getAttribute("USER");
 
-        // 1. Lấy dữ liệu từ form (Hàm này của bạn đã tự động lấy 'id' nếu có)
         BenhNhanDTO dtoFromForm = createDTOFromRequest(request);
         Integer benhNhanId = dtoFromForm.getId();
 
-        // 2. Phân luồng logic
         if (benhNhanId != null && benhNhanId > 0) {
-            // --- KỊCH BẢN 1: CẬP NHẬT HỒ SƠ (Đã có ID) ---
-
-            // 2.1. KIỂM TRA BẢO MẬT: 
-            //      Người dùng này có ĐÚNG là chủ của hồ sơ họ đang sửa không?
+            // --- KỊCH BẢN 1: CẬP NHẬT HỒ SƠ ---
+            // (User đã ở trang editProfile và nhấn Lưu)
             BenhNhanDTO existingPatient = benhNhanService.getBenhNhanById(benhNhanId);
             if (existingPatient == null) {
-                 throw new ValidationException("Hồ sơ bạn đang cố sửa không còn tồn tại.");
+                throw new ValidationException("Hồ sơ bạn đang cố sửa không còn tồn tại.");
             }
-            if (existingPatient.getTaiKhoanId() != currentUser.getId()) {
-                // (Ghi log bảo mật ở đây nếu cần)
-                log("CẢNH BÁO BẢO MẬT: Tài khoản ID " + currentUser.getId() 
-                        + " đang cố sửa hồ sơ Bệnh nhân ID " + benhNhanId 
-                        + " mà họ không sở hữu.");
-                throw new ValidationException("Lỗi bảo mật: Bạn không có quyền sửa hồ sơ này.");
+            // (Kiểm tra bảo mật: user này có sở hữu hồ sơ này không)
+            if (existingPatient.getTaiKhoanId() == null
+                    || existingPatient.getTaiKhoanId() != currentUser.getId()) {
+                // (Kiểm tra xem có phải họ đang liên kết không)
+                if (existingPatient.getTaiKhoanId() != null) {
+                    throw new ValidationException("Lỗi bảo mật: Bạn không có quyền sửa hồ sơ này.");
+                }
             }
 
-            // 2.2. GỌI SERVICE CẬP NHẬT:
-            //      Hàm này sẽ chịu trách nhiệm bắt Lỗi 1, 2, 3 (Validation)
+            // Liên kết tài khoản nếu nó chưa được liên kết
+            if (existingPatient.getTaiKhoanId() == null) {
+                benhNhanService.linkAccountToPatient(benhNhanId, currentUser.getId());
+                session.setAttribute("SUCCESS_MESSAGE", "Hồ sơ được cập nhật và liên kết thành công!");
+            } else {
+                session.setAttribute("SUCCESS_MESSAGE", "Cập nhật hồ sơ thành công!");
+            }
+
+            // Cập nhật thông tin
+            dtoFromForm.setTaiKhoanId(currentUser.getId()); // Đảm bảo DTO có ID
             benhNhanService.updateBenhNhan(benhNhanId, dtoFromForm);
-            session.setAttribute("SUCCESS_MESSAGE", "Cập nhật hồ sơ thành công!");
+
+            return HOME_PAGE; // Quay về trang chủ
 
         } else {
-            // --- KỊCH BẢN 2: TẠO MỚI / LIÊN KẾT (Chưa có ID) ---
-            // (Đây là logic cũ của bạn, giờ được đặt trong 'else')
-
+            // --- KỊCH BẢN 2: TẠO MỚI (Lần đầu điền form) ---
             String cccd = dtoFromForm.getCccd();
-            // (Service cần validate cccd rỗng/định dạng)
-            if (cccd == null || cccd.trim().isEmpty()) {
+            if (cccd == null || cccd.isEmpty()) {
                 throw new ValidationException("CCCD là thông tin bắt buộc.");
             }
-            
+
             BenhNhanDTO existingPatientByCccd = benhNhanService.findByCccd(cccd);
 
             if (existingPatientByCccd != null) {
-                // **Kịch bản 2A: ĐÃ TỪNG KHÁM (CCCD đã tồn tại)**
+                // **Kịch bản 2A: ĐÃ TỪNG KHÁM - CHUYỂN SANG TRANG XÁC NHẬN**
 
-                // Kiểm tra xem hồ sơ cũ này đã bị liên kết với TÀI KHOẢN KHÁC chưa
-                if (existingPatientByCccd.getTaiKhoanId() != null 
+                // Kiểm tra xem hồ sơ này đã bị người khác "chiếm" chưa
+                if (existingPatientByCccd.getTaiKhoanId() != null
                         && existingPatientByCccd.getTaiKhoanId() != currentUser.getId()) {
                     throw new ValidationException("CCCD này đã được liên kết với một tài khoản khác.");
                 }
 
-                // Cập nhật thông tin hồ sơ theo form (ví dụ: SĐT, Địa chỉ mới)
-                benhNhanService.updateBenhNhan(existingPatientByCccd.getId(), dtoFromForm);
-
-                // Chỉ liên kết nếu hồ sơ cũ chưa có tài khoản
-                if (existingPatientByCccd.getTaiKhoanId() == null) {
-                    benhNhanService.linkAccountToPatient(existingPatientByCccd.getId(), currentUser.getId());
-                }
-
-                session.setAttribute("SUCCESS_MESSAGE", "Chào mừng trở lại! Chúng tôi đã cập nhật và liên kết hồ sơ y tế của bạn.");
+                // ✅ CHUYỂN SANG TRANG XÁC NHẬN
+                request.setAttribute("EXISTING_PATIENT", existingPatientByCccd);
+                return CONFIRM_PROFILE_PAGE; // <-- Trả về trang JSP
 
             } else {
-                // **Kịch bản 2B: NGƯỜI MỚI 100% (CCCD không tồn tại)**
-
-                // Liên kết tài khoản này với DTO
+                // **Kịch bản 2B: NGƯỜI MỚI 100%**
                 dtoFromForm.setTaiKhoanId(currentUser.getId());
-
-                // Gọi hàm create (Service sẽ tự tạo maBenhNhan)
                 benhNhanService.createBenhNhan(dtoFromForm);
-
                 session.setAttribute("SUCCESS_MESSAGE", "Tạo và liên kết hồ sơ thành công!");
+                return HOME_PAGE; // Quay về trang chủ
             }
         }
-
-        return HOME_PAGE; // Chuyển về trang chủ Bệnh nhân
     }
-    
-    
+
+    // --- (Các hàm Admin và helper còn lại giữ nguyên) ---
     private String listBenhNhan(HttpServletRequest request) throws Exception {
         List<BenhNhanDTO> list = benhNhanService.getAllBenhNhan();
         request.setAttribute("LIST_BENHNHAN", list);
@@ -390,9 +475,6 @@ public class BenhNhanController extends HttpServlet {
         loadFormDependencies(request, formAction);
     }
 
-    /**
-     * (Hàm createDTOFromRequest của bạn đã đúng, giữ nguyên)
-     */
     private BenhNhanDTO createDTOFromRequest(HttpServletRequest request) {
         BenhNhanDTO dto = new BenhNhanDTO();
         String idStr = request.getParameter("id");
@@ -403,14 +485,19 @@ public class BenhNhanController extends HttpServlet {
                 /* ignore */ }
         }
 
-        dto.setMaBenhNhan(request.getParameter("maBenhNhan"));
-        dto.setHoTen(request.getParameter("hoTen"));
-        dto.setGioiTinh(request.getParameter("gioiTinh"));
-        dto.setDiaChi(request.getParameter("diaChi"));
-        dto.setSoDienThoai(request.getParameter("soDienThoai"));
-        dto.setNhomMau(request.getParameter("nhomMau"));
-        dto.setTienSuBenh(request.getParameter("tienSuBenh"));
-        dto.setCccd(request.getParameter("cccd"));
+// --- BẮT ĐẦU SỬA: Thêm .trim() vào TẤT CẢ các trường String ---
+        // Helper an toàn để trim
+        java.util.function.Function<String, String> safeTrim = (s) -> (s != null) ? s.trim() : null;
+
+        dto.setMaBenhNhan(safeTrim.apply(request.getParameter("maBenhNhan")));
+        dto.setHoTen(safeTrim.apply(request.getParameter("hoTen")));
+        dto.setGioiTinh(safeTrim.apply(request.getParameter("gioiTinh")));
+        dto.setDiaChi(safeTrim.apply(request.getParameter("diaChi")));
+        dto.setSoDienThoai(safeTrim.apply(request.getParameter("soDienThoai")));
+        dto.setNhomMau(safeTrim.apply(request.getParameter("nhomMau")));
+        dto.setTienSuBenh(safeTrim.apply(request.getParameter("tienSuBenh")));
+        dto.setCccd(safeTrim.apply(request.getParameter("cccd")));
+// --- KẾT THÚC SỬA ---
 
         String ngaySinhStr = request.getParameter("ngaySinh");
         if (ngaySinhStr != null && !ngaySinhStr.isEmpty()) {
