@@ -1,226 +1,60 @@
-/* === CÀI ĐẶT TỔNG THỂ === */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f7f6; /* Nền xám rất nhạt, sạch sẽ */
-    color: #333;
-    margin: 20px;
-    line-height: 1.6;
-}
+/* ==========================================================================
+CSS CỤ THỂ CHO TRANG GIƯỜNG BỆNH (GiuongBenh.css)
+**Lưu ý:** File này phải được tải SAU file CSS chung
+(DanhSachHoaDon.css hoặc base.css)
+========================================================================== */
 
-/* === TIÊU ĐỀ === */
-h2 {
-    color: #005a9c; /* Màu xanh dương đậm chuyên nghiệp */
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 8px;
-    margin-top: 30px;
-    margin-bottom: 20px;
-}
-
-/* === FORM (THÊM MỚI / CẬP NHẬT / TÌM KIẾM) === */
-form {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 25px;
-    margin-bottom: 25px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-/* Form tìm kiếm (layout khác) */
-form[action="MainController"][method="GET"] {
+/* Ô chứa các nút hành động trong bảng giường bệnh */
+td.actions-cell {
     display: flex;
+    flex-wrap: wrap; /* Cho phép xuống dòng nếu không đủ chỗ */
+    gap: 8px;
     align-items: center;
-    gap: 15px; /* Khoảng cách giữa các phần tử */
-    padding: 20px;
+    min-width: 350px; /* Giúp ô này đủ rộng cho form gán giường */
 }
 
-/* === CÁC TRƯỜNG NHẬP LIỆU (INPUT, SELECT) === */
-label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
-}
-
-/* Áp dụng cho form tìm kiếm */
-form[action="MainController"][method="GET"] label {
-    display: inline;
-    margin-bottom: 0;
-}
-
-input[type="text"],
-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box; /* Quan trọng để padding không làm vỡ layout */
-    font-size: 14px;
-}
-
-/* Thu hẹp input tìm kiếm */
-form[action="MainController"][method="GET"] input[type="text"] {
-    width: 350px;
-}
-
-/* === NÚT BẤM (BUTTON) VÀ LIÊN KẾT (LINK) === */
-button,
-a[href*="MainController"] /* Áp dụng cho các link hành động */
-{
-    background-color: #007bff; /* Màu xanh dương chính */
-    color: white;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    text-decoration: none;
+/* Form nằm trong 1 hàng (dùng cho Xóa, Trả giường) */
+.inline-form {
     display: inline-block;
-    margin-right: 10px;
-    font-weight: bold;
-    transition: background-color 0.2s ease;
+    margin: 0;
 }
 
-button:hover,
-a[href*="MainController"]:hover {
-    background-color: #0056b3; /* Tối hơn khi hover */
+/* Form gán giường (chứa select + button) */
+.inline-assign-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: nowrap; /* Ưu tiên không xuống dòng */
+    margin: 0;
 }
 
-/* Nút/Link "Hủy" hoặc "Xóa tìm kiếm" */
-a[href="MainController?action=listBeds"] {
-    background-color: #6c757d; /* Màu xám */
-}
-a[href="MainController?action=listBeds"]:hover {
-    background-color: #5a6268;
-}
-
-/* Nút Xóa (Đỏ) */
-.delete-button {
-    background-color: #dc3545;
-}
-.delete-button:hover {
-    background-color: #c82333;
-}
-
-/* === BẢNG SƠ ĐỒ GIƯỜNG === */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+/* Định dạng cho thẻ <select> CỤ THỂ trong form gán giường.
+Nó nhỏ hơn .form-control (chung)
+*/
+.inline-assign-form select {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    overflow: hidden; /* Giúp bo góc cho bảng */
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    padding-right: 30px; /* Chừa chỗ cho icon */
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 12px 15px;
-    text-align: left;
-    vertical-align: middle;
+.inline-assign-form select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 15%, transparent);
 }
 
-/* Tiêu đề bảng */
-thead {
-    background-color: #005a9c;
-    color: white;
-}
-
-th {
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Các hàng của bảng */
-tbody tr:nth-child(even) {
-    background-color: #f9f9f9; /* Zebra striping */
-}
-
-tbody tr:hover {
-    background-color: #f1f8ff; /* Highlight màu xanh nhạt khi hover */
-}
-
-/* === TRẠNG THÁI GIƯỜNG === */
-[class^="status-"] {
-    padding: 5px 12px;
-    border-radius: 15px; /* Bo tròn (pill shape) */
-    font-weight: bold;
-    color: white;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.status-trong {
-    background-color: #28a745; /* Xanh lá: Trống */
-}
-
-.status-dang_su_dung {
-    background-color: #dc3545; /* Đỏ: Đang sử dụng */
-}
-
-/* === CÁC HÀNH ĐỘNG TRONG BẢNG === */
-td:last-child {
-    min-width: 280px; /* Đảm bảo cột hành động đủ rộng */
-}
-
-/* Form trong bảng (Gán, Trả, Xóa) */
-td form {
-    display: inline-block;
-    background-color: transparent;
-    border: none;
-    padding: 0;
-    margin: 2px 5px 2px 0;
-    box-shadow: none;
-    vertical-align: middle;
-}
-
-/* Form Gán (có select và button) */
-td form[action*="assignBed"] {
-    display: flex; /* Cho select và button nằm ngang */
-    align-items: center;
-    gap: 5px;
-}
-
-/* Thu nhỏ các nút và select trong bảng */
-td button,
-td a[href*="MainController"] {
-    padding: 6px 10px;
-    font-size: 12px;
-    margin: 0; /* Xóa margin mặc định */
-}
-
-td select {
-    width: 150px; /* Độ rộng cố định cho select bệnh nhân */
-    padding: 6px;
-    font-size: 12px;
-}
-
-/* === THÔNG BÁO (LỖI, THÀNH CÔNG) === */
-.message {
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.message.info {
-    color: #00529B;
-    background-color: #BDE5F8; /* Xanh dương nhạt */
-    border-color: #BDE5F8;
-}
-
-.message.success {
-    color: #270;
-    background-color: #DFF2BF; /* Xanh lá nhạt */
-    border-color: #DFF2BF;
-}
-
-.message.error {
-    color: #D8000C;
-    background-color: #FFD2D2; /* Đỏ nhạt */
-    border-color: #FFD2D2;
+/* Điều chỉnh mũi tên select trong dark mode */
+body.dark-mode .inline-assign-form select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23E0E0E0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
 }
