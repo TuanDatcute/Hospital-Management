@@ -32,6 +32,7 @@ public class MainController extends HttpServlet {
     private static final String HD_GDTT_CONTROLLER = "HoaDon_GiaoDichThanhToanController";
     private static final String THONG_BAO_CONTROLLER = "ThongBaoController";
     private static final String USER_THONG_BAO_CONTROLLER = "UserThongBaoController";
+    private static final String PATIENT_LICH_HEN_CONTROLLER = "PatientLichHenController";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -75,12 +76,13 @@ public class MainController extends HttpServlet {
 
         String[] giuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed", "deleteBed", "updateBed", "getBedForUpdate", "showCreateBedForm"};
 
-        String[] hoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice"};
+        String[] hoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice", "printInvoice"};
 
         String[] thongBaoActions = {"createThongBao", "listNotifications"};
 
         String[] userThongBaoActions = {"viewMyNotifications", "markNotificationAsRead", "deleteMyNotification"};
 
+        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "myAppointments", "bookAppointment"};
         // 3. Điều hướng dựa trên action
         if (action == null || action.isEmpty()) {
             url = LOGIN_PAGE;
@@ -111,6 +113,8 @@ public class MainController extends HttpServlet {
             url = THONG_BAO_CONTROLLER;
         } else if (Arrays.asList(userThongBaoActions).contains(action)) {
             url = USER_THONG_BAO_CONTROLLER;
+        } else if (Arrays.asList(patientLichHenActions).contains(action)) {
+            url = PATIENT_LICH_HEN_CONTROLLER;
         }
 
         // 4. Forward đến controller tương ứng
