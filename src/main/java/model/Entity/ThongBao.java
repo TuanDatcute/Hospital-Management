@@ -1,11 +1,11 @@
 // path: com/model/ThongBao.java
 package model.Entity;
 
-// import org.hibernate.annotations.CreationTimestamp; // <-- KHÔNG DÙNG NỮA
-import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "ThongBao")
@@ -16,28 +16,26 @@ public class ThongBao {
     @Column(name = "id")
     private int id;
 
-    // SỬA LẠI: columnDefinition phải khớp với DB (NVARCHAR(255))
-    @Column(name = "tieu_de", length = 255, nullable = false, columnDefinition = "NVARCHAR(255)")
+    @Column(name = "tieu_de", length = 255, nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String tieuDe;
 
-    @Lob
+    @Lob // Dùng @Lob cho kiểu TEXT để hỗ trợ nội dung dài
     @Column(name = "noi_dung", columnDefinition = "NVARCHAR(MAX)")
     private String noiDung;
 
+    // Đặt giá trị mặc định trực tiếp trong CSDL
     @Column(name = "da_doc", nullable = false, columnDefinition = "bit default 0")
-    private boolean daDoc = false;
+    private boolean daDoc = false; // Giá trị mặc định trong Java
 
-    // === LỖI NẰM Ở ĐÂY ===
-    // @CreationTimestamp // <-- XÓA DÒNG NÀY ĐI
-    // ======================
-    @Column(name = "thoi_gian_gui", updatable = false, nullable = false) // Đảm bảo NOT NULL
+    @CreationTimestamp // Tự động gán thời gian khi tạo mới
+    @Column(name = "thoi_gian_gui", updatable = false)
     private LocalDateTime thoiGianGui;
-
-    // SỬA LẠI: columnDefinition cho trạng thái nên là NVARCHAR(50)
-    @Column(name = "trang_thai", length = 50, nullable = false, columnDefinition = "NVARCHAR(50)")
+    
+    @Column(name = "trang_thai", length = 50, nullable = false, columnDefinition = "NVARCHAR(MAX)")
     @ColumnDefault("'HOAT_DONG'")
-    private String trangThai; // 'HOAT_DONG', 'NGUNG_HOAT_DON'
+    private String trangThai ; // 'HOAT_DONG', 'NGUNG_SU_DUNG'
 
+    // Mối quan hệ: Nhiều thông báo thuộc về MỘT tài khoản
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tai_khoan_id", nullable = false)
     private TaiKhoan taiKhoan;
@@ -102,5 +100,5 @@ public class ThongBao {
     public void setTrangThai(String trangThai) {
         this.trangThai = trangThai;
     }
-
+    
 }
