@@ -2,129 +2,133 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<html>
+<!DOCTYPE html>
+<html lang="vi">
     <head>
         <title>Thông báo của tôi</title>
-        <%-- (CSS giữ nguyên) --%>
-        <style>
-            .notification-list {
-                list-style-type: none;
-                padding: 0;
-            }
-            .notification-item {
-                border: 1px solid #ddd;
-                margin-bottom: 10px;
-                padding: 15px;
-                border-radius: 5px;
-                position: relative;
-            }
-            .notification-item.unread {
-                background-color: #f8f9fa;
-                border-left: 5px solid #007bff;
-                font-weight: bold;
-            }
-            .notification-item h4 {
-                margin-top: 0;
-            }
-            .notification-item p {
-                font-weight: normal;
-            }
-            .notification-time {
-                font-size: 0.85em;
-                color: #6c757d;
-                font-weight: normal;
-            }
-            .actions {
-                margin-top: 10px;
-                font-weight: normal;
-            }
-            .actions form {
-                display: inline-block;
-                margin-right: 10px;
-            }
-            .delete-button {
-                background: none;
-                border: none;
-                color: red;
-                text-decoration: underline;
-                cursor: pointer;
-                padding: 0;
-                font-family: inherit;
-                font-size: 0.9em;
-            }
-            .read-button {
-                background: none;
-                border: none;
-                color: green;
-                text-decoration: underline;
-                cursor: pointer;
-                padding: 0;
-                font-family: inherit;
-                font-size: 0.9em;
-            }
-        </style>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <%-- BẮT BUỘC: Thêm Font Awesome cho icon --%>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+        <%-- BẮT BUỘC: Nhúng file CSS chung TRƯỚC --%>
+        <link rel="stylesheet" href="<c:url value='/css/StyleChungCuaQuang.css'/>"> <%-- Hoặc base.css --%>
+
+        <%-- (MỚI) Nhúng file CSS cụ thể cho trang này SAU --%>
+        <link rel="stylesheet" href="<c:url value='/css/UserThongBao.css'/>">
+
+        <script src="<c:url value='/js/darkmode.js'/>" defer></script>
     </head>
     <body>
-        <h1>Thông báo của tôi</h1>
 
-        <%-- Form Tìm kiếm: Sửa action trỏ về MainController --%>
-        <form action="MainController" method="GET"> <%-- SỬA --%>
-            <%-- SỬA: Thêm action GET --%>
-            <input type="hidden" name="action" value="viewMyNotifications"> 
+        <%-- (SỬA) Bọc toàn bộ trang trong .container --%>
+        <div class="container" style="max-width: 900px;"> <%-- Container hẹp hơn cho giao diện hộp thư --%>
 
-            Tìm kiếm:
-            <input type="text" 
-                   name="searchKeyword" 
-                   value="<c:out value='${param.searchKeyword}'/>" 
-                   placeholder="Nhập tiêu đề, nội dung...">
-            <button type="submit">Tìm</button>
+            <div class="page-header">
+                <h1>Thông báo của tôi</h1>
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="theme-toggle">
+                        <input type="checkbox" id="theme-toggle" />
+                        <span class="slider">
+                            <i class="fa-solid fa-sun sun-icon"></i>
+                            <i class="fa-solid fa-moon moon-icon"></i>
+                        </span>
+                    </label>
+                </div>
+            </div>
 
-            <%-- Link Xóa lọc: Sửa trỏ về MainController --%>
-            <a href="MainController?action=viewMyNotifications">Xóa lọc</a> <%-- SỬA --%>
-        </form>
-        <br>
+            <%-- (SỬA) Thay thế form tìm kiếm cũ bằng component .search-form chuẩn --%>
+            <div class="page-header" style="margin-bottom: 20px;">
+                <div class="search-container">
+                    <form action="MainController" method="GET" class="search-form">
+                        <input type="hidden" name="action" value="viewMyNotifications">
+                        <i class="fa-solid fa-magnifying-glass search-icon-left"></i>
+                        <input type="text"
+                               name="searchKeyword"
+                               class="form-control"
+                               value="<c:out value='${param.searchKeyword}'/>"
+                               placeholder="Tìm trong thông báo...">
+                        <button type="submit" class="search-button">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </form>
+                     <c:if test="${not empty param.searchKeyword}">
+                        <a href="MainController?action=viewMyNotifications" class="btn btn-clear-search">
+                           <i class="fa-solid fa-times"></i> Xóa lọc
+                        </a>
+                     </c:if>
+                </div>
+            </div>
 
-        <%-- (Thông báo lỗi/thành công giữ nguyên) --%>
-        <c:if test="${not empty param.deleteSuccess}"> <b style="color:green;">Đã xóa thông báo.</b> </c:if>
-        <c:if test="${not empty param.error}"> <b style="color:red;">Lỗi: <c:out value="${param.error}"/></b> </c:if>
-        <c:if test="${not empty error}"> <b style="color:red;">Lỗi: ${error}</b> </c:if>
+            <%-- (SỬA) Thay <b style=""> bằng component .alert --%>
+            <c:if test="${not empty param.deleteSuccess}">
+                <div class="alert alert-success">Đã xóa thông báo.</div>
+            </c:if>
+            <c:if test="${not empty param.error}">
+                <div class="alert alert-danger">Lỗi: <c:out value="${param.error}"/></div>
+            </c:if>
+            <c:if test="${not empty error}">
+                 <div class="alert alert-danger">Lỗi: ${error}</div>
+            </c:if>
 
+            <%-- Danh sách thông báo (Dùng <ul> <li>) --%>
             <ul class="notification-list">
-            <c:forEach var="noti" items="${notificationList}">
-                <li class="notification-item ${noti.daDoc ? '' : 'unread'}">
+                <c:forEach var="noti" items="${notificationList}">
+                    <%-- (SỬA) Class .unread được thêm/xóa động --%>
+                    <li class="notification-item ${noti.daDoc ? '' : 'unread'}">
 
-                    <h4><c:out value="${noti.tieuDe}"/></h4>
-                    <p><c:out value="${noti.noiDung}"/></p>
+                        <div class="notification-content">
+                            <h4><c:out value="${noti.tieuDe}"/></h4>
+                            <p><c:out value="${noti.noiDung}"/></p>
+                            <span class="notification-time">
+                                <i class="fa-solid fa-clock"></i> <c:out value="${noti.thoiGianGui}"/>
+                            </span>
+                        </div>
+                        
+                        <%-- (SỬA) Gộp các nút vào .actions --%>
+                        <div class="notification-actions">
+                            <%-- Nút Đánh dấu đã đọc --%>
+                            <c:if test="${!noti.daDoc}">
+                                <form action="MainController" method="POST">
+                                    <input type="hidden" name="action" value="markNotificationAsRead">
+                                    <input type="hidden" name="id" value="${noti.id}">
+                                    <%-- (SỬA) Dùng class .btn chuẩn --%>
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        <i class="fa-solid fa-check"></i> Đã đọc
+                                    </button>
+                                </form>
+                            </c:if>
 
-                    <span class="notification-time">
-                        <c:out value="${noti.thoiGianGui}"/>
-                    </span>
-
-                    <div class="actions">
-                        <%-- Nút Đánh dấu đã đọc: Sửa action trỏ về MainController --%>
-                        <c:if test="${!noti.daDoc}">
-                            <form action="MainController" method="POST" style="margin:0;"> <%-- SỬA --%>
-                                <input type="hidden" name="action" value="markNotificationAsRead"> <%-- SỬA --%>
+                            <%-- Nút Xóa mềm --%>
+                            <%-- (SỬA) Thêm class .form-delete-confirm để JS bắt sự kiện --%>
+                            <form action="MainController" method="POST" class="form-delete-confirm">
+                                <input type="hidden" name="action" value="deleteMyNotification">
                                 <input type="hidden" name="id" value="${noti.id}">
-                                <button type="submit" class="read-button">Đánh dấu đã đọc</button>
+                                <%-- (SỬA) Dùng class .btn chuẩn --%>
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fa-solid fa-trash"></i> Xóa
+                                </button>
                             </form>
-                        </c:if>
+                        </div>
+                    </li>
+                </c:forEach>
 
-                        <%-- Nút Xóa mềm: Sửa action trỏ về MainController --%>
-                        <form action="MainController" method="POST" style="margin:0;" <%-- SỬA --%>
-                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa thông báo này?');">
-                            <input type="hidden" name="action" value="deleteMyNotification"> <%-- SỬA --%>
-                            <input type="hidden" name="id" value="${noti.id}">
-                            <button type="submit" class="delete-button">Xóa</button>
-                        </form>
-                    </div>
-                </li>
-            </c:forEach>
-
-            <c:if test="${empty notificationList}">
-                <li class="notification-item" style="font-weight: normal;"><i>Bạn không có thông báo nào.</i></li>
+                <c:if test="${empty notificationList}">
+                    <li class="notification-item-empty">
+                        <i class="fa-solid fa-bell-slash"></i>
+                        Bạn không có thông báo nào.
+                    </li>
                 </c:if>
-        </ul>
+            </ul>
+
+        </div> <%-- End .container --%>
+
+        <%-- ========================================================== --%>
+        <%-- (MỚI) Nhúng file JS cho logic xác nhận xóa --%>
+        <%-- ========================================================== --%>
+        <script src="<c:url value='/js/UserThongBao.js'/>" defer></script>
 
     </body>
 </html>
