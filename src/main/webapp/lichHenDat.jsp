@@ -8,26 +8,34 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Tạo Lịch Hẹn Mới</title>
 
-        <link rel="stylesheet" href="<c:url value='/css/style.css'/>"> <%-- Link CSS chung --%>
-        <link rel="stylesheet" href="<c:url value='/css/form-style.css'/>"> <%-- Link CSS cho form --%>
+        <link rel="stylesheet" href="<c:url value='/css/lichHenDat-style.css'/>">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     </head>
     <body>
+
         <div class="form-container">
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="theme-toggle">
+                    <input type="checkbox" id="theme-toggle" />
+                    <div class="slider">
+                        <i class="fas fa-sun sun-icon"></i>
+                        <i class="fas fa-moon moon-icon"></i>
+                    </div>
+                </label>
+            </div>
+
             <h1>Tạo Lịch Hẹn Mới</h1>
 
-            <%-- Hiển thị thông báo lỗi (nếu có) --%>
             <c:if test="${not empty requestScope.ERROR_MESSAGE}">
                 <div class="alert alert-danger">
                     <strong>Lỗi!</strong> ${requestScope.ERROR_MESSAGE}
                 </div>
             </c:if>
 
-            <%-- Form gửi dữ liệu đến MainController --%>
             <form action="<c:url value='/MainController'/>" method="POST" class="form-grid">
                 <input type="hidden" name="action" value="createAppointment">
 
-                <%-- Dropdown chọn Bệnh Nhân --%>
                 <div class="form-group">
                     <label for="benhNhanId">Bệnh Nhân (*)</label>
                     <select id="benhNhanId" name="benhNhanId" class="form-control" required>
@@ -38,7 +46,6 @@
                     </select>
                 </div>
 
-                <%-- Dropdown chọn Bác Sĩ --%>
                 <div class="form-group">
                     <label for="bacSiId">Bác Sĩ (*)</label>
                     <select id="bacSiId" name="bacSiId" class="form-control" required>
@@ -49,29 +56,32 @@
                     </select>
                 </div>
 
-                <%-- Chọn Ngày Giờ Hẹn --%>
                 <div class="form-group full-width">
                     <label for="thoiGianHen">Thời Gian Hẹn (*)</label>
                     <input type="datetime-local" id="thoiGianHen" name="thoiGianHen" class="form-control" required>
                 </div>
 
-                <%-- Lý do khám --%>
                 <div class="form-group full-width">
                     <label for="lyDoKham">Lý Do Khám</label>
                     <textarea id="lyDoKham" name="lyDoKham" class="form-control" rows="3" placeholder="Nhập triệu chứng ban đầu của bệnh nhân..."></textarea>
                 </div>
 
-                <%-- Ghi chú --%>
                 <div class="form-group full-width">
                     <label for="ghiChu">Ghi Chú (nếu có)</label>
                     <textarea id="ghiChu" name="ghiChu" class="form-control" rows="2" placeholder="Ví dụ: Bệnh nhân yêu cầu khám buổi sáng..."></textarea>
                 </div>
 
                 <div class="button-group">
-                    <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="btn btn-secondary">Hủy</a>
-                    <button type="submit" class="btn btn-primary">Lưu Lịch Hẹn</button>
+                    <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Hủy
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu Lịch Hẹn
+                    </button>
                 </div>
             </form>
         </div>
+
+        <script src="<c:url value='/js/darkmode.js'/>"></script>
     </body>
 </html>

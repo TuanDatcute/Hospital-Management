@@ -52,6 +52,8 @@ body {
     border: 1px solid var(--border-color);
     border-radius: 16px;
     box-shadow: var(--card-shadow);
+    position: relative; /* Cần thiết để định vị nút gạt */
+
 }
 
 h1 {
@@ -218,8 +220,8 @@ body.dark-mode .alert-danger {
    ========================================================================== */
 .theme-switch-wrapper {
     position: absolute;
-    top: 25px;
-    right: 30px;
+    top: 37px; /* Điều chỉnh vị trí cho phù hợp */
+    right: 40px;
     z-index: 1000;
     display: flex;
     align-items: center;

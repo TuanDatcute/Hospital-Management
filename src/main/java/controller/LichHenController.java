@@ -60,11 +60,13 @@ public class LichHenController extends HttpServlet {
                     request.setAttribute("formAction", "createLichHen");
                     url = LICHHEN_FORM_PAGE;
                     break;
+                    
                     //===Dat=====
                 case "showCreateAppointmentForm":
                     url = loadAppointmentFormDependencies(request);
                     break;
                     //====end dat=====
+                    
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho GET.");
                     url = ERROR_PAGE;

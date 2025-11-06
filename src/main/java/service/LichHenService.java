@@ -262,7 +262,7 @@ public class LichHenService {
         LocalDate appointmentDate = dto.getThoiGianHen().toLocalDate();
 
         // Gọi DAO để đếm số lịch hẹn đã có trong ngày
-        long count = lichHenDAO.countAppointmentsByDate(appointmentDate);
+        long count = lichHenDAO.countAppointmentsByDateAndDoctor(appointmentDate, bacSi.getId());
 
         // STT mới sẽ là số đếm + 1
         int newStt = (int) count + 1;

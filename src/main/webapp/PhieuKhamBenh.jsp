@@ -32,15 +32,15 @@
         </c:if>
 
         <div class="container">
-            <!--            <div class="theme-switch-wrapper">
-                            <label class="theme-switch" for="theme-toggle">
-                                <input type="checkbox" id="theme-toggle" />
-                                <div class="slider">
-                                    <i class="fas fa-sun sun-icon"></i>
-                                    <i class="fas fa-moon moon-icon"></i>
-                                </div>
-                            </label>
-                        </div>-->
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="theme-toggle">
+                    <input type="checkbox" id="theme-toggle" />
+                    <div class="slider round">
+                        <span class="sun-icon"><i class="fas fa-sun"></i></span>
+                        <span class="moon-icon"><i class="fas fa-moon"></i></span>
+                    </div>
+                </label>
+            </div>
 
             <c:choose>
                 <c:when test="${empty phieuKham.id}"><h1>Tạo Phiếu Khám Mới</h1></c:when>
@@ -96,7 +96,7 @@
                         <input type="datetime-local" id="thoiGianKham" name="thoiGianKham" class="form-control"
                                value="${thoiGianKhamValue}" required>
                     </div>
-                
+
 
                     <div class="form-group">
                         <label for="benhNhanId_select">Bệnh Nhân</label>
@@ -186,7 +186,7 @@
             </form>
         </div>
 
-        <script src="<c:url value='/js/theme.js'/>"></script>
+        <script src="<c:url value='/js/darkmode.js'/>"></script>
         <script src="<c:url value='/js/pkb-form.js'/>"></script>
     </body>
 </html>

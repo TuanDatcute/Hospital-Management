@@ -196,26 +196,29 @@ public class LichHenDAO {
 
     //============================================DẠT===================================================
     /**
-     *  Đếm số lượng lịch hẹn đã có trong một ngày cụ thể.
+     * Đếm số lượng lịch hẹn đã có trong một ngày cụ thể CHO MỘT BÁC SĨ CỤ THỂ.
      *
-     * @param date Ngày cần đếm (ví dụ: 2025-10-27).
-     * @return Tổng số lịch hẹn trong ngày đó.
+     * @param date Ngày cần đếm.
+     * @param bacSiId ID của bác sĩ cần lọc.
+     * @return Tổng số lịch hẹn của bác sĩ đó trong ngày.
      */
-    public long countAppointmentsByDate(LocalDate date) {
-        // Xác định thời điểm bắt đầu và kết thúc của ngày
-        // (Giả sử múi giờ của server là GMT+7)
+    public long countAppointmentsByDateAndDoctor(LocalDate date, int bacSiId) {
+        // Xác định thời điểm bắt đầu và kết thúc của ngày (giữ nguyên)
         ZoneOffset zoneOffset = ZoneOffset.of("+07:00");
         OffsetDateTime startOfDay = date.atStartOfDay().atOffset(zoneOffset);
         OffsetDateTime endOfDay = date.plusDays(1).atStartOfDay().atOffset(zoneOffset);
 
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // ✨ THÊM ĐIỀU KIỆN 'lh.bacSi.id = :bacSiId' VÀO TRUY VẤN ✨
             Query<Long> query = session.createQuery(
                     "SELECT count(lh.id) FROM LichHen lh "
-                    + "WHERE lh.thoiGianHen >= :start AND lh.thoiGianHen < :end",
+                    + "WHERE lh.thoiGianHen >= :start AND lh.thoiGianHen < :end "
+                    + "AND lh.bacSi.id = :bacSiId",
                     Long.class
             );
             query.setParameter("start", startOfDay);
             query.setParameter("end", endOfDay);
+            query.setParameter("bacSiId", bacSiId); // Gán tham số bacSiId
 
             return query.uniqueResult();
         } catch (Exception e) {
@@ -250,8 +253,8 @@ public class LichHenDAO {
     }
 
     /**
-     * Lấy tất cả các lịch hẹn CHƯA HOÀN THÀNH của MỘT BÁC SĨ CỤ
-     * THỂ. Tải sẵn thông tin BenhNhan và BacSi.
+     * Lấy tất cả các lịch hẹn CHƯA HOÀN THÀNH của MỘT BÁC SĨ CỤ THỂ. Tải sẵn
+     * thông tin BenhNhan và BacSi.
      *
      * @param bacSiId ID của bác sĩ cần tìm lịch hẹn.
      * @return Danh sách các LichHen của bác sĩ đó.
