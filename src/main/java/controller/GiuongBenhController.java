@@ -47,7 +47,7 @@ public class GiuongBenhController extends HttpServlet {
         String action = request.getParameter("action");
         if (action == null) action = "listBeds"; // Mặc định là list
 
-        String url = "soDoGiuongBenh.jsp"; // URL mặc định
+        String url = "GiuongBenh.jsp"; // URL mặc định
 
         try {
             switch (action) {
@@ -55,7 +55,7 @@ public class GiuongBenhController extends HttpServlet {
                     // Chỉ cần tải roomList cho form thêm mới
                     List<PhongBenhDTO> roomListCreate = phongBenhService.getAllPhongBenh();
                     request.setAttribute("roomList", roomListCreate);
-                    url = "giuongBenhForm.jsp";
+                    url = "GiuongBenhForm.jsp";
                     break;
 
                 case "getBedForUpdate":
@@ -66,7 +66,7 @@ public class GiuongBenhController extends HttpServlet {
                     
                     request.setAttribute("bedToUpdate", bedToUpdate);
                     request.setAttribute("roomList", roomListUpdate);
-                    url = "giuongBenhForm.jsp";
+                    url = "GiuongBenhForm.jsp";
                     break;
 
                 case "listBeds":
@@ -193,7 +193,7 @@ public class GiuongBenhController extends HttpServlet {
             request.setAttribute("bedToUpdate", failedBedData);
             
             // 4. Forward về trang form
-            request.getRequestDispatcher("giuongBenhForm.jsp").forward(request, response);
+            request.getRequestDispatcher("GiuongBenhForm.jsp").forward(request, response);
         }
     }
 
@@ -250,7 +250,7 @@ public class GiuongBenhController extends HttpServlet {
             }
             
             // 4. Forward về trang form
-            request.getRequestDispatcher("giuongBenhForm.jsp").forward(request, response);
+            request.getRequestDispatcher("GiuongBenhForm.jsp").forward(request, response);
         }
     }
 
