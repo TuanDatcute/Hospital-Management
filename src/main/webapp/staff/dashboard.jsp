@@ -41,7 +41,7 @@
                <div class="icon"><i class="fas fa-calendar-check"></i></div>
                <span>Quản lý Lịch hẹn</span>
             </a>
-            <a href="${pageContext.request.contextPath}/MainController?action=showCreateForm" class="function-card">
+            <a href="${pageContext.request.contextPath}/MainController?action=showCreateEncounterForm" class="function-card">
                <div class="icon"><i class="fas fa-file-medical"></i></div>
                <span>Tạo Phiếu khám</span>
             </a>
