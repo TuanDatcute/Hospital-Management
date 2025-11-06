@@ -52,8 +52,12 @@
                 </button>
 
                 <div class="button-group">
-                    <button type="submit" class="btn btn-primary">Lưu Đơn Thuốc</button>
+                    <a href="javascript:history.back()" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Lưu Đơn Thuốc</button>
                 </div>
+
             </form>
         </div>
 

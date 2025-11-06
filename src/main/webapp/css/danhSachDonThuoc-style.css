@@ -185,19 +185,25 @@ body.dark-mode .alert-success {
 /* ==========================================================================
    NÚT GẠT CHUYỂN CHẾ ĐỘ
    ========================================================================== */
+/* --- Bắt đầu đoạn mã đã chỉnh sửa để căn chỉnh và đổi màu icon --- */
+
 .theme-switch-wrapper {
     display: flex;
     align-items: center;
+    gap: 10px;
 }
+
 .theme-switch {
     display: inline-block;
-    height: 28px;
+    height: 24px;
     position: relative;
-    width: 54px;
+    width: 50px;
 }
+
 .theme-switch input {
     display: none;
 }
+
 .slider {
     background-color: #ccc;
     bottom: 0;
@@ -207,40 +213,64 @@ body.dark-mode .alert-success {
     right: 0;
     top: 0;
     transition: .4s;
-    border-radius: 28px;
+    border-radius: 24px;
+
+    display: flex;
+    align-items: center;
+    /* Dùng justify-content: space-between để icon nằm ở hai đầu */
+    justify-content: space-between;
+    padding: 0 5px; /* Giữ padding để icon không quá sát mép */
 }
+
 .slider:before {
     background-color: #fff;
-    bottom: 4px;
     content: "";
-    height: 20px;
-    left: 4px;
-    position: absolute;
-    transition: .4s;
-    width: 20px;
+    height: 16px;
+    width: 16px;
     border-radius: 50%;
-}
-.slider::after {
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    transition: all .4s;
+    left: 4px; /* Vị trí ban đầu của nút tròn */
+    top: 4px; /* Căn giữa theo chiều dọc */
+    transition: .4s;
+    z-index: 1;
 }
-.slider::after {
-    content: "\f186";
-    color: #f1c40f;
-    right: 8px;
+
+/* Cập nhật màu sắc icon theo yêu cầu */
+.sun-icon,
+.moon-icon {
+    font-size: 12px;
+    transition: opacity 0.4s ease;
+    z-index: 2; /* Đảm bảo icon nổi lên trên nút tròn */
+    position: relative; /* Thêm để đảm bảo z-index hoạt động tốt với các icon */
+    line-height: 1; /* Căn chỉnh icon tốt hơn */
 }
+
+.sun-icon {
+    color: #FFD700; /* Màu vàng mặt trời */
+    opacity: 1;
+    /* Điều chỉnh vị trí của icon mặt trời */
+    margin-left: 0.8px; /* Đẩy icon mặt trời vào trong một chút */
+}
+
+.moon-icon {
+    color: #4682B4; /* Màu xanh nước biển cho mặt trăng */
+    opacity: 0;
+    /* Điều chỉnh vị trí của icon mặt trăng */
+    margin-right: 3px; /* Đẩy icon mặt trăng vào trong một chút */
+}
+
 input:checked + .slider {
-    background-color: #555;
+    background-color: var(--primary-color); /* Giữ màu nền slider khi được check */
 }
+
 input:checked + .slider:before {
-    transform: translateX(26px);
+    transform: translateX(26px); /* Khoảng cách di chuyển của nút tròn */
 }
-input:checked + .slider::after {
-    content: "\f185";
-    color: #f39c12;
-    left: 8px;
+
+input:checked + .slider .sun-icon {
+    opacity: 0;
+}
+
+input:checked + .slider .moon-icon {
+    opacity: 1;
 }

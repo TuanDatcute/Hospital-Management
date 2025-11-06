@@ -17,7 +17,6 @@
             </c:otherwise>
         </c:choose>
 
-        <link rel="stylesheet" href="<c:url value='/css/style.css'/>"> <%-- Link CSS chung --%>
         <link rel="stylesheet" href="<c:url value='/css/dv-style.css'/>">
         <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     </head>

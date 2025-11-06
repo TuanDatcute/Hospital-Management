@@ -1,6 +1,7 @@
 package service;
 
 import exception.ValidationException;
+import static java.rmi.server.LogStream.log;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,6 +20,8 @@ import model.dao.NhanVienDAO;
 import model.dao.PhieuKhamBenhDAO;
 import model.dto.ChiDinhDichVuDTO;
 import model.dto.PhieuKhamBenhDTO;
+import model.dto.TaiKhoanDTO;
+import util.EmailUtils;
 
 /**
  * Lớp Service cho Phiếu Khám Bệnh. Chứa tất cả logic nghiệp vụ liên quan đến
@@ -33,6 +36,7 @@ public class PhieuKhamBenhService {
     private final DonThuocService donThuocService = new DonThuocService();
     private final ChiDinhDichVuService chiDinhService = new ChiDinhDichVuService();
     private final LichHenDAO lichHenDAO = new LichHenDAO();
+    private final TaiKhoanService taiKhoanService = new TaiKhoanService();
 
     /**
      * Xử lý nghiệp vụ tạo một phiếu khám bệnh mới.
@@ -60,7 +64,6 @@ public class PhieuKhamBenhService {
         String newMaPhieuKham = "PK" + dateStr + sequenceStr;
         dto.setMaPhieuKham(newMaPhieuKham); // Gán mã mới vào DTO
 
-
         BenhNhan benhNhanEntity = benhNhanDAO.getById(dto.getBenhNhanId());
         if (benhNhanEntity == null) {
             throw new ValidationException("Không tìm thấy bệnh nhân với ID: " + dto.getBenhNhanId());
@@ -82,7 +85,19 @@ public class PhieuKhamBenhService {
         // --- BƯỚC 3: GỌI DAO ĐỂ LƯU ---
         PhieuKhamBenh savedEntity = phieuKhamDAO.create(entity);
 
-        // --- BƯỚC 4: CHUYỂN ĐỔI ENTITY -> DTO ĐỂ TRẢ VỀ ---
+        // --- BƯỚC 4: CẬP NHẬT TRẠNG THÁI LỊCH HẸN (NẾU CÓ) ✨ ---
+        if (dto.getLichHenId() != null) {
+            try {
+                // Giả sử LichHenService được tiêm vào (hoặc new)
+                LichHenService lichHenService = new LichHenService();
+                lichHenService.updateAppointmentStatus(dto.getLichHenId(), "DA_DEN_KHAM");
+            } catch (ValidationException e) {
+                // Ghi log lỗi cập nhật lịch hẹn, nhưng không làm sập giao dịch chính
+                throw new ValidationException("Lỗi khi cập nhật trạng thái Lịch hẹn: " + e.getMessage());
+            }
+        }
+
+        // --- BƯỚC 5: CHUYỂN ĐỔI ENTITY -> DTO ĐỂ TRẢ VỀ ---
         return toDTO(savedEntity);
     }
 
@@ -103,35 +118,6 @@ public class PhieuKhamBenhService {
         // Gọi hàm tìm kiếm gọn nhẹ
         List<PhieuKhamBenh> entities = phieuKhamDAO.searchForListing(keyword);
         return entities.stream().map(this::toDTOForListing).collect(Collectors.toList());
-    }
-
-    /**
-     * Chuyển đổi một Entity PhieuKhamBenh sang một DTO "gọn nhẹ", chỉ chứa các
-     * thông tin cần thiết để hiển thị trên danh sách.
-     *
-     * @param entity Đối tượng PhieuKhamBenh (đã fetch sẵn BenhNhan và BacSi).
-     * @return Một PhieuKhamBenhDTO với các thông tin cơ bản.
-     */
-    private PhieuKhamBenhDTO toDTOForListing(PhieuKhamBenh entity) {
-        if (entity == null) {
-            return null;
-        }
-
-        PhieuKhamBenhDTO dto = new PhieuKhamBenhDTO();
-        dto.setId(entity.getId());
-        dto.setMaPhieuKham(entity.getMaPhieuKham());
-        dto.setThoiGianKham(entity.getThoiGianKham());
-        dto.setChanDoan(entity.getChanDoan());
-        dto.setTrangThai(entity.getTrangThai());
-        // Lấy thông tin từ các đối tượng liên quan đã được JOIN FETCH
-        if (entity.getBenhNhan() != null) {
-            dto.setTenBenhNhan(entity.getBenhNhan().getHoTen());
-        }
-        if (entity.getBacSi() != null) {
-            dto.setTenBacSi(entity.getBacSi().getHoTen());
-        }
-
-        return dto;
     }
 
     /**
@@ -170,6 +156,24 @@ public class PhieuKhamBenhService {
         // 4. Gọi DAO để lưu thay đổi
         phieuKhamDAO.update(existingEntity);
 
+        PhieuKhamBenhDTO dto = toDTO(existingEntity);
+        try {
+            // Lấy email của bệnh nhân từ tài khoản của họ
+            TaiKhoanDTO benhNhanAccount = taiKhoanService.getTaiKhoanByBenhNhanId(dto.getBenhNhanId());
+            if (benhNhanAccount != null && benhNhanAccount.getEmail() != null) {
+                String toEmail = benhNhanAccount.getEmail();
+                // Chạy gửi email trên một luồng riêng để không làm chậm request
+                new Thread(() -> {
+                    try {
+                        EmailUtils.sendEncounterCompletedEmail(toEmail, dto);
+                    } catch (Exception e) {
+                        log("Lỗi ngầm khi gửi email: " + e.getMessage());
+                    }
+                }).start();
+            }
+        } catch (Exception e) {
+            log("Lỗi khi tìm email bệnh nhân: " + e.getMessage());
+        }
         // 5. Trả về DTO đã cập nhật
         return toDTOForUpdateStatus(existingEntity); // Giả sử có hàm toDTO đầy đủ
     }
@@ -268,6 +272,26 @@ public class PhieuKhamBenhService {
     }
 
     /**
+     * Lấy tất cả phiếu khám cho một bác sĩ cụ thể.
+     */
+    public List<PhieuKhamBenhDTO> getAllEncountersForDoctor(int bacSiId) {
+        List<PhieuKhamBenh> entities = phieuKhamDAO.getAllForDoctor(bacSiId);
+        return entities.stream()
+                .map(this::toDTOForListing)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Tìm kiếm phiếu khám cho một bác sĩ cụ thể.
+     */
+    public List<PhieuKhamBenhDTO> searchEncountersForDoctor(String keyword, int bacSiId) {
+        List<PhieuKhamBenh> entities = phieuKhamDAO.searchForDoctor(keyword, bacSiId);
+        return entities.stream()
+                .map(this::toDTOForListing)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Chuyển đổi từ DTO sang Entity.
      */
     private PhieuKhamBenh toEntity(PhieuKhamBenhDTO dto, BenhNhan benhNhan, NhanVien nhanVien, LichHen lichHen) {
@@ -305,6 +329,35 @@ public class PhieuKhamBenhService {
                     .collect(Collectors.toList());
             dto.setDanhSachChiDinh(chiDinhDTOs);
         }
+        return dto;
+    }
+
+    /**
+     * Chuyển đổi một Entity PhieuKhamBenh sang một DTO "gọn nhẹ", chỉ chứa các
+     * thông tin cần thiết để hiển thị trên danh sách.
+     *
+     * @param entity Đối tượng PhieuKhamBenh (đã fetch sẵn BenhNhan và BacSi).
+     * @return Một PhieuKhamBenhDTO với các thông tin cơ bản.
+     */
+    private PhieuKhamBenhDTO toDTOForListing(PhieuKhamBenh entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        PhieuKhamBenhDTO dto = new PhieuKhamBenhDTO();
+        dto.setId(entity.getId());
+        dto.setMaPhieuKham(entity.getMaPhieuKham());
+        dto.setThoiGianKham(entity.getThoiGianKham());
+        dto.setChanDoan(entity.getChanDoan());
+        dto.setTrangThai(entity.getTrangThai());
+        // Lấy thông tin từ các đối tượng liên quan đã được JOIN FETCH
+        if (entity.getBenhNhan() != null) {
+            dto.setTenBenhNhan(entity.getBenhNhan().getHoTen());
+        }
+        if (entity.getBacSi() != null) {
+            dto.setTenBacSi(entity.getBacSi().getHoTen());
+        }
+
         return dto;
     }
 

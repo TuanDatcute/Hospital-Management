@@ -1,539 +1,263 @@
-/* ==========================================================================
-GLOBAL STYLES & VARIABLES (LIGHT MODE - DEFAULT)
-========================================================================== */
+/* === BIẾN MÀU (THEME PHÒNG KHÁM/QUẢN LÝ) === */
 :root {
-    --primary-color: #4a90e2;
-    --success-color: #28a745;
-    --warning-color: #ffc107;
-    --bg-color: #f4f7f9;
-    --surface-color: #ffffff;
-    --border-color: #e9ecef;
-    --text-primary: #343a40;
-    --text-secondary: #6c757d;
-    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
-    --card-hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    --danger-color: #dc3545;
+    --primary-color: #007bff; /* Xanh dương (chính, tin cậy) */
+    --secondary-color: #6c757d; /* Xám (phụ, nút hủy) */
+    --success-color: #28a745; /* Xanh lá (thành công) */
+    --error-color: #dc3545; /* Đỏ (lỗi, xóa) */
+    --info-color: #007bff; /* Xanh dương (cập nhật) */
+    --light-bg: #f8f9fa; /* Nền sáng (cho form, hàng chẵn) */
+    --border-color: #dee2e6; /* Viền */
+    --text-color: #212529; /* Màu chữ chính */
+    --white-color: #ffffff;
 }
 
-/* ==========================================================================
-DARK MODE "BẠC ĐEN" (SILVER-BLACK) VARIABLES
-========================================================================== */
-body.dark-mode {
-    --danger-color: #e57373;
-    --primary-color: #77A5D9;
-    --success-color: #3d8c5a;
-    --warning-color: #c7811a;
-    --bg-color: #121212;
-    --surface-color: #1E1E1E;
-    --border-color: #333333;
-    --text-primary: #E0E0E0;
-    --text-secondary: #888888;
-    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    --card-hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-}
-
-/* ==========================================================================
-STYLES CHUNG
-========================================================================== */
+/* === CÀI ĐẶT CHUNG === */
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: var(--bg-color);
-    margin: 0;
-    color: var(--text-primary);
-    transition: background-color 0.3s, color 0.3s;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--white-color);
+    color: var(--text-color);
+    margin: 20px;
+    line-height: 1.6;
 }
 
-.container {
-    max-width: 1400px;
-    margin: 30px auto;
-    padding: 20px 30px;
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    box-shadow: var(--card-shadow);
-}
-h1 {
-    color: var(--text-primary);
-    text-align: center;
-    margin-bottom: 25px;
-    margin-top: 10px;
-    font-size: 2.2rem;
-}
-h3 {
+h2 {
     color: var(--primary-color);
-    margin-top: 30px;
-    margin-bottom: 20px;
-    border-bottom: 2px solid var(--border-color);
+    border-bottom: 2px solid var(--light-bg);
     padding-bottom: 10px;
-    font-size: 1.6rem;
+    margin-top: 5px;
+    margin-bottom: 20px;
 }
+
 hr {
-    border: none;
+    border: 0;
     border-top: 1px solid var(--border-color);
-    margin: 40px 0;
-}
-.btn {
-    padding: 10px 20px;
-    font-size: 1rem;
-    font-weight: 500;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-    transition: all 0.2s ease-in-out;
-}
-.btn:hover {
-    transform: translateY(-2px);
+    margin: 30px 0;
 }
 
-/* ==========================================================================
-ALERT / NOTIFICATION STYLES
-========================================================================== */
-.alert {
-    padding: 15px 20px;
-    margin-bottom: 25px;
-    border-radius: 8px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border: 1px solid transparent;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-.alert::before {
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-    font-size: 1.2rem;
-}
-.alert-success {
-    background-color: color-mix(in srgb, var(--success-color) 15%, var(--surface-color));
-    color: var(--success-color);
-    border-color: color-mix(in srgb, var(--success-color) 30%, transparent);
-}
-.alert-success::before {
-    content: "\f00c"; /* Icon checkmark */
-}
-.alert-danger {
-    background-color: color-mix(in srgb, var(--danger-color) 15%, var(--surface-color));
-    color: var(--danger-color);
-    border-color: color-mix(in srgb, var(--danger-color) 30%, transparent);
-}
-.alert-danger::before {
-    content: "\f071"; /* Icon exclamation-triangle */
-}
-body.dark-mode .alert-success {
-    color: #81c784;
-}
-body.dark-mode .alert-danger {
-    color: var(--danger-color);
-}
-
-/* ==========================================================================
-HEADER & SEARCH BAR
-========================================================================== */
-.page-header {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    gap: 20px;
-}
-.btn-create-new {
-    background-color: transparent;
-    border: 2px solid var(--primary-color);
-    color: var(--primary-color);
-    font-weight: 700;
-    white-space: nowrap;
-}
-.btn-create-new:hover {
-    background-color: var(--primary-color);
-    color: white;
-}
-.search-container {
-    flex-grow: 1;
-    max-width: 700px;
-    min-width: 300px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-.search-form {
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    flex-grow: 1;
+/* === FORM THÊM MỚI & CẬP NHẬT (method="POST") === */
+form[method="POST"] {
+    background-color: var(--light-bg);
     border: 1px solid var(--border-color);
-    border-radius: 40px;
-    background-color: var(--surface-color);
-    transition: all 0.2s ease-in-out;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 600px; /* Giới hạn độ rộng của form */
 }
-.search-icon-left {
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%) scale(0.8);
-    color: var(--text-secondary);
-    font-size: 1.2rem;
-    opacity: 0;
-    transition: all 0.2s ease-in-out;
-    pointer-events: none;
-}
-.search-form .form-control {
+
+/* Thiết lập cho các input, select trong form */
+form[method="POST"] input[type="text"],
+form[method="POST"] input[type="number"],
+form[method="POST"] select {
     width: 100%;
-    flex-grow: 1;
-    padding: 12px 20px;
-    border: none;
-    background: transparent;
-    outline: none;
-    color: var(--text-primary);
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
     font-size: 1rem;
-    transition: padding-left 0.2s ease-in-out;
+    margin-top: 5px;
+    margin-bottom: 15px; /* Thay thế cho <br/> */
+    box-sizing: border-box;
 }
-.search-form .form-control::placeholder {
-    color: var(--text-secondary);
-    opacity: 0.7;
-}
-.search-button {
-    flex-shrink: 0;
-    width: 64px;
-    height: 44px;
+
+/* Nút bấm (Thêm, Cập nhật) */
+form[method="POST"] button[type="submit"] {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    padding: 10px 18px;
     border: none;
-    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
-    border-top-right-radius: 40px;
-    border-bottom-right-radius: 40px;
+    border-radius: 4px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-left: 1px solid var(--border-color);
-    transition: background-color 0.2s;
-}
-.search-button:hover {
-    background-color: color-mix(in srgb, var(--bg-color) 70%, var(--surface-color));
-}
-.search-button i {
-    font-size: 1.2rem;
-    color: var(--text-secondary);
-}
-.search-form:focus-within {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color) 15%, transparent);
-}
-.search-form:focus-within .search-icon-left {
-    opacity: 1;
-    transform: translateY(-50%) scale(1);
-}
-.search-form:focus-within .form-control {
-    padding-left: 55px;
-}
-.btn-clear-search {
-    background-color: var(--text-secondary);
-    color: white;
-    white-space: nowrap;
-    padding: 10px 15px;
-    font-size: 0.9rem;
-    gap: 8px;
-    display: inline-flex;
-    align-items: center;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: opacity 0.2s ease;
 }
 
-/* ==========================================================================
-CARD STYLES (DÙNG CHO GRID VIEW)
-========================================================================== */
-.card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 25px;
-}
-/* ... (Tất cả các style .card-grid, .encounter-card, .card-header... ở đây) ... */
-.no-results {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 50px;
-    background-color: var(--surface-color);
-    border-radius: 12px;
-    color: var(--text-secondary);
+form[method="POST"] button[type="submit"]:hover {
+    opacity: 0.85;
 }
 
-/* ==========================================================================
-NÚT GẠT CHUYỂN CHẾ ĐỘ
-========================================================================== */
-.theme-switch-wrapper {
+/* Nút Hủy (trong form Cập nhật) */
+form[method="POST"] a {
+    display: inline-block;
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+    padding: 10px 18px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-left: 10px;
+    transition: background-color 0.2s ease;
+}
+
+form[method="POST"] a:hover {
+    background-color: #5a6268;
+}
+
+/* === FORM TÌM KIẾM (method="GET") === */
+form[method="GET"] {
+    background-color: var(--light-bg);
+    padding: 15px;
+    border-radius: 5px;
     display: flex;
     align-items: center;
     gap: 10px;
-}
-.theme-switch {
-    display: inline-block;
-    height: 24px;
-    position: relative;
-    width: 50px;
-}
-.theme-switch input {
-    display: none;
-}
-.slider {
-    background-color: #ccc;
-    bottom: 0;
-    cursor: pointer;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    transition: .4s;
-    border-radius: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 5px;
-}
-.slider:before {
-    background-color: #fff;
-    content: "";
-    height: 16px;
-    width: 16px;
-    border-radius: 50%;
-    position: absolute;
-    left: 4px;
-    top: 4px;
-    transition: .4s;
-    z-index: 1;
-}
-.sun-icon, .moon-icon {
-    font-size: 12px;
-    transition: opacity 0.4s ease;
-    z-index: 2;
-    position: relative;
-    line-height: 1;
-}
-.sun-icon {
-    color: #FFD700;
-    opacity: 1;
-    margin-left: 1.10px;
-}
-.moon-icon {
-    color: #4682B4;
-    opacity: 0;
-    margin-right: 3px;
-}
-input:checked + .slider {
-    background-color: var(--primary-color);
-}
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-input:checked + .slider .sun-icon {
-    opacity: 0;
-}
-input:checked + .slider .moon-icon {
-    opacity: 1;
-}
-
-/* ==========================================================================
-NÚT CHUYỂN ĐỔI GIAO DIỆN (GRID/LIST)
-========================================================================== */
-.view-toggle {
-    display: flex;
-    align-items: center;
-    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
-    border-radius: 8px;
-    padding: 4px;
-    border: 1px solid var(--border-color);
-}
-.view-btn {
-    background-color: transparent;
-    border: none;
-    border-radius: 6px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 6px 10px;
-    font-size: 1rem;
-    line-height: 1;
-    transition: all 0.2s ease-in-out;
-}
-.view-btn.active {
-    background-color: var(--primary-color);
-    color: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-body.dark-mode .view-btn.active {
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-}
-
-/* ==========================================================================
-ĐỊNH DẠNG GIAO DIỆN DẠNG DANH SÁCH (LIST VIEW)
-========================================================================== */
-/* ... (Tất cả các style .list-view, .card-grid.list-view ... ở đây) ... */
-@media (max-width: 768px) {
-    /* ... (Style media query cho list view ... ) ... */
-}
-
-/* ==========================================================================
-STYLES CHO BẢNG DỮ LIỆU (QUAN TRỌNG)
-========================================================================== */
-.table-responsive {
-    overflow-x: auto;
-    width: 100%;
     margin-bottom: 20px;
 }
+
+form[method="GET"] input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    flex-grow: 1;
+    max-width: 400px;
+}
+
+form[method="GET"] button[type="submit"] {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: opacity 0.2s ease;
+}
+
+form[method="GET"] button[type="submit"]:hover {
+    opacity: 0.85;
+}
+
+form[method="GET"] a {
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+form[method="GET"] a:hover {
+    background-color: #5a6268;
+}
+
+/* === BẢNG DANH SÁCH === */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-color); /* Ghi đè border="1" */
+    border-radius: 5px;
+    overflow: hidden;
 }
-table th, table td {
-    padding: 15px;
+
+th, td {
+    padding: 12px 15px;
     border-bottom: 1px solid var(--border-color);
     text-align: left;
     vertical-align: middle;
-    white-space: nowrap;
 }
-table thead th {
-    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
-    font-size: 0.9rem;
-    color: var(--text-secondary);
+
+/* Tiêu đề bảng */
+thead th {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    font-weight: 600;
     text-transform: uppercase;
-}
-table tbody tr:hover {
-    background-color: color-mix(in srgb, var(--bg-color) 70%, var(--surface-color));
-}
-table tbody tr td[colspan] {
-    text-align: center;
-    color: var(--text-secondary);
-    padding: 40px;
-    font-style: italic;
-}
-table td form {
-    margin: 0;
+    font-size: 0.9em;
+    letter-spacing: 0.5px;
 }
 
-/* Kiểu dáng cho nút trong bảng */
-table td button[type="submit"],
-table td a {
-    padding: 8px 15px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+/* Zebra striping cho các hàng */
+tbody tr:nth-child(even) {
+    background-color: var(--light-bg);
+}
+
+tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+/* === CỘT HÀNH ĐỘNG (SỬA, XÓA) === */
+td:last-child {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Tạo khoảng cách giữa "Sửa" và "Xóa" */
+    border-bottom: 1px solid var(--border-color); /* Cần thêm lại border do display:flex */
+}
+
+/* Nút Sửa (Link) */
+td:last-child a {
+    color: var(--primary-color);
+    font-weight: 500;
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.2s ease-in-out;
-    white-space: nowrap;
+    margin: 0; /* Ghi đè style="margin-right: 10px;" */
+    transition: color 0.2s ease;
+}
+
+td:last-child a:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}
+
+/* Form Xóa (Ghi đè style inline) */
+td:last-child form {
+    margin: 0 !important;
+    display: inline-block !important;
+}
+
+/* Nút Xóa (Class từ JSP) */
+.delete-button {
+    background: none;
+    border: none;
+    color: var(--error-color);
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
     font-family: inherit;
-}
-table td button[type="submit"]:hover,
-table td a:hover {
-    transform: translateY(-2px);
-}
-
-/* Nút Xóa (submit) -> MÀU XANH DƯƠNG */
-table td button[type="submit"] {
-    background-color: var(--primary-color);
-    color: white;
+    font-size: 1em; /* Kế thừa font-size từ <td> */
+    font-weight: 500; /* Làm đậm giống nút Sửa */
+    transition: color 0.2s ease;
 }
 
-/* Link Sửa (a) -> MÀU XANH LÁ */
-table td a {
-    background-color: color-mix(in srgb, var(--success-color) 85%, black);
-    color: white;
+.delete-button:hover {
+    color: #a00; /* Màu đỏ đậm hơn khi hover */
 }
 
-/* === BỔ SUNG: MÀU VÀNG (WARNING) VÀ ĐỎ (DANGER) CHO NÚT === */
-/* Thêm các class này để dùng cho Sửa/Xóa nếu muốn */
 
-.btn-warning {
-    background-color: var(--warning-color);
-    color: #333;
-}
-.btn-danger {
-    background-color: var(--danger-color);
-    color: white;
-}
-
-.actions-cell {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.actions-cell form {
-    margin-bottom: 0;
-}
-
-/* ==========================================================================
-✨ BỔ SUNG: STYLES CHO FORM (Thêm/Sửa) ✨
-========================================================================== */
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-}
-
-/* Style chung cho input, select 
-  (Dựa trên style .search-form .form-control của bạn) 
+/* === THÔNG BÁO (GHI ĐÈ INLINE STYLE) === */
+/* Đây là cách tạm thời để ghi đè <b style="...">.
+   Lý tưởng nhất là bạn nên đổi sang dùng class.
 */
-.form-control {
-    width: 100%;
-    padding: 12px 20px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px; /* Nhất quán với .btn */
-    background: var(--surface-color);
-    outline: none;
-    color: var(--text-primary);
-    font-size: 1rem;
-    font-family: inherit; /* Kế thừa font từ body */
-    transition: all 0.2s ease-in-out;
-    box-sizing: border-box; /* Quan trọng để padding không làm vỡ layout */
+b[style*="color:green"] {
+    display: block;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724 !important; /* Dùng !important để thắng inline style */
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    font-weight: bold;
 }
 
-/* Hiệu ứng khi focus (chọn) vào ô input/select */
-.form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color) 15%, transparent);
+b[style*="color:red"] {
+    display: block;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24 !important;
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    font-weight: bold;
 }
 
-/* Nơi chứa các nút Thêm/Hủy */
-.form-actions {
-    margin-top: 30px;
-    display: flex;
-    gap: 15px; /* Khoảng cách giữa các nút */
-    align-items: center;
-}
-
-
-/* ==========================================================================
-✨ BỔ SUNG: CÁC KIỂU NÚT CÒN THIẾU ✨
-========================================================================== */
-
-/* Nút chính (Thêm/Cập nhật) */
-.btn-primary {
-    background-color: var(--primary-color);
-    color: white;
-}
-.btn-primary:hover {
-    background-color: color-mix(in srgb, var(--primary-color) 85%, black);
-}
-
-/* Nút phụ (Hủy) - Dùng style giống .btn-clear-search */
-.btn-secondary {
-    background-color: var(--text-secondary);
-    color: white;
-}
-.btn-secondary:hover {
-    background-color: color-mix(in srgb, var(--text-secondary) 85%, black);
+b[style*="color:blue"] {
+    display: block;
+    background-color: #cce5ff;
+    border: 1px solid #b8daff;
+    color: #004085 !important;
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    font-weight: bold;
 }

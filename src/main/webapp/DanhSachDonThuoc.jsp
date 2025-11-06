@@ -38,9 +38,13 @@
                 <div class="theme-switch-wrapper">
                     <label class="theme-switch" for="theme-toggle">
                         <input type="checkbox" id="theme-toggle" />
-                        <div class="slider round"></div>
+                        <div class="slider round">
+                            <span class="sun-icon"><i class="fas fa-sun"></i></span>
+                            <span class="moon-icon"><i class="fas fa-moon"></i></span>
+                        </div>
                     </label>
                 </div>
+
             </div>
 
             <div class="table-responsive">

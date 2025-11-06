@@ -182,32 +182,14 @@ public class NhanVienDAO {
         }
     }
 
-    /**
-     * Tìm nhân viên bằng taiKhoanId.
-     *
-     * @param taiKhoanId ID của tài khoản
-     * @return Đối tượng NhanVien hoặc null nếu không tìm thấy.
-     */
-    public NhanVien findByTaiKhoanId(int taiKhoanId) {
-        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "FROM NhanVien n WHERE n.taiKhoan.id = :tkId";
-            Query<NhanVien> query = session.createQuery(hql, NhanVien.class);
-            query.setParameter("tkId", taiKhoanId);
-            return query.uniqueResult();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
+    
 
     public List<NhanVien> findDoctorsBySpecialty() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<NhanVien> query = session.createQuery(
                     "SELECT nv FROM NhanVien nv "
                     + "JOIN FETCH nv.taiKhoan "
-                    + 
-                    "WHERE nv.taiKhoan.vaiTro = :role",
+                    + "WHERE nv.taiKhoan.vaiTro = :role",
                     NhanVien.class
             );
             query.setParameter("role", "BAC_SI");
@@ -217,4 +199,34 @@ public class NhanVienDAO {
             return Collections.emptyList();
         }
     }
+    
+    //=============================Dat================
+    /**
+     * Tìm nhân viên bằng taiKhoanId.
+     *
+     * @param taiKhoanId ID của tài khoản
+     * @return Đối tượng NhanVien hoặc null nếu không tìm thấy.
+     */
+    public NhanVien findByTaiKhoanId(int taiKhoanId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Sử dụng HQL để truy vấn dựa trên quan hệ Entity
+            Query<NhanVien> query = session.createQuery(
+                    "SELECT nv FROM NhanVien nv "
+                    + "JOIN FETCH nv.taiKhoan "
+                    + // Lấy luôn thông tin tài khoản
+                    "LEFT JOIN FETCH nv.khoa "
+                    + // Lấy thông tin khoa (nếu có)
+                    "WHERE nv.taiKhoan.id = :taiKhoanId",
+                    NhanVien.class
+            );
+            query.setParameter("taiKhoanId", taiKhoanId);
+
+            // uniqueResult() sẽ trả về đối tượng hoặc null nếu không tìm thấy
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

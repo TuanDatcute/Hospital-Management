@@ -29,9 +29,8 @@ public class MainController extends HttpServlet {
     private static final String PHONG_BENH_CONTROLLER = "PhongBenhController";
     private static final String GIUONG_BENH_CONTROLLER = "GiuongBenhController";
     private static final String DON_THUOC_CONTROLLER = "DonThuocController";
-    private static final String HD_GDTT_CONTROLLER = "HoaDon_GiaoDichThanhToanController";
+    private static final String HOA_DON_GIAO_DICH_THANH_TOAN_CONTROLLER = "HoaDon_GiaoDichThanhToanController";
     private static final String THONG_BAO_CONTROLLER = "ThongBaoController";
-    private static final String USER_THONG_BAO_CONTROLLER = "UserThongBaoController";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -46,12 +45,13 @@ public class MainController extends HttpServlet {
         String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deleteService"};
 
-        // 2. Định nghĩa danh sách action cho từng Controller
+        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus", "showCreateAppointmentForm", "createAppointment"};
+
+        // (userActions của bạn đã có "verify", nhưng logic trong UserController đã bị vô hiệu hóa, nên vẫn an toàn)
         String[] userActions = {"login", "logout", "listUsers",
             "showUserCreateForm", "createUser",
             "showUserEditForm", "updateUserStatus",
-            "showChangePasswordForm", "changePassword",
-            "register"};
+            "showChangePasswordForm", "changePassword", "register", "verify"};
 
         String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa",
             "showKhoaEditForm", "updateKhoa", "deleteKhoa"};
@@ -59,26 +59,20 @@ public class MainController extends HttpServlet {
         String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien",
             "showNhanVienEditForm", "updateNhanVien", "deleteNhanVien"};
 
-        // --- **BẮT ĐẦU SỬA: Thêm 'updateProfile'** ---
+        // --- **BẮT ĐẦU SỬA (Giai đoạn 2 - Bước 5/5)** ---
+        // Thêm 2 action mới cho luồng nghiệp vụ "Hoàn tất Hồ sơ"
         String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan",
             "showBenhNhanEditForm", "updateBenhNhan", "deleteBenhNhan",
-            "updateProfile"}; // <-- THÊM ACTION MỚI
+            "updateProfile", // (Action này bạn đã có)
+            "showProfile", // <-- THÊM ACTION NÀY (cho doGet)
+            "saveProfile"};  // <-- THÊM ACTION NÀY (cho doPost)
         // --- **KẾT THÚC SỬA** ---
 
-        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen",
-            "updateLichHenStatus"};
-
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm", "createPrescription"};
-
-        String[] phongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate", "deleteRoom", "showCreateRoomForm"};
-
-        String[] giuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed", "deleteBed", "updateBed", "getBedForUpdate"};
-
-        String[] hoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice"};
-
-        String[] thongBaoActions = {"createThongBao", "listNotifications"};
-
-        String[] userThongBaoActions = {"viewMyNotifications", "markNotificationAsRead", "deleteMyNotification"};
+        String[] PhongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate", "deleteRoom"};
+        String[] GiuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed", "deleteBed", "updateBed", "getBedForUpdate"};
+        String[] HoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice"};
+        String[] ThongBaoActions = {"getThongBaoForUpdate", "createThongBao", "updateThongBao", "deleteThongBao", "listNotifications"};
 
         // 3. Điều hướng dựa trên action
         if (action == null || action.isEmpty()) {
@@ -92,25 +86,23 @@ public class MainController extends HttpServlet {
         } else if (Arrays.asList(nhanVienActions).contains(action)) {
             url = NHANVIEN_CONTROLLER;
         } else if (Arrays.asList(benhNhanActions).contains(action)) {
+            // **CẬP NHẬT:** Giờ đây 'showProfile' và 'saveProfile' sẽ được chuyển đến BenhNhanController
             url = BENHNHAN_CONTROLLER;
         } else if (Arrays.asList(lichHenActions).contains(action)) {
             url = LICHHEN_CONTROLLER;
         } else if (Arrays.asList(CatalogActions).contains(action)) {
             url = CATALOG_CONTROLLER;
-        } else if (Arrays.asList(phongBenhActions).contains(action)) {
+        } else if (Arrays.asList(PhongBenhActions).contains(action)) {
             url = PHONG_BENH_CONTROLLER;
-        } else if (Arrays.asList(giuongBenhActions).contains(action)) {
+        } else if (Arrays.asList(GiuongBenhActions).contains(action)) {
             url = GIUONG_BENH_CONTROLLER;
         } else if (Arrays.asList(DonThuocActions).contains(action)) {
             url = DON_THUOC_CONTROLLER;
-        } else if (Arrays.asList(hoaDon_GiaoDichThanhToanActions).contains(action)) {
-            url = HD_GDTT_CONTROLLER;
-        } else if (Arrays.asList(thongBaoActions).contains(action)) {
+        } else if (Arrays.asList(HoaDon_GiaoDichThanhToanActions).contains(action)) {
+            url = HOA_DON_GIAO_DICH_THANH_TOAN_CONTROLLER;
+        } else if (Arrays.asList(ThongBaoActions).contains(action)) {
             url = THONG_BAO_CONTROLLER;
-        } else if (Arrays.asList(userThongBaoActions).contains(action)) {
-            url = USER_THONG_BAO_CONTROLLER;
         }
-        // (Nếu action không khớp, url vẫn là LOGIN_PAGE)
 
         // 4. Forward đến controller tương ứng
         request.getRequestDispatcher(url).forward(request, response);

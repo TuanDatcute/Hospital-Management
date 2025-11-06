@@ -1,190 +1,187 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %> 
 
-<!DOCTYPE html>
-<html lang="vi">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Sơ đồ Giường bệnh</title>
+<html>
+<head>
+    <title>Sơ đồ Giường bệnh</title>
+    <%-- THÊM MỚI: Liên kết CSS bên ngoài --%>
+    <link rel="stylesheet" href="css/GiuongBenh.css">
+</head>
+<body>
 
-        <%-- BẮT BUỘC: Thêm Font Awesome cho icon --%>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-        <%-- File CSS và JS của bạn --%>
-        <link rel="stylesheet" href="css/GiuongBenh.css">
-        <link rel="stylesheet" href="css/StyleChungCuaQuang.css">
-        <script src="<c:url value='/js/darkmode.js'/>" defer></script>
-    </head>
-
-    <body>
-
-        <%-- Dùng .container để bọc toàn bộ trang --%>
-        <div class="container">
-
-            <h1>Sơ đồ Giường bệnh</h1>
-
-            <%-- HIỂN THỊ THÔNG BÁO --%>
-            <c:if test="${not empty param.createBedSuccess}">
-                <div class="alert alert-success">Thêm giường mới thành công!</div>
-            </c:if>
-            <c:if test="${not empty param.assignSuccess}">
-                <div class="alert alert-success">Gán giường thành công!</div>
-            </c:if>
-            <c:if test="${not empty param.deleteSuccess}">
-                <div class="alert alert-success">Xóa giường thành công!</div>
-            </c:if>
-
-            <%-- === THAY ĐỔI 1: Trả về alert-info (CSS mới đã hỗ trợ) === --%>
-            <c:if test="${not empty param.updateSuccess}">
-                <div class="alert alert-info">Cập nhật giường thành công!</div>
-            </c:if>
-            <c:if test="${not empty param.releaseSuccess}">
-                <div class="alert alert-info">Trả giường thành công!</div>
-            </c:if>
-
-            <%-- Lỗi (danger) --%>
-            <c:if test="${not empty param.createBedError}">
-                <div class="alert alert-danger">Lỗi thêm giường: <c:out value="${param.createBedError}"/></div>
-            </c:if>
-            <c:if test="${not empty param.assignError}">
-                <div class="alert alert-danger">Lỗi gán giường: <c:out value="${param.assignError}"/></div>
-            </c:if>
-            <c:if test="${not empty param.deleteError}">
-                <div class="alert alert-danger">Lỗi xóa giường: <c:out value="${param.deleteError}"/></div>
-            </c:if>
-            <c:if test="${not empty param.error}">
-                <div class="alert alert-danger">Lỗi: ${param.error}</div>
-            </c:if>
-
-            <%-- HEADER (Chứa Nút Thêm, Tìm kiếm, Toggles) --%>
-            <div class="page-header">
-
-                <%-- Nút Thêm Mới --%>
-                <a href="MainController?action=showCreateBedForm" class="btn btn-create-new">
-                    <i class="fa-solid fa-plus"></i> Thêm Giường Mới
-                </a>
-
-                <%-- Thanh Tìm Kiếm --%>
-                <div class="search-container">
-                    <form action="MainController" method="GET" class="search-form">
-                        <input type="hidden" name="action" value="listBeds">
-                        <i class="fa-solid fa-magnifying-glass search-icon-left"></i>
-                        <input type="text"
-                               id="searchKeyword"
-                               name="searchKeyword"
-                               class="form-control"
-                               value="<c:out value='${param.searchKeyword}'/>"
-                               placeholder="Tìm tên giường, phòng, bệnh nhân...">
-                        <button type="submit" class="search-button">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </form>
-                    <a href="MainController?action=listBeds" class="btn btn-clear-search">
-                        <i class="fa-solid fa-times"></i> Xóa lọc
-                    </a>
-                </div>
-
-                <%-- Nút gạt Dark Mode (đặt trong header) --%>
-                <div class="theme-switch-wrapper">
-                    <label class="theme-switch" for="theme-toggle">
-                        <input type="checkbox" id="theme-toggle" />
-                        <span class="slider">
-                            <i class="fa-solid fa-sun sun-icon"></i>
-                            <i class="fa-solid fa-moon moon-icon"></i>
-                        </span>
-                    </label>
-                </div>
-            </div>
-
-            <h3>Danh sách Giường</h3>
-
-            <%-- BẢNG SƠ ĐỒ GIƯỜNG --%>
-            <div class="table-responsive" id="bed-list-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Giường</th>
-                            <th>Phòng</th>
-                            <th>Trạng thái</th>
-                            <th>Bệnh nhân</th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach var="bed" items="${bedList}">
-                            <tr>
-                                <td><c:out value="${bed.tenGiuong}"/></td>
-                                <td><c:out value="${bed.tenPhong}"/></td>
-                                <td>
-                                    <%-- === THAY ĐỔI 2: Dùng class động (CSS mới đã hỗ trợ) === --%>
-                                    <span class="status status-${bed.trangThai.toLowerCase()}">
-                                        <c:out value="${bed.trangThai == 'DANG_SU_DUNG' ? 'Đang sử dụng' : 'Trống'}"/>
-                                    </span>
-                                </td>
-                                <td>
-                                    <c:out value="${bed.benhNhanId != null ? bed.tenBenhNhan : '---'}"/>
-                                </td>
-                                <td class="actions-cell">
-
-                                    <%-- Form Gán (khi TRONG) --%>
-                                    <c:if test="${bed.trangThai == 'TRONG'}">
-                                        <form action="MainController" method="POST" class="inline-assign-form">
-                                            <input type="hidden" name="action" value="assignBed">
-                                            <input type="hidden" name="bedId" value="${bed.id}">
-                                            <select name="patientId" required>
-                                                <option value="">-- Chọn bệnh nhân --</option>
-                                                <c:forEach var="patient" items="${patientList}">
-                                                    <option value="${patient.id}"><c:out value="${patient.hoTen}"/></option>
-                                                </c:forEach>
-                                            </select>
-                                            <%-- CSS mới đã định nghĩa .btn-primary và .btn-sm --%>
-                                            <button type="submit" class="btn btn-sm btn-primary">Gán</button>
-                                        </form>
-                                    </c:if>
-
-                                    <%-- Form Trả (khi DANG_SU_DUNG) --%>
-                                    <c:if test="${bed.trangThai == 'DANG_SU_DUNG'}">
-                                        <form action="MainController" method="POST" class="inline-form">
-                                            <input type="hidden" name="action" value="releaseBed">
-                                            <input type="hidden" name="bedId" value="${bed.id}">
-                                            <%-- CSS mới đã định nghĩa .btn-secondary --%>
-                                            <button type="submit" class="btn btn-sm btn-secondary">Trả giường</button>
-                                        </form>
-                                    </c:if>
-
-                                    <%-- Nút Sửa (chỉ khi TRONG) --%>
-                                    <c:if test="${bed.trangThai == 'TRONG'}">
-                                        <%-- CSS mới đã định nghĩa .btn-warning --%>
-                                        <a href="MainController?action=showUpdateBedForm&bedId=${bed.id}" class="btn btn-sm btn-warning">
-                                            <i class="fa-solid fa-pencil"></i> Sửa
-                                        </a>
-                                    </c:if>
-
-                                    <%-- Form Xóa (chỉ khi TRONG) --%>
-                                    <c:if test="${bed.trangThai == 'TRONG'}">
-                                        <form action="MainController" method="POST" class="inline-form"
-                                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa giường [${bed.tenGiuong}] không?');">
-                                            <input type="hidden" name="action" value="deleteBed">
-                                            <input type="hidden" name="bedId" value="${bed.id}">
-                                            <%-- CSS mới đã định nghĩa .btn-danger --%>
-                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                <i class="fa-solid fa-trash"></i> Xóa
-                                            </button>
-                                        </form>
-                                    </c:if>
-                                </td>
-                            </tr>
+    <%-- ============================================= --%>
+    <%--         THÊM MỚI / CẬP NHẬT FORM (Đã cập nhật)  --%>
+    <%-- ============================================= --%>
+    <c:choose>
+        <%-- TRƯỜNG HỢP 1: CẬP NHẬT --%>
+        <c:when test="${not empty bedToUpdate}">
+            <h2>Cập nhật Giường Bệnh: <c:out value="${bedToUpdate.tenGiuong}"/></h2>
+            <form action="${pageContext.request.contextPath}/MainController" method="POST">
+                <input type="hidden" name="action" value="updateBed">
+                <input type="hidden" name="bedId" value="${bedToUpdate.id}">
+                
+                <p>
+                    <label for="tenGiuong">Tên giường:</label>
+                    <input type="text" id="tenGiuong" name="tenGiuong" value="<c:out value='${bedToUpdate.tenGiuong}'/>" required>
+                </p>
+                <p>
+                    <label for="phongBenhId">Thuộc phòng:</label>
+                    <select id="phongBenhId" name="phongBenhId" required>
+                        <option value="">-- Chọn phòng --</option>
+                        <c:forEach var="room" items="${roomList}">
+                            <option value="${room.id}" ${room.id == bedToUpdate.phongBenhId ? 'selected' : ''}>
+                                <c:out value="${room.tenPhong}"/> (<c:out value="${room.tenKhoa}"/>)
+                            </option>
                         </c:forEach>
-                        <c:if test="${empty bedList}">
-                            <tr>
-                                <td colspan="5">Không tìm thấy giường bệnh nào.</td>
-                            </tr>
+                    </select>
+                </p>
+                
+                <button type="submit">Cập nhật Giường</button>
+                <a href="MainController?action=listBeds">Hủy</a>
+            </form>
+            
+            <%-- Hiển thị lỗi (Đã cập nhật dùng class) --%>
+            <c:if test="${not empty param.updateError && param.bedId == bedToUpdate.id}">
+                 <div class="message error">Lỗi cập nhật: <c:out value="${param.updateError}"/></div>
+            </c:if>
+        </c:when>
+        
+        <%-- TRƯỜNG HỢP 2: THÊM MỚI (Đã cập nhật) --%>
+        <c:otherwise>
+            <h2>Thêm Giường Bệnh Mới</h2>
+            <form action="${pageContext.request.contextPath}/MainController" method="POST">
+                <input type="hidden" name="action" value="createBed">
+                <p>
+                    <label for="tenGiuong">Tên giường:</label>
+                    <input type="text" id="tenGiuong" name="tenGiuong" required>
+                </p>
+                <p>
+                    <label for="phongBenhId">Thuộc phòng:</label>
+                    <select id="phongBenhId" name="phongBenhId" required>
+                        <option value="">-- Chọn phòng --</option>
+                        <c:forEach var="room" items="${roomList}">
+                            <option value="${room.id}">
+                                <c:out value="${room.tenPhong}"/> (<c:out value="${room.tenKhoa}"/>)
+                            </option>
+                        </c:forEach>
+                    </select>
+                </p>
+                <button type="submit">Thêm Giường</button>
+            </form>
+        </c:otherwise>
+    </c:choose>
+    
+    <hr>
+    <h2>Sơ đồ Giường bệnh</h2>
+
+    <%-- Form Tìm kiếm (Đã cập nhật) --%>
+    <form action="MainController" method="GET">
+         <input type="hidden" name="action" value="listBeds"> 
+         <label for="searchKeyword">Tìm kiếm:</label>
+         <input type="text" 
+                id="searchKeyword"
+                name="searchKeyword" 
+                value="<c:out value='${param.searchKeyword}'/>" 
+                placeholder="Nhập tên giường, phòng, bệnh nhân...">
+         <button type="submit">Tìm</button>
+         <a href="MainController?action=listBeds">Xóa tìm kiếm</a>
+    </form>
+    <br> 
+
+    <%-- Hiển thị thông báo (Đã cập nhật dùng class) --%>
+    <c:if test="${not empty param.updateSuccess}"> 
+        <div class="message info">Cập nhật giường thành công!</div> 
+    </c:if>
+    <c:if test="${not empty param.deleteSuccess}"> 
+        <div class="message success">Xóa giường thành công!</div> 
+    </c:if>
+    <c:if test="${not empty param.deleteError}"> 
+        <div class="message error">Lỗi xóa giường: <c:out value="${param.deleteError}"/></div> 
+    </c:if>
+    <c:if test="${not empty param.createBedSuccess}"> 
+        <div class="message success">Thêm giường mới thành công!</div> 
+    </c:if>
+    <c:if test="${not empty param.createBedError}"> 
+        <div class="message error">Lỗi thêm giường: <c:out value="${param.createBedError}"/></div> 
+    </c:if>
+    <c:if test="${not empty param.assignSuccess}"> 
+        <div class="message success">Gán giường thành công!</div> 
+    </c:if>
+    <c:if test="${not empty param.assignError}"> 
+        <div class="message error">Lỗi gán giường: <c:out value="${param.assignError}"/></div> 
+    </c:if>
+    <c:if test="${not empty param.releaseSuccess}"> 
+        <div class="message info">Trả giường thành công!</div> 
+    </c:if>
+    <c:if test="${not empty param.error}"> 
+        <div class="message error">Lỗi: ${param.error}</div> 
+    </c:if>
+
+
+    <%-- Bảng Sơ đồ giường (Đã xóa style inline) --%>
+    <table>
+        <thead>
+            <tr>
+                <th>Giường</th> <th>Phòng</th> <th>Trạng thái</th> <th>Bệnh nhân</th> <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <c:forEach var="bed" items="${bedList}">
+                <tr>
+                    <td><c:out value="${bed.tenGiuong}"/></td>
+                    <td><c:out value="${bed.tenPhong}"/></td> 
+                    <td>
+                        <span class="status-${bed.trangThai.toLowerCase()}"> ${bed.trangThai} </span>
+                    </td>
+                    <td>
+                        <c:out value="${bed.benhNhanId != null ? bed.tenBenhNhan : '---'}"/>
+                    </td>
+                    
+                    <%-- CỘT HÀNH ĐỘNG (Đã xóa style inline) --%>
+                    <td>
+                        <%-- Nút Sửa --%>
+                        <c:if test="${bed.trangThai != 'DANG_SU_DUNG'}">
+                            <a href="MainController?action=getBedForUpdate&bedId=${bed.id}">Sửa</a>
                         </c:if>
-                    </tbody>
-                </table>
-            </div>
-        </div> <%-- End .container --%>
-    </body>
+                        
+                        <%-- Form Gán/Trả --%>
+                        <c:if test="${bed.trangThai == 'TRONG'}">
+                            <form action="${pageContext.request.contextPath}/MainController" method="POST">
+                                <input type="hidden" name="action" value="assignBed">
+                                <input type="hidden" name="bedId" value="${bed.id}">
+                                <select name="patientId">
+                                    <option value="">-- Chọn bệnh nhân --</option>
+                                    <c:forEach var="patient" items="${patientList}">
+                                        <option value="${patient.id}">
+                                            <c:out value="${patient.hoTen}"/>
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                                <button type="submit">Gán</button>
+                            </form>
+                        </c:if>
+                        <c:if test="${bed.trangThai == 'DANG_SU_DUNG'}">
+                            <form action="MainController" method="POST">
+                                <input type="hidden" name="action" value="releaseBed">
+                                <input type="hidden" name="bedId" value="${bed.id}">
+                                <button type="submit">Trả giường</button>
+                            </form>
+                        </c:if>
+
+                        <%-- Form Xóa mềm --%>
+                        <c:if test="${bed.trangThai != 'DANG_SU_DUNG'}">
+                            <form action="MainController" method="POST" 
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa giường [${bed.tenGiuong}] không? Giường sẽ bị ẩn đi.');">
+                                <input type="hidden" name="action" value="deleteBed">
+                                <input type="hidden" name="bedId" value="${bed.id}">
+                                <button type="submit" class="delete-button">Xóa</button>
+                            </form>
+                        </c:if>
+                    </td>
+                </tr>
+            </c:forEach>
+        </tbody>
+    </table>
+</body>
 </html>
