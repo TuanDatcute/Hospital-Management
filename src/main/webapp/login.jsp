@@ -7,6 +7,10 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
+<%-- **THÊM MỚI (CLEAN CODE):** Tạo biến URL động --%>
+<c:url var="mainControllerUrl" value="/MainController" />
+
+
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -22,7 +26,7 @@
 
         <%-- 
             Kiểm tra xem có lỗi đăng ký không (từ UserController)
-            Nếu có, chúng ta sẽ thêm class 'active' vào container ngay từ đầu.
+            (Logic này rất tốt, giữ nguyên)
         --%>
         <c:set var="containerClass" value="" />
         <c:if test="${requestScope.formAction == 'register'}">
@@ -45,7 +49,8 @@
             <%-- FORM ĐĂNG KÝ (SIGN UP) --%>
             <%-- ======================= --%>
             <div class="form-container sign-up">
-                <form action="MainController" method="post">
+                <%-- **CẬP NHẬT (CLEAN CODE):** Dùng biến URL --%>
+                <form action="${mainControllerUrl}" method="post">
                     <input type="hidden" name="action" value="register" />
                     <h1>Tạo tài khoản</h1>
 
@@ -53,7 +58,6 @@
                     <div class="social-icons">
                         <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
                         <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
-                            <%-- Bạn có thể thêm Github/LinkedIn hoặc bỏ bớt nếu muốn --%>
                     </div>
                     <span>hoặc dùng email của bạn để đăng ký</span>
 
@@ -69,7 +73,6 @@
                     <input type="password" placeholder="Mật khẩu" name="password" required="required"/>
                     <input type="password" placeholder="Xác nhận Mật khẩu" name="confirmPassword" required="required"/>
 
-                    <%-- Sửa lỗi type submit của bạn --%>
                     <input type="submit" value="Đăng Ký" />
                 </form>
             </div>
@@ -78,7 +81,8 @@
             <%-- FORM ĐĂNG NHẬP (SIGN IN) --%>
             <%-- ======================== --%>
             <div class="form-container sign-in">
-                <form action="MainController" method="post">
+                <%-- **CẬP NHẬT (CLEAN CODE):** Dùng biến URL --%>
+                <form action="${mainControllerUrl}" method="post">
                     <input type="hidden" name="action" value="login" />
                     <h1>Đăng nhập</h1>
 
@@ -95,7 +99,7 @@
                             <div class="error-message">${requestScope.ERROR_MESSAGE}</div>
                         </c:if>
                     </c:if>
-                    <%-- Hiển thị thông báo đăng ký thành công --%>
+                    <%-- Hiển thị thông báo đăng ký thành công (hoặc reset pass thành công) --%>
                     <c:if test="${not empty sessionScope.SUCCESS_MESSAGE}">
                         <p class="success-message">
                             ${sessionScope.SUCCESS_MESSAGE}
@@ -105,7 +109,11 @@
 
                     <input type="text" name="username" placeholder="Tên đăng nhập" required="required"/>
                     <input type="password" name="password" placeholder="Mật khẩu" required="required"/>
-                    <a href="#">Quên mật khẩu?</a>
+                    
+                    <%-- --- **BẮT ĐẦU CẬP NHẬT (Quên Mật khẩu)** --- --%>
+                    <a href="forgotPassword.jsp">Quên mật khẩu?</a>
+                    <%-- --- **KẾT THÚC CẬP NHẬT** --- --%>
+                    
                     <input type="submit" value="Đăng Nhập" />
                 </form>
             </div>
@@ -129,7 +137,7 @@
             </div>
         </div>
 
-        <%-- SCRIPT ĐIỀU KHIỂN ANIMATION --%>
+        <%-- SCRIPT ĐIỀU KHIỂN ANIMATION (Giữ nguyên) --%>
         <script>
             const container = document.getElementById('container');
             const registerBtn = document.getElementById('register');
