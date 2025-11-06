@@ -182,8 +182,6 @@ public class NhanVienDAO {
         }
     }
 
-    
-
     public List<NhanVien> findDoctorsBySpecialty() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<NhanVien> query = session.createQuery(
@@ -199,7 +197,7 @@ public class NhanVienDAO {
             return Collections.emptyList();
         }
     }
-    
+
     //=============================Dat================
     /**
      * Tìm nhân viên bằng taiKhoanId.
@@ -229,4 +227,24 @@ public class NhanVienDAO {
         }
     }
 
+    /**
+     * HÀM MỚI: Tìm các bác sĩ (NhanVien) theo Khoa ID
+     */
+    public List<NhanVien> findByKhoaId(int khoaId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Giả sử vai trò 'BAC_SI' và trạng thái 'HOAT_DONG'
+            String hql = "FROM NhanVien nv "
+                    + "JOIN FETCH nv.taiKhoan tk "
+                    + // Lấy luôn tài khoản để check
+                    "WHERE nv.khoa.id = :khoaId "
+                    + "AND tk.vaiTro = 'BAC_SI' "
+                    + "AND tk.trangThai = 'HOAT_DONG'";
+            Query<NhanVien> query = session.createQuery(hql, NhanVien.class);
+            query.setParameter("khoaId", khoaId);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
 }

@@ -82,7 +82,7 @@ public class MainController extends HttpServlet {
 
         String[] userThongBaoActions = {"viewMyNotifications", "markNotificationAsRead", "deleteMyNotification"};
 
-        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "myAppointments", "bookAppointment"};
+        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "bookAppointment", "getBacSiByKhoa", "cancelAppointment"};
         // 3. Điều hướng dựa trên action
         if (action == null || action.isEmpty()) {
             url = LOGIN_PAGE;
