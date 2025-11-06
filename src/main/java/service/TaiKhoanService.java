@@ -14,12 +14,35 @@ import java.util.stream.Collectors;
 import util.PasswordHasher;
 
 /**
+ * Lớp Service chứa logic nghiệp vụ cho TaiKhoan. Đã cập nhật: Thêm Regex cho
+ * validation.
  * Lớp Service chứa logic nghiệp vụ cho TaiKhoan.
  * **ĐÃ CẬP NHẬT:** Kích hoạt Logic Xác thực Email & Quên Mật khẩu.
  */
 public class TaiKhoanService {
 
     private final TaiKhoanDAO taiKhoanDAO = new TaiKhoanDAO();
+
+    // --- THÊM MỚI: Định nghĩa các hằng số REGEX ---
+    /**
+     * Regex cho Tên đăng nhập: - ^[a-zA-Z0-9_.-]{4,30}$ - Chỉ cho phép chữ cái
+     * (hoa, thường), số, dấu gạch dưới, dấu chấm, gạch ngang. - Độ dài từ 4 đến
+     * 30 ký tự.
+     */
+    private static final String USERNAME_REGEX = "^[a-zA-Z0-9_.-]{4,30}$";
+
+    /**
+     * Regex cho Email (một dạng phổ biến, đủ dùng): -
+     * ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$
+     */
+    private static final String EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
+
+    /**
+     * Regex cho Mật khẩu: - ^(?=.*[A-Za-z])(?=.*\d).{6,}$ - Ít nhất 6 ký tự. -
+     * Ít nhất 1 chữ cái. - Ít nhất 1 số.
+     */
+    private static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d).{6,}$";
+    // --- KẾT THÚC THÊM MỚI ---
 
     // --- THÊM HẰNG SỐ TRẠNG THÁI ---
     private static final String TRANG_THAI_CHUA_XAC_THUC = "CHUA_XAC_THUC";
@@ -56,6 +79,11 @@ public class TaiKhoanService {
     }
 
     /**
+     * Dịch vụ tạo tài khoản mới. Đã cập nhật: Thêm Regex validation.
+     */
+    public TaiKhoanDTO createTaiKhoan(TaiKhoanDTO dto, String matKhau) throws ValidationException, Exception {
+
+        // --- BƯỚC 1: VALIDATION ---
      * Dịch vụ tạo tài khoản mới.
      * **CẬP NHẬT:** Set trạng thái 'CHUA_XAC_THUC' và tạo token.
      */
@@ -68,6 +96,9 @@ public class TaiKhoanService {
         if (!Pattern.matches(USERNAME_REGEX, dto.getTenDangNhap())) {
             throw new ValidationException("Tên đăng nhập không hợp lệ (chỉ gồm chữ, số, '_', '.', '-'; dài 4-30 ký tự).");
         }
+        // --- KẾT THÚC CẬP NHẬT ---
+
+        // --- CẬP NHẬT: Thêm Regex cho Mật khẩu ---
         if (matKhau == null || !Pattern.matches(PASSWORD_REGEX, matKhau)) {
             throw new ValidationException("Mật khẩu phải có ít nhất 6 ký tự, bao gồm ít nhất 1 chữ cái và 1 số.");
         }
@@ -75,6 +106,8 @@ public class TaiKhoanService {
             throw new ValidationException("Tên đăng nhập '" + dto.getTenDangNhap() + "' đã tồn tại.");
         }
         if (dto.getEmail() != null && !dto.getEmail().trim().isEmpty()) {
+
+            // --- CẬP NHẬT: Thêm Regex cho Email ---
             if (!Pattern.matches(EMAIL_REGEX, dto.getEmail())) {
                 throw new ValidationException("Định dạng Email không hợp lệ.");
             }
@@ -118,6 +151,8 @@ public class TaiKhoanService {
     }
 
     /**
+     * Dịch vụ thay đổi mật khẩu. Đã cập nhật: Thêm Regex validation cho mật
+     * khẩu mới.
      * Dịch vụ thay đổi mật khẩu (cho người đã đăng nhập).
      */
     public void changePassword(int id, String oldPassword, String newPassword) throws ValidationException, Exception {
@@ -137,10 +172,14 @@ public class TaiKhoanService {
         if (PasswordHasher.checkPassword(newPassword, entity.getMatKhau())) {
             throw new ValidationException("Mật khẩu mới không được trùng với mật khẩu cũ.");
         }
-        
+
         String hashedNewPassword = PasswordHasher.hashPassword(newPassword);
         entity.setMatKhau(hashedNewPassword);
         entity.setUpdatedAt(LocalDateTime.now());
+        entity.setTrangThaiMatKhau("DA_DOI");
+
+        if (!taiKhoanDAO.update(entity)) {
+            throw new Exception("Cập nhật mật khẩu thất bại.");
         entity.setTrangThaiMatKhau("DA_DOI"); 
         
         try {
@@ -314,7 +353,6 @@ public class TaiKhoanService {
     // =================================================================
     // CÁC HÀM CŨ (GET, UPDATE STATUS, MAPPERS...)
     // =================================================================
-
     public TaiKhoanDTO getTaiKhoanById(int id) throws ValidationException, Exception {
         TaiKhoan entity = taiKhoanDAO.getById(id);
         if (entity == null) {
@@ -366,6 +404,17 @@ public class TaiKhoanService {
                         .collect(Collectors.toList());
     }
 
+    // === THÊM HÀM MỚI ===
+    /**
+     * Lấy danh sách các vai trò duy nhất từ CSDL.
+     *
+     * @return List<String> các tên vai trò.
+     */
+    public List<String> getDistinctRoles() {
+        return taiKhoanDAO.getDistinctVaiTro();
+    }
+    // ======================
+
     /**
      * Chuyển Entity sang DTO. 
      */
@@ -381,6 +430,7 @@ public class TaiKhoanService {
         dto.setTrangThai(entity.getTrangThai());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setTrangThaiMatKhau(entity.getTrangThaiMatKhau());
+
         
         // Không map verificationToken và tokenExpiryDate ra DTO
         
@@ -399,9 +449,9 @@ public class TaiKhoanService {
         entity.setTrangThai(dto.getTrangThai()); 
         
         entity.setMatKhau(hashedMatKhau);
-        entity.setTrangThaiMatKhau(dto.getTrangThaiMatKhau()); 
-        
+        entity.setTrangThaiMatKhau(dto.getTrangThaiMatKhau());
+
         return entity;
     }
-    
+
 }
