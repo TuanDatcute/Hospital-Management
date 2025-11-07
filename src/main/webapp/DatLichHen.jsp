@@ -4,34 +4,9 @@
 <html>
     <head>
         <title>Đặt lịch hẹn</title>
-        <style>
-            /* (CSS cũ giữ nguyên) */
-            .form-container {
-                border: 1px solid #ccc;
-                padding: 20px;
-                max-width: 500px;
-            }
-            .form-group {
-                margin-bottom: 15px;
-            }
-            label {
-                display: block;
-                margin-bottom: 5px;
-                font-weight: bold;
-            }
-            input[type="datetime-local"], select, textarea {
-                width: 100%;
-                padding: 8px;
-                box-sizing: border-box;
-            }
-            .error {
-                color: red;
-                font-weight: bold;
-            }
-            .load-error {
-                color: orange;
-            }
-        </style>
+        <%-- THÊM CSS MỚI --%>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/LichHenQuang.css">
+        <%-- Xóa thẻ <style> cũ --%>
     </head>
     <body>
 
@@ -45,15 +20,15 @@
                 <p class="load-error"><c:out value="${LOAD_FORM_ERROR}"/></p>
             </c:if>
 
+            <%-- FORM (Giữ nguyên) --%>
             <form action="${pageContext.request.contextPath}/MainController" method="POST">
                 <input type="hidden" name="action" value="bookAppointment">
 
-                <%-- === THÊM MỚI: CHỌN KHOA === --%>
                 <div class="form-group">
                     <label for="khoaId">Chọn Khoa:</label>
-                    <select name="khoaId" id="khoaId" required onchange="loadBacSi()">
+                    <%-- GỌI HÀM loadBacSi TỪ TỆP app.js --%>
+                    <select name="khoaId" id="khoaId" required onchange="loadBacSi(this)">
                         <option value="">-- Vui lòng chọn khoa --</option>
-                        <%-- Lặp qua 'khoaList' (List<KhoaDTO>) --%>
                         <c:forEach var="khoa" items="${khoaList}">
                             <option value="${khoa.id}">
                                 <c:out value="${khoa.tenKhoa}"/>
@@ -61,21 +36,19 @@
                         </c:forEach>
                     </select>
                 </div>
-                <%-- =========================== --%>
 
                 <div class="form-group">
                     <label for="bacSiId">Chọn Bác sĩ:</label>
-                    <%-- SỬA: Thêm id "bacSiLoading" --%>
                     <select name="bacSiId" id="bacSiId" required>
                         <option value="">-- Vui lòng chọn khoa trước --</option>
                     </select>
-                    <small id="bacSiLoading" style="color: blue; display: none;">Đang tải bác sĩ...</small>
+                    <small id="bacSiLoading" style="color: #007bff; display: none;">Đang tải bác sĩ...</small>
                 </div>
 
                 <div class="form-group">
                     <label for="thoiGianHen">Thời gian hẹn:</label>
                     <input type="datetime-local" id="thoiGianHen" name="thoiGianHen" required 
-                           value="${LICHHEN_DATA.thoiGianHen.toLocalDateTime()}"> <%-- Giữ lại giá trị --%>
+                           value="${LICHHEN_DATA.thoiGianHen.toLocalDateTime()}">
                 </div>
 
                 <div class="form-group">
@@ -86,59 +59,12 @@
                 <button type="submit">Xác nhận Đặt lịch</button>
             </form>
 
-            <p><a href="${pageContext.request.contextPath}/MainController?action=myAppointments">Xem lịch hẹn của tôi</a></p>
+            <p><a href="MainController?action=myAppointments">Xem lịch hẹn của tôi</a></p>
         </div>
 
-        <%-- === THÊM MỚI: JAVASCRIPT CHO AJAX === --%>
-        <script>
-        const contextPath = '${pageContext.request.contextPath}';
-        const khoaSelect = document.getElementById('khoaId');
-        const bacSiSelect = document.getElementById('bacSiId');
-        const bacSiLoading = document.getElementById('bacSiLoading');
+        <%-- THÊM JAVASCRIPT MỚI --%>
+        <script src="${pageContext.request.contextPath}/js/LichHenQuang.js"></script>
+        <%-- Xóa thẻ <script> cũ --%>
 
-        async function loadBacSi() {
-            const khoaId = khoaSelect.value;
-            bacSiSelect.innerHTML = ''; // Xóa option cũ
-
-            if (!khoaId) {
-                bacSiSelect.innerHTML = '<option value="">-- Vui lòng chọn khoa trước --</option>';
-                return;
-            }
-
-            bacSiLoading.style.display = 'block'; // Hiển thị "Đang tải..."
-            bacSiSelect.disabled = true;
-
-            try {
-                // Gọi Controller (action 'getBacSiByKhoa')
-                const response = await fetch(`${contextPath}/MainController?action=getBacSiByKhoa&khoaId=${khoaId}`);
-
-                            if (!response.ok) {
-                                throw new Error('Lỗi server khi tải bác sĩ.');
-                            }
-
-                            const bacSiList = await response.json(); // Nhận List<NhanVienDTO>
-
-                            if (bacSiList.length === 0) {
-                                bacSiSelect.innerHTML = '<option value="">-- Khoa này không có bác sĩ --</option>';
-                            } else {
-                                bacSiSelect.innerHTML = '<option value="">-- Chọn bác sĩ --</option>';
-                                bacSiList.forEach(bacSi => {
-                                    const option = document.createElement('option');
-                                    option.value = bacSi.id;
-                                    option.textContent = `${bacSi.hoTen} (${bacSi.chuyenMon || 'Chưa cập nhật'})`;
-                                    bacSiSelect.appendChild(option);
-                                });
-                            }
-
-                        } catch (error) {
-                            console.error('Lỗi AJAX:', error);
-                            bacSiSelect.innerHTML = '<option value="">-- Lỗi tải danh sách --</option>';
-                        } finally {
-                            bacSiLoading.style.display = 'none'; // Ẩn "Đang tải..."
-                            bacSiSelect.disabled = false;
-                        }
-                    }
-        </script>
-        <%-- =================================== --%>
     </body>
 </html>

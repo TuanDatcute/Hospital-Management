@@ -208,9 +208,9 @@ public class NhanVienService {
      */
     public List<NhanVienDTO> getBacSiByKhoa(int khoaId) {
         // Giả sử DAO findByKhoaId đã lọc vai trò BAC_SI
-        List<NhanVien> entities = nhanVienDAO.findByKhoaId(khoaId);
-
-        // Lọc lại chỉ những người HOAT_DONG
+        System.out.println("Service: Bắt đầu gọi DAO với khoaId: " + khoaId); // <-- THÊM DÒNG NÀY
+        List<NhanVien> entities = nhanVienDAO.findBacSiByKhoaId(khoaId);
+        System.out.println("Service: DAO đã trả về " + entities.size() + " entities."); // Lọc lại chỉ những người HOAT_DONG
         return entities.stream()
                 .filter(nv -> nv.getTaiKhoan() != null && TRANG_THAI_HOAT_DONG.equals(nv.getTaiKhoan().getTrangThai()))
                 .map(this::toDTO)

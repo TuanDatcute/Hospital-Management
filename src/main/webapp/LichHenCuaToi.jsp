@@ -5,24 +5,14 @@
 <html>
     <head>
         <title>Lịch hẹn của tôi</title>
-        <style>
-            /* (CSS cũ giữ nguyên) */
-            .delete-button {
-                background: none;
-                border: none;
-                color: red;
-                text-decoration: underline;
-                cursor: pointer;
-                padding: 0;
-                font-family: inherit;
-                font-size: 0.9em;
-            }
-        </style>
+        <%-- THÊM CSS MỚI --%>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/LichHenQuang.css">
+        <%-- Xóa thẻ <style> cũ --%>
     </head>
     <body>
         <h2>Lịch hẹn của tôi</h2>
 
-        <%-- Thông báo (Thêm 'cancelSuccess') --%>
+        <%-- Thông báo (Giữ nguyên) --%>
         <c:if test="${not empty param.bookSuccess}"><p class="success">Bạn đã đặt lịch hẹn thành công!</p></c:if>
         <c:if test="${not empty param.cancelSuccess}"><p class="success">Bạn đã hủy lịch hẹn thành công.</p></c:if>
         <c:if test="${not empty ERROR_MESSAGE}"><p class="error"><c:out value="${ERROR_MESSAGE}"/></p></c:if>
@@ -34,7 +24,7 @@
             </a>
         </p>
 
-        <%-- === THÊM MỚI: Form Tìm kiếm === --%>
+        <%-- Form Tìm kiếm (Giữ nguyên) --%>
         <form action="${pageContext.request.contextPath}/MainController" method="GET">
             <input type="hidden" name="action" value="myAppointments">
             Tìm kiếm:
@@ -44,7 +34,6 @@
             <a href="${pageContext.request.contextPath}/MainController?action=myAppointments">Xóa lọc</a>
         </form>
         <br>
-        <%-- ================================ --%>
 
         <table border="1" style="width:100%">
             <thead>
@@ -54,7 +43,7 @@
                     <th>Bác sĩ</th>
                     <th>Lý do khám</th>
                     <th>Trạng thái</th>
-                    <th>Hành động</th> <%-- THÊM CỘT MỚI --%>
+                    <th>Hành động</th> 
                 </tr>
             </thead>
             <tbody>
@@ -69,13 +58,13 @@
                         </td>
                         <td><c:out value="${lich.lyDoKham}"/></td>
                         <td>
+                            <%-- SỬ DỤNG CLASS MỚI ĐỂ ĐỊNH DẠNG MÀU TRẠNG THÁI --%>
                             <span class="status-${lich.trangThai}">
                                 <c:out value="${lich.trangThai}"/>
                             </span>
                         </td>
-                        <%-- === THÊM MỚI: Nút Hủy === --%>
                         <td>
-                            <%-- Chỉ cho hủy nếu đang chờ hoặc đã xác nhận --%>
+                            <%-- Nút Hủy (Giữ nguyên) --%>
                             <c:if test="${lich.trangThai == 'CHO_XAC_NHAN' || lich.trangThai == 'DA_XAC_NHAN'}">
                                 <form action="${pageContext.request.contextPath}/MainController" method="POST"
                                       onsubmit="return confirm('Bạn có chắc chắn muốn hủy lịch hẹn này?');">
@@ -85,7 +74,6 @@
                                 </form>
                             </c:if>
                         </td>
-                        <%-- ======================== --%>
                     </tr>
                 </c:forEach>
             </tbody>
