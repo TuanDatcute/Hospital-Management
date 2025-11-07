@@ -37,7 +37,7 @@ public class TaiKhoanDAO {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             // Đảm bảo trạng thái mặc định khi tạo mới
-            
+
             // LƯU Ý: Service sẽ set trạng thái là 'CHUA_XAC_THUC'
             // Dòng code dưới đây chỉ là dự phòng nếu Service quên.
             if (taiKhoan.getTrangThai() == null) {
@@ -61,11 +61,11 @@ public class TaiKhoanDAO {
      * @param taiKhoan Đối tượng TaiKhoan (Entity) đã được thay đổi.
      * @return true nếu cập nhật thành công, false nếu lỗi.
      */
-    public void update(TaiKhoan taiKhoan) { 
+    public void update(TaiKhoan taiKhoan) {
         Transaction transaction = null;
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.update(taiKhoan); 
+            session.update(taiKhoan);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -84,7 +84,7 @@ public class TaiKhoanDAO {
      */
     public void delete(TaiKhoan taiKhoan) {
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.delete(taiKhoan);
             transaction.commit();
@@ -142,7 +142,7 @@ public class TaiKhoanDAO {
             return query.list();
         } catch (Exception e) {
             e.printStackTrace(); // Nên dùng logger
-            return Collections.emptyList(); 
+            return Collections.emptyList();
         }
     }
 
@@ -192,18 +192,18 @@ public class TaiKhoanDAO {
      * @return Danh sách các TaiKhoan (Entity) phù hợp.
      */
     public List<TaiKhoan> findActiveAndUnassignedAccounts(String role) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "SELECT tk FROM TaiKhoan tk " +
-                         "WHERE tk.trangThai = :trangThai " +
-                         "AND NOT EXISTS (SELECT 1 FROM NhanVien nv WHERE nv.taiKhoan = tk) " + 
-                         "AND NOT EXISTS (SELECT 1 FROM BenhNhan bn WHERE bn.taiKhoan = tk) "; 
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT tk FROM TaiKhoan tk "
+                    + "WHERE tk.trangThai = :trangThai "
+                    + "AND NOT EXISTS (SELECT 1 FROM NhanVien nv WHERE nv.taiKhoan = tk) "
+                    + "AND NOT EXISTS (SELECT 1 FROM BenhNhan bn WHERE bn.taiKhoan = tk) ";
 
             if (role != null && !role.trim().isEmpty()) {
                 hql += " AND tk.vaiTro = :vaiTro";
             }
 
             Query<TaiKhoan> query = session.createQuery(hql, TaiKhoan.class);
-            query.setParameter("trangThai", TRANG_THAI_HOAT_DONG); 
+            query.setParameter("trangThai", TRANG_THAI_HOAT_DONG);
 
             if (role != null && !role.trim().isEmpty()) {
                 query.setParameter("vaiTro", role);
@@ -212,33 +212,31 @@ public class TaiKhoanDAO {
             return query.list();
         } catch (Exception e) {
             e.printStackTrace(); // Nên dùng logger
-            return Collections.emptyList(); 
+            return Collections.emptyList();
         }
     }
 
-
     // --- **CÁC HÀM CHO XÁC THỰC/RESET (Đã cập nhật)** ---
-    
     /**
      * HÀM MỚI (Kích hoạt): Tìm tài khoản bằng token xác thực/reset.
      */
     public Optional<TaiKhoan> findByVerificationToken(String token) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM TaiKhoan t WHERE t.verificationToken = :token";
             Query<TaiKhoan> query = session.createQuery(hql, TaiKhoan.class);
             query.setParameter("token", token);
             return query.uniqueResultOptional();
         } catch (Exception e) {
-            e.printStackTrace(); 
-            return Optional.empty(); 
+            e.printStackTrace();
+            return Optional.empty();
         }
     }
-    
+
     /**
      * HÀM MỚI: Lấy token bằng email (dùng cho Xác thực Email).
      */
     public Optional<String> findVerificationTokenByEmail(String email) {
-         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "SELECT T.verificationToken FROM TaiKhoan T WHERE T.email = :email";
             Query<String> query = session.createQuery(hql, String.class);
             query.setParameter("email", email);
@@ -248,14 +246,14 @@ public class TaiKhoanDAO {
             return Optional.empty();
         }
     }
-    
+
     // --- **BẮT ĐẦU THÊM MỚI (Cho 'Quên Mật khẩu')** ---
     /**
-     * HÀM MỚI: Tìm một tài khoản bằng Email (dùng cho Quên mật khẩu).
-     * Trả về Optional<TaiKhoan> để Service có thể lấy entity và cập nhật token.
+     * HÀM MỚI: Tìm một tài khoản bằng Email (dùng cho Quên mật khẩu). Trả về
+     * Optional<TaiKhoan> để Service có thể lấy entity và cập nhật token.
      */
     public Optional<TaiKhoan> findByEmail(String email) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM TaiKhoan t WHERE t.email = :email";
             Query<TaiKhoan> query = session.createQuery(hql, TaiKhoan.class);
             query.setParameter("email", email);
@@ -267,7 +265,6 @@ public class TaiKhoanDAO {
     }
     // --- **KẾT THÚC THÊM MỚI** ---
 
-
     // ============================================
     // === CÁC HÀM MỚI CHO THONGBAOSERVICE ===
     // ============================================
@@ -278,13 +275,13 @@ public class TaiKhoanDAO {
      * @return List<Integer> chứa ID tài khoản.
      */
     public List<Integer> getAllActiveTaiKhoanIds() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "SELECT t.id FROM TaiKhoan t WHERE t.trangThai = :trangThai";
             Query<Integer> query = session.createQuery(hql, Integer.class);
             query.setParameter("trangThai", TRANG_THAI_HOAT_DONG);
             return query.list();
         } catch (Exception e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
             return Collections.emptyList();
         }
     }
@@ -297,17 +294,17 @@ public class TaiKhoanDAO {
      * @return List<Integer> chứa ID tài khoản.
      */
     public List<Integer> getActiveTaiKhoanIdsByRole(String role) {
-         if (role == null || role.trim().isEmpty()) {
-             return Collections.emptyList(); 
-         }
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        if (role == null || role.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "SELECT t.id FROM TaiKhoan t WHERE t.trangThai = :trangThai AND t.vaiTro = :vaiTro";
             Query<Integer> query = session.createQuery(hql, Integer.class);
             query.setParameter("trangThai", TRANG_THAI_HOAT_DONG);
             query.setParameter("vaiTro", role.trim());
             return query.list();
         } catch (Exception e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
             return Collections.emptyList();
         }
     }

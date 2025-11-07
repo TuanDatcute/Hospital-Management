@@ -1,8 +1,8 @@
 package model.Entity; // Gói của bạn
 
-import java.io.Serializable; // <-- **THÊM 1: IMPORT**
-import java.time.LocalDate; // <-- **THÊM 2: IMPORT (thay cho LocalDateTime)**
-import java.time.LocalDateTime; // (Giữ lại nếu bạn dùng cho các trường khác)
+import java.io.Serializable; 
+import java.time.LocalDate; 
+import java.time.LocalDateTime; 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,14 +10,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne; // <-- **THÊM 1: IMPORT**
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "BenhNhan")
-public class BenhNhan implements Serializable { // <-- **SỬA 3: THÊM Serializable**
+public class BenhNhan implements Serializable { 
 
-    private static final long serialVersionUID = 1L; // Thêm dòng này
+    private static final long serialVersionUID = 1L; 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,10 +31,8 @@ public class BenhNhan implements Serializable { // <-- **SỬA 3: THÊM Serializ
     @Column(name = "ho_ten", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String hoTen;
 
-    // --- **SỬA 4: ĐỔI KIỂU DỮ LIỆU** ---
-    @Column(name = "ngay_sinh") // Sẽ được map sang kiểu DATE trong CSDL
+    @Column(name = "ngay_sinh") 
     private LocalDate ngaySinh; 
-    // --- **KẾT THÚC SỬA** ---
 
     @Column(name = "gioi_tinh", columnDefinition = "NVARCHAR(MAX)")
     private String gioiTinh;
@@ -53,9 +52,17 @@ public class BenhNhan implements Serializable { // <-- **SỬA 3: THÊM Serializ
     @Column(name = "tien_su_benh", columnDefinition = "NVARCHAR(MAX)", nullable = true)
     private String tienSuBenh;
 
+    // Mối quan hệ với Tài khoản (Giữ nguyên)
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "tai_khoan_id", referencedColumnName = "id", nullable = true)
     private TaiKhoan taiKhoan;
+    
+    // --- **THÊM 2: MỐI QUAN HỆ VỚI KHOA** ---
+    // Giả định: Nhiều bệnh nhân thuộc về một khoa
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "khoa_id", referencedColumnName = "id", nullable = true)
+    private Khoa khoa;
+    // --- **KẾT THÚC THÊM MỚI** ---
     
     // Constructors
     public BenhNhan() {
@@ -86,7 +93,6 @@ public class BenhNhan implements Serializable { // <-- **SỬA 3: THÊM Serializ
         this.hoTen = hoTen;
     }
 
-    // --- **SỬA 5: ĐỔI KIỂU GETTER/SETTER** ---
     public LocalDate getNgaySinh() {
         return ngaySinh;
     }
@@ -94,7 +100,6 @@ public class BenhNhan implements Serializable { // <-- **SỬA 3: THÊM Serializ
     public void setNgaySinh(LocalDate ngaySinh) {
         this.ngaySinh = ngaySinh;
     }
-    // --- **KẾT THÚC SỬA** ---
 
     public String getGioiTinh() {
         return gioiTinh;
@@ -151,4 +156,14 @@ public class BenhNhan implements Serializable { // <-- **SỬA 3: THÊM Serializ
     public void setCccd(String cccd){
         this.cccd = cccd;
     }
+    
+    // --- **THÊM 3: GETTER/SETTER CHO KHOA** ---
+    public Khoa getKhoa() {
+        return khoa;
+    }
+
+    public void setKhoa(Khoa khoa) {
+        this.khoa = khoa;
+    }
+    // --- **KẾT THÚC THÊM MỚI** ---
 }

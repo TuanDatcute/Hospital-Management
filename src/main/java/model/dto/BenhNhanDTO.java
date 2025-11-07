@@ -1,21 +1,21 @@
 package model.dto;
 
-import java.io.Serializable; // <-- **THÊM 1: IMPORT**
-import java.time.LocalDate; // <-- **THÊM 2: IMPORT (thay cho LocalDateTime)**
+import java.io.Serializable; 
+import java.time.LocalDate; 
 
 /**
  * DTO (Data Transfer Object) cho BenhNhan.
- * Dùng để truyền dữ liệu Bệnh nhân giữa View (JSP) và Controller/Service.
+ * **ĐÃ CẬP NHẬT:** Thêm khoaId để đồng bộ với Entity.
  */
-public class BenhNhanDTO implements Serializable { // <-- **SỬA 3: THÊM Serializable**
+public class BenhNhanDTO implements Serializable { 
 
-    private static final long serialVersionUID = 1L; // Bắt buộc phải có
+    private static final long serialVersionUID = 1L; 
 
     private int id;
     private String maBenhNhan;
     private String hoTen;
     
-    private LocalDate ngaySinh; // <-- **SỬA 4: Đổi kiểu dữ liệu**
+    private LocalDate ngaySinh; 
     
     private String gioiTinh;
     private String diaChi;
@@ -25,13 +25,17 @@ public class BenhNhanDTO implements Serializable { // <-- **SỬA 3: THÊM Seria
     private String tienSuBenh;
     
     private Integer taiKhoanId;
+    
+    // --- **THÊM 1: THÊM TRƯỜNG KHOAID** ---
+    private Integer khoaId;
+    // --- **KẾT THÚC THÊM MỚI** ---
 
     // Constructors
     public BenhNhanDTO() {
     }
 
-    // Constructor đầy đủ (Đã sửa kiểu ngaySinh)
-    public BenhNhanDTO(int id, String maBenhNhan, String hoTen, LocalDate ngaySinh, String gioiTinh, String diaChi, String soDienThoai, String nhomMau, String cccd, String tienSuBenh, Integer taiKhoanId) {
+    // Constructor đầy đủ (Đã thêm khoaId)
+    public BenhNhanDTO(int id, String maBenhNhan, String hoTen, LocalDate ngaySinh, String gioiTinh, String diaChi, String soDienThoai, String nhomMau, String cccd, String tienSuBenh, Integer taiKhoanId, Integer khoaId) { // <-- Thêm khoaId
         this.id = id;
         this.maBenhNhan = maBenhNhan;
         this.hoTen = hoTen;
@@ -43,6 +47,7 @@ public class BenhNhanDTO implements Serializable { // <-- **SỬA 3: THÊM Seria
         this.cccd = cccd;
         this.tienSuBenh = tienSuBenh;
         this.taiKhoanId = taiKhoanId;
+        this.khoaId = khoaId; // <-- Thêm khoaId
     }
 
     // Getters and Setters
@@ -70,7 +75,6 @@ public class BenhNhanDTO implements Serializable { // <-- **SỬA 3: THÊM Seria
         this.hoTen = hoTen;
     }
 
-    // --- **SỬA 5: ĐỔI KIỂU GETTER/SETTER** ---
     public LocalDate getNgaySinh() {
         return ngaySinh;
     }
@@ -78,7 +82,6 @@ public class BenhNhanDTO implements Serializable { // <-- **SỬA 3: THÊM Seria
     public void setNgaySinh(LocalDate ngaySinh) {
         this.ngaySinh = ngaySinh;
     }
-    // --- **KẾT THÚC SỬA ĐỔI** ---
 
     public String getGioiTinh() {
         return gioiTinh;
@@ -135,4 +138,14 @@ public class BenhNhanDTO implements Serializable { // <-- **SỬA 3: THÊM Seria
     public void setTaiKhoanId(Integer taiKhoanId) {
         this.taiKhoanId = taiKhoanId;
     }
+    
+    // --- **THÊM 2: THÊM GETTER/SETTER CHO KHOAID** ---
+    public Integer getKhoaId() {
+        return khoaId;
+    }
+
+    public void setKhoaId(Integer khoaId) {
+        this.khoaId = khoaId;
+    }
+    // --- **KẾT THÚC THÊM MỚI** ---
 }
