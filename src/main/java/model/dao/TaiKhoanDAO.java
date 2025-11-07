@@ -358,4 +358,79 @@ public class TaiKhoanDAO {
             return Collections.emptyMap();
         }
     }
+
+    /**
+     * HÀM MỚI (PHÂN TRANG): Lấy danh sách Tài khoản (có phân trang) Lấy tất cả,
+     * bao gồm cả tài khoản BỊ KHÓA (để Admin quản lý)
+     */
+    public List<TaiKhoan> getAllTaiKhoan(int page, int pageSize) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "FROM TaiKhoan t ORDER BY t.id ASC";
+            Query<TaiKhoan> query = session.createQuery(hql, TaiKhoan.class);
+
+            int offset = (page - 1) * pageSize;
+            query.setFirstResult(offset);
+            query.setMaxResults(pageSize);
+
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * HÀM MỚI (PHÂN TRANG): Đếm tổng số Tài khoản (bao gồm cả bị khóa)
+     */
+    public long getTotalTaiKhoanCount() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT count(t.id) FROM TaiKhoan t";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * HÀM MỚI (TÌM KIẾM): Tìm kiếm Tài khoản (có phân trang) Tìm theo Tên đăng
+     * nhập hoặc Email
+     */
+    public List<TaiKhoan> searchTaiKhoanPaginated(String keyword, int page, int pageSize) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "FROM TaiKhoan t "
+                    + "WHERE t.tenDangNhap LIKE :keyword OR t.email LIKE :keyword "
+                    + "ORDER BY t.id ASC";
+
+            Query<TaiKhoan> query = session.createQuery(hql, TaiKhoan.class);
+            query.setParameter("keyword", "%" + keyword + "%");
+
+            int offset = (page - 1) * pageSize;
+            query.setFirstResult(offset);
+            query.setMaxResults(pageSize);
+
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * HÀM MỚI (TÌM KIẾM): Đếm kết quả tìm kiếm Tài khoản
+     */
+    public long getTaiKhoanSearchCount(String keyword) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT count(t.id) FROM TaiKhoan t "
+                    + "WHERE t.tenDangNhap LIKE :keyword OR t.email LIKE :keyword";
+
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("keyword", "%" + keyword + "%");
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
 }

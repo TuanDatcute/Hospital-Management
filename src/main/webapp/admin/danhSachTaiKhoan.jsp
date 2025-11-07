@@ -1,7 +1,8 @@
 <%--
-    Document   : danhSachTaiKhoan.jsp (Đã sửa lỗi GET/POST)
-    Created on : Oct 29, 2025
-    Author     : ADMIN
+    Document    : danhSachTaiKhoan.jsp
+    Created on  : Oct 29, 2025
+    Author      : ADMIN
+    (ĐÃ NÂNG CẤP: Thêm Phân trang, Tìm kiếm, Sửa lỗi PRG)
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -15,6 +16,55 @@
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
+
+        <%-- Thêm CSS cho Phân trang và Tìm kiếm --%>
+        <style>
+            .pagination-container {
+                margin-top: 20px;
+                text-align: center;
+            }
+            .pagination-btn {
+                display: inline-block;
+                padding: 8px 16px;
+                margin: 0 5px;
+                background-color: #007bff;
+                color: white;
+                text-decoration: none;
+                border-radius: 4px;
+                font-weight: bold;
+            }
+            .pagination-btn.disabled {
+                background-color: #cccccc;
+                color: #666666;
+                cursor: not-allowed;
+            }
+            .pagination-info {
+                margin: 0 10px;
+                font-size: 1.1em;
+                vertical-align: middle;
+            }
+            .search-container {
+                margin-top: 15px;
+                margin-bottom: 20px;
+                display: flex;
+                justify-content: flex-end;
+            }
+            .search-container input[type="text"] {
+                padding: 8px;
+                width: 250px;
+                border: 1px solid #ccc;
+                border-radius: 4px 0 0 4px;
+            }
+            .search-container button {
+                padding: 8px 12px;
+                border: none;
+                background-color: #007bff;
+                color: white;
+                cursor: pointer;
+                border-radius: 0 4px 4px 0;
+                margin-left: -1px;
+            }
+        </style>
     </head>
     <body>
 
@@ -24,16 +74,32 @@
 
             <h2 class="section-title">Quản lý Tài khoản</h2>
 
-            <c:if test="${not empty requestScope.SUCCESS_MESSAGE}">
-                <p class="success-message">${requestScope.SUCCESS_MESSAGE}</p>
+            <%-- === SỬA LỖI PRG (Post-Redirect-Get) === --%>
+            <c:if test="${not empty sessionScope.SUCCESS_MESSAGE}">
+                <p class="success-message">${sessionScope.SUCCESS_MESSAGE}</p>
+                <c:remove var="SUCCESS_MESSAGE" scope="session" />
             </c:if>
-            <c:if test="${not empty requestScope.ERROR_MESSAGE}">
-                <p class="error-message">${requestScope.ERROR_MESSAGE}</p>
+            <c:if test="${not empty sessionScope.ERROR_MESSAGE}">
+                <p class="error-message">${sessionScope.ERROR_MESSAGE}</p>
+                <c:remove var="ERROR_MESSAGE" scope="session" />
             </c:if>
+            <%-- === KẾT THÚC SỬA LỖI PRG === --%>
 
             <a href="${pageContext.request.contextPath}/MainController?action=showUserCreateForm" class="add-new-btn">
                 <i class="fas fa-user-plus"></i> Thêm Tài khoản Mới
             </a>
+
+            <%-- === BẮT ĐẦU THÊM MỚI (FORM TÌM KIẾM) === --%>
+            <div class="search-container">
+                <form action="MainController" method="GET">
+                    <input type="hidden" name="action" value="listUsers" />
+                    <input type="text" name="keyword" 
+                           placeholder="Tìm theo Tên đăng nhập, Email..." 
+                           value="<c:out value='${requestScope.searchKeyword}' />" />
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <%-- === KẾT THÚC THÊM MỚI (FORM TÌM KIẾM) === --%>
 
             <table class="data-table">
                 <thead>
@@ -63,46 +129,35 @@
                             </td>
 
                             <td class="actions">
-                                <%-- Không cho admin tự khóa/sửa chính mình --%>
                                 <c:if test="${sessionScope.USER.id != tk.id}">
-
-                                    <%-- Link Sửa (vẫn là GET vì nó chỉ HIỂN THỊ form) --%>
+                                    <%-- (Link Sửa giữ nguyên) --%>
                                     <a href="${pageContext.request.contextPath}/MainController?action=showUserEditForm&id=${tk.id}" class="edit-btn" title="Sửa Trạng thái">
                                         <i class="fas fa-edit"></i>
                                     </a>
-
-                                    <%-- **SỬA LỖI: Dùng Form POST cho Nút Khóa** --%>
+                                    <%-- (Form Khóa/Mở khóa POST của bạn đã rất tốt, giữ nguyên) --%>
                                     <c:if test="${tk.trangThai == 'HOAT_DONG'}">
                                         <form action="${pageContext.request.contextPath}/MainController" method="post" class="table-form" 
                                               onsubmit="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản này?');">
-
                                             <input type="hidden" name="action" value="updateUserStatus" />
                                             <input type="hidden" name="id" value="${tk.id}" />
                                             <input type="hidden" name="trangThai" value="BI_KHOA" />
-
                                             <button type="submit" class="delete-btn" title="Khóa tài khoản">
                                                 <i class="fas fa-lock"></i>
                                             </button>
                                         </form>
                                     </c:if>
-
-                                    <%-- **SỬA LỖI: Dùng Form POST cho Nút Mở khóa** --%>
                                     <c:if test="${tk.trangThai == 'BI_KHOA'}">
                                         <form action="${pageContext.request.contextPath}/MainController" method="post" class="table-form" 
                                               onsubmit="return confirm('Bạn có chắc chắn muốn MỞ KHÓA tài khoản này?');">
-
                                             <input type="hidden" name="action" value="updateUserStatus" />
                                             <input type="hidden" name="id" value="${tk.id}" />
                                             <input type="hidden" name="trangThai" value="HOAT_DONG" />
-
                                             <button type="submit" class="edit-btn" title="Mở khóa tài khoản">
                                                 <i class="fas fa-lock-open"></i>
                                             </button>
                                         </form>
                                     </c:if>
-
                                 </c:if>
-
                                 <c:if test="${sessionScope.USER.id == tk.id}">
                                     (Đây là bạn)
                                 </c:if>
@@ -112,11 +167,53 @@
 
                     <c:if test="${empty requestScope.LIST_TAIKHOAN}">
                         <tr>
-                            <td colspan="6" class="empty-cell">Không có dữ liệu tài khoản.</td>
+                            <td colspan="6" class="empty-cell">
+                                <%-- === SỬA (THÊM THÔNG BÁO TÌM KIẾM) === --%>
+                                <c:if test="${not empty requestScope.searchKeyword}">
+                                    Không tìm thấy tài khoản nào với từ khóa "<c:out value='${requestScope.searchKeyword}' />".
+                                </c:if>
+                                <c:if test="${empty requestScope.searchKeyword}">
+                                    Không có dữ liệu tài khoản.
+                                </c:if>
+                                <%-- === KẾT THÚC SỬA === --%>
+                            </td>
                         </tr>
                     </c:if>
                 </tbody>
             </table>
+
+            <%-- === BẮT ĐẦU THÊM MỚI (PHÂN TRANG + TÌM KIẾM) === --%>
+            <div class="pagination-container">
+                <c:set var="currentPage" value="${requestScope.currentPage}" />
+                <c:set var="totalPages" value="${requestScope.totalPages}" />
+                <c:set var="searchKeyword" value="${requestScope.searchKeyword}" />
+
+                <c:if test="${totalPages > 1}">
+                    <%-- Nút Trang Trước --%>
+                    <c:url var="prevPageUrl" value="MainController">
+                        <c:param name="action" value="listUsers" />
+                        <c:param name="page" value="${currentPage - 1}" />
+                        <c:if test="${not empty searchKeyword}"><c:param name="keyword" value="${searchKeyword}" /></c:if>
+                    </c:url>
+                    <a href="${currentPage > 1 ? prevPageUrl : '#'}" 
+                       class="pagination-btn ${currentPage > 1 ? '' : 'disabled'}">&laquo; Trang trước</a>
+
+                    <%-- Hiển thị số trang --%>
+                    <span class="pagination-info">
+                        Trang ${currentPage} / ${totalPages}
+                    </span>
+
+                    <%-- Nút Trang Sau --%>
+                    <c:url var="nextPageUrl" value="MainController">
+                        <c:param name="action" value="listUsers" />
+                        <c:param name="page" value="${currentPage + 1}" />
+                        <c:if test="${not empty searchKeyword}"><c:param name="keyword" value="${searchKeyword}" /></c:if>
+                    </c:url>
+                    <a href="${currentPage < totalPages ? nextPageUrl : '#'}" 
+                       class="pagination-btn ${currentPage < totalPages ? '' : 'disabled'}">Trang sau &raquo;</a>
+                </c:if>
+            </div>
+            <%-- === KẾT THÚC THÊM MỚI (PHÂN TRANG + TÌM KIẾM) === --%>
 
         </div> 
 

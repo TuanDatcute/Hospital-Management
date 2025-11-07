@@ -1,8 +1,7 @@
-package model.Entity; // Gói của bạn
+package model.Entity;
 
-import java.io.Serializable; 
-import java.time.LocalDate; 
-import java.time.LocalDateTime; 
+import java.io.Serializable;
+import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,29 +9,29 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne; // <-- **THÊM 1: IMPORT**
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "BenhNhan")
-public class BenhNhan implements Serializable { 
+public class BenhNhan implements Serializable {
 
-    private static final long serialVersionUID = 1L; 
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
-    
+
     @Column(name = "ma_benh_nhan", nullable = false, unique = true, columnDefinition = "NVARCHAR(MAX)")
     private String maBenhNhan;
 
     @Column(name = "ho_ten", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String hoTen;
 
-    @Column(name = "ngay_sinh") 
-    private LocalDate ngaySinh; 
+    @Column(name = "ngay_sinh")
+    private LocalDate ngaySinh;
 
     @Column(name = "gioi_tinh", columnDefinition = "NVARCHAR(MAX)")
     private String gioiTinh;
@@ -42,7 +41,7 @@ public class BenhNhan implements Serializable {
 
     @Column(name = "so_dien_thoai", columnDefinition = "NVARCHAR(MAX)")
     private String soDienThoai;
-    
+
     @Column(name = "cccd", length = 20, unique = true, columnDefinition = "NVARCHAR(MAX)")
     private String cccd;
 
@@ -52,23 +51,23 @@ public class BenhNhan implements Serializable {
     @Column(name = "tien_su_benh", columnDefinition = "NVARCHAR(MAX)", nullable = true)
     private String tienSuBenh;
 
-    // Mối quan hệ với Tài khoản (Giữ nguyên)
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "tai_khoan_id", referencedColumnName = "id", nullable = true)
     private TaiKhoan taiKhoan;
-    
-    // --- **THÊM 2: MỐI QUAN HỆ VỚI KHOA** ---
-    // Giả định: Nhiều bệnh nhân thuộc về một khoa
+
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "khoa_id", referencedColumnName = "id", nullable = true)
     private Khoa khoa;
-    // --- **KẾT THÚC THÊM MỚI** ---
-    
-    // Constructors
+
+    // === BẮT ĐẦU THÊM MỚI (CHO XÓA MỀM) ===
+    @Column(name = "trang_thai", nullable = false, length = 50)
+    private String trangThai = "HOAT_DONG"; // Đặt giá trị mặc định
+    // === KẾT THÚC THÊM MỚI ===
+
+    // (Constructors và Getters/Setters cũ giữ nguyên)
     public BenhNhan() {
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -148,16 +147,15 @@ public class BenhNhan implements Serializable {
     public void setTaiKhoan(TaiKhoan taiKhoan) {
         this.taiKhoan = taiKhoan;
     }
-    
-    public String getCccd(){
+
+    public String getCccd() {
         return cccd;
     }
-    
-    public void setCccd(String cccd){
+
+    public void setCccd(String cccd) {
         this.cccd = cccd;
     }
-    
-    // --- **THÊM 3: GETTER/SETTER CHO KHOA** ---
+
     public Khoa getKhoa() {
         return khoa;
     }
@@ -165,5 +163,14 @@ public class BenhNhan implements Serializable {
     public void setKhoa(Khoa khoa) {
         this.khoa = khoa;
     }
-    // --- **KẾT THÚC THÊM MỚI** ---
+
+    // === BẮT ĐẦU THÊM MỚI (GETTER/SETTER CHO TRẠNG THÁI) ===
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
+    }
+    // === KẾT THÚC THÊM MỚI ===
 }

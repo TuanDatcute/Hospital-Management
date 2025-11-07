@@ -44,10 +44,10 @@ public class MainController extends HttpServlet {
         String[] NurseLichHenActions = {"showCreateAppointmentForm", "createAppointment", "getDoctorsByKhoa"};
         String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus", "showCreateAppointmentForm", "createAppointment", "getDoctorsByKhoa"};
         String[] userActions = {"login", "logout", "listUsers", "showUserCreateForm", "createUser", "showUserEditForm", "updateUserStatus", "showChangePasswordForm", "changePassword", "register", "resendVerification"};
-        String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa", "showKhoaEditForm", "updateKhoa", "deleteKhoa"};
-        String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien", "showNhanVienEditForm", "updateNhanVien", "deleteNhanVien"};
+        String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa", "showKhoaEditForm", "updateKhoa", "softDeleteKhoa"};
+        String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien", "showNhanVienEditForm", "updateNhanVien", "softDeleteNhanVien"};
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm", "createPrescription"};
-        String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan", "showBenhNhanEditForm", "updateBenhNhan", "deleteBenhNhan", "showProfile", "showEditProfile", "saveProfile", "confirmAndLink", "showEditProfileWithExisting", "updateAndLink"};
+        String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan", "showBenhNhanEditForm", "updateBenhNhan", "softDeleteBenhNhan", "showProfile", "showEditProfile", "saveProfile", "confirmAndLink", "showEditProfileWithExisting", "updateAndLink"};
         String[] phongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate", "deleteRoom", "showCreateRoomForm"};
         String[] giuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed", "deleteBed", "updateBed", "getBedForUpdate", "showCreateBedForm"};
         String[] hoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice", "printInvoice"};
@@ -58,6 +58,16 @@ public class MainController extends HttpServlet {
         String[] resetActions = {"requestReset", "performReset"};
         String[] securityActions = {"showConfirmPassword", "confirmPassword", "showEditPhone", "savePhone", "showEditCCCD", "saveCCCD", "showEditName", "saveName", "showEditDOB", "saveDOB"};
 
+        // Logic AJAX mới được thêm vào
+        String[] ajaxActions = {"getBacSiByKhoa"};
+        if (Arrays.asList(ajaxActions).contains(action)) {
+            if ("getBacSiByKhoa".equals(action)) {
+                new PatientLichHenController().doGet(request, response);
+                return; // Quan trọng: Dừng lại để không forward
+            }
+        }
+
+        // Logic điều hướng chính
         if (action == null || action.isEmpty()) {
             url = LOGIN_PAGE;
         } else if (Arrays.asList(userActions).contains(action)) {

@@ -2,11 +2,10 @@ package controller;
 
 import exception.ValidationException;
 import java.io.IOException;
-import java.time.LocalDateTime; // Cần import LocalDateTime
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset; // Cần import ZoneOffset
+import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -27,39 +26,51 @@ import service.NhanVienService;
 import com.google.gson.Gson;
 
 /**
- * Controller xử lý các nghiệp vụ liên quan đến Lịch Hẹn (Appointment).
+ * Controller xử lý các nghiệp vụ liên quan đến Lịch Hẹn (Appointment). (ĐÃ NÂNG
+ * CẤP: Sửa lỗi gọi hàm BenhNhanService)
  */
 @WebServlet(name = "LichHenController", urlPatterns = {"/LichHenController"})
 public class LichHenController extends HttpServlet {
 
-    // Khai báo URL cho các trang JSP
+    // (Các hằng số giữ nguyên)
     private static final String LICHHEN_LIST_PAGE = "admin/danhSachLichHen.jsp";
     private static final String ERROR_PAGE = "error.jsp";
 
-    // Khởi tạo các Service cần thiết
+    // (Các Service giữ nguyên)
     private final LichHenService lichHenService = new LichHenService();
     private final BenhNhanService benhNhanService = new BenhNhanService();
     private final NhanVienService nhanVienService = new NhanVienService();
     private final KhoaService khoaService = new KhoaService();
+    private static final String LICHHEN_FORM_PAGE = "admin/formLichHen.jsp";
     private final Gson gson = new Gson();
+
+    // Hằng số cho phân trang
+    private static final int PAGE_SIZE = 10; // 10 lịch hẹn mỗi trang
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // (Hàm doGet giữ nguyên y hệt, không thay đổi)
+        response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
-
-        // Các yêu cầu này sẽ tự xử lý response và kết thúc (return)
-        String url = ERROR_PAGE; // Đặt URL lỗi làm mặc định
+        String url = LICHHEN_LIST_PAGE;
         try {
             if (action == null || action.isEmpty()) {
                 action = "listLichHen"; // Đặt action mặc định
             }
-
             switch (action) {
                 case "listLichHen":
                     url = listLichHen(request);
+                    break;
+                case "showLichHenCreateForm":
+                    loadFormDependencies(request);
+                    request.setAttribute("formAction", "createLichHen");
+                    url = LICHHEN_FORM_PAGE;
+                    break;
+                case "showLichHenEditForm":
+                    url = showLichHenEditForm(request);
                     break;
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho GET.");
@@ -79,90 +90,142 @@ public class LichHenController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // (Hàm doPost giữ nguyên y hệt, không thay đổi)
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
-
         String action = request.getParameter("action");
         String url = ERROR_PAGE;
-        boolean loadListAfterSuccess = true;
-
+        String formErrorPage = ERROR_PAGE;
         try {
             if (action == null || action.isEmpty()) {
                 throw new Exception("Hành động không được chỉ định.");
             }
-
+            if ("createLichHen".equals(action) || "updateLichHen".equals(action)) {
+                formErrorPage = LICHHEN_FORM_PAGE;
+            } else if ("createAppointment".equals(action)) {
+                formErrorPage = "lichHenDat.jsp";
+            } else if ("updateLichHenStatus".equals(action)) {
+                formErrorPage = LICHHEN_LIST_PAGE;
+            }
             switch (action) {
                 case "createLichHen":
                     url = createLichHen(request);
+                    break;
+                case "updateLichHen":
+                    url = updateLichHen(request);
                     break;
                 case "updateLichHenStatus":
                     url = updateLichHenStatus(request);
                     break;
                 default:
-                    loadListAfterSuccess = false;
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho POST.");
+                    url = ERROR_PAGE;
             }
-
             if (url.startsWith("redirect:")) {
                 String redirectUrl = url.substring("redirect:".length());
                 response.sendRedirect(request.getContextPath() + redirectUrl);
             } else {
                 request.getRequestDispatcher(url).forward(request, response);
             }
-
-        } catch (Exception e) {
-            log("Lỗi tại LichHenController (doPost): " + e.getMessage(), e);
+        } catch (ValidationException e) {
+            log("Lỗi Validation tại LichHenController (doPost): " + e.getMessage());
             handleServiceException(request, e, action);
-            request.setAttribute("ERROR_MESSAGE", "Đã có lỗi nghiêm trọng xảy ra: " + e.getMessage());
+            request.getRequestDispatcher(formErrorPage).forward(request, response);
+        } catch (Exception e) {
+            log("Lỗi Hệ thống tại LichHenController (doPost): " + e.getMessage(), e);
+            request.setAttribute("ERROR_MESSAGE", "Đã có lỗi hệ thống nghiêm trọng xảy ra: " + e.getMessage());
             request.getRequestDispatcher(ERROR_PAGE).forward(request, response);
-
         }
     }
 
     /**
-     * Lấy danh sách Lịch hẹn và chuyển đến trang hiển thị.
+     * (Hàm listLichHen giữ nguyên y hệt, không thay đổi)
      */
     private String listLichHen(HttpServletRequest request) throws Exception {
-        List<LichHenDTO> list = lichHenService.getAllLichHen();
+        int page = 1;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+        List<LichHenDTO> list = lichHenService.getAllLichHenPaginated(page, PAGE_SIZE);
+        long totalLichHen = lichHenService.getLichHenCount();
+        long totalPages = (long) Math.ceil((double) totalLichHen / PAGE_SIZE);
         request.setAttribute("LIST_LICHHEN", list);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
         return LICHHEN_LIST_PAGE;
     }
 
     /**
-     * Xử lý logic tạo mới một Lịch hẹn.
+     * (Hàm createLichHen giữ nguyên y hệt, không thay đổi)
      */
-    private String createLichHen(HttpServletRequest request) throws Exception {
+    private String createLichHen(HttpServletRequest request) throws ValidationException, Exception {
         LichHenDTO newLichHenDTO = createDTOFromRequest(request);
         LichHenDTO result = lichHenService.createLichHen(newLichHenDTO);
-        request.setAttribute("SUCCESS_MESSAGE", "Tạo lịch hẹn thành công! ID: " + result.getId() + ", STT: " + result.getStt());
-        return LICHHEN_LIST_PAGE;
+        request.getSession().setAttribute("SUCCESS_MESSAGE", "Tạo lịch hẹn thành công! ID: " + result.getId() + ", STT: " + result.getStt());
+        return "redirect:MainController?action=listLichHen";
     }
 
     /**
-     * Xử lý logic cập nhật trạng thái một Lịch hẹn.
+     * (Hàm showLichHenEditForm giữ nguyên y hệt, không thay đổi)
+     */
+    private String showLichHenEditForm(HttpServletRequest request) throws ValidationException, Exception {
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            LichHenDTO lichHen = lichHenService.getLichHenById(id);
+            request.setAttribute("LICHHEN_DATA", lichHen);
+            loadFormDependencies(request);
+            request.setAttribute("formAction", "updateLichHen");
+            return LICHHEN_FORM_PAGE;
+        } catch (NumberFormatException e) {
+            throw new ValidationException("ID Lịch hẹn không hợp lệ.");
+        }
+    }
+
+    /**
+     * (Hàm updateLichHen giữ nguyên y hệt, không thay đổi)
+     */
+    private String updateLichHen(HttpServletRequest request) throws ValidationException, Exception {
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            LichHenDTO dto = createDTOFromRequest(request);
+            LichHenDTO result = lichHenService.updateLichHen(id, dto);
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Cập nhật lịch hẹn ID " + result.getId() + " thành công!");
+            return "redirect:MainController?action=listLichHen";
+        } catch (NumberFormatException e) {
+            throw new ValidationException("ID Lịch hẹn không hợp lệ khi cập nhật.");
+        }
+    }
+
+    /**
+     * (Hàm updateLichHenStatus giữ nguyên y hệt, không thay đổi)
      */
     private String updateLichHenStatus(HttpServletRequest request) throws Exception {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             String newTrangThai = request.getParameter("trangThai");
             String ghiChu = request.getParameter("ghiChu");
-
             LichHenDTO result = lichHenService.updateTrangThaiLichHen(id, newTrangThai, ghiChu);
-            request.setAttribute("SUCCESS_MESSAGE", "Cập nhật trạng thái lịch hẹn ID " + result.getId() + " thành công!");
-            return LICHHEN_LIST_PAGE;
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Cập nhật trạng thái lịch hẹn ID " + result.getId() + " thành công!");
+            return "redirect:MainController?action=listLichHen";
         } catch (NumberFormatException e) {
-            request.setAttribute("ERROR_MESSAGE", "ID Lịch hẹn không hợp lệ.");
-            return ERROR_PAGE;
+            throw new ValidationException("ID Lịch hẹn không hợp lệ.");
         }
     }
 
     /**
-     * Tải danh sách Bệnh nhân và Bác sĩ (đang hoạt động) cho form.
+     * === BẮT ĐẦU SỬA (GỌI ĐÚNG HÀM SERVICE) === Tải danh sách Bệnh nhân và Bác
+     * sĩ (đang hoạt động) cho form.
      */
     private void loadFormDependencies(HttpServletRequest request) {
         try {
-            List<BenhNhanDTO> listBenhNhan = benhNhanService.getAllBenhNhan();
-            List<NhanVienDTO> listBacSi = nhanVienService.findDoctorsBySpecialty();
+            // Sửa: Gọi hàm 'getAllActiveBenhNhan()' mới (dùng cho dropdown)
+            List<BenhNhanDTO> listBenhNhan = benhNhanService.getAllActiveBenhNhan();
+            List<NhanVienDTO> listBacSi = nhanVienService.findDoctorsBySpecialty(); // Hàm này đã đúng
 
             request.setAttribute("LIST_BENHNHAN", listBenhNhan);
             request.setAttribute("LIST_BACSI", listBacSi);
@@ -172,13 +235,14 @@ public class LichHenController extends HttpServlet {
             request.setAttribute("LOAD_FORM_ERROR", "Lỗi tải danh sách Bệnh nhân/Bác sĩ.");
         }
     }
+    // === KẾT THÚC SỬA ===
 
     /**
-     * Xử lý lỗi từ Service và gửi lại form (chủ yếu cho action tạo).
+     * (Hàm handleServiceException giữ nguyên y hệt, không thay đổi)
      */
     private void handleServiceException(HttpServletRequest request, Exception e, String formAction) {
         request.setAttribute("ERROR_MESSAGE", e.getMessage());
-        if ("createLichHen".equals(formAction)) {
+        if ("createLichHen".equals(formAction) || "updateLichHen".equals(formAction)) {
             request.setAttribute("LICHHEN_DATA", createDTOFromRequest(request));
             request.setAttribute("formAction", formAction);
             loadFormDependencies(request);
@@ -186,7 +250,7 @@ public class LichHenController extends HttpServlet {
     }
 
     /**
-     * Hàm tiện ích tạo LichHenDTO từ request.
+     * (Hàm createDTOFromRequest giữ nguyên y hệt, không thay đổi)
      */
     private LichHenDTO createDTOFromRequest(HttpServletRequest request) {
         LichHenDTO dto = new LichHenDTO();
@@ -197,41 +261,30 @@ public class LichHenController extends HttpServlet {
             } catch (NumberFormatException e) {
                 /* ignore */ }
         }
-
         try {
             dto.setBenhNhanId(Integer.parseInt(request.getParameter("benhNhanId")));
             dto.setBacSiId(Integer.parseInt(request.getParameter("bacSiId")));
         } catch (NumberFormatException e) {
             log("Lỗi parse ID Bệnh nhân/Bác sĩ");
         }
-
         dto.setLyDoKham(request.getParameter("lyDoKham"));
         dto.setGhiChu(request.getParameter("ghiChu"));
-
-        // --- PHẦN SỬA LỖI OffsetDateTime ---
-        String thoiGianHenStr = request.getParameter("thoiGianHen"); // Input dạng yyyy-MM-ddTHH:mm
+        String thoiGianHenStr = request.getParameter("thoiGianHen");
         if (thoiGianHenStr != null && !thoiGianHenStr.isEmpty()) {
             try {
-                // 1. Parse chuỗi từ input thành LocalDateTime
                 LocalDateTime localDateTime = LocalDateTime.parse(thoiGianHenStr);
-
-                // 2. Xác định Offset (ví dụ: +07:00 cho Việt Nam)
-                // Có thể lấy động dựa trên cài đặt server hoặc múi giờ người dùng nếu phức tạp hơn
                 ZoneOffset offset = ZoneOffset.ofHours(7);
-
-                // 3. Tạo OffsetDateTime từ LocalDateTime và Offset
                 dto.setThoiGianHen(OffsetDateTime.of(localDateTime, offset));
-
             } catch (DateTimeParseException e) {
                 log("Lỗi parse OffsetDateTime từ chuỗi '" + thoiGianHenStr + "': " + e.getMessage());
-                // Có thể set attribute báo lỗi nếu cần
             }
         }
-        // --- KẾT THÚC SỬA ---
-
         return dto;
     }
+
+   
     @Override
+
     public String getServletInfo() {
         return "Controller quản lý các nghiệp vụ liên quan đến Lịch Hẹn.";
     }

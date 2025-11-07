@@ -18,32 +18,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Lớp Service chứa logic nghiệp vụ cho LichHen.
- *
- * @author ADMIN
+ * Lớp Service chứa logic nghiệp vụ cho LichHen. (ĐÃ GỘP XUNG ĐỘT: Giữ lại logic
+ * Phân trang, Sửa, Giới hạn Lịch hẹn, và Hủy)
  */
 public class LichHenService {
 
-    // Khởi tạo các DAO cần thiết
+    // (Các DAO và hằng số)
     private final LichHenDAO lichHenDAO = new LichHenDAO();
     private final BenhNhanDAO benhNhanDAO = new BenhNhanDAO();
     private final NhanVienDAO nhanVienDAO = new NhanVienDAO();
-    // Khởi tạo Service cần thiết
     private final NhanVienService nhanVienService = new NhanVienService();
-
-    // Danh sách các trạng thái lịch hẹn hợp lệ
     private static final List<String> VALID_TRANG_THAI = Arrays.asList(
             "CHO_XAC_NHAN", "DA_XAC_NHAN", "HOAN_THANH", "DA_HUY", "DA_DEN_KHAM"
     );
 
-    // === THÊM MỚI: Giới hạn lịch hẹn ===
-    private static final int MAX_APPOINTMENTS_PER_DAY = 5;
+    // === LOGIC TỪ NHÁNH c6c746e... ===
+    private static final int MAX_APPOINTMENTS_PER_DAY = 5; // Giới hạn 5 lịch/ngày
 
     /**
      * Dịch vụ tạo một Lịch hẹn mới (cho Admin).
      */
     public LichHenDTO createLichHen(LichHenDTO dto) throws Exception {
-
         // --- BƯỚC 1: VALIDATION ---
         if (dto.getBenhNhanId() <= 0) {
             throw new Exception("ID Bệnh nhân không hợp lệ.");
@@ -61,7 +56,7 @@ public class LichHenService {
             throw new Exception("Không tìm thấy Bệnh nhân với ID: " + dto.getBenhNhanId());
         }
 
-        NhanVienDTO bacSiDTO = null;
+        NhanVienDTO bacSiDTO;
         try {
             bacSiDTO = nhanVienService.getNhanVienById(dto.getBacSiId());
         } catch (Exception e) {
@@ -73,7 +68,6 @@ public class LichHenService {
             throw new Exception("Lỗi không mong muốn: Không thể lấy entity Bác sĩ ID: " + dto.getBacSiId());
         }
 
-        // --- BƯỚC 3: CHUYỂN ĐỔI (MAP) ---
         LichHen entity = toEntity(dto, benhNhanEntity, bacSiEntity);
         entity.setTrangThai("CHO_XAC_NHAN");
 
@@ -81,7 +75,6 @@ public class LichHenService {
         // (STT sẽ do Trigger CSDL tự gán)
         LichHen savedEntity = lichHenDAO.create(entity);
 
-        // --- BƯỚC 5: TRẢ VỀ DTO ---
         if (savedEntity != null) {
             LichHen fullSavedEntity = lichHenDAO.getByIdWithRelations(savedEntity.getId());
             return toDTO(fullSavedEntity);
@@ -90,17 +83,61 @@ public class LichHenService {
     }
 
     /**
+     * Dịch vụ cập nhật thông tin Lịch hẹn (cho Admin).
+     */
+    public LichHenDTO updateLichHen(int lichHenId, LichHenDTO dto) throws ValidationException, Exception {
+        if (dto.getBenhNhanId() <= 0) {
+            throw new ValidationException("ID Bệnh nhân không hợp lệ.");
+        }
+        if (dto.getBacSiId() <= 0) {
+            throw new ValidationException("ID Bác sĩ không hợp lệ.");
+        }
+        if (dto.getThoiGianHen() == null) {
+            throw new ValidationException("Thời gian hẹn không được để trống.");
+        }
+
+        LichHen existingEntity = lichHenDAO.getById(lichHenId);
+        if (existingEntity == null) {
+            throw new ValidationException("Không tìm thấy lịch hẹn với ID: " + lichHenId);
+        }
+
+        if (existingEntity.getBenhNhan().getId() != dto.getBenhNhanId()) {
+            BenhNhan newBenhNhan = benhNhanDAO.getById(dto.getBenhNhanId());
+            if (newBenhNhan == null) {
+                throw new ValidationException("Không tìm thấy Bệnh nhân mới (ID: " + dto.getBenhNhanId() + ").");
+            }
+            existingEntity.setBenhNhan(newBenhNhan);
+        }
+
+        if (existingEntity.getBacSi().getId() != dto.getBacSiId()) {
+            NhanVien newBacSi = nhanVienDAO.getById(dto.getBacSiId());
+            if (newBacSi == null) {
+                throw new ValidationException("Không tìm thấy Bác sĩ mới (ID: " + dto.getBacSiId() + ").");
+            }
+            existingEntity.setBacSi(newBacSi);
+        }
+
+        existingEntity.setThoiGianHen(dto.getThoiGianHen());
+        existingEntity.setLyDoKham(dto.getLyDoKham());
+        existingEntity.setGhiChu(dto.getGhiChu());
+
+        if (!lichHenDAO.update(existingEntity)) {
+            throw new Exception("Lỗi CSDL: Cập nhật lịch hẹn thất bại.");
+        }
+
+        return toDTO(lichHenDAO.getByIdWithRelations(lichHenId));
+    }
+
+    /**
      * Dịch vụ cập nhật trạng thái của một Lịch hẹn.
      */
     public LichHenDTO updateTrangThaiLichHen(int lichHenId, String newTrangThai, String ghiChu) throws Exception {
-
         if (newTrangThai == null || newTrangThai.trim().isEmpty()) {
             throw new Exception("Trạng thái mới không được để trống.");
         }
         if (!VALID_TRANG_THAI.contains(newTrangThai)) {
             throw new Exception("Trạng thái '" + newTrangThai + "' không hợp lệ.");
         }
-
         LichHen existingEntity = lichHenDAO.getById(lichHenId);
         if (existingEntity == null) {
             throw new Exception("Không tìm thấy lịch hẹn với ID: " + lichHenId);
@@ -120,9 +157,6 @@ public class LichHenService {
         return toDTO(updatedEntity);
     }
 
-    /**
-     * Lấy lịch hẹn bằng ID (tải đủ quan hệ).
-     */
     public LichHenDTO getLichHenById(int id) throws Exception {
         LichHen entity = lichHenDAO.getByIdWithRelations(id);
         if (entity == null) {
@@ -131,19 +165,17 @@ public class LichHenService {
         return toDTO(entity);
     }
 
-    /**
-     * Lấy tất cả lịch hẹn (tải đủ quan hệ).
-     */
-    public List<LichHenDTO> getAllLichHen() {
-        List<LichHen> entities = lichHenDAO.getAllWithRelations();
+    public List<LichHenDTO> getAllLichHenPaginated(int page, int pageSize) {
+        List<LichHen> entities = lichHenDAO.getAllWithRelations(page, pageSize);
         return entities.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Lấy tất cả lịch hẹn của một bác sĩ đang hoạt động (tải đủ quan hệ).
-     */
+    public long getLichHenCount() {
+        return lichHenDAO.getTotalLichHenCount();
+    }
+
     public List<LichHenDTO> getLichHenByBacSi(int bacSiId) throws Exception {
         try {
             nhanVienService.getNhanVienById(bacSiId);
@@ -189,43 +221,29 @@ public class LichHenService {
         dto.setLyDoKham(entity.getLyDoKham());
         dto.setTrangThai(entity.getTrangThai());
         dto.setGhiChu(entity.getGhiChu());
-
         if (entity.getBenhNhan() != null) {
             dto.setBenhNhanId(entity.getBenhNhan().getId());
-            dto.setTenBenhNhan(entity.getBenhNhan().getHoTen()); // <-- LÀM PHẲNG
+            dto.setTenBenhNhan(entity.getBenhNhan().getHoTen());
         }
         if (entity.getBacSi() != null) {
             dto.setBacSiId(entity.getBacSi().getId());
-            dto.setTenBacSi(entity.getBacSi().getHoTen()); // <-- LÀM PHẲNG
+            dto.setTenBacSi(entity.getBacSi().getHoTen());
         }
-
         return dto;
     }
 
-    /**
-     * Chuyển LichHenDTO sang LichHen (Entity).
-     */
     private LichHen toEntity(LichHenDTO dto, BenhNhan benhNhan, NhanVien bacSi) {
         LichHen entity = new LichHen();
-
         entity.setThoiGianHen(dto.getThoiGianHen());
         entity.setLyDoKham(dto.getLyDoKham());
         entity.setTrangThai(dto.getTrangThai());
         entity.setGhiChu(dto.getGhiChu());
-
         entity.setBenhNhan(benhNhan);
         entity.setBacSi(bacSi);
-
         return entity;
     }
 
-    //===================================================Dat=======================================
-    /**
-     * NGHIỆP VỤ: Tạo lịch hẹn mới (do Y tá hoặc Lễ tân thực hiện).
-     */
     public LichHenDTO createAppointmentByNurse(LichHenDTO dto) throws ValidationException {
-
-        // --- BƯỚC 1: VALIDATE DỮ LIỆU ĐẦU VÀO ---
         if (dto.getThoiGianHen() == null) {
             throw new ValidationException("Thời gian hẹn không được để trống.");
         }
@@ -246,7 +264,7 @@ public class LichHenService {
             throw new ValidationException("Không tìm thấy bác sĩ.");
         }
 
-        // **THÊM KIỂM TRA GIỚI HẠN (cho cả Y tá)**
+        // **KIỂM TRA GIỚI HẠN (cho cả Y tá)**
         LocalDate appointmentDateCheck = dto.getThoiGianHen().toLocalDate();
         long countCheck = lichHenDAO.countAppointmentsByDateAndDoctor(appointmentDateCheck, bacSi.getId());
         if (countCheck >= MAX_APPOINTMENTS_PER_DAY) {
@@ -264,73 +282,46 @@ public class LichHenService {
         newLichHen.setStt(newStt);
         newLichHen.setTrangThai("CHO_XAC_NHAN");
 
-        // --- BƯỚC 4: LƯU VÀO CSDL ---
         LichHen savedEntity = lichHenDAO.create(newLichHen);
-
-        // --- BƯỚC 5: TRẢ VỀ DTO ---
         return toDTO(savedEntity);
     }
 
     /**
-     *
      * Đánh dấu một lịch hẹn là đã được xử lý (ví dụ: ĐÃ KHÁM).
-     *
      */
     public void updateAppointmentStatus(Integer lichHenId, String newStatus) throws ValidationException {
-
         if (lichHenId == null) {
-
             return;
-
         }
-
         LichHen lichHen = lichHenDAO.getById(lichHenId);
-
         if (lichHen != null) {
-
             lichHen.setTrangThai(newStatus);
-
             lichHenDAO.update(lichHen); // Giả sử DAO có hàm update
-
         } else {
-
             throw new ValidationException("Không tìm thấy lịch hẹn với ID: " + lichHenId);
-
         }
-
     }
 
     /**
-     *
      * Lấy tất cả các lịch hẹn đang ở trạng thái chờ khám (chưa hoàn thành).
-     *
      */
     public List<LichHenDTO> getAllPendingAppointments() {
-
         List<LichHen> entities = lichHenDAO.getAllPendingAppointments();
-
         return entities.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
-
     }
 
     /**
-     *
      * Lấy tất cả các lịch hẹn đang chờ của một bác sĩ cụ thể.
-     *
      */
     public List<LichHenDTO> getPendingAppointmentsForDoctor(int bacSiId) {
-
         List<LichHen> entities = lichHenDAO.getPendingAppointmentsForDoctor(bacSiId);
-
         return entities.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
-
     }
 
-    //===================================================Quang=======================================
     // ===================================================
     // === HÀM CHO BỆNH NHÂN TỰ ĐẶT LỊCH ===
     // ===================================================
@@ -338,8 +329,6 @@ public class LichHenService {
      * CẬP NHẬT: Dành cho Bệnh nhân tự đặt lịch (Đã thêm 5-limit).
      */
     public LichHenDTO createAppointmentByPatient(LichHenDTO dto, int taiKhoanIdCuaBenhNhan) throws Exception {
-
-        // --- BƯỚC 1: VALIDATE DỮ LIỆU ĐẦU VÀO ---
         if (dto.getBacSiId() <= 0) {
             throw new ValidationException("Vui lòng chọn bác sĩ.");
         }
@@ -360,6 +349,7 @@ public class LichHenService {
         if (bacSiEntity == null) {
             throw new Exception("Không tìm thấy bác sĩ đã chọn.");
         }
+
         try {
             nhanVienService.getNhanVienById(dto.getBacSiId());
         } catch (Exception e) {

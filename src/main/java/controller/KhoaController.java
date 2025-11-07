@@ -1,6 +1,6 @@
 package controller;
 
-import exception.ValidationException; // --- THÊM MỚI ---
+import exception.ValidationException;
 import java.io.IOException;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -12,17 +12,20 @@ import model.dto.KhoaDTO;
 import service.KhoaService;
 
 /**
- * Controller xử lý các nghiệp vụ liên quan đến Khoa (Department).
+ * Controller xử lý các nghiệp vụ liên quan đến Khoa (Department). (ĐÃ NÂNG CẤP:
+ * Thêm Phân trang, Tìm kiếm, và PRG Pattern, Xóa Mềm)
  */
 @WebServlet(name = "KhoaController", urlPatterns = {"/KhoaController"})
 public class KhoaController extends HttpServlet {
 
-    // Khai báo URL cho các trang JSP
-    private static final String KHOA_LIST_PAGE = "admin/danhSachKhoa.jsp"; // Trang danh sách Khoa
-    private static final String KHOA_FORM_PAGE = "admin/formKhoa.jsp";    // Trang form tạo/sửa Khoa
+    // (Các hằng số JSP giữ nguyên)
+    private static final String KHOA_LIST_PAGE = "admin/danhSachKhoa.jsp";
+    private static final String KHOA_FORM_PAGE = "admin/formKhoa.jsp";
     private static final String ERROR_PAGE = "error.jsp";
 
-    // Khởi tạo Service
+    // === HẰNG SỐ MỚI CHO PHÂN TRANG ===
+    private static final int PAGE_SIZE = 10; // 10 khoa mỗi trang
+
     private final KhoaService khoaService = new KhoaService();
 
     @Override
@@ -32,42 +35,36 @@ public class KhoaController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
-        String url = KHOA_LIST_PAGE; // Mặc định là hiển thị danh sách
+        String url = ERROR_PAGE;
 
         try {
             if (action == null || action.isEmpty()) {
-                action = "listKhoa"; // Nếu không có action, mặc định là list
+                action = "listKhoa";
             }
 
             switch (action) {
                 case "listKhoa":
-                    url = listKhoa(request);
+                    url = listKhoa(request); // <-- ĐÃ NÂNG CẤP (Tìm kiếm + Phân trang)
                     break;
                 case "showKhoaCreateForm":
-                    // Chỉ cần chuyển đến trang form, không cần load dữ liệu gì thêm
-                    request.setAttribute("formAction", "createKhoa"); // Gửi action cho form biết là tạo mới
+                    request.setAttribute("formAction", "createKhoa");
                     url = KHOA_FORM_PAGE;
                     break;
                 case "showKhoaEditForm":
                     url = showKhoaEditForm(request);
                     break;
-                // --- CẬP NHẬT: Xóa "deleteKhoa" khỏi doGet ---
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho GET.");
                     url = ERROR_PAGE;
             }
-        // --- CẬP NHẬT: Tách riêng 2 catch ---
         } catch (ValidationException ve) {
-            // Lỗi nghiệp vụ (VD: getById không thấy) -> Chuyển đến trang lỗi
             log("Lỗi validation tại KhoaController (doGet): " + ve.getMessage(), ve);
             request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi nghiệp vụ: " + ve.getMessage());
-            url = ERROR_PAGE; // Hoặc có thể là trang list nếu muốn
+            url = ERROR_PAGE;
         } catch (Exception e) {
-            // Lỗi hệ thống -> Chuyển đến trang lỗi
             log("Lỗi hệ thống tại KhoaController (doGet): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
             url = ERROR_PAGE;
-        // --- KẾT THÚC CẬP NHẬT ---
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
@@ -80,156 +77,166 @@ public class KhoaController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
-        String url = ERROR_PAGE; // Mặc định là lỗi
-        boolean loadListAfterSuccess = true; // Cờ để load lại list sau khi CUD thành công
+        String url = ERROR_PAGE;
+        String formErrorPage = KHOA_FORM_PAGE; // Quay về form nếu lỗi
 
         try {
             if (action == null || action.isEmpty()) {
                 throw new Exception("Hành động không được chỉ định.");
             }
 
-            switch (action) {
-                case "createKhoa":
-                    url = createKhoa(request);
-                    break;
-                case "updateKhoa":
-                    url = updateKhoa(request);
-                    break;
-                // --- CẬP NHẬT: Chuyển "deleteKhoa" sang doPost ---
-                case "deleteKhoa":
-                    url = deleteKhoa(request);
-                    break;
-                // --- KẾT THÚC CẬP NHẬT ---
-                default:
-                    loadListAfterSuccess = false;
-                    request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho POST.");
-            }
-            
-            // Nếu thành công (không phải trang lỗi/form) và cần load lại list
-            if (loadListAfterSuccess && !url.equals(ERROR_PAGE) && !url.equals(KHOA_FORM_PAGE)) {
-                url = listKhoa(request);
+            if ("softDeleteKhoa".equals(action)) {
+                formErrorPage = KHOA_LIST_PAGE; // Lỗi xóa quay về trang list
             }
 
-        // --- CẬP NHẬT: Tách riêng 2 catch (Giống NhanVienController) ---
+            switch (action) {
+                case "createKhoa":
+                    url = createKhoa(request); // Trả về redirect
+                    break;
+                case "updateKhoa":
+                    url = updateKhoa(request); // Trả về redirect
+                    break;
+                case "softDeleteKhoa":
+                    url = softDeleteKhoa(request); // Trả về redirect
+                    break;
+                default:
+                    request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho POST.");
+                    url = ERROR_PAGE;
+            }
+
         } catch (ValidationException ve) {
-            // Lỗi nghiệp vụ (Tên trống, tên trùng, regex fail...)
             log("Lỗi validation tại KhoaController (doPost): " + ve.getMessage());
-            // Quay lại form với thông báo lỗi và dữ liệu đã nhập
-            handleServiceException(request, ve, action); 
-            url = KHOA_FORM_PAGE; 
-            loadListAfterSuccess = false; // Không load lại list khi có lỗi
+            handleServiceException(request, ve, action);
+            url = formErrorPage; // Sẽ là KHOA_FORM_PAGE hoặc KHOA_LIST_PAGE
         } catch (Exception e) {
-            // Lỗi hệ thống (Lỗi DB, NullPointerException...)
             log("Lỗi hệ thống tại KhoaController (doPost): " + e.getMessage(), e);
-            // Gửi đến trang lỗi chung
             request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống nghiêm trọng: " + e.getMessage());
-            url = ERROR_PAGE; 
-            loadListAfterSuccess = false; 
-        // --- KẾT THÚC CẬP NHẬT ---
+            url = ERROR_PAGE;
         } finally {
-            request.getRequestDispatcher(url).forward(request, response);
+            // (Áp dụng PRG Pattern)
+            if (url.startsWith("redirect:")) {
+                response.sendRedirect(request.getContextPath() + "/" + url.substring("redirect:".length()));
+            } else {
+                request.getRequestDispatcher(url).forward(request, response);
+            }
         }
     }
 
     /**
-     * Lấy danh sách Khoa và chuyển đến trang hiển thị.
-     * (Giữ nguyên)
+     * (ĐÃ NÂNG CẤP: Phân trang + Tìm kiếm) Lấy danh sách Khoa
      */
     private String listKhoa(HttpServletRequest request) throws Exception {
-        List<KhoaDTO> list = khoaService.getAllKhoa();
+        // 1. Lấy tham số trang
+        int page = 1;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+
+        // 2. Lấy tham số tìm kiếm
+        String keyword = request.getParameter("keyword");
+
+        // 3. Khai báo biến
+        List<KhoaDTO> list;
+        long totalKhoa;
+
+        // 4. Logic nghiệp vụ: Kiểm tra xem có tìm kiếm hay không
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            // Kịch bản TÌM KIẾM
+            String trimmedKeyword = keyword.trim();
+            list = khoaService.searchKhoaPaginated(trimmedKeyword, page, PAGE_SIZE);
+            totalKhoa = khoaService.getKhoaSearchCount(trimmedKeyword);
+            request.setAttribute("searchKeyword", keyword); // <-- Gửi lại keyword
+        } else {
+            // Kịch bản XEM TẤT CẢ (phân trang)
+            list = khoaService.getAllKhoaPaginated(page, PAGE_SIZE);
+            totalKhoa = khoaService.getKhoaCount();
+        }
+
+        // 5. Tính toán và Gửi dữ liệu về JSP
+        long totalPages = (long) Math.ceil((double) totalKhoa / PAGE_SIZE);
+
         request.setAttribute("LIST_KHOA", list);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+
         return KHOA_LIST_PAGE;
     }
 
-     /**
-     * Lấy thông tin Khoa cần sửa và hiển thị form.
-     * (Giữ nguyên - lỗi sẽ được bắt bởi doGet)
+    /**
+     * (Hàm showKhoaEditForm giữ nguyên)
      */
     private String showKhoaEditForm(HttpServletRequest request) throws ValidationException {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
-            // Ném ValidationException nếu không tìm thấy
-            KhoaDTO khoa = khoaService.getKhoaById(id); 
-            request.setAttribute("KHOA_DATA", khoa); // Gửi DTO của khoa cần sửa
-            request.setAttribute("formAction", "updateKhoa"); // Gửi action cho form biết là cập nhật
+            KhoaDTO khoa = khoaService.getKhoaById(id);
+            request.setAttribute("KHOA_DATA", khoa);
+            request.setAttribute("formAction", "updateKhoa");
             return KHOA_FORM_PAGE;
         } catch (NumberFormatException e) {
-             // Ném ValidationException để doGet bắt được và đưa ra trang lỗi
-             throw new ValidationException("ID Khoa không hợp lệ.");
+            throw new ValidationException("ID Khoa không hợp lệ.");
         }
     }
 
     /**
-     * Xử lý logic tạo mới một Khoa.
-     * (Giữ nguyên - lỗi sẽ được bắt bởi doPost)
+     * (Đã NÂNG CẤP: Dùng PRG)
      */
     private String createKhoa(HttpServletRequest request) throws ValidationException, Exception {
         KhoaDTO newKhoaDTO = createDTOFromRequest(request);
         KhoaDTO result = khoaService.createKhoa(newKhoaDTO);
-        request.setAttribute("SUCCESS_MESSAGE", "Tạo khoa '" + result.getTenKhoa() + "' thành công!");
-        return KHOA_LIST_PAGE; // Quay về trang danh sách
+        request.getSession().setAttribute("SUCCESS_MESSAGE", "Tạo khoa '" + result.getTenKhoa() + "' thành công!");
+        return "redirect:MainController?action=listKhoa";
     }
 
     /**
-     * Xử lý logic cập nhật một Khoa.
-     * (Giữ nguyên - lỗi sẽ được bắt bởi doPost)
+     * (Đã NÂNG CẤP: Dùng PRG)
      */
     private String updateKhoa(HttpServletRequest request) throws ValidationException, Exception {
         try {
-            int id = Integer.parseInt(request.getParameter("id")); // Lấy ID từ hidden input trong form
+            int id = Integer.parseInt(request.getParameter("id"));
             KhoaDTO khoaDTO = createDTOFromRequest(request);
             KhoaDTO result = khoaService.updateKhoa(id, khoaDTO);
-            request.setAttribute("SUCCESS_MESSAGE", "Cập nhật khoa '" + result.getTenKhoa() + "' thành công!");
-            return KHOA_LIST_PAGE; // Quay về trang danh sách
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Cập nhật khoa '" + result.getTenKhoa() + "' thành công!");
+            return "redirect:MainController?action=listKhoa";
         } catch (NumberFormatException e) {
-            // Ném ValidationException để doPost bắt được và đưa về form
             throw new ValidationException("ID Khoa không hợp lệ khi cập nhật.");
         }
     }
 
-     /**
-     * Xử lý logic xóa một Khoa. (Đã chuyển sang POST)
+    /**
+     * (Đã NÂNG CẤP: Dùng PRG và gọi Xóa Mềm)
      */
-    private String deleteKhoa(HttpServletRequest request) throws ValidationException, Exception {
+    private String softDeleteKhoa(HttpServletRequest request) throws ValidationException, Exception {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
-            khoaService.deleteKhoa(id);
-            request.setAttribute("SUCCESS_MESSAGE", "Xóa khoa thành công!");
-            return KHOA_LIST_PAGE; // Trả về trang list để doPost load lại
+            khoaService.softDeleteKhoa(id); // Service đã gọi Xóa Mềm
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Vô hiệu hóa khoa thành công!");
+            return "redirect:MainController?action=listKhoa";
         } catch (NumberFormatException e) {
-            // Ném ValidationException để doPost bắt được và đưa về trang lỗi
-            throw new ValidationException("ID Khoa không hợp lệ khi xóa.");
+            throw new ValidationException("ID Khoa không hợp lệ khi vô hiệu hóa.");
         }
-        // Các Exception khác (ValidationException từ Service, Exception hệ thống)
-        // sẽ tự động được ném ra và bị bắt bởi doPost
     }
-    
-    // --- THÊM MỚI: Hàm xử lý lỗi validation (Giống NhanVienController) ---
-    /**
-     * Xử lý lỗi từ Service (chỉ dành cho ValidationException) và gửi lại form.
-     */
+
+    // (Hàm handleServiceException giữ nguyên)
     private void handleServiceException(HttpServletRequest request, ValidationException e, String formAction) {
         request.setAttribute("ERROR_MESSAGE", e.getMessage());
-        // Giữ lại dữ liệu người dùng đã nhập để hiển thị lại trên form
         request.setAttribute("KHOA_DATA", createDTOFromRequest(request));
         request.setAttribute("formAction", formAction);
-        // (Khoa form không cần load dependencies nên hàm này đơn giản hơn)
     }
-    // --- KẾT THÚC THÊM MỚI ---
 
-
-    /**
-     * Hàm tiện ích tạo KhoaDTO từ request.
-     * (Giữ nguyên)
-     */
+    // (Hàm createDTOFromRequest giữ nguyên)
     private KhoaDTO createDTOFromRequest(HttpServletRequest request) {
         KhoaDTO dto = new KhoaDTO();
-        // Lấy cả ID (dù là tạo mới hay cập nhật, dùng để gửi lại form nếu lỗi)
         String idStr = request.getParameter("id");
-        if(idStr != null && !idStr.isEmpty()){
+        if (idStr != null && !idStr.isEmpty()) {
             try {
                 dto.setId(Integer.parseInt(idStr));
-            } catch (NumberFormatException e) { /* Bỏ qua nếu ID không hợp lệ */ }
+            } catch (NumberFormatException e) {
+                /* Bỏ qua */ }
         }
         dto.setTenKhoa(request.getParameter("tenKhoa"));
         dto.setMoTa(request.getParameter("moTa"));

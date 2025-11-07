@@ -87,7 +87,7 @@ public class ThongBaoController extends HttpServlet {
         List<GroupedThongBaoDTO> groupedNotificationList = thongBaoService.searchGroupedNotifications(searchKeyword);
 
         // 2. Lấy danh sách tài khoản (để chọn khi gửi cho tài khoản cụ thể)
-        List<TaiKhoanDTO> accountList = taiKhoanService.getAllTaiKhoan();
+        List<TaiKhoanDTO> accountList = taiKhoanService.getActiveAndUnassignedAccounts(searchKeyword);
 
         // === THAY ĐỔI ===
         // 3. Lấy danh sách Vai trò ĐỘNG từ CSDL
