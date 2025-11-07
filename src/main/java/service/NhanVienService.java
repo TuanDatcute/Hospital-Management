@@ -331,5 +331,3 @@ public class NhanVienService {
     }
 }
 
-// === ĐÃ XÓA: Hàm toDTOFotGetByTaiKhoan (trùng lặp) ===
-

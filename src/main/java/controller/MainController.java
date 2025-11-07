@@ -53,7 +53,9 @@ public class MainController extends HttpServlet {
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deleteService"};
         String[] NurseLichHenActions = {"showCreateAppointmentForm", "createAppointment", "getDoctorsByKhoa"};
         // **MERGE:** Lấy 'lichHenActions' từ nhánh 'main' (vì nó đầy đủ hơn)
+
         String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen"};
+
 
         // **MERGE:** Lấy 'userActions' từ nhánh của bạn (vì nó có logic Auth mới)
         String[] userActions = {"login", "logout", "listUsers",
@@ -87,7 +89,7 @@ public class MainController extends HttpServlet {
         String[] hoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice", "printInvoice"};
         String[] thongBaoActions = {"createThongBao", "listNotifications"};
         String[] userThongBaoActions = {"viewMyNotifications", "markNotificationAsRead", "deleteMyNotification"};
-        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "bookAppointment", "cancelAppointment"};
+        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "bookAppointment", "cancelAppointment", "getBacSiByKhoa"};
         String[] verifyActions = {"verify"}; // Chỉ xử lý 'verify'
         String[] resetActions = {"requestReset", "performReset"}; // Chỉ xử lý 'Quên MK'
         String[] securityActions = {"showConfirmPassword", "confirmPassword",
@@ -97,22 +99,7 @@ public class MainController extends HttpServlet {
             "showEditDOB", "saveDOB"
         };
 
-        // 3. Điều hướng dựa trên action (ĐÃ KẾT HỢP CẢ 2 NHÁNH)    
-        //action đặc biệt không dùng forward, mà chuyển thẳng đến doget của controller tương ứng,
-        //ví dụ để hiển thị danh sách bác sĩ thuộc khoa trong trang đặt lịch hẹn của bệnh nhân
-        String[] ajaxActions = {"getBacSiByKhoa"};
-        if (Arrays.asList(ajaxActions).contains(action)) {
-            // Nếu đây là action AJAX cần trả về JSON, chúng ta gọi controller trực tiếp
-            // và dừng luồng MainController
 
-            if ("getBacSiByKhoa".equals(action)) {
-                // Khởi tạo và gọi doGet của Controller AJAX
-                new PatientLichHenController().doGet(request, response);
-                return; // DỪNG NGAY LẬP TỨC.
-
-            }
-
-        }
 
         if (action == null || action.isEmpty()) {
             url = LOGIN_PAGE;

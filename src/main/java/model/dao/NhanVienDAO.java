@@ -198,39 +198,7 @@ public class NhanVienDAO {
         }
     }
 
-    //=============================Dat================
-    /**
-     * Tìm nhân viên bằng taiKhoanId.
-     *
-     * @param taiKhoanId ID của tài khoản
-     * @return Đối tượng NhanVien hoặc null nếu không tìm thấy.
-     */
-    public NhanVien findByTaiKhoanId(int taiKhoanId) {
-        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // Sử dụng HQL để truy vấn dựa trên quan hệ Entity
-            Query<NhanVien> query = session.createQuery(
-                    "SELECT nv FROM NhanVien nv "
-                    + "JOIN FETCH nv.taiKhoan "
-                    + // Lấy luôn thông tin tài khoản
-                    "LEFT JOIN FETCH nv.khoa "
-                    + // Lấy thông tin khoa (nếu có)
-                    "WHERE nv.taiKhoan.id = :taiKhoanId",
-                    NhanVien.class
-            );
-            query.setParameter("taiKhoanId", taiKhoanId);
-
-            // uniqueResult() sẽ trả về đối tượng hoặc null nếu không tìm thấy
-            return query.uniqueResult();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
-    /**
-     * HÀM SỬA: Tìm các bác sĩ (NhanVien) theo Khoa ID.
-     */
+    //===================================Quang San ==============================================
     public List<NhanVien> findBacSiByKhoaId(int khoaId) {
         // Thêm Log để kiểm tra ID đang được truy vấn
         System.out.println("DAO: Đang truy vấn bác sĩ cho Khoa ID: " + khoaId);
@@ -263,4 +231,53 @@ public class NhanVienDAO {
             return Collections.emptyList();
         }
     }
+
+    //=============================Dat================
+    /**
+     * Tìm nhân viên bằng taiKhoanId.
+     *
+     * @param taiKhoanId ID của tài khoản
+     * @return Đối tượng NhanVien hoặc null nếu không tìm thấy.
+     */
+    public NhanVien findByTaiKhoanId(int taiKhoanId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Sử dụng HQL để truy vấn dựa trên quan hệ Entity
+            Query<NhanVien> query = session.createQuery(
+                    "SELECT nv FROM NhanVien nv "
+                    + "JOIN FETCH nv.taiKhoan "
+                    + // Lấy luôn thông tin tài khoản
+                    "LEFT JOIN FETCH nv.khoa "
+                    + // Lấy thông tin khoa (nếu có)
+                    "WHERE nv.taiKhoan.id = :taiKhoanId",
+                    NhanVien.class
+            );
+            query.setParameter("taiKhoanId", taiKhoanId);
+
+            // uniqueResult() sẽ trả về đối tượng hoặc null nếu không tìm thấy
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+
+    // Trong file dao/NhanVienDAO.java
+    public List<NhanVien> findDoctorsByKhoaId(int khoaId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<NhanVien> query = session.createQuery(
+                    "SELECT nv FROM NhanVien nv "
+                    + "JOIN FETCH nv.taiKhoan "
+                    + // Lọc theo khoa.id VÀ vaiTro là BAC_SI
+                    "WHERE nv.khoa.id = :khoaId AND nv.taiKhoan.vaiTro = 'BAC_SI'",
+                    NhanVien.class
+            );
+            query.setParameter("khoaId", khoaId);
+            return query.list();
+        } catch (Exception e) {
+            return Collections.EMPTY_LIST;
+        }
+    }
+
 }
