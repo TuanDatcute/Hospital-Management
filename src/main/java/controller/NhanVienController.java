@@ -1,11 +1,11 @@
 package controller;
 
-import exception.ValidationException; // --- THÊM MỚI ---
+import exception.ValidationException;
 import java.io.IOException;
-import java.time.LocalDate; // --- THÊM MỚI ---
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList; // --- THÊM MỚI ---
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.ServletException;
@@ -21,20 +21,24 @@ import service.NhanVienService;
 import service.TaiKhoanService;
 
 /**
- * Controller xử lý các nghiệp vụ liên quan đến Nhân Viên (Staff).
+ * Controller xử lý các nghiệp vụ liên quan đến Nhân Viên (Staff). (ĐÃ NÂNG CẤP:
+ * Thêm Phân trang và Post-Redirect-Get)
  */
 @WebServlet(name = "NhanVienController", urlPatterns = {"/NhanVienController"})
 public class NhanVienController extends HttpServlet {
 
-    // Khai báo URL cho các trang JSP
+    // (Các hằng số JSP giữ nguyên)
     private static final String NHANVIEN_LIST_PAGE = "admin/danhSachNhanVien.jsp";
     private static final String NHANVIEN_FORM_PAGE = "admin/formNhanVien.jsp";
     private static final String ERROR_PAGE = "error.jsp";
 
-    // Khởi tạo các Service cần thiết
+    // (Các Service giữ nguyên)
     private final NhanVienService nhanVienService = new NhanVienService();
     private final TaiKhoanService taiKhoanService = new TaiKhoanService();
     private final KhoaService khoaService = new KhoaService();
+
+    // === HẰNG SỐ MỚI CHO PHÂN TRANG ===
+    private static final int PAGE_SIZE = 10; // 10 nhân viên mỗi trang
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -43,7 +47,7 @@ public class NhanVienController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
-        String url = NHANVIEN_LIST_PAGE; // Mặc định
+        String url = ERROR_PAGE; // Đặt mặc định là lỗi
 
         try {
             if (action == null || action.isEmpty()) {
@@ -52,33 +56,28 @@ public class NhanVienController extends HttpServlet {
 
             switch (action) {
                 case "listNhanVien":
-                    url = listNhanVien(request);
+                    url = listNhanVien(request); // Đã sửa để dùng phân trang
                     break;
                 case "showNhanVienCreateForm":
-                    loadFormDependencies(request, "createNhanVien"); // Truyền action vào
+                    loadFormDependencies(request, "createNhanVien");
                     request.setAttribute("formAction", "createNhanVien");
                     url = NHANVIEN_FORM_PAGE;
                     break;
                 case "showNhanVienEditForm":
                     url = showNhanVienEditForm(request);
                     break;
-                // Không xử lý delete bằng GET nữa
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho GET.");
                     url = ERROR_PAGE;
             }
-        // --- CẬP NHẬT: Tách riêng 2 catch ---
         } catch (ValidationException e) {
-            // Lỗi nghiệp vụ (VD: getById không thấy) -> Chuyển đến trang lỗi
             log("Lỗi validation tại NhanVienController (doGet): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi nghiệp vụ: " + e.getMessage());
-            url = ERROR_PAGE; // Hoặc có thể là trang list nếu muốn
+            url = ERROR_PAGE;
         } catch (Exception e) {
-            // Lỗi hệ thống -> Chuyển đến trang lỗi
             log("Lỗi hệ thống tại NhanVienController (doGet): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
             url = ERROR_PAGE;
-        // --- KẾT THÚC CẬP NHẬT ---
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
@@ -92,248 +91,265 @@ public class NhanVienController extends HttpServlet {
 
         String action = request.getParameter("action");
         String url = ERROR_PAGE; // Mặc định là lỗi
-        boolean loadListAfterSuccess = true; // Biến cờ để kiểm soát việc load lại list
+        String formErrorPage = NHANVIEN_FORM_PAGE; // Quay về form nếu lỗi validation
 
         try {
             if (action == null || action.isEmpty()) {
                 throw new Exception("Hành động không được chỉ định.");
             }
 
-            switch (action) {
-                case "createNhanVien":
-                    url = createNhanVien(request);
-                    break;
-                case "updateNhanVien":
-                    url = updateNhanVien(request);
-                    break;
-                case "deleteNhanVien": // Xử lý Soft Delete
-                    url = softDeleteNhanVien(request);
-                    break;
-                default:
-                    loadListAfterSuccess = false;
-                    request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho POST.");
-            }
-            // Nếu thành công (không phải trang lỗi/form) và cần load lại list
-            if (loadListAfterSuccess && !url.equals(ERROR_PAGE) && !url.equals(NHANVIEN_FORM_PAGE)) {
-                url = listNhanVien(request); // Load lại danh sách sau khi CUD thành công
+            // Xác định trang lỗi cho action "delete"
+            if ("softDeleteNhanVien".equals(action)) {
+                formErrorPage = NHANVIEN_LIST_PAGE; // Lỗi xóa thì quay về trang list
             }
 
-        // --- CẬP NHẬT: Tách riêng 2 catch ---
+            switch (action) {
+                case "createNhanVien":
+                    url = createNhanVien(request); // Sửa: Trả về redirect
+                    break;
+                case "updateNhanVien":
+                    url = updateNhanVien(request); // Sửa: Trả về redirect
+                    break;
+                case "softDeleteNhanVien":
+                    url = softDeleteNhanVien(request); // Sửa: Trả về redirect
+                    break;
+                default:
+                    request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho POST.");
+                    url = ERROR_PAGE;
+            }
+
+            // --- BẮT ĐẦU SỬA (ÁP DỤNG PRG PATTERN) ---
+            // (Đã xóa block `if (loadListAfterSuccess...)` cũ)
         } catch (ValidationException ve) {
             // Lỗi nghiệp vụ (VD: SĐT trùng, tên trống...)
             log("Lỗi validation tại NhanVienController (doPost): " + ve.getMessage());
             // Quay lại form với thông báo lỗi và dữ liệu đã nhập
-            handleServiceException(request, ve, action); 
-            url = NHANVIEN_FORM_PAGE; 
-            loadListAfterSuccess = false; // Không load lại list khi có lỗi
+            handleServiceException(request, ve, action);
+            url = formErrorPage; // Sẽ là NHANVIEN_FORM_PAGE
+
         } catch (Exception e) {
             // Lỗi hệ thống (VD: Lỗi DB, NullPointerException...)
             log("Lỗi hệ thống tại NhanVienController (doPost): " + e.getMessage(), e);
-            // Gửi đến trang lỗi chung
             request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống nghiêm trọng: " + e.getMessage());
-            url = ERROR_PAGE; 
-            loadListAfterSuccess = false; 
-        // --- KẾT THÚC CẬP NHẬT ---
+            url = ERROR_PAGE;
         } finally {
-            request.getRequestDispatcher(url).forward(request, response);
+            // Logic PRG: Nếu url là redirect, thì redirect. Ngược lại, forward.
+            if (url.startsWith("redirect:")) {
+                response.sendRedirect(request.getContextPath() + "/" + url.substring("redirect:".length()));
+            } else {
+                request.getRequestDispatcher(url).forward(request, response);
+            }
         }
+        // --- KẾT THÚC SỬA ---
     }
 
-    /**
-     * Lấy danh sách Nhân Viên và chuyển đến trang hiển thị.
-     * (Giữ nguyên)
+/**
+     * === ĐÃ NÂNG CẤP (PHÂN TRANG + TÌM KIẾM) ===
+     * Lấy danh sách Nhân Viên (có phân trang và tìm kiếm)
      */
     private String listNhanVien(HttpServletRequest request) throws Exception {
-        // Service đã được cập nhật để chỉ lấy nhân viên hoạt động
-        List<NhanVienDTO> list = nhanVienService.getAllNhanVien();
+        // 1. Lấy tham số trang
+        int page = 1;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+
+        // 2. Lấy tham số tìm kiếm
+        String keyword = request.getParameter("keyword");
+
+        // 3. Khai báo biến
+        List<NhanVienDTO> list;
+        long totalNhanVien;
+
+        // 4. Logic nghiệp vụ: Kiểm tra xem có tìm kiếm hay không
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            // Kịch bản TÌM KIẾM
+            String trimmedKeyword = keyword.trim();
+            list = nhanVienService.searchNhanVienPaginated(trimmedKeyword, page, PAGE_SIZE);
+            totalNhanVien = nhanVienService.getNhanVienSearchCount(trimmedKeyword);
+            request.setAttribute("searchKeyword", keyword); // <-- QUAN TRỌNG: Gửi lại keyword
+        } else {
+            // Kịch bản XEM TẤT CẢ (phân trang)
+            list = nhanVienService.getAllNhanVienPaginated(page, PAGE_SIZE);
+            totalNhanVien = nhanVienService.getNhanVienCount();
+        }
+
+        // 5. Tính toán và Gửi dữ liệu về JSP
+        long totalPages = (long) Math.ceil((double) totalNhanVien / PAGE_SIZE);
+
         request.setAttribute("LIST_NHANVIEN", list);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+
         return NHANVIEN_LIST_PAGE;
     }
 
-     /**
-     * Lấy thông tin Nhân Viên cần sửa và hiển thị form.
-     * (Giữ nguyên - lỗi sẽ được bắt bởi doGet)
+    /**
+     * (Hàm showNhanVienEditForm giữ nguyên)
      */
     private String showNhanVienEditForm(HttpServletRequest request) throws Exception {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
-            // Service đã được cập nhật để chỉ lấy nhân viên hoạt động
-            // Sẽ ném ValidationException nếu không tìm thấy hoặc bị khóa
             NhanVienDTO nhanVien = nhanVienService.getNhanVienById(id);
-            request.setAttribute("NHANVIEN_DATA", nhanVien); // Dữ liệu nhân viên cần sửa
-            loadFormDependencies(request, "updateNhanVien"); // Tải danh sách Khoa
+            request.setAttribute("NHANVIEN_DATA", nhanVien);
+            loadFormDependencies(request, "updateNhanVien");
             request.setAttribute("formAction", "updateNhanVien");
             return NHANVIEN_FORM_PAGE;
         } catch (NumberFormatException e) {
-             request.setAttribute("ERROR_MESSAGE", "ID Nhân viên không hợp lệ.");
-             return ERROR_PAGE;
+            // Ném ValidationException để doGet bắt được và đưa ra trang lỗi
+            throw new ValidationException("ID Nhân viên không hợp lệ.");
         }
-        // Exception từ Service (VD: nhân viên bị khóa) sẽ được bắt ở doGet
     }
 
     /**
-     * Xử lý logic tạo mới một Nhân Viên.
-     * (Giữ nguyên - lỗi sẽ được bắt bởi doPost)
+     * Xử lý logic tạo mới một Nhân Viên. (SỬA: Dùng Session Attribute và trả về
+     * redirect)
      */
-    private String createNhanVien(HttpServletRequest request) throws Exception {
+    private String createNhanVien(HttpServletRequest request) throws ValidationException, Exception {
         NhanVienDTO newNhanVienDTO = createDTOFromRequest(request);
         NhanVienDTO result = nhanVienService.createNhanVien(newNhanVienDTO);
-        request.setAttribute("SUCCESS_MESSAGE", "Tạo nhân viên '" + result.getHoTen() + "' thành công!");
-        // Trả về trang list để doPost gọi listNhanVien
-        return NHANVIEN_LIST_PAGE;
+        // Dùng Session để thông báo tồn tại sau khi redirect
+        request.getSession().setAttribute("SUCCESS_MESSAGE", "Tạo nhân viên '" + result.getHoTen() + "' thành công!");
+        return "redirect:MainController?action=listNhanVien";
     }
 
     /**
-     * Xử lý logic cập nhật một Nhân Viên.
-     * (Giữ nguyên - lỗi sẽ được bắt bởi doPost)
+     * Xử lý logic cập nhật một Nhân Viên. (SỬA: Dùng Session Attribute và trả
+     * về redirect)
      */
-    private String updateNhanVien(HttpServletRequest request) throws Exception {
+    private String updateNhanVien(HttpServletRequest request) throws ValidationException, Exception {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             NhanVienDTO nhanVienDTO = createDTOFromRequest(request);
             NhanVienDTO result = nhanVienService.updateNhanVien(id, nhanVienDTO);
-            request.setAttribute("SUCCESS_MESSAGE", "Cập nhật nhân viên '" + result.getHoTen() + "' thành công!");
-            return NHANVIEN_LIST_PAGE;
+            // Dùng Session để thông báo tồn tại sau khi redirect
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Cập nhật nhân viên '" + result.getHoTen() + "' thành công!");
+            return "redirect:MainController?action=listNhanVien";
         } catch (NumberFormatException e) {
-             request.setAttribute("ERROR_MESSAGE", "ID Nhân viên không hợp lệ khi cập nhật.");
-             return ERROR_PAGE;
+            // Ném lỗi để doPost bắt được và chuyển về form
+            throw new ValidationException("ID Nhân viên không hợp lệ khi cập nhật.");
         }
-        // Exception từ Service (VD: nhân viên bị khóa) sẽ được bắt ở doPost
     }
 
     /**
-     * Xử lý logic Soft Delete một Nhân Viên.
-     * (Cập nhật để bắt ValidationException cụ thể)
+     * Xử lý logic Soft Delete một Nhân Viên. (SỬA: Dùng Session Attribute và
+     * trả về redirect)
      */
-    private String softDeleteNhanVien(HttpServletRequest request) {
+    private String softDeleteNhanVien(HttpServletRequest request) throws ValidationException, Exception {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             nhanVienService.softDeleteNhanVien(id);
-            request.setAttribute("SUCCESS_MESSAGE", "Đã vô hiệu hóa nhân viên thành công!");
-            return NHANVIEN_LIST_PAGE; // Trả về trang list để doPost load lại
+            // Dùng Session để thông báo tồn tại sau khi redirect
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã vô hiệu hóa nhân viên thành công!");
+            return "redirect:MainController?action=listNhanVien";
         } catch (NumberFormatException e) {
-            request.setAttribute("ERROR_MESSAGE", "ID Nhân viên không hợp lệ khi xóa.");
-            return ERROR_PAGE;
-        // --- CẬP NHẬT ---
-        } catch (ValidationException ve) {
-             log("Lỗi validation khi vô hiệu hóa nhân viên: " + ve.getMessage(), ve);
-             request.setAttribute("ERROR_MESSAGE", "Vô hiệu hóa nhân viên thất bại: " + ve.getMessage());
-             return NHANVIEN_LIST_PAGE; // Quay về trang list
-        } catch (Exception e) {
-        // --- KẾT THÚC CẬP NHẬT ---
-            log("Lỗi hệ thống khi vô hiệu hóa nhân viên: " + e.getMessage(), e);
-            request.setAttribute("ERROR_MESSAGE", "Vô hiệu hóa nhân viên thất bại (lỗi hệ thống): " + e.getMessage());
-            return ERROR_PAGE; // Lỗi hệ thống nên về trang lỗi
+            // Ném lỗi để doPost bắt được (và trả về trang list)
+            throw new ValidationException("ID Nhân viên không hợp lệ khi xóa.");
         }
+        // Các Exception khác (Validation, Exception) sẽ tự ném ra và bị doPost bắt
     }
 
-
     /**
-     * Tải các dữ liệu phụ thuộc cho form (danh sách Tài khoản hoạt động chưa gán, Khoa).
+     * Tải các dữ liệu phụ thuộc cho form (Tài khoản, Khoa). (SỬA: Tải danh sách
+     * Khoa không phân trang cho dropdown)
      */
     private void loadFormDependencies(HttpServletRequest request, String formAction) {
         try {
+            // Chỉ tải danh sách tài khoản chưa gán KHI TẠO MỚI
             if ("createNhanVien".equals(formAction)) {
-                // --- CẬP NHẬT: Sửa lỗi TODO ---
-                // Chỉ lấy các tài khoản hoạt động, chưa gán, và có vai trò là NHÂN VIÊN
-                // (Không lấy vai trò 'BENH_NHAN')
                 List<TaiKhoanDTO> unassignedStaffAccounts = new ArrayList<>();
-                
-                // Giả sử vai trò nhân viên bao gồm 3 loại này:
                 unassignedStaffAccounts.addAll(taiKhoanService.getActiveAndUnassignedAccounts("ADMIN"));
                 unassignedStaffAccounts.addAll(taiKhoanService.getActiveAndUnassignedAccounts("BAC_SI"));
                 unassignedStaffAccounts.addAll(taiKhoanService.getActiveAndUnassignedAccounts("DUOC_SI"));
                 // Thêm các vai trò nhân viên khác nếu có...
-
                 request.setAttribute("LIST_TAIKHOAN", unassignedStaffAccounts);
-                // --- KẾT THÚC CẬP NHẬT ---
             }
 
+            // Luôn tải danh sách Khoa (cho cả Tạo và Sửa)
+            // Hàm getAllKhoa() của KhoaService là đúng, nó lấy tất cả (cho dropdown)
             List<KhoaDTO> listKhoa = khoaService.getAllKhoa();
             request.setAttribute("LIST_KHOA", listKhoa);
+
         } catch (Exception e) {
             log("Không thể tải dữ liệu phụ thuộc cho form Nhân viên: " + e.getMessage(), e);
             request.setAttribute("LOAD_FORM_ERROR", "Lỗi tải danh sách Tài khoản/Khoa.");
         }
     }
 
-     /**
-     * Xử lý lỗi từ Service (chỉ dành cho ValidationException) và gửi lại form.
+    /**
+     * (Hàm handleServiceException giữ nguyên)
      */
     private void handleServiceException(HttpServletRequest request, ValidationException e, String formAction) {
         request.setAttribute("ERROR_MESSAGE", e.getMessage());
-        // Giữ lại dữ liệu người dùng đã nhập để hiển thị lại trên form
         request.setAttribute("NHANVIEN_DATA", createDTOFromRequest(request));
         request.setAttribute("formAction", formAction);
-        // Tải lại các dropdowns (Khoa, Tài khoản...)
-        loadFormDependencies(request, formAction); 
+        loadFormDependencies(request, formAction);
     }
 
-
     /**
-     * Hàm tiện ích tạo NhanVienDTO từ request.
+     * (Hàm createDTOFromRequest giữ nguyên)
      */
     private NhanVienDTO createDTOFromRequest(HttpServletRequest request) {
-         NhanVienDTO dto = new NhanVienDTO();
-         String idStr = request.getParameter("id");
-         if(idStr != null && !idStr.isEmpty()){
-             try {
-                 dto.setId(Integer.parseInt(idStr));
-             } catch (NumberFormatException e) { /* ignore */ }
-         }
-         dto.setHoTen(request.getParameter("hoTen"));
-         dto.setGioiTinh(request.getParameter("giớiTinh"));
-         dto.setDiaChi(request.getParameter("diaChi"));
-         dto.setSoDienThoai(request.getParameter("soDienThoai"));
-         dto.setChuyenMon(request.getParameter("chuyenMon"));
-         dto.setBangCap(request.getParameter("bangCap"));
+        NhanVienDTO dto = new NhanVienDTO();
+        String idStr = request.getParameter("id");
+        if (idStr != null && !idStr.isEmpty()) {
+            try {
+                dto.setId(Integer.parseInt(idStr));
+            } catch (NumberFormatException e) {
+                /* ignore */ }
+        }
+        dto.setHoTen(request.getParameter("hoTen"));
+        dto.setGioiTinh(request.getParameter("gioiTinh")); // SỬA LỖI CHÍNH TẢ: "giớiTinh" -> "gioiTinh"
+        dto.setDiaChi(request.getParameter("diaChi"));
+        dto.setSoDienThoai(request.getParameter("soDienThoai"));
+        dto.setChuyenMon(request.getParameter("chuyenMon"));
+        dto.setBangCap(request.getParameter("bangCap"));
 
-         String ngaySinhStr = request.getParameter("ngaySinh");
-         if (ngaySinhStr != null && !ngaySinhStr.isEmpty()) {
-             try {
-                // --- CẬP NHẬT: Sửa lỗi Parse ---
-                // Input type="date" gửi về "YYYY-MM-DD"
-                // Parse thành LocalDate trước, sau đó chuyển sang LocalDateTime (vào lúc 00:00)
-                dto.setNgaySinh(LocalDate.parse(ngaySinhStr).atStartOfDay());
-                // --- KẾT THÚC CẬP NHẬT ---
-             } catch (DateTimeParseException e) {
-                 log("Lỗi parse ngày sinh: " + ngaySinhStr);
-                 // Có thể set attribute báo lỗi nếu cần
-             }
-         }
+        String ngaySinhStr = request.getParameter("ngaySinh");
+        if (ngaySinhStr != null && !ngaySinhStr.isEmpty()) {
+            try {
+                // Input type="datetime-local" gửi về "YYYY-MM-DDTHH:MM"
+                // (Nếu bạn dùng type="date" thì dùng LocalDate.parse(ngaySinhStr).atStartOfDay())
+                dto.setNgaySinh(LocalDateTime.parse(ngaySinhStr));
+            } catch (DateTimeParseException e) {
+                log("Lỗi parse ngày sinh (datetime-local): " + ngaySinhStr);
+                // Thử parse kiểu "date"
+                try {
+                    dto.setNgaySinh(LocalDate.parse(ngaySinhStr).atStartOfDay());
+                } catch (DateTimeParseException e2) {
+                    log("Lỗi parse ngày sinh (date): " + ngaySinhStr);
+                }
+            }
+        }
 
-         // Chỉ lấy TaiKhoanId khi tạo mới
-         String formAction = request.getParameter("action");
-         if ("createNhanVien".equals(formAction)) {
-             String taiKhoanIdStr = request.getParameter("taiKhoanId");
-             if (taiKhoanIdStr != null && !taiKhoanIdStr.isEmpty()) {
-                 try {
-                     dto.setTaiKhoanId(Integer.parseInt(taiKhoanIdStr));
-                 } catch (NumberFormatException e) { /* ignore */ }
-             }
-         } else if ("updateNhanVien".equals(formAction)) {
-             // Khi update, không lấy TaiKhoanId từ request
-             // Lấy từ hidden field nếu cần thiết, để gửi về form nếu có lỗi
-             String hiddenTaiKhoanId = request.getParameter("hiddenTaiKhoanId"); // Ví dụ tên hidden field
-             if (hiddenTaiKhoanId != null && !hiddenTaiKhoanId.isEmpty()) {
-                 try {
-                     // Chỉ set lại để gửi về form nếu có lỗi, Service không dùng cái này
-                     dto.setTaiKhoanId(Integer.parseInt(hiddenTaiKhoanId));
-                 } catch (NumberFormatException e) { /* ignore */ }
-             }
-         }
+        // (Logic lấy taiKhoanId và khoaId giữ nguyên)
+        String formAction = request.getParameter("action");
+        if ("createNhanVien".equals(formAction)) {
+            String taiKhoanIdStr = request.getParameter("taiKhoanId");
+            if (taiKhoanIdStr != null && !taiKhoanIdStr.isEmpty()) {
+                try {
+                    dto.setTaiKhoanId(Integer.parseInt(taiKhoanIdStr));
+                } catch (NumberFormatException e) {
+                    /* ignore */ }
+            }
+        }
 
+        String khoaIdStr = request.getParameter("khoaId");
+        if (khoaIdStr != null && !khoaIdStr.isEmpty() && !khoaIdStr.equals("0")) {
+            try {
+                dto.setKhoaId(Integer.parseInt(khoaIdStr));
+            } catch (NumberFormatException e) {
+                /* ignore */ }
+        } else {
+            dto.setKhoaId(null);
+        }
 
-         String khoaIdStr = request.getParameter("khoaId");
-         if (khoaIdStr != null && !khoaIdStr.isEmpty() && !khoaIdStr.equals("0")) {
-             try {
-                 dto.setKhoaId(Integer.parseInt(khoaIdStr));
-             } catch (NumberFormatException e) { /* ignore */ }
-         } else {
-             dto.setKhoaId(null);
-         }
-
-         return dto;
+        return dto;
     }
 
     @Override

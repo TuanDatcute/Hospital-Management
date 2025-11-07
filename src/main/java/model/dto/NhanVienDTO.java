@@ -16,12 +16,13 @@ public class NhanVienDTO {
     private int taiKhoanId;
     private Integer khoaId;
     private String vaiTro; // new from dat
+    private String tenKhoa;
     // Constructors
 
     public NhanVienDTO() {
     }
 
-    public NhanVienDTO(int id, String hoTen, LocalDateTime ngaySinh, String gioiTinh, String diaChi, String soDienThoai, String chuyenMon, String bangCap, int taiKhoanId, Integer khoaId) { // <-- ĐÃ THAY ĐỔI
+    public NhanVienDTO(int id, String hoTen, LocalDateTime ngaySinh, String gioiTinh, String diaChi, String soDienThoai, String chuyenMon, String bangCap, int taiKhoanId, Integer khoaId, String vaiTro, String tenKhoa) {
         this.id = id;
         this.hoTen = hoTen;
         this.ngaySinh = ngaySinh;
@@ -32,19 +33,12 @@ public class NhanVienDTO {
         this.bangCap = bangCap;
         this.taiKhoanId = taiKhoanId;
         this.khoaId = khoaId;
+        this.vaiTro = vaiTro;
+        this.tenKhoa = tenKhoa;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
-    }
-
-    public String getVaiTro() {
-        return vaiTro;
-    }
-
-    public void setVaiTro(String vaiTro) {
-        this.vaiTro = vaiTro;
     }
 
     public void setId(int id) {
@@ -122,4 +116,21 @@ public class NhanVienDTO {
     public void setKhoaId(Integer khoaId) {
         this.khoaId = khoaId;
     }
+
+    public String getVaiTro() {
+        return vaiTro;
+    }
+
+    public void setVaiTro(String vaiTro) {
+        this.vaiTro = vaiTro;
+    }
+
+    public String getTenKhoa() {
+        return tenKhoa;
+    }
+
+    public void setTenKhoa(String tenKhoa) {
+        this.tenKhoa = tenKhoa;
+    }
+  
 }

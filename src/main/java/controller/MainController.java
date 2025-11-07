@@ -9,10 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet điều hướng chính (Front Controller). **ĐÃ CẬP NHẬT:** Đã merge (kết
- * hợp) các tính năng Auth và tính năng Main.
- *
- * @author tungi (đã chỉnh sửa)
+ * Servlet điều hướng chính (Front Controller). (ĐÃ SỬA LỖI MERGE CONFLICT)
  */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 public class MainController extends HttpServlet {
@@ -33,8 +30,6 @@ public class MainController extends HttpServlet {
     private static final String THONG_BAO_CONTROLLER = "ThongBaoController";
     private static final String USER_THONG_BAO_CONTROLLER = "UserThongBaoController";
     private static final String PATIENT_LICH_HEN_CONTROLLER = "PatientLichHenController";
-
-    // --- (Các Controller từ nhánh Auth của bạn) ---
     private static final String VERIFY_CONTROLLER = "VerifyController";
     private static final String SECURITY_CONTROLLER = "SecurityController";
     private static final String RESET_CONTROLLER = "PasswordResetController";
@@ -51,27 +46,33 @@ public class MainController extends HttpServlet {
         String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deleteService"};
 
-        // **MERGE:** Lấy 'lichHenActions' từ nhánh 'main' (vì nó đầy đủ hơn)
-        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus", "showCreateAppointmentForm", "createAppointment"};
+        // (Đã thêm 'updateLichHen' mà chúng ta đã làm)
+        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus",
+            "showLichHenEditForm", "updateLichHen", // <-- Logic Sửa Lịch Hẹn
+            "showCreateAppointmentForm", "createAppointment"};
 
-        // **MERGE:** Lấy 'userActions' từ nhánh của bạn (vì nó có logic Auth mới)
         String[] userActions = {"login", "logout", "listUsers",
             "showUserCreateForm", "createUser",
             "showUserEditForm", "updateUserStatus",
             "showChangePasswordForm", "changePassword",
             "register", "resendVerification"
-    // "verify" đã được chuyển đi
         };
 
+        // (Đã dùng 'softDeleteKhoa' từ các bước trước)
         String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa",
-            "showKhoaEditForm", "updateKhoa", "deleteKhoa"};
+            "showKhoaEditForm", "updateKhoa", "softDeleteKhoa"};
+
+        // (Đã dùng 'softDeleteNhanVien' từ các bước trước)
         String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien",
-            "showNhanVienEditForm", "updateNhanVien", "deleteNhanVien"};
+            "showNhanVienEditForm", "updateNhanVien", "softDeleteNhanVien"};
+
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm", "createPrescription"};
 
-        // **MERGE:** Lấy 'benhNhanActions' từ nhánh của bạn (vì nó có logic hồ sơ mới)
+        // === BẮT ĐẦU SỬA LỖI CONFLICT ===
+        // Giữ lại "softDeleteBenhNhan" từ HEAD (logic Xóa Mềm mới của chúng ta)
+        // và xóa "deleteBenhNhan" từ nhánh cũ.
         String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan",
-            "showBenhNhanEditForm", "updateBenhNhan", "deleteBenhNhan",
+            "showBenhNhanEditForm", "updateBenhNhan", "softDeleteBenhNhan",
             "showProfile", // (Xem hồ sơ)
             "showEditProfile", // (Sửa hồ sơ)
             "saveProfile", // (Lưu hồ sơ)
@@ -79,16 +80,16 @@ public class MainController extends HttpServlet {
             "showEditProfileWithExisting", // (Nút "Cần cập nhật")
             "updateAndLink" // (Lưu sau khi "Cần cập nhật")
     };
+        // === KẾT THÚC SỬA LỖI CONFLICT ===
 
-        // **MERGE:** Lấy các mảng mới từ nhánh 'main'
         String[] phongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate", "deleteRoom", "showCreateRoomForm"};
         String[] giuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed", "deleteBed", "updateBed", "getBedForUpdate", "showCreateBedForm"};
         String[] hoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice", "printInvoice"};
         String[] thongBaoActions = {"createThongBao", "listNotifications"};
         String[] userThongBaoActions = {"viewMyNotifications", "markNotificationAsRead", "deleteMyNotification"};
         String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "bookAppointment", "cancelAppointment"};
-        String[] verifyActions = {"verify"}; // Chỉ xử lý 'verify'
-        String[] resetActions = {"requestReset", "performReset"}; // Chỉ xử lý 'Quên MK'
+        String[] verifyActions = {"verify"};
+        String[] resetActions = {"requestReset", "performReset"};
         String[] securityActions = {"showConfirmPassword", "confirmPassword",
             "showEditPhone", "savePhone",
             "showEditCCCD", "saveCCCD",
@@ -96,25 +97,19 @@ public class MainController extends HttpServlet {
             "showEditDOB", "saveDOB"
         };
 
-        //action đặc biệt không dùng forward, mà chuyển thẳng đến doget của controller tương ứng,
-        //ví dụ để hiển thị danh sách bác sĩ thuộc khoa trong trang đặt lịch hẹn của bệnh nhân
+        // (Logic AJAX của bạn giữ nguyên)
         String[] ajaxActions = {"getBacSiByKhoa"};
         if (Arrays.asList(ajaxActions).contains(action)) {
-            // Nếu đây là action AJAX cần trả về JSON, chúng ta gọi controller trực tiếp
-            // và dừng luồng MainController
-
             if ("getBacSiByKhoa".equals(action)) {
-                // Khởi tạo và gọi doGet của Controller AJAX
                 new PatientLichHenController().doGet(request, response);
-                return; // DỪNG NGAY LẬP TỨC.
+                return;
             }
-
         }
 
+        // (Logic điều hướng IF/ELSE IF giữ nguyên)
         if (action == null || action.isEmpty()) {
             url = LOGIN_PAGE;
-        } // --- (Auth features - từ nhánh của bạn) ---
-        else if (Arrays.asList(userActions).contains(action)) {
+        } else if (Arrays.asList(userActions).contains(action)) {
             url = USER_CONTROLLER;
         } else if (Arrays.asList(verifyActions).contains(action)) {
             url = VERIFY_CONTROLLER;
@@ -122,8 +117,7 @@ public class MainController extends HttpServlet {
             url = RESET_CONTROLLER;
         } else if (Arrays.asList(securityActions).contains(action)) {
             url = SECURITY_CONTROLLER;
-        } // --- (Feature features - từ cả 2 nhánh) ---
-        else if (Arrays.asList(benhNhanActions).contains(action)) {
+        } else if (Arrays.asList(benhNhanActions).contains(action)) {
             url = BENHNHAN_CONTROLLER;
         } else if (Arrays.asList(EMRCoreActions).contains(action)) {
             url = EMRCORE_CONTROLLER;
@@ -137,8 +131,7 @@ public class MainController extends HttpServlet {
             url = CATALOG_CONTROLLER;
         } else if (Arrays.asList(DonThuocActions).contains(action)) {
             url = DON_THUOC_CONTROLLER;
-        } // --- (Main features - từ nhánh main) ---
-        else if (Arrays.asList(phongBenhActions).contains(action)) {
+        } else if (Arrays.asList(phongBenhActions).contains(action)) {
             url = PHONG_BENH_CONTROLLER;
         } else if (Arrays.asList(giuongBenhActions).contains(action)) {
             url = GIUONG_BENH_CONTROLLER;
@@ -156,6 +149,7 @@ public class MainController extends HttpServlet {
         request.getRequestDispatcher(url).forward(request, response);
     }
 
+    // (Các hàm doGet, doPost, getServletInfo giữ nguyên)
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
