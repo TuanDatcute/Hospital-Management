@@ -40,7 +40,6 @@ public class MainController extends HttpServlet {
     private static final String VERIFY_CONTROLLER = "VerifyController";
     private static final String SECURITY_CONTROLLER = "SecurityController";
     private static final String RESET_CONTROLLER = "PasswordResetController";
-    private final NhanVienService nhanVienService = new NhanVienService();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -89,9 +88,7 @@ public class MainController extends HttpServlet {
         String[] hoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice", "printInvoice"};
         String[] thongBaoActions = {"createThongBao", "listNotifications"};
         String[] userThongBaoActions = {"viewMyNotifications", "markNotificationAsRead", "deleteMyNotification"};
-        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "myAppointments", "bookAppointment"};
-
-        // **MERGE:** Lấy các mảng mới từ nhánh của bạn
+        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "bookAppointment", "cancelAppointment"};
         String[] verifyActions = {"verify"}; // Chỉ xử lý 'verify'
         String[] resetActions = {"requestReset", "performReset"}; // Chỉ xử lý 'Quên MK'
         String[] securityActions = {"showConfirmPassword", "confirmPassword",
@@ -101,8 +98,21 @@ public class MainController extends HttpServlet {
             "showEditDOB", "saveDOB"
         };
 
-        // 3. Điều hướng dựa trên action (ĐÃ KẾT HỢP CẢ 2 NHÁNH)
-       
+        // 3. Điều hướng dựa trên action (ĐÃ KẾT HỢP CẢ 2 NHÁNH)    
+        //action đặc biệt không dùng forward, mà chuyển thẳng đến doget của controller tương ứng,
+        //ví dụ để hiển thị danh sách bác sĩ thuộc khoa trong trang đặt lịch hẹn của bệnh nhân
+        String[] ajaxActions = {"getBacSiByKhoa"};
+        if (Arrays.asList(ajaxActions).contains(action)) {
+            // Nếu đây là action AJAX cần trả về JSON, chúng ta gọi controller trực tiếp
+            // và dừng luồng MainController
+
+            if ("getBacSiByKhoa".equals(action)) {
+                // Khởi tạo và gọi doGet của Controller AJAX
+                new PatientLichHenController().doGet(request, response);
+                return; // DỪNG NGAY LẬP TỨC.
+            }
+
+        }
         if (action == null || action.isEmpty()) {
             url = LOGIN_PAGE;
         } // --- (Auth features - từ nhánh của bạn) ---

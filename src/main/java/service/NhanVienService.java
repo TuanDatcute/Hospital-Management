@@ -16,8 +16,6 @@ import java.util.Collections;
 
 /**
  * Lớp Service chứa logic nghiệp vụ cho NhanVien.
- *
- * @author ADMIN (Đã CẬP NHẬT: Fix lỗi 'Pattern cannot be converted to String')
  */
 public class NhanVienService {
 
@@ -27,27 +25,21 @@ public class NhanVienService {
     private final KhoaDAO khoaDAO = new KhoaDAO();
 
     // --- CẬP NHẬT: Định nghĩa các hằng số REGEX ---
-    // **BẮT ĐẦU SỬA (Đổi Pattern về lại String)**
     private static final String PHONE_NUMBER_REGEX = "^(0[3|5|7|8|9])+([0-9]{8})$";
-    // **KẾT THÚC SỬA**
-
     private static final String NAME_REGEX = "^[\\p{L} .'-]{2,50}$";
 
     // --- THÊM MỚI: Hằng số trạng thái (Clean Code) ---
     private static final String TRANG_THAI_HOAT_DONG = "HOAT_DONG";
     private static final String TRANG_THAI_BI_KHOA = "BI_KHOA";
-    // --- KẾT THÚC THÊM MỚI ---
 
     /**
-     * Dịch vụ tạo một Nhân Viên mới. CẬP NHẬT: Gọi hàm validation tập trung.
+     * Dịch vụ tạo một Nhân Viên mới.
      */
     public NhanVienDTO createNhanVien(NhanVienDTO dto) throws ValidationException, Exception {
 
         // --- BƯỚC 1: LOGIC NGHIỆP VỤ (VALIDATION) ---
-        // Gọi hàm helper, 'null' vì đây là tạo mới
         validateNhanVienData(dto, null);
 
-        // Validation riêng cho 'create' (Kiểm tra Tài khoản)
         if (dto.getTaiKhoanId() <= 0) {
             throw new ValidationException("ID Tài khoản không hợp lệ. Phải gán một tài khoản.");
         }
@@ -81,16 +73,17 @@ public class NhanVienService {
 
         // --- BƯỚC 5: TRẢ VỀ DTO ---
         if (savedEntity != null) {
-            // Tải lại để đảm bảo có đủ thông tin relations cho toDTO
-            NhanVien fullSavedEntity = nhanVienDAO.getByIdWithRelations(savedEntity.getId());
-            return toDTO(fullSavedEntity);
+            // Gán lại các entity vừa dùng để đảm bảo toDTO có đủ thông tin
+            // (vì savedEntity có thể chưa load lazy relations)
+            savedEntity.setTaiKhoan(taiKhoanEntity);
+            savedEntity.setKhoa(khoaEntity);
+            return toDTO(savedEntity);
         }
         return null;
     }
 
     /**
-     * Dịch vụ cập nhật thông tin Nhân Viên. CẬP NHẬT: Gọi hàm validation tập
-     * trung.
+     * Dịch vụ cập nhật thông tin Nhân Viên.
      */
     public NhanVienDTO updateNhanVien(int nhanVienId, NhanVienDTO dto) throws ValidationException, Exception {
 
@@ -104,7 +97,6 @@ public class NhanVienService {
         }
 
         // --- BƯỚC 2: VALIDATION ---
-        // Gọi hàm helper, truyền 'existingEntity' để check logic update
         validateNhanVienData(dto, existingEntity);
 
         // --- BƯỚC 3: CẬP NHẬT CÁC TRƯỜNG ---
@@ -137,12 +129,14 @@ public class NhanVienService {
         }
 
         // --- BƯỚC 5: TRẢ VỀ DTO (ĐÃ CẬP NHẬT) ---
+        // Tải lại để chắc chắn lấy dữ liệu mới nhất
         NhanVien updatedEntity = nhanVienDAO.getByIdWithRelations(nhanVienId);
         return toDTO(updatedEntity);
     }
 
     /**
-     * Dịch vụ thực hiện Soft Delete cho Nhân Viên.
+     * Dịch vụ thực hiện Soft Delete cho Nhân Viên. (Bằng cách khóa tài khoản
+     * liên kết)
      */
     public void softDeleteNhanVien(int nhanVienId) throws ValidationException, Exception {
         NhanVien nhanVien = nhanVienDAO.getByIdWithRelations(nhanVienId);
@@ -157,7 +151,7 @@ public class NhanVienService {
 
         if (!TRANG_THAI_BI_KHOA.equals(taiKhoan.getTrangThai())) {
             taiKhoan.setTrangThai(TRANG_THAI_BI_KHOA);
-            taiKhoan.setUpdatedAt(LocalDateTime.now());
+            taiKhoan.setUpdatedAt(LocalDateTime.now()); // Giả sử Entity TaiKhoan có trường này
 
             try {
                 taiKhoanDAO.update(taiKhoan);
@@ -194,13 +188,14 @@ public class NhanVienService {
      * Dịch vụ tìm tất cả bác sĩ đang hoạt động.
      */
     public List<NhanVienDTO> findDoctorsBySpecialty() {
-
+        // Giả sử DAO findDoctorsBySpecialty() chỉ lấy vai trò BAC_SI
         List<NhanVien> entities = nhanVienDAO.findDoctorsBySpecialty();
 
         if (entities == null) {
             return Collections.emptyList();
         }
 
+        // Lọc thêm trạng thái HOAT_DONG
         return entities.stream()
                 .filter(nv -> nv.getTaiKhoan() != null && TRANG_THAI_HOAT_DONG.equals(nv.getTaiKhoan().getTrangThai()))
                 .map(this::toDTO)
@@ -208,7 +203,23 @@ public class NhanVienService {
     }
 
     /**
-     * Chuyển NhanVien (Entity) sang NhanVienDTO
+     * HÀM MỚI: Lấy danh sách Bác Sĩ (DTO) theo Khoa ID (Chỉ lấy bác sĩ đang
+     * HOAT_DONG)
+     */
+    public List<NhanVienDTO> getBacSiByKhoa(int khoaId) {
+        // Giả sử DAO findByKhoaId đã lọc vai trò BAC_SI
+        System.out.println("Service: Bắt đầu gọi DAO với khoaId: " + khoaId); // <-- THÊM DÒNG NÀY
+        List<NhanVien> entities = nhanVienDAO.findBacSiByKhoaId(khoaId);
+        System.out.println("Service: DAO đã trả về " + entities.size() + " entities."); // Lọc lại chỉ những người HOAT_DONG
+        return entities.stream()
+                .filter(nv -> nv.getTaiKhoan() != null && TRANG_THAI_HOAT_DONG.equals(nv.getTaiKhoan().getTrangThai()))
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Chuyển NhanVien (Entity) sang NhanVienDTO CẬP NHẬT: Tuân thủ DTO phẳng
+     * (chỉ chứa khoaId)
      */
     private NhanVienDTO toDTO(NhanVien entity) {
         if (entity == null) {
@@ -227,10 +238,12 @@ public class NhanVienService {
 
         if (entity.getTaiKhoan() != null) {
             dto.setTaiKhoanId(entity.getTaiKhoan().getId());
+            dto.setVaiTro(entity.getTaiKhoan().getVaiTro());
         }
 
         if (entity.getKhoa() != null) {
             dto.setKhoaId(entity.getKhoa().getId());
+            // Đã xóa: dto.setTenKhoa(...)
         }
 
         return dto;
@@ -257,10 +270,6 @@ public class NhanVienService {
     }
 
     // --- HÀM VALIDATE TẬP TRUNG (DRY) ---
-    /**
-     * Hàm private để validate dữ liệu NhanVienDTO. Được gọi bởi cả 'create' và
-     * 'update'.
-     */
     private void validateNhanVienData(NhanVienDTO dto, NhanVien existingEntity) throws ValidationException {
         // 1. Kiểm tra Họ tên
         if (dto.getHoTen() == null || dto.getHoTen().trim().isEmpty()) {
@@ -270,31 +279,30 @@ public class NhanVienService {
             throw new ValidationException("Họ tên không hợp lệ (chỉ chứa chữ cái, dấu cách, và dài 2-50 ký tự).");
         }
 
-        // 2. Kiểm tra Số điện thoại (chỉ check nếu có nhập)
+        // 2. Kiểm tra Số điện thoại
         String newSdt = dto.getSoDienThoai();
         if (newSdt != null && !newSdt.trim().isEmpty()) {
-            // 2a. Check định dạng (Regex)
-            // Dòng này giờ đã đúng vì PHONE_NUMBER_REGEX là String
             if (!Pattern.matches(PHONE_NUMBER_REGEX, newSdt)) {
                 throw new ValidationException("Số điện thoại không hợp lệ (phải là 10 số, bắt đầu bằng 03, 05, 07, 08, 09).");
             }
 
-            // 2b. Check tính duy nhất (Unique)
             boolean isCreating = (existingEntity == null);
             boolean isUpdatingAndChanged = (!isCreating && !newSdt.equals(existingEntity.getSoDienThoai()));
 
+            // Giả sử DAO có hàm này
             if ((isCreating || isUpdatingAndChanged) && nhanVienDAO.isSoDienThoaiExisted(newSdt)) {
                 throw new ValidationException("Số điện thoại '" + newSdt + "' đã tồn tại.");
             }
         }
-
-        // (Bạn có thể thêm các validation khác cho chuyenMon, bangCap... ở đây nếu cần)
     }
 
     //=======================================================Dat==============================================
+    /**
+     * CẬP NHẬT: Dùng hàm toDTO() chính
+     */
     public NhanVienDTO getNhanVienByTaiKhoanId(int taiKhoanId) {
         NhanVien entity = nhanVienDAO.findByTaiKhoanId(taiKhoanId);
-        return toDTOFotGetByTaiKhoan(entity);
+        return toDTO(entity); // <-- SỬA: Dùng hàm 'toDTO' chính
     }
 
     private NhanVienDTO toDTOFotGetByTaiKhoan(NhanVien entity) {
@@ -317,8 +325,11 @@ public class NhanVienService {
     }
 
     public List<NhanVienDTO> getDoctorsByKhoaId(int khoaId) {
-        return nhanVienDAO.findDoctorsByKhoaId(khoaId).stream()
-                .map(this::toDTO) 
+        return nhanVienDAO.findBacSiByKhoaId(khoaId).stream()
+                .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 }
+
+// === ĐÃ XÓA: Hàm toDTOFotGetByTaiKhoan (trùng lặp) ===
+
