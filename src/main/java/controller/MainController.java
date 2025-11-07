@@ -7,7 +7,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import service.NhanVienService;
 
 /**
  * Servlet điều hướng chính (Front Controller). **ĐÃ CẬP NHẬT:** Đã merge (kết
@@ -18,7 +17,6 @@ import service.NhanVienService;
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 public class MainController extends HttpServlet {
 
-    // --- Khai báo URL Controller ---
     private static final String LOGIN_PAGE = "login.jsp";
     private static final String USER_CONTROLLER = "UserController";
     private static final String EMRCORE_CONTROLLER = "EMRCoreController";
@@ -48,7 +46,6 @@ public class MainController extends HttpServlet {
         String action = request.getParameter("action");
         String url = LOGIN_PAGE;
 
-        // 2. Nhóm các action cho từng controller
         String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deleteService"};
         String[] NurseLichHenActions = {"showCreateAppointmentForm", "createAppointment", "getDoctorsByKhoa"};
@@ -69,44 +66,21 @@ public class MainController extends HttpServlet {
         String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien",
             "showNhanVienEditForm", "updateNhanVien", "deleteNhanVien"};
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm", "createPrescription"};
-
-        // **MERGE:** Lấy 'benhNhanActions' từ nhánh của bạn (vì nó có logic hồ sơ mới)
-        String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan",
-            "showBenhNhanEditForm", "updateBenhNhan", "deleteBenhNhan",
-            "showProfile", // (Xem hồ sơ)
-            "showEditProfile", // (Sửa hồ sơ)
-            "saveProfile", // (Lưu hồ sơ)
-            "confirmAndLink", // (Nút "Liên kết ngay")
-            "showEditProfileWithExisting", // (Nút "Cần cập nhật")
-            "updateAndLink" // (Lưu sau khi "Cần cập nhật")
-    };
-
-        // **MERGE:** Lấy các mảng mới từ nhánh 'main'
+        String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan", "showBenhNhanEditForm", "updateBenhNhan", "softDeleteBenhNhan", "showProfile", "showEditProfile", "saveProfile", "confirmAndLink", "showEditProfileWithExisting", "updateAndLink"};
         String[] phongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate", "deleteRoom", "showCreateRoomForm"};
         String[] giuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed", "deleteBed", "updateBed", "getBedForUpdate", "showCreateBedForm"};
         String[] hoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice", "printInvoice"};
         String[] thongBaoActions = {"createThongBao", "listNotifications"};
         String[] userThongBaoActions = {"viewMyNotifications", "markNotificationAsRead", "deleteMyNotification"};
         String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "bookAppointment", "cancelAppointment"};
-        String[] verifyActions = {"verify"}; // Chỉ xử lý 'verify'
-        String[] resetActions = {"requestReset", "performReset"}; // Chỉ xử lý 'Quên MK'
-        String[] securityActions = {"showConfirmPassword", "confirmPassword",
-            "showEditPhone", "savePhone",
-            "showEditCCCD", "saveCCCD",
-            "showEditName", "saveName",
-            "showEditDOB", "saveDOB"
-        };
+        String[] verifyActions = {"verify"};
+        String[] resetActions = {"requestReset", "performReset"};
+        String[] securityActions = {"showConfirmPassword", "confirmPassword", "showEditPhone", "savePhone", "showEditCCCD", "saveCCCD", "showEditName", "saveName", "showEditDOB", "saveDOB"};
 
-        // 3. Điều hướng dựa trên action (ĐÃ KẾT HỢP CẢ 2 NHÁNH)    
-        //action đặc biệt không dùng forward, mà chuyển thẳng đến doget của controller tương ứng,
-        //ví dụ để hiển thị danh sách bác sĩ thuộc khoa trong trang đặt lịch hẹn của bệnh nhân
+        // Logic AJAX mới được thêm vào
         String[] ajaxActions = {"getBacSiByKhoa"};
         if (Arrays.asList(ajaxActions).contains(action)) {
-            // Nếu đây là action AJAX cần trả về JSON, chúng ta gọi controller trực tiếp
-            // và dừng luồng MainController
-
             if ("getBacSiByKhoa".equals(action)) {
-                // Khởi tạo và gọi doGet của Controller AJAX
                 new PatientLichHenController().doGet(request, response);
                 return; // DỪNG NGAY LẬP TỨC.
 
@@ -116,8 +90,7 @@ public class MainController extends HttpServlet {
 
         if (action == null || action.isEmpty()) {
             url = LOGIN_PAGE;
-        } // --- (Auth features - từ nhánh của bạn) ---
-        else if (Arrays.asList(userActions).contains(action)) {
+        } else if (Arrays.asList(userActions).contains(action)) {
             url = USER_CONTROLLER;
         } else if (Arrays.asList(verifyActions).contains(action)) {
             url = VERIFY_CONTROLLER;
@@ -125,8 +98,7 @@ public class MainController extends HttpServlet {
             url = RESET_CONTROLLER;
         } else if (Arrays.asList(securityActions).contains(action)) {
             url = SECURITY_CONTROLLER;
-        } // --- (Feature features - từ cả 2 nhánh) ---
-        else if (Arrays.asList(benhNhanActions).contains(action)) {
+        } else if (Arrays.asList(benhNhanActions).contains(action)) {
             url = BENHNHAN_CONTROLLER;
         } else if (Arrays.asList(EMRCoreActions).contains(action)) {
             url = EMRCORE_CONTROLLER;
@@ -140,8 +112,7 @@ public class MainController extends HttpServlet {
             url = CATALOG_CONTROLLER;
         } else if (Arrays.asList(DonThuocActions).contains(action)) {
             url = DON_THUOC_CONTROLLER;
-        } // --- (Main features - từ nhánh main) ---
-        else if (Arrays.asList(phongBenhActions).contains(action)) {
+        } else if (Arrays.asList(phongBenhActions).contains(action)) {
             url = PHONG_BENH_CONTROLLER;
         } else if (Arrays.asList(giuongBenhActions).contains(action)) {
             url = GIUONG_BENH_CONTROLLER;
@@ -157,7 +128,6 @@ public class MainController extends HttpServlet {
             url = NURSE_LICH_HEN_CONTROLLER;
         }
 
-        // 4. Forward đến controller tương ứng
         request.getRequestDispatcher(url).forward(request, response);
     }
 
@@ -178,5 +148,4 @@ public class MainController extends HttpServlet {
     public String getServletInfo() {
         return "Main Front Controller for Hospital Management System";
     }
-    // </editor-fold>
 }

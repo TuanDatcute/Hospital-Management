@@ -322,7 +322,7 @@ public class EMRCoreController extends HttpServlet {
      */
     private void loadCreateFormDependencies(HttpServletRequest request) {
         try {
-            List<BenhNhanDTO> danhSachBenhNhan = benhNhanService.getAllBenhNhan();
+            List<BenhNhanDTO> danhSachBenhNhan = benhNhanService.getAllActiveBenhNhan();
             List<NhanVienDTO> danhSachBacSi = nhanVienService.findDoctorsBySpecialty();
 
             HttpSession session = request.getSession(false);

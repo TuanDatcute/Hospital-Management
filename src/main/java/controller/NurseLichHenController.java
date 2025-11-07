@@ -53,7 +53,8 @@ public class NurseLichHenController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
 
-        String url = ERROR_PAGE;
+      
+        String url = ERROR_PAGE; 
         try {
             if (action == null || action.isEmpty()) {
                 action = "listLichHen"; // Đặt action mặc định
@@ -117,6 +118,7 @@ public class NurseLichHenController extends HttpServlet {
 
         }
     }
+
 
     //====================================================Dat=================================================
     private String createAppointment(HttpServletRequest request, HttpServletResponse response)
