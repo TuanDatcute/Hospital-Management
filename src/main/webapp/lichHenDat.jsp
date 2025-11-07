@@ -47,12 +47,19 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="bacSiId">Bác Sĩ (*)</label>
-                    <select id="bacSiId" name="bacSiId" class="form-control" required>
-                        <option value="">-- Chọn bác sĩ --</option>
-                        <c:forEach var="bacSi" items="${danhSachBacSi}">
-                            <option value="${bacSi.id}">${bacSi.hoTen} (${bacSi.chuyenMon})</option>
+                    <label for="khoaId">Chọn Khoa (*)</label>
+                    <select id="khoaId" name="khoaId" class="form-control" required>
+                        <option value="">-- Vui lòng chọn khoa trước --</option>
+                        <c:forEach var="khoa" items="${danhSachKhoa}">
+                            <option value="${khoa.id}">${khoa.tenKhoa}</option>
                         </c:forEach>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="bacSiId">Bác Sĩ (*)</label>
+                    <select id="bacSiId" name="bacSiId" class="form-control" required disabled>
+                        <option value="">-- Vui lòng chọn khoa --</option>
                     </select>
                 </div>
 
@@ -81,7 +88,83 @@
                 </div>
             </form>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const khoaSelect = document.getElementById('khoaId');
+                const bacSiSelect = document.getElementById('bacSiId');
+                const baseUrl = '<c:url value="/MainController?action=getDoctorsByKhoa&khoaId="/>';
 
+                khoaSelect.addEventListener('change', function () {
+                    const khoaId = this.value;
+
+                    if (!khoaId) {
+                        resetBacSiSelect();
+                        return;
+                    }
+
+                    bacSiSelect.innerHTML = '<option value="">-- Đang tải bác sĩ... --</option>';
+                    bacSiSelect.disabled = true;
+
+                    fetch(baseUrl + khoaId)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                                }
+                                return response.text(); // Dùng text() trước để kiểm tra
+                            })
+                            .then(text => {
+                                // Kiểm tra nếu response là "false"
+                                if (text === "false") {
+                                    throw new Error("Server trả về false");
+                                }
+
+                                try {
+                                    const data = JSON.parse(text);
+                                    updateBacSiSelect(data);
+                                } catch (e) {
+                                    console.error('Lỗi parse JSON:', e, 'Response text:', text);
+                                    throw new Error("Dữ liệu không hợp lệ từ server");
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Lỗi AJAX:', error);
+                                showBacSiError('Lỗi khi tải danh sách bác sĩ');
+                            });
+                });
+
+                function resetBacSiSelect() {
+                    bacSiSelect.innerHTML = '<option value="">-- Vui lòng chọn khoa --</option>';
+                    bacSiSelect.disabled = true;
+                    bacSiSelect.required = false;
+                }
+
+                function updateBacSiSelect(data) {
+                    bacSiSelect.innerHTML = '';
+
+                    if (!Array.isArray(data) || data.length === 0) {
+                        bacSiSelect.innerHTML = '<option value="">-- Khoa này không có bác sĩ --</option>';
+                        bacSiSelect.disabled = true;
+                        bacSiSelect.required = false;
+                    } else {
+                        bacSiSelect.innerHTML = '<option value="">-- Chọn bác sĩ --</option>';
+                        data.forEach(bacSi => {
+                            const option = document.createElement('option');
+                            option.value = bacSi.id || '';
+                            option.textContent = `${bacSi.hoTen || 'N/A'} (${bacSi.chuyenMon || 'Chưa có chuyên môn'})`;
+                            bacSiSelect.appendChild(option);
+                        });
+                        bacSiSelect.disabled = false;
+                        bacSiSelect.required = true;
+                    }
+                }
+
+                function showBacSiError(message) {
+                    bacSiSelect.innerHTML = `<option value="">-- ${message} --</option>`;
+                    bacSiSelect.disabled = true;
+                    bacSiSelect.required = false;
+                }
+            });
+        </script>
         <script src="<c:url value='/js/darkmode.js'/>"></script>
     </body>
 </html>

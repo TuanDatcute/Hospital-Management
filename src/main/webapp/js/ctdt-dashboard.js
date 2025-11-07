@@ -1,7 +1,6 @@
+// Nội dung cho file: /js/ctdt-dashboard.js
 document.addEventListener('DOMContentLoaded', function () {
-
-
-
+    
     // --- Xử lý Modal ---
     const modalOverlay = document.getElementById('modal-overlay');
     const updateButtons = document.querySelectorAll('.update-result-btn');
@@ -39,17 +38,16 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateVitalGauges() {
         const gauges = document.querySelectorAll('.vital-gauge');
 
-        // Định nghĩa ngưỡng giá trị bình thường, cảnh báo và nguy hiểm
         const thresholds = {
             temp: {normal: [36.5, 37.5], warning: [37.6, 38.5], range: [35, 42]},
-            bp: {normal: [90, 120], warning: [121, 139], range: [70, 180]}, // Huyết áp tâm thu
+            bp: {normal: [90, 120], warning: [121, 139], range: [70, 180]},
             hr: {normal: [60, 100], warning: [101, 120], range: [40, 180]},
             rr: {normal: [16, 20], warning: [21, 24], range: [10, 30]}
         };
 
         gauges.forEach(gauge => {
             const type = gauge.dataset.type;
-            const rawValue = gauge.dataset.value.split('/')[0];
+            const rawValue = String(gauge.dataset.value).split('/')[0]; // Thêm String() để đảm bảo
             const value = parseFloat(rawValue);
 
             if (isNaN(value) || !thresholds[type])
@@ -70,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (value >= config.normal[0] && value <= config.normal[1]) {
                 gauge.classList.add('status-normal');
                 valueElement.classList.add('status-normal');
-            } else if (value > config.normal[1] && value <= config.warning[1] || (value < config.normal[0] && value >= 80)) {
+            } else if ((value > config.normal[1] && value <= config.warning[1]) || (value < config.normal[0] && value >= config.range[0])) {
                 gauge.classList.add('status-warning');
                 valueElement.classList.add('status-warning');
             } else {
@@ -81,52 +79,4 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     updateVitalGauges();
-
-
-    // 1. Lấy ra các đối tượng cần thiết từ DOM
-    const themeToggle = document.getElementById('theme-toggle');
-    const body = document.body;
-
-    // Tên key để lưu trong localStorage
-    const themeKey = 'theme-preference';
-
-    // 2. Hàm để áp dụng theme được lưu
-    const applyTheme = (theme) => {
-        if (theme === 'dark') {
-            // Thêm class 'dark-mode' vào body
-            body.classList.add('dark-mode');
-            // Đánh dấu check cho nút gạt
-            themeToggle.checked = true;
-        } else {
-            // Xóa class 'dark-mode' khỏi body
-            body.classList.remove('dark-mode');
-            // Bỏ check cho nút gạt
-            themeToggle.checked = false;
-        }
-    };
-
-    // 3. Lấy theme đã lưu từ localStorage khi tải trang
-    const savedTheme = localStorage.getItem(themeKey);
-
-    // Mặc định là 'light' nếu chưa có gì được lưu
-    const currentTheme = savedTheme ? savedTheme : 'light';
-    applyTheme(currentTheme);
-
-
-    // 4. Lắng nghe sự kiện 'change' trên nút gạt
-    themeToggle.addEventListener('change', () => {
-        let newTheme;
-        // Nếu nút gạt được check, theme mới là 'dark'
-        if (themeToggle.checked) {
-            newTheme = 'dark';
-        } else {
-            // Nếu không, theme mới là 'light'
-            newTheme = 'light';
-        }
-
-        // Lưu lựa chọn mới vào localStorage
-        localStorage.setItem(themeKey, newTheme);
-        // Áp dụng theme mới ngay lập tức
-        applyTheme(newTheme);
-    });
 });

@@ -182,8 +182,6 @@ public class NhanVienDAO {
         }
     }
 
-    
-
     public List<NhanVien> findDoctorsBySpecialty() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<NhanVien> query = session.createQuery(
@@ -199,7 +197,7 @@ public class NhanVienDAO {
             return Collections.emptyList();
         }
     }
-    
+
     //=============================Dat================
     /**
      * Tìm nhân viên bằng taiKhoanId.
@@ -226,6 +224,24 @@ public class NhanVienDAO {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    // Trong file dao/NhanVienDAO.java
+    public List<NhanVien> findDoctorsByKhoaId(int khoaId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<NhanVien> query = session.createQuery(
+                    "SELECT nv FROM NhanVien nv "
+                    + "JOIN FETCH nv.taiKhoan "
+                    + // Lọc theo khoa.id VÀ vaiTro là BAC_SI
+                    "WHERE nv.khoa.id = :khoaId AND nv.taiKhoan.vaiTro = 'BAC_SI'",
+                    NhanVien.class
+            );
+            query.setParameter("khoaId", khoaId);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
         }
     }
 
