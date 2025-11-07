@@ -1,12 +1,13 @@
 <%--
-    Document   : danhSachLichHen.jsp
-    Created on : Oct 29, 2025
-    Author     : ADMIN
+    Document    : danhSachLichHen.jsp
+    Created on  : Oct 29, 2025
+    Author      : ADMIN
+    (ĐÃ NÂNG CẤP: Thêm Phân trang, CRUD Sửa, Sửa lỗi PRG & POST)
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %> <%-- Thêm thư viện Format (fmt) để định dạng ngày giờ --%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <!DOCTYPE html>
 <html>
@@ -16,32 +17,85 @@
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
+
+        <%-- Thêm CSS cho các nút phân trang --%>
+        <style>
+            .pagination-container {
+                margin-top: 20px;
+                text-align: center;
+            }
+            .pagination-btn {
+                display: inline-block;
+                padding: 8px 16px;
+                margin: 0 5px;
+                background-color: #007bff;
+                color: white;
+                text-decoration: none;
+                border-radius: 4px;
+                font-weight: bold;
+            }
+            .pagination-btn.disabled {
+                background-color: #cccccc;
+                color: #666666;
+                cursor: not-allowed;
+            }
+            .pagination-info {
+                margin: 0 10px;
+                font-size: 1.1em;
+                vertical-align: middle;
+            }
+            .search-container {
+                margin-top: 15px;
+                margin-bottom: 20px;
+                display: flex;
+                justify-content: flex-end;
+            }
+            .search-container input[type="text"] {
+                padding: 8px;
+                width: 250px;
+                border: 1px solid #ccc;
+                border-radius: 4px 0 0 4px;
+            }
+            .search-container button {
+                padding: 8px 12px;
+                border: none;
+                background-color: #007bff;
+                color: white;
+                cursor: pointer;
+                border-radius: 0 4px 4px 0;
+                margin-left: -1px;
+            }
+            .disabled-input {
+                background-color: #f4f4f4;
+                cursor: not-allowed;
+            }
+        </style>
     </head>
     <body>
 
-        <%-- Nhúng Header --%>
         <jsp:include page="/WEB-INF/header.jsp" /> 
 
         <div class="container page-content" style="padding-top: 30px;">
 
             <h2 class="section-title">Quản lý Lịch hẹn</h2>
 
-            <%-- Hiển thị thông báo (nếu có) --%>
-            <c:if test="${not empty requestScope.SUCCESS_MESSAGE}">
-                <p class="success-message">${requestScope.SUCCESS_MESSAGE}</p>
+            <%-- === SỬA LỖI PRG (Post-Redirect-Get) === --%>
+            <c:if test="${not empty sessionScope.SUCCESS_MESSAGE}">
+                <p class="success-message">${sessionScope.SUCCESS_MESSAGE}</p>
+                <c:remove var="SUCCESS_MESSAGE" scope="session" />
             </c:if>
-            <c:if test="${not empty requestScope.ERROR_MESSAGE}">
-                <p class="error-message">${requestScope.ERROR_MESSAGE}</p>
+            <c:if test="${not empty sessionScope.ERROR_MESSAGE}">
+                <p class="error-message">${sessionScope.ERROR_MESSAGE}</p>
+                <c:remove var="ERROR_MESSAGE" scope="session" />
             </c:if>
+            <%-- === KẾT THÚC SỬA LỖI PRG === --%>
 
-            <%-- Nút Thêm Mới --%>
             <a href="MainController?action=showLichHenCreateForm" class="add-new-btn">
                 <i class="fas fa-calendar-plus"></i> Tạo Lịch hẹn Mới
             </a>
 
-            <%-- TODO: Thêm bộ lọc (filter) theo ngày, bác sĩ, trạng thái ở đây --%>
+            <%-- (CHƯA THÊM TÌM KIẾM CHO LỊCH HẸN) --%>
 
-            <%-- Bảng Dữ liệu --%>
             <table class="data-table">
                 <thead>
                     <tr>
@@ -51,68 +105,90 @@
                         <th>Bác sĩ</th>
                         <th>Trạng thái</th>
                         <th style="width: 250px;">Cập nhật Trạng thái</th>
+                        <th style="width: 50px;">Sửa</th>
                     </tr>
                 </thead>
                 <tbody>
-                <c:forEach var="lh" items="${requestScope.LIST_LICHHEN}">
-                    <tr>
-                        <td>${lh.stt}</td>
-                        <td>
-                            <%-- Định dạng OffsetDateTime (ví dụ: 29/10/2025 14:30) --%>
-                    <fmt:parseDate value="${lh.thoiGianHen}" pattern="yyyy-MM-dd'T'HH:mmXXX" var="parsedDateTime" type="both" />
-                    <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
-                    </td>
+                    <c:forEach var="lh" items="${requestScope.LIST_LICHHEN}">
+                        <tr>
+                            <td>${lh.stt}</td>
+                            <td>
+                                <fmt:parseDate value="${lh.thoiGianHen}" pattern="yyyy-MM-dd'T'HH:mmXXX" var="parsedDateTime" type="both" />
+                                <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
+                            </td>
+                            <td><c:out value="${lh.tenBenhNhan}" /></td>
+                            <td><c:out value="${lh.tenBacSi}" /></td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${lh.trangThai == 'HOAN_THANH'}"><span style="color: green; font-weight: bold;">Hoàn thành</span></c:when>
+                                    <c:when test="${lh.trangThai == 'DA_XAC_NHAN'}"><span style="color: blue; font-weight: bold;">Đã xác nhận</span></c:when>
+                                    <c:when test="${lh.trangThai == 'DA_HUY'}"><span style="color: red; font-weight: bold;">Đã hủy</span></c:when>
+                                    <c:when test="${lh.trangThai == 'CHO_XAC_NHAN'}"><span style="color: orange; font-weight: bold;">Chờ xác nhận</span></c:when>
+                                    <c:otherwise><c:out value="${lh.trangThai}"/></c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td class="actions">
+                                <c:if test="${lh.trangThai != 'HOAN_THANH' && lh.trangThai != 'DA_HUY'}">
+                                    <form action="MainController" method="post" class="table-form">
+                                        <input type="hidden" name="action" value="updateLichHenStatus" />
+                                        <input type="hidden" name="id" value="${lh.id}" />
+                                        <select name="trangThai" class="form-control-sm">
+                                            <option value="DA_XAC_NHAN" ${lh.trangThai == 'DA_XAC_NHAN' ? 'selected' : ''}>Đã xác nhận</option>
+                                            <option value="DA_DEN_KHAM" ${lh.trangThai == 'DA_DEN_KHAM' ? 'selected' : ''}>Đã đến khám</option>
+                                            <option value="HOAN_THANH" ${lh.trangThai == 'HOAN_THANH' ? 'selected' : ''}>Hoàn thành</option>
+                                            <option value="DA_HUY" ${lh.trangThai == 'DA_HUY' ? 'selected' : ''}>Hủy lịch</option>
+                                        </select>
+                                        <button type="submit" class="btn-sm" title="Cập nhật">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                </c:if>
+                            </td>
+                            <td>
+                                <c:if test="${lh.trangThai != 'HOAN_THANH' && lh.trangThai != 'DA_HUY'}">
+                                    <a href="MainController?action=showLichHenEditForm&id=${lh.id}" class="edit-btn" title="Sửa lịch hẹn">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </c:if>
+                            </td>
+                        </tr>
+                    </c:forEach>
 
-                    <%-- 
-                       LƯU Ý: Giả định LichHenService (hàm getAllLichHen) 
-                       đã trả về DTO có tên Bác sĩ và Bệnh nhân.
-                       Nếu DTO chỉ có ID, bạn cần sửa Service để nó gán tên.
-                       Tạm thời, chúng ta sẽ hiển thị ID.
-                    --%>
-                    <td>(ID: ${lh.benhNhanId})</td> <%-- TODO: Hiển thị tên Bệnh nhân --%>
-                    <td>(ID: ${lh.bacSiId})</td>   <%-- TODO: Hiển thị tên Bác sĩ --%>
-
-                    <td>
-                        <%-- Hiển thị trạng thái với màu sắc --%>
-                    <c:choose>
-                        <c:when test="${lh.trangThai == 'HOAN_THANH'}"><span style="color: green; font-weight: bold;">Hoàn thành</span></c:when>
-                        <c:when test="${lh.trangThai == 'DA_XAC_NHAN'}"><span style="color: blue; font-weight: bold;">Đã xác nhận</span></c:when>
-                        <c:when test="${lh.trangThai == 'DA_HUY'}"><span style="color: red; font-weight: bold;">Đã hủy</span></c:when>
-                        <c:when test="${lh.trangThai == 'CHO_XAC_NHAN'}"><span style="color: orange; font-weight: bold;">Chờ xác nhận</span></c:when>
-                        <c:otherwise><c:out value="${lh.trangThai}"/></c:otherwise>
-                    </c:choose>
-                    </td>
-
-                    <td class="actions">
-                        <%-- Chỉ cho phép cập nhật nếu chưa Hoàn thành hoặc Hủy --%>
-                    <c:if test="${lh.trangThai != 'HOAN_THANH' && lh.trangThai != 'DA_HUY'}">
-                        <form action="MainController" method="post" class="table-form">
-                            <input type="hidden" name="action" value="updateLichHenStatus" />
-                            <input type="hidden" name="id" value="${lh.id}" />
-
-                            <select name="trangThai" class="form-control-sm">
-                                <option value="DA_XAC_NHAN" ${lh.trangThai == 'DA_XAC_NHAN' ? 'selected' : ''}>Đã xác nhận</option>
-                                <option value="DA_DEN_KHAM" ${lh.trangThai == 'DA_DEN_KHAM' ? 'selected' : ''}>Đã đến khám</option>
-                                <option value="HOAN_THANH" ${lh.trangThai == 'HOAN_THANH' ? 'selected' : ''}>Hoàn thành</option>
-                                <option value="DA_HUY" ${lh.trangThai == 'DA_HUY' ? 'selected' : ''}>Hủy lịch</option>
-                            </select>
-
-                            <button type="submit" class="btn-sm" title="Cập nhật">
-                                <i class="fas fa-check"></i>
-                            </button>
-                        </form>
+                    <c:if test="${empty requestScope.LIST_LICHHEN}">
+                        <tr>
+                            <td colspan="7" class="empty-cell">Không có dữ liệu lịch hẹn.</td>
+                        </tr>
                     </c:if>
-                    </td>
-                    </tr>
-                </c:forEach>
-
-                <c:if test="${empty requestScope.LIST_LICHHEN}">
-                    <tr>
-                        <td colspan="6" class="empty-cell">Không có dữ liệu lịch hẹn.</td>
-                    </tr>
-                </c:if>
                 </tbody>
             </table>
+
+            <div class="pagination-container">
+                <c:set var="currentPage" value="${requestScope.currentPage}" />
+                <c:set var="totalPages" value="${requestScope.totalPages}" />
+                <%-- (CHƯA THÊM KEYWORD VÀO PHÂN TRANG) --%>
+                <c:if test="${totalPages > 1}">
+                    <c:choose>
+                        <c:when test="${currentPage > 1}">
+                            <a href="MainController?action=listLichHen&page=${currentPage - 1}" class="pagination-btn">&laquo; Trang trước</a>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="pagination-btn disabled">&laquo; Trang trước</span>
+                        </c:otherwise>
+                    </c:choose>
+                    <span class="pagination-info">
+                        Trang ${currentPage} / ${totalPages}
+                    </span>
+                    <c:choose>
+                        <c:when test="${currentPage < totalPages}">
+                            <a href="MainController?action=listLichHen&page=${currentPage + 1}" class="pagination-btn">Trang sau &raquo;</a>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="pagination-btn disabled">Trang sau &raquo;</span>
+                        </c:otherwise>
+                    </c:choose>
+                </c:if>
+            </div>
+
         </div>
 
         <jsp:include page="/WEB-INF/footer.jsp" /> 

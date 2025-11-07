@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model.dao;
 
 import model.Entity.LichHen;
@@ -18,13 +14,14 @@ import java.util.List;
 
 /**
  *
- * @author ADMIN
+ * @author ADMIN (Đã GỘP: Giữ lại Phân trang & Xóa Mềm, và giữ nguyên khối code
+ * DẠT)
  */
 public class LichHenDAO {
 
     /**
-     * Thêm một lịch hẹn mới vào CSDL. STT sẽ được tự động gán bởi Trigger trong
-     * CSDL.
+     * Thêm một lịch hẹn mới vào CSDL. (Giữ logic throw RuntimeException từ File
+     * 1)
      */
     public LichHen create(LichHen lichHen) {
         Transaction transaction = null;
@@ -44,7 +41,8 @@ public class LichHenDAO {
     }
 
     /**
-     * Cập nhật thông tin một lịch hẹn.
+     * Cập nhật thông tin một lịch hẹn. (Giữ logic throw RuntimeException từ
+     * File 1)
      */
     public boolean update(LichHen lichHen) {
         Transaction transaction = null;
@@ -76,14 +74,18 @@ public class LichHenDAO {
     }
 
     /**
-     * Lấy thông tin lịch hẹn bằng ID (tải kèm BenhNhan và BacSi).
+     * Lấy thông tin lịch hẹn bằng ID (đã NÂNG CẤP Xóa Mềm từ File 2).
      */
     public LichHen getByIdWithRelations(int id) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM LichHen lh "
-                    + "JOIN FETCH lh.benhNhan "
-                    + "JOIN FETCH lh.bacSi "
-                    + "WHERE lh.id = :id";
+                    + "LEFT JOIN FETCH lh.benhNhan bn " // Sửa: Dùng LEFT JOIN
+                    + "LEFT JOIN FETCH lh.bacSi bs " // Sửa: Dùng LEFT JOIN
+                    + "LEFT JOIN FETCH bn.taiKhoan bntk "
+                    + "LEFT JOIN FETCH bs.taiKhoan bstk "
+                    + "WHERE lh.id = :id "
+                    + "AND (bn.trangThai = 'HOAT_DONG') " // Lọc BN Xóa Mềm
+                    + "AND (bstk.trangThai = 'HOAT_DONG')"; // Lọc BS Xóa Mềm
             Query<LichHen> query = session.createQuery(hql, LichHen.class);
             query.setParameter("id", id);
             return query.uniqueResult();
@@ -94,8 +96,31 @@ public class LichHenDAO {
     }
 
     /**
-     * Lấy tất cả lịch hẹn (tải kèm BenhNhan và BacSi).
+     * NÂNG CẤP (PHÂN TRANG): Lấy tất cả lịch hẹn (từ File 2)
      */
+    public List<LichHen> getAllWithRelations(int page, int pageSize) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT DISTINCT lh FROM LichHen lh "
+                    + "LEFT JOIN FETCH lh.benhNhan bn "
+                    + "LEFT JOIN FETCH lh.bacSi bs "
+                    + "LEFT JOIN FETCH bn.taiKhoan bntk "
+                    + "LEFT JOIN FETCH bs.taiKhoan bstk "
+                    + "WHERE (bn.trangThai = 'HOAT_DONG') " // Lọc BN Xóa Mềm
+                    + "AND (bstk.trangThai = 'HOAT_DONG') " // Lọc BS Xóa Mềm
+                    + "ORDER BY lh.thoiGianHen DESC";
+            Query<LichHen> query = session.createQuery(hql, LichHen.class);
+
+            int offset = (page - 1) * pageSize;
+            query.setFirstResult(offset);
+            query.setMaxResults(pageSize);
+
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
     public List<LichHen> getAllWithRelations() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM LichHen lh "
@@ -110,14 +135,38 @@ public class LichHenDAO {
     }
 
     /**
-     * Tìm tất cả lịch hẹn của một Bác Sĩ cụ thể.
+     * HÀM MỚI (PHÂN TRANG): Đếm tổng số Lịch hẹn (đã lọc) (từ File 2)
+     */
+    public long getTotalLichHenCount() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT count(DISTINCT lh.id) FROM LichHen lh "
+                    + "JOIN lh.benhNhan bn " // Dùng JOIN
+                    + "JOIN lh.bacSi bs "
+                    + "JOIN bn.taiKhoan bntk "
+                    + "JOIN bs.taiKhoan bstk "
+                    + "WHERE (bn.trangThai = 'HOAT_DONG') " // Lọc BN Xóa Mềm
+                    + "AND (bstk.trangThai = 'HOAT_DONG')"; // Lọc BS Xóa Mềm
+            Query<Long> query = session.createQuery(hql, Long.class);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * NÂNG CẤP: Tìm tất cả lịch hẹn của một Bác Sĩ (từ File 2, đã lọc)
      */
     public List<LichHen> findByBacSiId(int bacSiId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM LichHen lh "
-                    + "JOIN FETCH lh.benhNhan "
-                    + "JOIN FETCH lh.bacSi "
-                    + "WHERE lh.bacSi.id = :bsId "
+                    + "LEFT JOIN FETCH lh.benhNhan bn "
+                    + "LEFT JOIN FETCH lh.bacSi bs "
+                    + "LEFT JOIN FETCH bn.taiKhoan bntk "
+                    + "LEFT JOIN FETCH bs.taiKhoan bstk "
+                    + "WHERE bs.id = :bsId "
+                    + "AND (bn.trangThai = 'HOAT_DONG') "
+                    + "AND (bstk.trangThai = 'HOAT_DONG') "
                     + "ORDER BY lh.thoiGianHen DESC";
             Query<LichHen> query = session.createQuery(hql, LichHen.class);
             query.setParameter("bsId", bacSiId);
@@ -129,18 +178,17 @@ public class LichHenDAO {
     }
 
     /**
-     * CẬP NHẬT: Tìm tất cả lịch hẹn của một Bệnh Nhân (có tìm kiếm).
-     *
-     * @param benhNhanId ID của bệnh nhân
-     * @param keyword Từ khóa để tìm (tên BS, lý do, trạng thái) hoặc null
-     * @return Danh sách LichHen (đã tải relations).
+     * GỘP: Giữ lại hàm tìm kiếm (từ File 1) và THÊM logic Xóa Mềm (từ File 2).
      */
     public List<LichHen> findByBenhNhanId(int benhNhanId, String keyword) {
         String hql = "SELECT lh FROM LichHen lh "
-                + "JOIN FETCH lh.benhNhan bn "
-                + "JOIN FETCH lh.bacSi bs "
-                + // bs là NhanVien
-                "WHERE bn.id = :benhNhanId ";
+                + "LEFT JOIN FETCH lh.benhNhan bn " // Sửa: LEFT JOIN
+                + "LEFT JOIN FETCH lh.bacSi bs " // Sửa: LEFT JOIN
+                + "LEFT JOIN FETCH bn.taiKhoan bntk " // Thêm
+                + "LEFT JOIN FETCH bs.taiKhoan bstk " // Thêm
+                + "WHERE bn.id = :benhNhanId "
+                + "AND (bn.trangThai = 'HOAT_DONG') " // Thêm
+                + "AND (bstk.trangThai = 'HOAT_DONG') "; // Thêm
 
         if (keyword != null && !keyword.trim().isEmpty()) {
             // Tìm theo tên bác sĩ (bs.hoTen), lý do khám, trạng thái
@@ -164,8 +212,7 @@ public class LichHenDAO {
     }
 
     /**
-     * HÀM MỚI: Lấy lịch hẹn (an toàn) Chỉ trả về nếu đúng ID lịch hẹn VÀ đúng
-     * ID bệnh nhân. Dùng cho chức năng Hủy lịch.
+     * HÀM GIỮ LẠI (từ File 1): Lấy lịch hẹn (an toàn)
      */
     public LichHen getByIdAndBenhNhanId(int lichHenId, int benhNhanId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -183,15 +230,20 @@ public class LichHenDAO {
     }
 
     /**
-     * Tìm lịch hẹn của bác sĩ trong một ngày cụ thể (để lấy STT).
+     * HÀM GIỮ LẠI (từ File 1) & NÂNG CẤP (thêm lọc Xóa Mềm): Tìm lịch hẹn của
+     * bác sĩ trong một ngày cụ thể (để lấy STT).
      */
     public List<LichHen> findByBacSiIdAndDate(int bacSiId, LocalDate date) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM LichHen lh "
-                    + "JOIN FETCH lh.benhNhan "
-                    + "JOIN FETCH lh.bacSi "
-                    + "WHERE lh.bacSi.id = :bsId "
+                    + "LEFT JOIN FETCH lh.benhNhan bn "
+                    + "LEFT JOIN FETCH lh.bacSi bs "
+                    + "LEFT JOIN FETCH bn.taiKhoan bntk " // Thêm
+                    + "LEFT JOIN FETCH bs.taiKhoan bstk " // Thêm
+                    + "WHERE bs.id = :bsId "
                     + "AND date(lh.thoiGianHen) = :date "
+                    + "AND (bn.trangThai = 'HOAT_DONG') " // Thêm
+                    + "AND (bstk.trangThai = 'HOAT_DONG') " // Thêm
                     + "ORDER BY lh.stt ASC";
             Query<LichHen> query = session.createQuery(hql, LichHen.class);
             query.setParameter("bsId", bacSiId);
@@ -204,6 +256,7 @@ public class LichHenDAO {
     }
 
     //============================================DẠT===================================================
+    // (KHỐI CODE NÀY ĐƯỢC SAO CHÉP NGUYÊN BẢN TỪ FILE 1 THEO YÊU CẦU)
     /**
      * Đếm số lượng lịch hẹn đã có trong một ngày cụ thể CHO MỘT BÁC SĨ CỤ THỂ.
      */
@@ -271,4 +324,5 @@ public class LichHenDAO {
             return Collections.emptyList();
         }
     }
+    // (KẾT THÚC KHỐI CODE CỦA DẠT)
 }
