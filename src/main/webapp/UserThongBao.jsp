@@ -96,7 +96,7 @@
                                     <input type="hidden" name="id" value="${noti.id}">
                                     <%-- (SỬA) Dùng class .btn chuẩn --%>
                                     <button type="submit" class="btn btn-sm btn-success">
-                                        <i class="fa-solid fa-check"></i> Đã đọc
+                                        <i class="fa-solid fa-check"></i> Đánh dấu đã đọc
                                     </button>
                                 </form>
                             </c:if>
