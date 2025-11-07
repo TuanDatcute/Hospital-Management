@@ -280,4 +280,38 @@ public class LichHenDAO {
             return Collections.emptyList();
         }
     }
+
+    // Hàm mới 1: Lấy danh sách đã phân trang
+    public List<LichHen> getAllWithRelations(int page, int pageSize) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT DISTINCT lh FROM LichHen lh " // Thêm DISTINCT
+                    + "JOIN FETCH lh.benhNhan "
+                    + "JOIN FETCH lh.bacSi "
+                    + "ORDER BY lh.thoiGianHen DESC"; // Sắp xếp (ví dụ: mới nhất)
+
+            Query<LichHen> query = session.createQuery(hql, LichHen.class);
+
+            // Phân trang
+            int offset = (page - 1) * pageSize;
+            query.setFirstResult(offset);
+            query.setMaxResults(pageSize);
+
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+// Hàm mới 2: Đếm tổng số lịch hẹn
+    public long getTotalLichHenCount() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT count(lh.id) FROM LichHen lh";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
 }

@@ -1,7 +1,8 @@
 <%--
-    Document   : formBenhNhan.jsp
-    Created on : Oct 29, 2025
-    Author     : ADMIN
+    Document    : formBenhNhan.jsp
+    Created on  : Oct 29, 2025
+    Author      : ADMIN
+    (ĐÃ NÂNG CẤP: Mã Bệnh nhân tự động & an toàn, Thêm CCCD, Sửa lỗi Ngày sinh)
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -18,8 +19,6 @@
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
-
-        <%-- Trang này sử dụng các class: .data-form, .form-group, .btn-submit, .btn-cancel --%>
     </head>
     <body>
 
@@ -40,79 +39,68 @@
                 <p class="error-message">${requestScope.LOAD_FORM_ERROR}</p>
             </c:if>
 
-            <%-- 
-                Form này gửi đến MainController.
-                Action sẽ là 'createBenhNhan' hoặc 'updateBenhNhan' 
-                (được set bởi BenhNhanController trong biến requestScope.formAction)
-            --%>
             <form action="MainController" method="post" class="data-form">
 
                 <input type="hidden" name="action" value="${requestScope.formAction}" />
 
-                <%-- Truyền ID (chỉ khi cập nhật) --%>
                 <c:if test="${!isCreating}">
                     <input type="hidden" name="id" value="${requestScope.BENHNHAN_DATA.id}" />
                 </c:if>
 
+                <%-- === BẮT ĐẦU SỬA (HIỂN THỊ MÃ DỰ KIẾN) === --%>
                 <div class="form-group">
                     <label for="maBenhNhan">Mã Bệnh nhân:</label>
-                    <%-- Không cho sửa Mã Bệnh nhân khi cập nhật --%>
-                    <input type="text" id="maBenhNhan" name="maBenhNhan" 
-                           value="<c:out value="${requestScope.BENHNHAN_DATA.maBenhNhan}"/>" 
-                           ${!isCreating ? 'readonly' : ''} 
-                           required="required">
+
+                    <%-- Nếu là "Sửa" (Update), hiển thị mã và khóa lại --%>
+                    <c:if test="${!isCreating}">
+                        <input type="text" id="maBenhNhan" name="maBenhNhan" 
+                               value="<c:out value="${requestScope.BENHNHAN_DATA.maBenhNhan}"/>" readonly class="disabled-input">
+                    </c:if>
+
+                    <%-- Nếu là "Tạo mới" (Create), hiển thị mã dự kiến nhưng VÔ HIỆU HÓA nó --%>
+                    <c:if test="${isCreating}">
+                        <input type="text" id="maBenhNhan" name="maBenhNhan"
+                               value="<c:out value="${requestScope.BENHNHAN_DATA.maBenhNhan}"/>" 
+                               placeholder="<Tự động tạo...>" disabled class="disabled-input">
+
+                        <%-- Ghi chú cho Admin biết đây là mã dự kiến --%>
+                        <small>Mã dự kiến: <c:out value="${requestScope.BENHNHAN_DATA.maBenhNhan}" /> (Sẽ được gán tự động khi lưu).</small>
+                    </c:if>
                 </div>
+                <%-- === KẾT THÚC SỬA === --%>
 
                 <div class="form-group">
                     <label for="hoTen">Họ tên Bệnh nhân:</label>
                     <input type="text" id="hoTen" name="hoTen" value="<c:out value="${requestScope.BENHNHAN_DATA.hoTen}"/>" required="required">
                 </div>
 
-                <%-- Tài khoản (Có thể chọn khi TẠO MỚI, có thể đổi khi CẬP NHẬT) --%>
                 <div class="form-group">
-                    <label for="taiKhoanId">Tài khoản liên kết:</label>
-                    <select id="taiKhoanId" name="taiKhoanId">
-                        <option value="0">-- Không gán tài khoản --</option> <%-- Cho phép bệnh nhân không có tài khoản --%>
-
-                        <%-- 
-                           Hiển thị tài khoản HIỆN TẠI của bệnh nhân (khi Edit) 
-                           ngay cả khi tài khoản đó đã bị khóa (để biết nó đang được gán)
-                        --%>
-                        <c:if test="${!isCreating && not empty requestScope.BENHNHAN_DATA.taiKhoanId}">
-                            <option value="${requestScope.BENHNHAN_DATA.taiKhoanId}" selected="selected">
-                                Tài khoản hiện tại (ID: ${requestScope.BENHNHAN_DATA.taiKhoanId})
-                            </option>
-                        </c:if>
-
-                        <%-- Lặp qua danh sách tài khoản CHƯA GÁN (vai trò Bệnh Nhân) --%>
-                        <c:forEach var="tk" items="${requestScope.LIST_TAIKHOAN}">
-                            <option value="${tk.id}" ${requestScope.BENHNHAN_DATA.taiKhoanId == tk.id ? 'selected' : ''}>
-                                ${tk.tenDangNhap} (ID: ${tk.id})
-                            </option>
-                        </c:forEach>
-                    </select>
-                    <c:if test="${empty requestScope.LIST_TAIKHOAN && isCreating}">
-                        <p style="color: #6c757d; font-style: italic;">Không tìm thấy tài khoản (vai trò Bệnh nhân) nào còn trống.</p>
+                    <label for="cccd">Số CCCD (Bắt buộc):</label>
+                    <input type="text" id="cccd" name="cccd" 
+                           value="<c:out value='${requestScope.BENHNHAN_DATA.cccd}'/>" 
+                           required="required"
+                           placeholder="Nhập 9 hoặc 12 số CCCD"
+                           ${!isCreating ? 'readonly' : ''}>
+                    <c:if test="${isCreating}">
+                        <small>Đây sẽ là khóa để bệnh nhân liên kết tài khoản của họ sau này.</small>
                     </c:if>
                 </div>
 
-                <%-- Thêm các trường khác (Ngày sinh, Giới tính, SĐT, Địa chỉ, Tiền sử bệnh, Nhóm máu) --%>
+                <%-- Khối div "Tài khoản liên kết" đã được xóa --%>
 
                 <div class="form-group">
                     <label for="soDienThoai">Số điện thoại:</label>
-                    <input type="text" id="soDienThoai" name="soDienThoai" value="<c:out value="${requestScope.BENHNHAN_DATA.soDienThoai}"/>">
+                    <input type="text" id="soDienThoai" name="soDienThoai" value="<c:out value="${requestScope.BENHNHAN_DATA.soDienThoai}"/>" required="required">
                 </div>
 
                 <div class="form-group">
                     <label for="ngaySinh">Ngày sinh:</label>
-                    <%-- Lấy giá trị LocalDateTime và format về đúng kiểu input --%>
-                    <c:set var="ngaySinhValue" value="${requestScope.BENHNHAN_DATA.ngaySinh}" />
-                    <input type="datetime-local" id="ngaySinh" name="ngaySinh" value="${ngaySinhValue}">
+                    <input type="date" id="ngaySinh" name="ngaySinh" value="${requestScope.BENHNHAN_DATA.ngaySinh}" required="required">
                 </div>
 
                 <div class="form-group">
                     <label for="gioiTinh">Giới tính:</label>
-                    <select id="gioiTinh" name="gioiTinh">
+                    <select id="gioiTinh" name="gioiTinh" required="required">
                         <option value="">-- Chọn giới tính --</option>
                         <option value="Nam" ${requestScope.BENHNHAN_DATA.gioiTinh == 'Nam' ? 'selected' : ''}>Nam</option>
                         <option value="Nữ" ${requestScope.BENHNHAN_DATA.gioiTinh == 'Nữ' ? 'selected' : ''}>Nữ</option>
@@ -122,16 +110,16 @@
 
                 <div class="form-group">
                     <label for="diaChi">Địa chỉ:</label>
-                    <input type="text" id="diaChi" name="diaChi" value="<c:out value="${requestScope.BENHNHAN_DATA.diaChi}"/>">
+                    <input type="text" id="diaChi" name="diaChi" value="<c:out value="${requestScope.BENHNHAN_DATA.diaChi}"/>" required="required">
                 </div>
 
                 <div class="form-group">
-                    <label for="nhomMau">Nhóm máu:</label>
-                    <input type="text" id="nhomMau" name="nhomMau" value="<c:out value="${requestScope.BENHNHAN_DATA.nhomMau}"/>">
+                    <label for="nhomMau">Nhóm máu (Tùy chọn):</label>
+                    <input type="text" id="nhomMau" name="nhomMau" value="<c:out value="${requestScope.BENHNHAN_DATA.nhomMau}"/>" placeholder="Ví dụ: O+ hoặc AB-">
                 </div>
 
                 <div class="form-group">
-                    <label for="tienSuBenh">Tiền sử bệnh:</label>
+                    <label for="tienSuBenh">Tiền sử bệnh (Tùy chọn):</label>
                     <textarea id="tienSuBenh" name="tienSuBenh" rows="4"><c:out value="${requestScope.BENHNHAN_DATA.tienSuBenh}"/></textarea>
                 </div>
 
