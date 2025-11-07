@@ -242,7 +242,8 @@ public class ThongBaoDAO {
     // ...
     private static final String GROUPED_HQL_SELECT
             = "SELECT new model.dto.GroupedThongBaoDTO(tb.tieuDe, tb.noiDung, tb.thoiGianGui, COUNT(tb.id)) "
-            + "FROM ThongBao tb ";
+            + "FROM ThongBao tb "
+            + "WHERE tb.trangThai = :trangThai ";
     private static final String GROUPED_HQL_GROUP_BY
             = " GROUP BY tb.tieuDe, tb.noiDung, tb.thoiGianGui "
             + " ORDER BY tb.thoiGianGui DESC";
@@ -251,6 +252,7 @@ public class ThongBaoDAO {
         String hql = GROUPED_HQL_SELECT + GROUPED_HQL_GROUP_BY;
         try ( Session session = sessionFactory.openSession()) {
             Query<GroupedThongBaoDTO> query = session.createQuery(hql, GroupedThongBaoDTO.class);
+            query.setParameter("trangThai", TRANG_THAI_ACTIVE);
             return query.list();
         } catch (Exception e) {
             e.printStackTrace();
@@ -265,6 +267,7 @@ public class ThongBaoDAO {
                 + GROUPED_HQL_GROUP_BY;
         try ( Session session = sessionFactory.openSession()) {
             Query<GroupedThongBaoDTO> query = session.createQuery(hql, GroupedThongBaoDTO.class);
+            query.setParameter("trangThai", TRANG_THAI_ACTIVE);
             query.setParameter("keyword", searchPattern);
             return query.list();
         } catch (Exception e) {

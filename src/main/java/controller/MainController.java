@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import service.NhanVienService;
 
+
 /**
  * Servlet điều hướng chính (Front Controller). **ĐÃ CẬP NHẬT:** Đã merge (kết
  * hợp) các tính năng Auth và tính năng Main.
@@ -39,6 +40,7 @@ public class MainController extends HttpServlet {
     private static final String VERIFY_CONTROLLER = "VerifyController";
     private static final String SECURITY_CONTROLLER = "SecurityController";
     private static final String RESET_CONTROLLER = "PasswordResetController";
+    private final NhanVienService nhanVienService = new NhanVienService();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -53,7 +55,7 @@ public class MainController extends HttpServlet {
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deleteService"};
 
         // **MERGE:** Lấy 'lichHenActions' từ nhánh 'main' (vì nó đầy đủ hơn)
-        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus", "showCreateAppointmentForm", "createAppointment", "getDoctorsByKhoa"};
+        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus", "showCreateAppointmentForm", "createAppointment","getDoctorsByKhoa"};
 
         // **MERGE:** Lấy 'userActions' từ nhánh của bạn (vì nó có logic Auth mới)
         String[] userActions = {"login", "logout", "listUsers",
@@ -87,7 +89,9 @@ public class MainController extends HttpServlet {
         String[] hoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice", "printInvoice"};
         String[] thongBaoActions = {"createThongBao", "listNotifications"};
         String[] userThongBaoActions = {"viewMyNotifications", "markNotificationAsRead", "deleteMyNotification"};
-        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "bookAppointment", "cancelAppointment", "getBacSiByKhoa"};
+        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "myAppointments", "bookAppointment"};
+
+        // **MERGE:** Lấy các mảng mới từ nhánh của bạn
         String[] verifyActions = {"verify"}; // Chỉ xử lý 'verify'
         String[] resetActions = {"requestReset", "performReset"}; // Chỉ xử lý 'Quên MK'
         String[] securityActions = {"showConfirmPassword", "confirmPassword",
@@ -97,6 +101,8 @@ public class MainController extends HttpServlet {
             "showEditDOB", "saveDOB"
         };
 
+        // 3. Điều hướng dựa trên action (ĐÃ KẾT HỢP CẢ 2 NHÁNH)
+       
         if (action == null || action.isEmpty()) {
             url = LOGIN_PAGE;
         } // --- (Auth features - từ nhánh của bạn) ---
@@ -141,6 +147,8 @@ public class MainController extends HttpServlet {
         // 4. Forward đến controller tương ứng
         request.getRequestDispatcher(url).forward(request, response);
     }
+
+   
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     @Override
