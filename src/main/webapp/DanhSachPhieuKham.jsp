@@ -10,6 +10,18 @@
         <link rel="stylesheet" href="<c:url value='/css/danhSach-style.css'/>">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">   
+        <script>
+            (function () {
+                // Key này (theme-preference) phải khớp với key trong theme.js
+                var themeKey = 'theme-preference';
+                var theme = localStorage.getItem(themeKey);
+
+                if (theme === 'dark') {
+                    // ✨ SỬA 3: Không đổi màu nền, mà thêm class vào <html>
+                    document.documentElement.classList.add('dark-mode');
+                }
+            })();
+        </script>
     </head>
     <body>
         <div class="container">

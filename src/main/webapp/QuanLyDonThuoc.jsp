@@ -12,6 +12,18 @@
 
         <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+        <script>
+            (function () {
+                // Key này (theme-preference) phải khớp với key trong theme.js
+                var themeKey = 'theme-preference';
+                var theme = localStorage.getItem(themeKey);
+
+                if (theme === 'dark') {
+                    // ✨ SỬA 3: Không đổi màu nền, mà thêm class vào <html>
+                    document.documentElement.classList.add('dark-mode');
+                }
+            })();
+        </script>
     </head>
     <body>
 

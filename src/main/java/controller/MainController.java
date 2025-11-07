@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import service.NhanVienService;
 
 /**
  * Servlet điều hướng chính (Front Controller). (ĐÃ SỬA LỖI MERGE CONFLICT)
@@ -30,6 +31,7 @@ public class MainController extends HttpServlet {
     private static final String THONG_BAO_CONTROLLER = "ThongBaoController";
     private static final String USER_THONG_BAO_CONTROLLER = "UserThongBaoController";
     private static final String PATIENT_LICH_HEN_CONTROLLER = "PatientLichHenController";
+    private static final String NURSE_LICH_HEN_CONTROLLER = "NurseLichHenController";
     private static final String VERIFY_CONTROLLER = "VerifyController";
     private static final String SECURITY_CONTROLLER = "SecurityController";
     private static final String RESET_CONTROLLER = "PasswordResetController";
@@ -46,10 +48,14 @@ public class MainController extends HttpServlet {
         String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deleteService"};
 
+
         // (Đã thêm 'updateLichHen' mà chúng ta đã làm)
         String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus",
-            "showLichHenEditForm", "updateLichHen", // <-- Logic Sửa Lịch Hẹn
-            "showCreateAppointmentForm", "createAppointment"};
+            "showLichHenEditForm", "updateLichHen"};
+        String[] NurseLichHenActions = {"showCreateAppointmentForm", "createAppointment", "getDoctorsByKhoa"};
+        // **MERGE:** Lấy 'lichHenActions' từ nhánh 'main' (vì nó đầy đủ hơn)
+
+       
 
         String[] userActions = {"login", "logout", "listUsers",
             "showUserCreateForm", "createUser",
@@ -87,24 +93,15 @@ public class MainController extends HttpServlet {
         String[] hoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice", "printInvoice"};
         String[] thongBaoActions = {"createThongBao", "listNotifications"};
         String[] userThongBaoActions = {"viewMyNotifications", "markNotificationAsRead", "deleteMyNotification"};
-        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "bookAppointment", "cancelAppointment"};
         String[] verifyActions = {"verify"};
         String[] resetActions = {"requestReset", "performReset"};
+        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "bookAppointment", "cancelAppointment", "getBacSiByKhoa"};
         String[] securityActions = {"showConfirmPassword", "confirmPassword",
             "showEditPhone", "savePhone",
             "showEditCCCD", "saveCCCD",
             "showEditName", "saveName",
             "showEditDOB", "saveDOB"
         };
-
-        // (Logic AJAX của bạn giữ nguyên)
-        String[] ajaxActions = {"getBacSiByKhoa"};
-        if (Arrays.asList(ajaxActions).contains(action)) {
-            if ("getBacSiByKhoa".equals(action)) {
-                new PatientLichHenController().doGet(request, response);
-                return;
-            }
-        }
 
         // (Logic điều hướng IF/ELSE IF giữ nguyên)
         if (action == null || action.isEmpty()) {
@@ -143,6 +140,8 @@ public class MainController extends HttpServlet {
             url = USER_THONG_BAO_CONTROLLER;
         } else if (Arrays.asList(patientLichHenActions).contains(action)) {
             url = PATIENT_LICH_HEN_CONTROLLER;
+        } else if (Arrays.asList(NurseLichHenActions).contains(action)) {
+            url = NURSE_LICH_HEN_CONTROLLER;
         }
 
         // 4. Forward đến controller tương ứng

@@ -13,11 +13,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.dto.BenhNhanDTO;
+import model.dto.KhoaDTO;
 import model.dto.LichHenDTO;
-import model.dto.NhanVienDTO;
+
 import service.BenhNhanService;
+import service.KhoaService;
 import service.LichHenService;
+import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.List;
+import model.dto.NhanVienDTO;
 import service.NhanVienService;
+import com.google.gson.Gson;
 
 /**
  * Controller xử lý các nghiệp vụ liên quan đến Lịch Hẹn (Appointment). (ĐÃ NÂNG
@@ -35,6 +42,8 @@ public class LichHenController extends HttpServlet {
     private final LichHenService lichHenService = new LichHenService();
     private final BenhNhanService benhNhanService = new BenhNhanService();
     private final NhanVienService nhanVienService = new NhanVienService();
+    private final KhoaService khoaService = new KhoaService();
+    private final Gson gson = new Gson();
 
     // Hằng số cho phân trang
     private static final int PAGE_SIZE = 10; // 10 lịch hẹn mỗi trang
@@ -47,11 +56,16 @@ public class LichHenController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
         String url = LICHHEN_LIST_PAGE;
+
+
         try {
             if (action == null || action.isEmpty()) {
-                action = "listLichHen";
+                action = "listLichHen"; // Đặt action mặc định
             }
             switch (action) {
+                case "getDoctorsByKhoa":
+                    handleGetDoctorsByKhoa(request, response);
+                    return; // Đã xử lý, không forward
                 case "listLichHen":
                     url = listLichHen(request);
                     break;
@@ -68,14 +82,16 @@ public class LichHenController extends HttpServlet {
                     break;
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho GET.");
-                    url = ERROR_PAGE;
+
             }
+
+            request.getRequestDispatcher(url).forward(request, response);
+
         } catch (Exception e) {
             log("Lỗi tại LichHenController (doGet): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi: " + e.getMessage());
-            url = ERROR_PAGE;
-        } finally {
-            request.getRequestDispatcher(url).forward(request, response);
+            // Forward đến trang lỗi khi có exception
+            request.getRequestDispatcher(ERROR_PAGE).forward(request, response);
         }
     }
 
@@ -321,6 +337,12 @@ public class LichHenController extends HttpServlet {
             List<NhanVienDTO> danhSachBacSi = nhanVienService.findDoctorsBySpecialty();
             request.setAttribute("danhSachBenhNhan", danhSachBenhNhan);
             request.setAttribute("danhSachBacSi", danhSachBacSi);
+
+            // Lấy danh sách Khoa, KHÔNG lấy danh sách Bác sĩ
+            List<KhoaDTO> danhSachKhoa = khoaService.getAllKhoa();
+
+            request.setAttribute("danhSachKhoa", danhSachKhoa); // Gửi danh sách Khoa
+
             return "lichHenDat.jsp";
         } catch (Exception e) {
             log("Không thể tải dữ liệu cho form tạo lịch hẹn (Dat): " + e.getMessage(), e);
@@ -329,6 +351,40 @@ public class LichHenController extends HttpServlet {
         }
     }
     // === KẾT THÚC SỬA ===
+
+    protected void handleGetDoctorsByKhoa(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        String khoaIdStr = request.getParameter("khoaId");
+
+        // === KHẮC PHỤC LỖI 500: Kiểm tra chuỗi rỗng/null trước khi parse ===
+        if (khoaIdStr == null || khoaIdStr.trim().isEmpty()) {
+            // Trả về mảng rỗng nếu không có ID khoa
+            out.print(gson.toJson(Collections.emptyList()));
+            out.flush();
+            return;
+        }
+
+        try {
+            int khoaId = Integer.parseInt(khoaIdStr);
+            List<NhanVienDTO> bacSiList = nhanVienService.getBacSiByKhoa(khoaId);
+            out.print(gson.toJson(bacSiList));
+        } catch (NumberFormatException e) {
+            // Trường hợp lỗi parse (ví dụ: gửi "abc" thay vì số)
+            log("Lỗi NumberFormatException khi tải bác sĩ theo khoaId: " + khoaIdStr, e);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // 400 Bad Request
+            out.print(gson.toJson(Collections.singletonMap("error", "ID khoa không hợp lệ.")));
+        } catch (Exception e) {
+            // Lỗi DB hoặc Service
+            log("Lỗi tải danh sách bác sĩ tại Service: " + e.getMessage(), e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.print(gson.toJson(Collections.singletonMap("error", "Lỗi tải danh sách bác sĩ: " + e.getMessage())));
+        }
+        out.flush();
+    }
 
     @Override
     public String getServletInfo() {

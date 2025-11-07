@@ -88,12 +88,12 @@ public class EMRCoreController extends HttpServlet {
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho phương thức GET.");
             }
+            request.getRequestDispatcher(url).forward(request, response);
         } catch (Exception e) {
             log("Lỗi tại EMRCoreController (doGet): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Đã có lỗi xảy ra: " + e.getMessage());
-        } finally {
-            request.getRequestDispatcher(url).forward(request, response);
         }
+
     }
 
     @Override

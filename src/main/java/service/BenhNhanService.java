@@ -498,4 +498,8 @@ public class BenhNhanService {
             return "BN-ERROR"; // Trả về lỗi nếu không tạo được
         }
     }
+
+    public List<BenhNhanDTO> getAllBenhNhan() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
