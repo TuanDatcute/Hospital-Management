@@ -156,6 +156,7 @@ public class PatientLichHenController extends HttpServlet {
     }
 
     // --- CÁC HÀM HELPER ĐÃ CẬP NHẬT/THÊM MỚI ---
+    
     private void loadPatientBookingFormDependencies(HttpServletRequest request) throws Exception {
         List<KhoaDTO> khoaList = khoaService.getAllKhoa();
         request.setAttribute("khoaList", khoaList);
@@ -165,7 +166,7 @@ public class PatientLichHenController extends HttpServlet {
      * HÀM SỬA LỖI 500: Đã thêm kiểm tra chuỗi rỗng cho khoaId trước khi parse.
      */
     private void getBacSiByKhoa(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("application/json");
+       response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
         String khoaIdStr = request.getParameter("khoaId");

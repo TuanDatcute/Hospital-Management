@@ -482,9 +482,8 @@ public class BenhNhanService {
             }
         }
     }
-    
-    // THÊM HÀM NÀY VÀO BenhNhanService.java
 
+    // THÊM HÀM NÀY VÀO BenhNhanService.java
     /**
      * HÀM MỚI (CHO GIAO DIỆN): "Nhìn trộm" mã bệnh nhân tiếp theo sẽ là gì.
      * (Hàm này gọi trực tiếp DAO.generateNewMaBenhNhan)
@@ -497,5 +496,15 @@ public class BenhNhanService {
             e.printStackTrace();
             return "BN-ERROR"; // Trả về lỗi nếu không tạo được
         }
+    }
+
+    public List<BenhNhanDTO> getAllBenhNhan() {
+        // 1. Gọi DAO để lấy danh sách Entity
+        List<BenhNhan> entities = benhNhanDAO.getAllBenhNhan();
+
+        // 2. Dùng Stream API để chuyển đổi từng Entity sang DTO
+        return entities.stream()
+                .map(this::toDTO) // Áp dụng hàm toDTO cho mỗi phần tử
+                .collect(Collectors.toList());
     }
 }

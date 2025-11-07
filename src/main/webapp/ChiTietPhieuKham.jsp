@@ -7,11 +7,21 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Bệnh Án - ${phieuKham.maPhieuKham}</title>
+        <title>Dashboard Bệnh Án - ${phieuKham.maPhieuKham}</title>
 
-        <%-- Sử dụng c:url để đảm bảo đường dẫn luôn đúng --%>
         <link rel="stylesheet" href="<c:url value='/css/ctdt-style.css'/>">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+        <script>
+            (function () {
+                var themeKey = 'theme-preference'; // Key này phải khớp với theme.js
+                var theme = localStorage.getItem(themeKey);
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                }
+            })();
+        </script>
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,17 +29,18 @@
     <body>
         <div class="dashboard-container">
 
-            <%--  nút gạt  --%>
+            <%-- Nút gạt --%>
             <div class="theme-switch-wrapper">
                 <label class="theme-switch" for="theme-toggle">
                     <input type="checkbox" id="theme-toggle" />
                     <div class="slider round">
-
                         <span class="sun-icon"><i class="fas fa-sun"></i></span>
                         <span class="moon-icon"><i class="fas fa-moon"></i></span>
                     </div>
                 </label>
             </div>
+
+            <%-- Thông báo --%>
             <c:if test="${not empty sessionScope.ERROR_MESSAGE}">
                 <div class="alert alert-danger">${sessionScope.ERROR_MESSAGE}</div>
                 <c:remove var="ERROR_MESSAGE" scope="session" />
@@ -54,7 +65,7 @@
             </div>
 
             <%-- Card Hành động nhanh --%>
-            <div class="card actions-card">              
+            <div class="card actions-card">          
                 <div class="card-header"><h3><i class="fa-solid fa-bolt"></i> Hành động</h3></div>
                 <div class="card-body action-buttons">
                     <c:if test="${phieuKham.trangThai ne 'HOAN_THANH'}">
@@ -74,7 +85,6 @@
             </div>
 
             <%-- Card Chỉ số sinh tồn (Vitals) --%>
-
             <div class="card vitals-dashboard-card">
                 <div class="card-header"><h3><i class="fas fa-heart-pulse"></i> Chỉ số Sinh tồn</h3></div>
                 <div class="card-body vitals-grid">
@@ -246,6 +256,7 @@
             </div>
         </div>
 
+        <script src="<c:url value='/js/darkmode.js'/>"></script>
         <script src="<c:url value='/js/ctdt-dashboard.js'/>"></script>
     </body>
 </html>

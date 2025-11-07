@@ -297,5 +297,31 @@ public class NhanVienService {
         return toDTO(entity); // <-- Dùng hàm 'toDTO' chính
     }
 
-    // === ĐÃ XÓA: Hàm toDTOFotGetByTaiKhoan (trùng lặp) ===
-} // Kết thúc class
+    private NhanVienDTO toDTOFotGetByTaiKhoan(NhanVien entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        NhanVienDTO dto = new NhanVienDTO();
+        dto.setId(entity.getId());
+        dto.setHoTen(entity.getHoTen());
+        dto.setChuyenMon(entity.getChuyenMon());
+
+        // Lấy thông tin từ đối tượng TaiKhoan đã được JOIN FETCH
+        if (entity.getTaiKhoan() != null) {
+            dto.setTaiKhoanId(entity.getTaiKhoan().getId());
+            dto.setVaiTro(entity.getTaiKhoan().getVaiTro());
+        }
+
+        return dto;
+    }
+
+    public List<NhanVienDTO> getDoctorsByKhoaId(int khoaId) {
+        return nhanVienDAO.findBacSiByKhoaId(khoaId).stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+}
+
+// === ĐÃ XÓA: Hàm toDTOFotGetByTaiKhoan (trùng lặp) ===
+

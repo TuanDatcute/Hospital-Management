@@ -430,4 +430,18 @@ public class BenhNhanDAO {
             return Collections.emptyList();
         }
     }
+    
+    public List<BenhNhan> getAllBenhNhan() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Sử dụng HQL để truy vấn
+            Query<BenhNhan> query = session.createQuery(
+                "FROM BenhNhan bn ORDER BY bn.hoTen ASC", 
+                BenhNhan.class
+            );
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList(); // Trả về danh sách rỗng nếu có lỗi
+        }
+    }
 }

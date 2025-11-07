@@ -285,7 +285,7 @@ public class NhanVienDAO {
         }
     }
 
-    // --- Hàm từ nhánh c6c746e... (Hỗ trợ Đặt lịch hẹn) ---
+
     /**
      * HÀM SỬA: Tìm các bác sĩ (NhanVien) theo Khoa ID.
      */
@@ -309,6 +309,7 @@ public class NhanVienDAO {
 
         } catch (Exception e) {
             System.err.println("LỖI DAO khi tìm bác sĩ theo khoa ID: " + khoaId);
+
             e.printStackTrace();
             return Collections.emptyList();
         }
