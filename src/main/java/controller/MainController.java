@@ -110,9 +110,11 @@ public class MainController extends HttpServlet {
                 // Khởi tạo và gọi doGet của Controller AJAX
                 new PatientLichHenController().doGet(request, response);
                 return; // DỪNG NGAY LẬP TỨC.
-            }
+                
+           }
 
         }
+              
         if (action == null || action.isEmpty()) {
             url = LOGIN_PAGE;
         } // --- (Auth features - từ nhánh của bạn) ---
