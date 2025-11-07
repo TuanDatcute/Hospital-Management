@@ -305,7 +305,6 @@ public class NhanVienService {
         return toDTO(entity); // <-- SỬA: Dùng hàm 'toDTO' chính
     }
 
-
     private NhanVienDTO toDTOFotGetByTaiKhoan(NhanVien entity) {
         if (entity == null) {
             return null;
@@ -326,10 +325,9 @@ public class NhanVienService {
     }
 
     public List<NhanVienDTO> getDoctorsByKhoaId(int khoaId) {
-        return nhanVienDAO.findDoctorsByKhoaId(khoaId).stream()
-                .map(this::toDTO) 
+        return nhanVienDAO.findBacSiByKhoaId(khoaId).stream()
+                .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 }
- 
 

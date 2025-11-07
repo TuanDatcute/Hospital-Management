@@ -261,6 +261,8 @@ public class NhanVienDAO {
         }
     }
 
+
+
     // Trong file dao/NhanVienDAO.java
     public List<NhanVien> findDoctorsByKhoaId(int khoaId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
