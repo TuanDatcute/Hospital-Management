@@ -1,6 +1,7 @@
 <%--
     Document   : user/viewProfile.jsp
     Mô tả      : (File MỚI) Trang "Chỉ Xem" hồ sơ.
+    (ĐÃ CẬP NHẬT: Thêm hiển thị Avatar)
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -29,6 +30,21 @@
                 max-width: 600px;
                 margin: 40px auto;
             }
+
+            /* */
+            .profile-avatar-container {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .profile-avatar-img {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%; /* Hiển thị ảnh dạng tròn */
+                border: 3px solid #eee;
+                object-fit: cover; /* Đảm bảo ảnh không bị méo */
+            }
+            /* */
+
             .view-profile-item {
                 display: flex;
                 justify-content: space-between;
@@ -71,6 +87,23 @@
     <body class="login-page-body"> 
         <div class="view-profile-container">
 
+            <div class="profile-avatar-container">
+                <c:choose>
+                    <%-- Nếu có ảnh Base64 trong DTO, thì hiển thị nó --%>
+                    <c:when test="${not empty requestScope.BENHNHAN_DATA.avatarBase64}">
+                        <img src="${requestScope.BENHNHAN_DATA.avatarBase64}" 
+                             alt="Ảnh đại diện" 
+                             class="profile-avatar-img">
+                    </c:when>
+                    <%-- Ngược lại, hiển thị ảnh mặc định --%>
+                    <c:otherwise>
+                        <%-- (Bạn có thể thay đổi đường dẫn này thành ảnh placeholder của bạn) --%>
+                        <img src="${pageContext.request.contextPath}/images/default-avatar.png" 
+                             alt="Ảnh đại diện mặc định" 
+                             class="profile-avatar-img">
+                    </c:otherwise>
+                </c:choose>
+            </div>
             <h1 class="form-title">Hồ sơ Cá nhân</h1>
             <p class="form-description">
                 Đây là thông tin hồ sơ y tế của bạn tại bệnh viện.
@@ -132,10 +165,13 @@
 
             <%-- Nút bấm --%>
             <div class="profile-actions">
-                <%-- Link này sẽ trỏ đến action "showEditProfile" MỚI --%>
                 <a href="${mainControllerUrl}?action=showEditProfile" class="btn-submit btn-secondary">
                     <i class="fas fa-edit"></i> Chỉnh sửa thông tin hồ sơ
                 </a>
+
+                <a href="${pageContext.request.contextPath}/home.jsp" class="home-link" title="Quay về Trang chủ">
+                    <i class="fas fa-home"></i>
+                </a> 
             </div>
 
         </div>
