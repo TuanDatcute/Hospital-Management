@@ -157,7 +157,7 @@
                                     <%-- Nút Sửa (chỉ khi TRONG) --%>
                                     <c:if test="${bed.trangThai == 'TRONG'}">
                                         <%-- CSS mới đã định nghĩa .btn-warning --%>
-                                        <a href="MainController?action=showUpdateBedForm&bedId=${bed.id}" class="btn btn-sm btn-warning">
+                                        <a href="MainController?action=getBedForUpdate&bedId=${bed.id}" class="btn btn-sm btn-warning">
                                             <i class="fa-solid fa-pencil"></i> Sửa
                                         </a>
                                     </c:if>

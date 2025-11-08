@@ -8,7 +8,7 @@
         <title>Form Phòng Bệnh</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link rel="stylesheet" href="css/PhongBenh.css">
-        <script src="<c:url value='/js/darkmode.js'/>" defer></script>
+        <script src="<c:url value='/js/darkmodeQuang.js'/>" defer></script>
     </head>
     <body>
 
