@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model.dao;
 
 import model.Entity.BenhNhan;
@@ -12,40 +8,30 @@ import util.HibernateUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional; // <-- Đảm bảo bạn đã import
+import java.util.Optional;
 
 /**
  *
- * @author ADMIN (Đã cập nhật Giai đoạn 2 & 3) (Đã Clean Code - Thêm .trim() vào
- * các truy vấn)
+ * @author ADMIN (Đã NÂNG CẤP: Thêm Xóa Mềm & Tìm kiếm & Sửa Mã BN)
  */
 public class BenhNhanDAO {
 
-    /**
-     * Thêm một bệnh nhân mới vào CSDL. (Giữ nguyên)
-     */
+    // (Hàm create và update giữ nguyên)
     public BenhNhan create(BenhNhan benhNhan) {
         Transaction transaction = null;
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.save(benhNhan);
+            session.save(benhNhan); // Service sẽ đảm bảo trạng thái là HOAT_DONG
             transaction.commit();
             return benhNhan;
         } catch (Exception e) {
             if (transaction != null) {
-                try {
-                    transaction.rollback();
-                } catch (Exception rollbackEx) {
-                    System.err.println("Lỗi khi rollback (kết nối có thể đã đóng): " + rollbackEx.getMessage());
-                }
+                transaction.rollback();
             }
             throw new RuntimeException("Lỗi DAO khi tạo BenhNhan: " + e.getMessage(), e);
         }
     }
 
-    /**
-     * Cập nhật thông tin một bệnh nhân. (Đã Clean Code: void + throw)
-     */
     public void update(BenhNhan benhNhan) {
         Transaction transaction = null;
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -54,35 +40,42 @@ public class BenhNhanDAO {
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
-                try {
-                    transaction.rollback();
-                } catch (Exception rollbackEx) {
-                    System.err.println("Lỗi khi rollback (kết nối có thể đã đóng): " + rollbackEx.getMessage());
-                }
+                transaction.rollback();
             }
             throw new RuntimeException("Lỗi DAO khi cập nhật BenhNhan: " + e.getMessage(), e);
         }
     }
 
+    // === BẮT ĐẦU THÊM MỚI (XÓA MỀM) ===
     /**
-     * Lấy thông tin bệnh nhân bằng ID. (Giữ nguyên)
+     * HÀM MỚI (XÓA MỀM): Vô hiệu hóa một bệnh nhân
      */
-    public BenhNhan getById(int id) {
+    public boolean softDelete(int id) {
+        Transaction transaction = null;
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(BenhNhan.class, id);
+            transaction = session.beginTransaction();
+            BenhNhan benhNhan = session.get(BenhNhan.class, id); // Lấy entity (kể cả đã xóa)
+            if (benhNhan != null && benhNhan.getTrangThai().equals("HOAT_DONG")) {
+                benhNhan.setTrangThai("DA_XOA"); // Đổi trạng thái
+                session.update(benhNhan); // Cập nhật lại
+            }
+            transaction.commit();
+            return true;
         } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
-            return null;
+            return false;
         }
     }
 
     /**
-     * Lấy thông tin bệnh nhân bằng ID (tải kèm thông tin Relations). (Giữ
-     * nguyên)
+     * SỬA (XÓA MỀM): Lấy bằng ID (chỉ bệnh nhân HOAT_DONG)
      */
-    public BenhNhan getByIdWithRelations(int id) {
+    public BenhNhan getById(int id) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan LEFT JOIN FETCH bn.khoa WHERE bn.id = :id";
+            String hql = "FROM BenhNhan bn WHERE bn.id = :id AND bn.trangThai = 'HOAT_DONG'";
             Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
             query.setParameter("id", id);
             return query.uniqueResult();
@@ -93,11 +86,46 @@ public class BenhNhanDAO {
     }
 
     /**
-     * Lấy tất cả bệnh nhân trong CSDL (không tải Relations). (Giữ nguyên)
+     * SỬA (XÓA MỀM): Lấy bằng ID (chỉ HOAT_DONG BenhNhan và HOAT_DONG TaiKhoan)
+     */
+    public BenhNhan getByIdWithRelations(int id) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "FROM BenhNhan bn "
+                    + "LEFT JOIN FETCH bn.taiKhoan tk "
+                    + "LEFT JOIN FETCH bn.khoa "
+                    + "WHERE bn.id = :id AND bn.trangThai = 'HOAT_DONG' "
+                    + "AND (tk IS NULL OR tk.trangThai = 'HOAT_DONG')";
+            Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
+            query.setParameter("id", id);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * HÀM MỚI (CHO Service): Lấy bệnh nhân (kể cả bị vô hiệu hóa) Dùng cho
+     * logic 'softDelete' và 'confirmAndLink'
+     */
+    public BenhNhan getByIdEvenIfInactive(int id) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan WHERE bn.id = :id";
+            Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
+            query.setParameter("id", id);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * (Hàm getAll của bạn - SỬA: Lọc theo trangThai)
      */
     public List<BenhNhan> getAll() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "FROM BenhNhan";
+            String hql = "FROM BenhNhan bn WHERE bn.trangThai = 'HOAT_DONG'";
             Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
             return query.list();
         } catch (Exception e) {
@@ -107,12 +135,11 @@ public class BenhNhanDAO {
     }
 
     /**
-     * Lấy tất cả bệnh nhân trong CSDL (tải kèm thông tin Relations). (Giữ
-     * nguyên)
+     * (Hàm getAllWithRelations_IncludingInactive của bạn - Giữ nguyên)
      */
-    public List<BenhNhan> getAllWithRelations() {
+    public List<BenhNhan> getAllWithRelations_IncludingInactive() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan LEFT JOIN FETCH bn.khoa";
+            String hql = "SELECT DISTINCT bn FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan LEFT JOIN FETCH bn.khoa";
             Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
             return query.list();
         } catch (Exception e) {
@@ -122,7 +149,112 @@ public class BenhNhanDAO {
     }
 
     /**
-     * Kiểm tra xem Mã Bệnh Nhân đã tồn tại chưa. (Đã cập nhật .trim())
+     * SỬA (XÓA MỀM): Thêm lọc trangThai (Đây là hàm Phân trang của bạn)
+     */
+    public List<BenhNhan> getAllActiveWithRelations(int page, int pageSize) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT DISTINCT bn FROM BenhNhan bn "
+                    + "LEFT JOIN FETCH bn.taiKhoan tk "
+                    + "LEFT JOIN FETCH bn.khoa k "
+                    + "WHERE bn.trangThai = 'HOAT_DONG' AND (tk IS NULL OR tk.trangThai = 'HOAT_DONG') "
+                    + "ORDER BY bn.id ASC";
+            Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
+            int offset = (page - 1) * pageSize;
+            query.setFirstResult(offset);
+            query.setMaxResults(pageSize);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * SỬA (XÓA MỀM): Thêm lọc trangThai (Đây là hàm Đếm của bạn)
+     */
+    public long getTotalActiveBenhNhanCount() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT count(DISTINCT bn.id) FROM BenhNhan bn "
+                    + "LEFT JOIN bn.taiKhoan tk "
+                    + "WHERE bn.trangThai = 'HOAT_DONG' AND (tk IS NULL OR tk.trangThai = 'HOAT_DONG')";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * SỬA (XÓA MỀM): Thêm lọc trangThai (Hàm này cho Dropdown)
+     */
+    public List<BenhNhan> getAllActiveWithRelations() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT DISTINCT bn FROM BenhNhan bn "
+                    + "LEFT JOIN FETCH bn.taiKhoan tk "
+                    + "LEFT JOIN FETCH bn.khoa k "
+                    + "WHERE bn.trangThai = 'HOAT_DONG' AND (tk IS NULL OR tk.trangThai = 'HOAT_DONG') "
+                    + "ORDER BY bn.hoTen ASC";
+            Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    // === BẮT ĐẦU THÊM MỚI (TÌM KIẾM) ===
+    /**
+     * HÀM MỚI (TÌM KIẾM): Tìm kiếm Bệnh nhân (có phân trang) Tìm theo Mã BN,
+     * Tên, SĐT, CCCD
+     */
+    public List<BenhNhan> searchBenhNhanPaginated(String keyword, int page, int pageSize) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT DISTINCT bn FROM BenhNhan bn "
+                    + "LEFT JOIN FETCH bn.taiKhoan tk "
+                    + "LEFT JOIN FETCH bn.khoa k "
+                    + "WHERE bn.trangThai = 'HOAT_DONG' "
+                    + "AND (tk IS NULL OR tk.trangThai = 'HOAT_DONG') "
+                    + "AND (bn.hoTen LIKE :keyword OR bn.soDienThoai LIKE :keyword OR bn.cccd LIKE :keyword OR bn.maBenhNhan LIKE :keyword) "
+                    + "ORDER BY bn.id ASC";
+
+            Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
+            query.setParameter("keyword", "%" + keyword + "%");
+
+            int offset = (page - 1) * pageSize;
+            query.setFirstResult(offset);
+            query.setMaxResults(pageSize);
+
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * HÀM MỚI (TÌM KIẾM): Đếm kết quả tìm kiếm Bệnh nhân
+     */
+    public long getBenhNhanSearchCount(String keyword) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT count(DISTINCT bn.id) FROM BenhNhan bn "
+                    + "LEFT JOIN bn.taiKhoan tk "
+                    + "WHERE bn.trangThai = 'HOAT_DONG' "
+                    + "AND (tk IS NULL OR tk.trangThai = 'HOAT_DONG') "
+                    + "AND (bn.hoTen LIKE :keyword OR bn.soDienThoai LIKE :keyword OR bn.cccd LIKE :keyword OR bn.maBenhNhan LIKE :keyword)";
+
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("keyword", "%" + keyword + "%");
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    // === KẾT THÚC THÊM MỚI (TÌM KIẾM) ===
+
+    /**
+     * SỬA (XÓA MỀM): Lọc theo trangThai
      */
     public boolean isMaBenhNhanExisted(String maBenhNhan) {
         if (maBenhNhan == null || maBenhNhan.trim().isEmpty()) {
@@ -130,7 +262,7 @@ public class BenhNhanDAO {
         }
         String trimmedMa = maBenhNhan.trim();
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "SELECT count(bn.id) FROM BenhNhan bn WHERE bn.maBenhNhan = :ma";
+            String hql = "SELECT count(bn.id) FROM BenhNhan bn WHERE bn.maBenhNhan = :ma AND bn.trangThai = 'HOAT_DONG'";
             Query<Long> query = session.createQuery(hql, Long.class);
             query.setParameter("ma", trimmedMa);
             return query.uniqueResult() > 0;
@@ -141,12 +273,11 @@ public class BenhNhanDAO {
     }
 
     /**
-     * Kiểm tra xem TaiKhoan ID đã được liên kết với Bệnh nhân nào chưa. (Giữ
-     * nguyên)
+     * SỬA (XÓA MỀM): Lọc theo trangThai
      */
     public boolean isTaiKhoanIdLinked(int taiKhoanId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "SELECT count(bn.id) FROM BenhNhan bn WHERE bn.taiKhoan.id = :tkId";
+            String hql = "SELECT count(bn.id) FROM BenhNhan bn WHERE bn.taiKhoan.id = :tkId AND bn.trangThai = 'HOAT_DONG'";
             Query<Long> query = session.createQuery(hql, Long.class);
             query.setParameter("tkId", taiKhoanId);
             return query.uniqueResult() > 0;
@@ -157,7 +288,7 @@ public class BenhNhanDAO {
     }
 
     /**
-     * Tìm bệnh nhân bằng Mã Bệnh Nhân. (Đã cập nhật .trim())
+     * SỬA (XÓA MỀM): Lọc theo trangThai
      */
     public BenhNhan findByMaBenhNhan(String maBenhNhan) {
         if (maBenhNhan == null || maBenhNhan.trim().isEmpty()) {
@@ -165,7 +296,8 @@ public class BenhNhanDAO {
         }
         String trimmedMa = maBenhNhan.trim();
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan WHERE bn.maBenhNhan = :ma";
+            String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan "
+                    + "WHERE bn.maBenhNhan = :ma AND bn.trangThai = 'HOAT_DONG'";
             Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
             query.setParameter("ma", trimmedMa);
             return query.uniqueResult();
@@ -176,11 +308,12 @@ public class BenhNhanDAO {
     }
 
     /**
-     * Tìm bệnh nhân bằng ID Tài khoản. (Giữ nguyên)
+     * SỬA (XÓA MỀM): Lọc theo trangThai
      */
     public BenhNhan findByTaiKhoanId(int taiKhoanId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan WHERE bn.taiKhoan.id = :tkId";
+            String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan "
+                    + "WHERE bn.taiKhoan.id = :tkId AND bn.trangThai = 'HOAT_DONG'";
             Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
             query.setParameter("tkId", taiKhoanId);
             return query.uniqueResult();
@@ -191,10 +324,11 @@ public class BenhNhanDAO {
     }
 
     /**
-     * Tự động tạo Mã Bệnh Nhân mới. (Giữ nguyên)
+     * (Hàm generateNewMaBenhNhan của bạn - ĐÃ NÂNG CẤP LÊN 5 SỐ 0)
      */
     public String generateNewMaBenhNhan() {
-        String defaultMa = "BN-10001";
+        String defaultMa = "BN-00001";
+        int nextNum = 1;
 
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "SELECT bn.maBenhNhan FROM BenhNhan bn WHERE bn.maBenhNhan LIKE 'BN-%'";
@@ -215,19 +349,19 @@ public class BenhNhanDAO {
                         }
                     })
                     .max()
-                    .orElse(10000);
+                    .orElse(0);
 
-            int nextNum = maxNum + 1;
-            return "BN-" + nextNum;
+            nextNum = maxNum + 1;
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "BN-" + (System.currentTimeMillis() % 100000);
+            return "BN-ERR" + (System.currentTimeMillis() % 10000);
         }
+        return "BN-" + String.format("%05d", nextNum);
     }
 
     /**
-     * HÀM MỚI: Tìm bệnh nhân bằng CCCD (duy nhất). (Đã cập nhật .trim())
+     * SỬA (XÓA MỀM): Lọc theo trangThai
      */
     public BenhNhan findByCccd(String cccd) {
         if (cccd == null || cccd.trim().isEmpty()) {
@@ -235,7 +369,8 @@ public class BenhNhanDAO {
         }
         String trimmedCccd = cccd.trim();
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan WHERE bn.cccd = :cccd";
+            String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan "
+                    + "WHERE bn.cccd = :cccd AND bn.trangThai = 'HOAT_DONG'";
             Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
             query.setParameter("cccd", trimmedCccd);
             return query.uniqueResult();
@@ -246,8 +381,7 @@ public class BenhNhanDAO {
     }
 
     /**
-     * HÀM MỚI: Kiểm tra xem CCCD đã tồn tại chưa (cho Kịch bản B). (Đã cập nhật
-     * .trim())
+     * SỬA (XÓA MỀM): Lọc theo trangThai
      */
     public boolean isCccdExisted(String cccd) {
         if (cccd == null || cccd.trim().isEmpty()) {
@@ -255,7 +389,7 @@ public class BenhNhanDAO {
         }
         String trimmedCccd = cccd.trim();
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "SELECT count(bn.id) FROM BenhNhan bn WHERE bn.cccd = :cccd";
+            String hql = "SELECT count(bn.id) FROM BenhNhan bn WHERE bn.cccd = :cccd AND bn.trangThai = 'HOAT_DONG'";
             Query<Long> query = session.createQuery(hql, Long.class);
             query.setParameter("cccd", trimmedCccd);
             return query.uniqueResult() > 0;
@@ -266,8 +400,7 @@ public class BenhNhanDAO {
     }
 
     /**
-     * HÀM MỚI: Kiểm tra xem Số Điện Thoại đã tồn tại chưa (cho Kịch bản B). (Đã
-     * cập nhật .trim())
+     * SỬA (XÓA MỀM): Lọc theo trangThai
      */
     public boolean isSoDienThoaiExisted(String soDienThoai) {
         if (soDienThoai == null || soDienThoai.trim().isEmpty()) {
@@ -275,7 +408,7 @@ public class BenhNhanDAO {
         }
         String trimmedSdt = soDienThoai.trim();
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "SELECT count(bn.id) FROM BenhNhan bn WHERE bn.soDienThoai = :sdt";
+            String hql = "SELECT count(bn.id) FROM BenhNhan bn WHERE bn.soDienThoai = :sdt AND bn.trangThai = 'HOAT_DONG'";
             Query<Long> query = session.createQuery(hql, Long.class);
             query.setParameter("sdt", trimmedSdt);
             return query.uniqueResult() > 0;
@@ -286,8 +419,7 @@ public class BenhNhanDAO {
     }
 
     /**
-     * HÀM MỚI (BẮT BUỘC): Tìm bệnh nhân bằng SĐT (duy nhất). (Đã cập nhật
-     * .trim())
+     * SỬA (XÓA MỀM): Lọc theo trangThai
      */
     public BenhNhan findBySoDienThoai(String soDienThoai) {
         if (soDienThoai == null || soDienThoai.trim().isEmpty()) {
@@ -295,7 +427,8 @@ public class BenhNhanDAO {
         }
         String trimmedSdt = soDienThoai.trim();
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan WHERE bn.soDienThoai = :sdt";
+            String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan "
+                    + "WHERE bn.soDienThoai = :sdt AND bn.trangThai = 'HOAT_DONG'";
             Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
             query.setParameter("sdt", trimmedSdt);
             return query.uniqueResult();
@@ -305,15 +438,27 @@ public class BenhNhanDAO {
         }
     }
 
+    public List<BenhNhan> getAllWithRelations() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "FROM BenhNhan bn LEFT JOIN FETCH bn.taiKhoan LEFT JOIN FETCH bn.khoa";
+            Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
     /**
-     * Lấy tất cả bệnh nhân CHƯA được gán vào giường bệnh. (Giữ nguyên)
+     * SỬA (XÓA MỀM): Lọc theo trangThai
      */
     public List<BenhNhan> getBenhNhanChuaCoGiuongWithRelations() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<BenhNhan> query = session.createQuery(
                     "FROM BenhNhan bn "
-                    + "LEFT JOIN FETCH bn.taiKhoan "
-                    + "WHERE bn.id NOT IN ( "
+                    + "LEFT JOIN FETCH bn.taiKhoan tk "
+                    + "WHERE bn.trangThai = 'HOAT_DONG' AND (tk IS NULL OR tk.trangThai = 'HOAT_DONG') "
+                    + "AND bn.id NOT IN ( "
                     + "  SELECT gb.benhNhan.id "
                     + "  FROM GiuongBenh gb "
                     + "  WHERE gb.benhNhan IS NOT NULL "
