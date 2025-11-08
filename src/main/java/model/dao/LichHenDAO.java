@@ -271,4 +271,24 @@ public class LichHenDAO {
             return Collections.emptyList();
         }
     }
+
+    /**
+     * HÀM MỚI: Lấy lịch hẹn (an toàn, có relations) Dùng cho chức năng Hủy lịch
+     * (cần tên BS để gửi mail)
+     */
+    public LichHen getByIdAndBenhNhanIdWithRelations(int lichHenId, int benhNhanId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "FROM LichHen lh "
+                    + "JOIN FETCH lh.benhNhan "
+                    + "JOIN FETCH lh.bacSi "
+                    + "WHERE lh.id = :lichHenId AND lh.benhNhan.id = :benhNhanId";
+            Query<LichHen> query = session.createQuery(hql, LichHen.class);
+            query.setParameter("lichHenId", lichHenId);
+            query.setParameter("benhNhanId", benhNhanId);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
