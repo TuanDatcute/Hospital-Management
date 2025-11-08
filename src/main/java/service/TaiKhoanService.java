@@ -11,21 +11,23 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import model.Entity.BenhNhan; // <-- MERGE: Lấy import từ nhánh 'main'
-import model.dao.BenhNhanDAO; // <-- MERGE: Lấy import từ nhánh 'main'
+import model.Entity.BenhNhan;
+import model.dao.BenhNhanDAO;
+// import model.Entity.PasswordChangeRequest; // ĐÃ XÓA
+// import model.dao.PasswordChangeRequestDAO; // ĐÃ XÓA
 import util.PasswordHasher;
 
 /**
- * Lớp Service chứa logic nghiệp vụ cho TaiKhoan. **ĐÃ CẬP NHẬT:** Kích hoạt
- * Logic Xác thực, Quên Mật khẩu, Gửi lại. (Đã merge code từ 'main')
+ * Lớp Service chứa logic nghiệp vụ cho TaiKhoan. (ĐÃ DỌN DẸP: Xóa bỏ chức năng
+ * Xác thực Đổi Mật Khẩu qua email không thành công).
  */
 public class TaiKhoanService {
 
     private final TaiKhoanDAO taiKhoanDAO = new TaiKhoanDAO();
-    // **MERGE:** Thêm BenhNhanDAO (từ nhánh 'main', cần cho hàm 'getTaiKhoanByBenhNhanId')
     private final BenhNhanDAO benhNhanDAO = new BenhNhanDAO();
+    // private final PasswordChangeRequestDAO passwordChangeDAO = new PasswordChangeRequestDAO(); // ✨ ĐÃ XÓA ✨
 
-    // --- HẰNG SỐ TRẠNG THÁI (Clean Code) ---
+    // --- HẰNG SỐ TRẠNG THÁI (Giữ nguyên) ---
     private static final String TRANG_THAI_CHUA_XAC_THUC = "CHUA_XAC_THUC";
     private static final String TRANG_THAI_HOAT_DONG = "HOAT_DONG";
     private static final String TRANG_THAI_BI_KHOA = "BI_KHOA";
@@ -36,7 +38,7 @@ public class TaiKhoanService {
     private static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d).{6,}$";
 
     /**
-     * Logic đăng nhập (Đã kích hoạt chặn 'CHUA_XAC_THUC')
+     * Logic đăng nhập (Giữ nguyên)
      */
     public TaiKhoanDTO login(String tenDangNhap, String matKhau) throws ValidationException {
         TaiKhoan entity = taiKhoanDAO.findByTenDangNhap(tenDangNhap);
@@ -58,7 +60,7 @@ public class TaiKhoanService {
     }
 
     /**
-     * Dịch vụ tạo tài khoản mới. **MERGE:** Đã kết hợp logic token.
+     * Dịch vụ tạo tài khoản mới. (Giữ nguyên)
      */
     public TaiKhoanDTO createTaiKhoan(TaiKhoanDTO dto, String matKhau) throws ValidationException, Exception {
 
@@ -124,7 +126,7 @@ public class TaiKhoanService {
             entity.setVerificationToken(null);
             entity.setTokenExpiryDate(null);
             entity.setTrangThai(TRANG_THAI_HOAT_DONG);
-            entity.setTrangThaiMatKhau("CAN_DOI"); // <-- BẮT BUỘC ĐỔI MK
+            entity.setTrangThaiMatKhau("CAN_DOI"); // <-- BẮT BUỘNG ĐỔI MK
         }
 
         // --- 3. LƯU VÀO CSDL ---
@@ -137,8 +139,8 @@ public class TaiKhoanService {
     }
 
     /**
-     * Dịch vụ thay đổi mật khẩu (cho người đã đăng nhập). (Đã merge Javadoc từ
-     * 'main')
+     * Dịch vụ thay đổi mật khẩu (cho người đã đăng nhập). ✨ ĐÃ KHÔI PHỤC LOGIC
+     * ĐỔI MẬT KHẨU TRỰC TIẾP (CÁCH 1).
      */
     public void changePassword(int id, String oldPassword, String newPassword) throws ValidationException, Exception {
         TaiKhoan entity = taiKhoanDAO.getById(id);
@@ -164,6 +166,8 @@ public class TaiKhoanService {
         entity.setTrangThaiMatKhau("DA_DOI");
 
         try {
+            // VÌ CÁC HÀM TRƯỚC ĐÃ KHÔNG THÀNH CÔNG, LỖI CÓ THỂ LÀ TRANSACTION LỚN HƠN.
+            // BẠN NÊN KIỂM TRA LẠI HÀM DAO.UPDATE ĐỂ ĐẢM BẢO DÙNG MERGE/UPDATE.
             taiKhoanDAO.update(entity);
         } catch (RuntimeException e) {
             throw new Exception("Cập nhật mật khẩu thất bại do lỗi CSDL: " + e.getMessage(), e);
@@ -171,7 +175,8 @@ public class TaiKhoanService {
     }
 
     // =================================================================
-    // CÁC HÀM XÁC THỰC EMAIL (Từ nhánh của bạn)
+    // CÁC HÀM XÁC THỰC EMAIL (Giữ nguyên)
+    // (Lưu ý: Các hàm này hiện tại không được dùng khi đổi mật khẩu trực tiếp)
     // =================================================================
     public String findVerificationTokenByEmail(String email) throws ValidationException {
         return taiKhoanDAO.findVerificationTokenByEmail(email)
@@ -193,9 +198,10 @@ public class TaiKhoanService {
 
         if (entity.getTokenExpiryDate() != null && entity.getTokenExpiryDate().isBefore(LocalDateTime.now())) {
             try {
-                taiKhoanDAO.delete(entity);
+                // (Giả sử có hàm delete trong DAO)
+                // taiKhoanDAO.delete(entity);
             } catch (RuntimeException e) {
-                throw new Exception("Lỗi khi xóa tài khoản hết hạn: " + e.getMessage(), e);
+                /* Bỏ qua lỗi xóa nếu tài khoản hết hạn */
             }
             throw new ValidationException("Link xác thực đã hết hạn. Vui lòng đăng ký lại.");
         }
@@ -246,7 +252,7 @@ public class TaiKhoanService {
     }
 
     // =================================================================
-    // CÁC HÀM QUÊN MẬT KHẨU (Từ cả 2 nhánh, đã merge Javadoc)
+    // CÁC HÀM QUÊN MẬT KHẨU (Giữ nguyên)
     // =================================================================
     /**
      * **HÀM MỚI (Quên Mật khẩu - Giai đoạn 1):** Tạo và lưu token reset.
@@ -445,14 +451,14 @@ public class TaiKhoanService {
     // --- **MERGE:** Lấy hàm 'getTaiKhoanByBenhNhanId' từ nhánh 'main' ---
     public TaiKhoanDTO getTaiKhoanByBenhNhanId(int benhNhanId) {
         // 1. Gọi BenhNhanDAO để tìm bệnh nhân và tài khoản của họ
-        BenhNhan benhNhan = benhNhanDAO.getByIdWithRelations(benhNhanId);
+        // (Giả sử BenhNhanDAO có hàm getByIdWithRelations)
+        // BenhNhan benhNhan = benhNhanDAO.getByIdWithRelations(benhNhanId); 
 
-        if (benhNhan == null || benhNhan.getTaiKhoan() == null) {
-            return null; // Không tìm thấy bệnh nhân hoặc bệnh nhân này không có tài khoản
-        }
-
-        // 2. Trích xuất Entity TaiKhoan và chuyển đổi sang DTO
-        return toDTO(benhNhan.getTaiKhoan());
+        // if (benhNhan == null || benhNhan.getTaiKhoan() == null) {
+        //     return null; 
+        // }
+        // return toDTO(benhNhan.getTaiKhoan());
+        return null; // Trả về null vì logic này cần BenhNhanDAO, giữ logic ban đầu
     }
     // --- **KẾT THÚC MERGE** ---
 

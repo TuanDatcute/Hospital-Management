@@ -22,7 +22,7 @@ public class Khoa {
     @Column(name = "mo_ta", columnDefinition = "NVARCHAR(MAX)")
     private String moTa;
 
-    @Column(name = "trang_thai", nullable = false, length = 50)
+    @Column(name = "trang_thai", nullable = true, length = 50)
     private String trangThai = "HOAT_DONG"; // Đặt giá trị mặc định
 
     // Constructors

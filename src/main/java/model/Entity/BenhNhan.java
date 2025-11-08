@@ -63,7 +63,7 @@ public class BenhNhan implements Serializable {
     private Khoa khoa;
 
     // === THÊM MỚI (CHO XÓA MỀM) TỪ FILE 2 ===
-    @Column(name = "trang_thai", nullable = false, length = 50)
+    @Column(name = "trang_thai", nullable = true, length = 50)
     private String trangThai = "HOAT_DONG"; // Đặt giá trị mặc định
     // === KẾT THÚC THÊM MỚI ===
 
