@@ -68,14 +68,14 @@ public class MainController extends HttpServlet {
         };
 
         String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa",
-            "showKhoaEditForm", "updateKhoa", "deleteKhoa"};
+            "showKhoaEditForm", "updateKhoa", "softDeleteKhoa"};
         String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien",
-            "showNhanVienEditForm", "updateNhanVien", "deleteNhanVien"};
+            "showNhanVienEditForm", "updateNhanVien", "softDeleteNhanVien"};
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm", "createPrescription"};
 
         // **MERGE:** Lấy 'benhNhanActions' từ nhánh của bạn (vì nó có logic hồ sơ mới)
         String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan",
-            "showBenhNhanEditForm", "updateBenhNhan", "deleteBenhNhan",
+            "showBenhNhanEditForm", "updateBenhNhan", "softDeleteBenhNhan",
             "showProfile", // (Xem hồ sơ)
             "showEditProfile", // (Sửa hồ sơ)
             "saveProfile", // (Lưu hồ sơ)
@@ -90,7 +90,7 @@ public class MainController extends HttpServlet {
         String[] hoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice", "printInvoice"};
         String[] thongBaoActions = {"createThongBao", "listNotifications"};
         String[] userThongBaoActions = {"viewMyNotifications", "markNotificationAsRead", "deleteMyNotification"};
-        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "myAppointments", "bookAppointment"};
+        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "myAppointments", "bookAppointment", "getBacSiByKhoa", "cancelAppointment"};
 
         // **MERGE:** Lấy các mảng mới từ nhánh của bạn
         String[] verifyActions = {"verify"}; // Chỉ xử lý 'verify'

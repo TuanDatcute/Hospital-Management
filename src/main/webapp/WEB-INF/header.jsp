@@ -52,70 +52,18 @@
                                    class="${fn:contains(currentAction, 'ThongBao') ? 'active' : ''}">Thông Báo</a></li>     
                             </c:when>
 
-                        <%-- 2. NẾU LÀ BỆNH NHÂN --%>
-                        <c:when test="${sessionScope.ROLE == 'BENH_NHAN'}">
-                            <c:set var="isHome" value="${fn:endsWith(servletPath, '/home.jsp')}" />
-                            <li><a href="${pageContext.request.contextPath}/home.jsp" 
-                                   class="${isHome ? 'active' : ''}">Trang chủ</a></li>
-                            <li><a href="${pageContext.request.contextPath}/MainController?action=showLichHenCreateForm" 
-                                   class="${fn:contains(currentAction, 'LichHen') ? 'active' : ''}">Đặt lịch hẹn</a></li>
-                            <li><a href="#">Lịch sử khám bệnh</a></li>
-                            <li>
-                                <a href="${pageContext.request.contextPath}/MainController?action=showProfile" 
-                                   class="${currentAction == 'showProfile' ? 'active' : ''}">
-                                    Hồ sơ của tôi
-                                </a>
-                            </li>
-                            <li><a href="${pageContext.request.contextPath}/MainController?action=viewMyNotifications"
-                                   class="${fn:contains(currentAction, 'ThongBao') ? 'active' : ''}">Thông Báo</a></li>                 
-                            </c:when>
-
-                        <%-- 3. NẾU LÀ BÁC SĨ / LỄ TÂN --%>
-                        <c:when test="${sessionScope.ROLE == 'BAC_SI' || sessionScope.ROLE == 'LE_TAN'}">
-                            <c:set var="isStaffDashboard" value="${fn:endsWith(servletPath, '/dashboard.jsp')}" />
-                            <li><a href="${pageContext.request.contextPath}/staff/dashboard.jsp" 
-                                   class="${isStaffDashboard ? 'active' : ''}">Bảng điều khiển</a></li>
-                            <li><a href="${pageContext.request.contextPath}/MainController?action=listLichHen" 
-                                   class="${fn:contains(currentAction, 'LichHen') ? 'active' : ''}">QL Lịch hẹn</a></li>
-                            <li><a href="${pageContext.request.contextPath}/MainController?action=showCreateForm" 
-                                   class="${fn:contains(currentAction, 'CreateForm') ? 'active' : ''}">Tạo Phiếu khám</a></li>
-                            <li><a href="${pageContext.request.contextPath}/MainController?action=viewMyNotifications"
-                                   class="${fn:contains(currentAction, 'ThongBao') ? 'active' : ''}">Thông Báo</a></li>     
-                            </c:when>
-
-                        <%-- 4. NẾU CHƯA ĐĂNG NHẬP (Khách) -> Hiển thị Menu Public --%>
-                        <c:otherwise>
-                            <c:set var="isIndex" value="${fn:endsWith(servletPath, '/index.jsp')}" />
-                            <li><a href="${pageContext.request.contextPath}/index.jsp" class="${isIndex ? 'active' : ''}">Cơ sở y tế <span class="dropdown-icon">▼</span></a></li>
-                            <li><a href="#">Dịch vụ y tế <span class="dropdown-icon">▼</span></a></li>
-                            <li><a href="#">Khám sức khỏe DN</a></li>
-                            <li><a href="#">Tin tức <span class="dropdown-icon">▼</span></a></li>
-                            <li><a href="#">Hướng dẫn <span class="dropdown-icon">▼</span></a></li>
-                            <li><a href="#">Liên hệ <span class="dropdown-icon">▼</span></a></li>
-                            </c:otherwise>
-                        </c:choose>
-                </ul>
-            </nav>
-        </div>
-
-        <%-- ✨ KHU VỰC TÀI KHOẢN MỚI (Đã di chuyển logic từ .top-actions vào đây) --%>
-        <div class="header-right">
-            <div class="top-actions">
-                <%-- 1. KHI CHƯA ĐĂNG NHẬP --%>
-                <c:if test="${empty sessionScope.USER}">
-                    <a href="${pageContext.request.contextPath}/login.jsp" class="btn btn-account">
-                        <i class="fas fa-user"></i> Tài khoản
-                    </a>
-                </c:if>
-
-                <%-- 2. KHI ĐÃ ĐĂNG NHẬP --%>
-                <c:if test="${not empty sessionScope.USER}">
-                    <%-- Dùng c:choose để link về đúng trang chủ (Dashboard hoặc Home) --%>
-                    <c:choose>
-                        <%-- Link cho Admin --%>
-                        <c:when test="${sessionScope.ROLE == 'QUAN_TRI'}">
-                            <a href="${pageContext.request.contextPath}/admin/dashboard.jsp" class="btn btn-account">
-                                <i class="fas fa-user-shield"></i> ${sessionScope.USER.tenDangNhap}
+                    <%-- 2. NẾU LÀ BỆNH NHÂN --%>
+                    <c:when test="${sessionScope.ROLE == 'BENH_NHAN'}">
+                        <c:set var="isHome" value="${fn:endsWith(servletPath, '/home.jsp')}" />
+                        <li><a href="${pageContext.request.contextPath}/home.jsp" 
+                               class="${isHome ? 'active' : ''}">Bảng điều khiển</a></li>
+                        <li><a href="${pageContext.request.contextPath}/MainController?action=myAppointments" 
+                               class="${fn:contains(currentAction, 'LichHen') ? 'active' : ''}">Đặt lịch hẹn</a></li>
+                        <li><a href="#">Lịch sử khám bệnh</a></li>
+                        <li>
+                            <a href="${pageContext.request.contextPath}/MainController?action=showProfile" 
+                               class="${currentAction == 'showProfile' ? 'active' : ''}">
+                                Hồ sơ của tôi
                             </a>
                         </c:when>
                         <%-- Link cho Nhân viên (BS/LT) --%>

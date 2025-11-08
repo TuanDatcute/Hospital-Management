@@ -12,7 +12,7 @@
         <%-- BẮT BUỘC: Thêm Font Awesome cho icon --%>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
         <%-- BẮT BUỘC: Nhúng file CSS chung TRƯỚC --%>
         <%-- (Đây là file DanhSachHoaDon.css đã được gộp, hoặc file base.css) --%>
         <link rel="stylesheet" href="<c:url value='/css/StyleChungCuaQuang.css'/>"> 
@@ -23,6 +23,7 @@
         <script src="<c:url value='/js/darkmodeQuang.js'/>" defer></script>
     </head>
     <body>
+        <jsp:include page="/WEB-INF/header.jsp" /> 
 
         <%-- Bọc toàn bộ trang trong .container --%>
         <div class="container">
@@ -50,7 +51,7 @@
                 <div class="alert alert-danger">Lỗi tạo thông báo: <c:out value="${param.createError}"/></div>
             </c:if>
             <c:if test="${not empty error}">
-                 <div class="alert alert-danger">Lỗi: ${error}</div>
+                <div class="alert alert-danger">Lỗi: ${error}</div>
             </c:if>
 
             <%-- Dùng thẻ H3 và class .form-card --%>
@@ -121,11 +122,11 @@
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </form>
-                     <c:if test="${not empty param.searchKeyword}">
+                    <c:if test="${not empty param.searchKeyword}">
                         <a href="MainController?action=listNotifications" class="btn btn-clear-search">
-                           <i class="fa-solid fa-times"></i> Xóa lọc
+                            <i class="fa-solid fa-times"></i> Xóa lọc
                         </a>
-                     </c:if>
+                    </c:if>
                 </div>
             </div>
 
@@ -169,11 +170,13 @@
         <%-- Bước 1: Khởi tạo dữ liệu động từ JSTL cho JS --%>
         <script>
             const roles = [<c:forEach var="role" items="${roles}" varStatus="loop">'${role}'<c:if test="${!loop.last}">, </c:if></c:forEach>];
-            const accounts = [<c:forEach var="acc" items="${accountList}" varStatus="loop">{ id: ${acc.id}, username: '${acc.tenDangNhap}' }<c:if test="${!loop.last}">, </c:if></c:forEach>];
-        </script>
+                    const accounts = [<c:forEach var="acc" items="${accountList}" varStatus="loop">{ id: ${acc.id}, username: '${acc.tenDangNhap}' }<c:if test="${!loop.last}">, </c:if></c:forEach>
+                    ];
+                </script>
 
         <%-- Bước 2: Tải file JS logic (defer để chạy sau khi DOM tải) --%>
         <script src="<c:url value='/js/ThongBao.js'/>" defer></script>
 
+        <jsp:include page="/WEB-INF/footer.jsp" /> 
     </body>
 </html>

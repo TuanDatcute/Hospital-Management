@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -57,13 +58,17 @@ public class BenhNhan implements Serializable {
     @JoinColumn(name = "tai_khoan_id", referencedColumnName = "id", nullable = true)
     private TaiKhoan taiKhoan;
 
+    @Lob
+    @Column(name = "avatarBase64", columnDefinition = "NVARCHAR(MAX)") // <-- Thêm cái này
+    private String avatarBase64;
+
     // Giữ quan hệ với Khoa
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "khoa_id", referencedColumnName = "id", nullable = true)
     private Khoa khoa;
 
     // === THÊM MỚI (CHO XÓA MỀM) TỪ FILE 2 ===
-    @Column(name = "trang_thai", nullable = false, length = 50)
+    @Column(name = "trang_thai", nullable = true, length = 50)
     private String trangThai = "HOAT_DONG"; // Đặt giá trị mặc định
     // === KẾT THÚC THÊM MỚI ===
 
@@ -177,4 +182,12 @@ public class BenhNhan implements Serializable {
         this.trangThai = trangThai;
     }
     // === KẾT THÚC THÊM MỚI ===
+
+    public String getAvatarBase64() {
+        return avatarBase64;
+    }
+
+    public void setAvatarBase64(String avatarBase64) {
+        this.avatarBase64 = avatarBase64;
+    }
 }

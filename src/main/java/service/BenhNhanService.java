@@ -56,7 +56,30 @@ public class BenhNhanService {
             }
         }
         // (Đã xóa logic gán TaiKhoanId - Theo yêu cầu)
+        // ================================================================
+        // === ✨ BẮT ĐẦU SỬA LỖI (LIÊN KẾT TÀI KHOẢN KHI TẠO) ✨ ===
+        // ================================================================
+
         TaiKhoan taiKhoanEntity = null;
+        Integer taiKhoanIdTuDTO = dto.getTaiKhoanId(); // Lấy ID từ DTO
+
+        // Nếu DTO (từ saveProfile của Bệnh Nhân) có cung cấp taiKhoanId,
+        // chúng ta PHẢI tải Entity của tài khoản đó lên.
+        if (taiKhoanIdTuDTO != null && taiKhoanIdTuDTO > 0) {
+
+            // Dùng DAO bạn đã tiêm ở trên
+            taiKhoanEntity = taiKhoanDAO.getById(taiKhoanIdTuDTO);
+
+            if (taiKhoanEntity == null) {
+                // Điều này không nên xảy ra nếu user đã login
+                throw new ValidationException("Tài khoản (ID: " + taiKhoanIdTuDTO + ") không tồn tại để liên kết.");
+            }
+        }
+        // Nếu DTO không có taiKhoanId (do Admin tạo), taiKhoanEntity sẽ vẫn là null (ĐÚNG)
+
+        // ================================================================
+        // === ✨ KẾT THÚC SỬA LỖI ✨ ===
+        // ================================================================
         Khoa khoaEntity = null;
         BenhNhan entity = new BenhNhan();
         entity = toEntity(dto, entity, taiKhoanEntity, khoaEntity);
@@ -353,6 +376,8 @@ public class BenhNhanService {
         dto.setCccd(entity.getCccd());
         dto.setNhomMau(entity.getNhomMau());
         dto.setTienSuBenh(entity.getTienSuBenh());
+        dto.setAvatarBase64(entity.getAvatarBase64());
+
         if (entity.getTaiKhoan() != null) {
             dto.setTaiKhoanId(entity.getTaiKhoan().getId());
         }
@@ -375,6 +400,8 @@ public class BenhNhanService {
         entity.setDiaChi(dto.getDiaChi());
         entity.setNhomMau(dto.getNhomMau());
         entity.setTienSuBenh(dto.getTienSuBenh());
+        entity.setAvatarBase64(dto.getAvatarBase64());
+
         if (dto.getMaBenhNhan() != null && !dto.getMaBenhNhan().isEmpty()) {
             entity.setMaBenhNhan(dto.getMaBenhNhan());
         }
