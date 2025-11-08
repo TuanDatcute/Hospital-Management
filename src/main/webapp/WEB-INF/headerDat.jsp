@@ -22,7 +22,7 @@
     <div class="header-main">
         <div class="header-left">
             <div class="logo">
-                <a href="${pageContext.request.contextPath}/index.jsp"><img src="${pageContext.request.contextPath}/images/your-logo.png" alt="Logo Bệnh viện"></a>
+                <a href="${pageContext.request.contextPath}/index.jsp"><img src="${pageContext.request.contextPath}/images/logo.png" alt="Logo Bệnh viện"></a>
             </div>
 
             <%-- LOGIC MENU CHÍNH (Giữ nguyên) --%>
@@ -55,7 +55,7 @@
                         <%-- 2. NẾU LÀ BỆNH NHÂN --%>
                         <c:when test="${sessionScope.ROLE == 'BENH_NHAN'}">
                             <c:set var="isHome" value="${fn:endsWith(servletPath, '/home.jsp')}" />
-                            <li><a href="${pageContext.request.contextPath}/home.jsp" 
+                            <li><a href="${pageContext.request.contextPath}/index.jsp#" 
                                    class="${isHome ? 'active' : ''}">Trang chủ</a></li>
                             <li><a href="${pageContext.request.contextPath}/MainController?action=showLichHenCreateForm" 
                                    class="${fn:contains(currentAction, 'LichHen') ? 'active' : ''}">Đặt lịch hẹn</a></li>
@@ -67,8 +67,9 @@
                                 </a>
                             </li>
                             <li><a href="${pageContext.request.contextPath}/MainController?action=viewMyNotifications"
-                                   class="${fn:contains(currentAction, 'ThongBao') ? 'active' : ''}">Thông Báo</a></li>                 
-                            </c:when>
+                                   class="${fn:contains(currentAction, 'ThongBao') ? 'active' : ''}">Thông Báo</a>
+                            </li>                 
+                        </c:when>
 
                         <%-- 3. NẾU LÀ BÁC SĨ / LỄ TÂN --%>
                         <c:when test="${sessionScope.ROLE == 'BAC_SI' || sessionScope.ROLE == 'LE_TAN'}">
@@ -134,7 +135,19 @@
 
                     <%-- Hiển thị Vai trò --%>
                     <span style="margin-left: 15px; color: #0056b3; font-weight: 600; font-size: 0.9em;">
-                        (${sessionScope.ROLE})
+                        <c:choose>
+                            <%-- 1. Nếu là Bệnh nhân --%>
+                            <c:when test="${sessionScope.ROLE == 'BENH_NHAN'}">
+                                Bệnh Nhân
+                            </c:when>
+
+                            <%-- 2. Nếu là các vai trò khác (ví dụ: QUAN_TRI, BAC_SI) --%>
+                            <%-- Tự động thay thế gạch dưới bằng khoảng trắng --%>
+                            <c:when test="${not empty sessionScope.ROLE}">
+                                ${fn:replace(sessionScope.ROLE, '_', ' ')}
+                            </c:when>
+                        </c:choose>
+
                     </span>
 
                     <%-- Nút Đăng xuất --%>
@@ -150,10 +163,5 @@
 
     </div>
 
-    <%-- Dòng chữ chạy (Vẫn giữ logic ở đây nhưng CSS sẽ ẩn nó) --%>
-    <div class="marquee-banner">
-        <marquee behavior="scroll" direction="left" scrollamount="5">
-            Hãy liên hệ với chúng tôi qua hotline 1900 0000 để được tư vấn và hỗ trợ một cách tốt nhất! 🏥 Chúc bạn ngày mới tốt lành!
-        </marquee>
-    </div>
+
 </div>
