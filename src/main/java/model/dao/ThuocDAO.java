@@ -95,7 +95,7 @@ public class ThuocDAO {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             // Sử dụng HQL với mệnh đề LIKE để tìm kiếm tương đối
             Query<Thuoc> query = session.createQuery(
-                    "FROM Thuoc t WHERE t.tenThuoc LIKE :ten", Thuoc.class
+                    "FROM Thuoc t WHERE t.tenThuoc LIKE :ten OR t.id LIKE :ten", Thuoc.class
             );
             // Thêm dấu '%' để tìm kiếm bất kỳ chuỗi nào chứa từ khóa
             query.setParameter("ten", "%" + tenThuoc + "%");

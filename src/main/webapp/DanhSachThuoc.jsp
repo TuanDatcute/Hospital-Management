@@ -8,24 +8,33 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Quản lý Danh Sách Thuốc</title>
-        <link rel="stylesheet" href="<c:url value='/css/danhSachThuoc-style.css'/>">
+
+        <link rel="stylesheet" href="<c:url value='/css/danhSachThuoc-style.css?v=1.2'/>">
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-        <script src="js/darkmode.js"></script>
+
         <script>
             (function () {
-                // Key này (theme-preference) phải khớp với key trong theme.js
-                var themeKey = 'theme-preference';
+                var themeKey = 'theme-preference'; // Key này phải khớp với theme.js
                 var theme = localStorage.getItem(themeKey);
-
                 if (theme === 'dark') {
-                    // ✨ SỬA 3: Không đổi màu nền, mà thêm class vào <html>
                     document.documentElement.classList.add('dark-mode');
                 }
             })();
-        </script>
+        </script>   
     </head>
     <body>
+
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="theme-toggle">
+                <input type="checkbox" id="theme-toggle" />
+                <div class="slider round">
+                    <span class="sun-icon"><i class="fas fa-sun"></i></span>
+                    <span class="moon-icon"><i class="fas fa-moon"></i></span>
+                </div>
+            </label>
+        </div>
 
         <div class="main-container">
             <h1>Quản lý Thuốc</h1>
@@ -50,17 +59,6 @@
                     </c:if>
                 </form>
                 <a href="<c:url value='/MainController?action=showMedicationForm'/>" class="btn btn-success"><i class="fas fa-plus"></i> Thêm Thuốc Mới</a>
-
-                <div class="theme-switch-wrapper">
-                    <label class="theme-switch" for="theme-toggle">
-                        <input type="checkbox" id="theme-toggle" />
-                        <div class="slider round">
-
-                            <span class="sun-icon"><i class="fas fa-sun"></i></span>
-                            <span class="moon-icon"><i class="fas fa-moon"></i></span>
-                        </div>
-                    </label>
-                </div>
             </div>
 
             <div class="table-responsive">
@@ -86,7 +84,19 @@
                                         <td>${thuoc.hoatChat}</td>
                                         <td>${thuoc.donViTinh}</td>
                                         <td class="text-right"><fmt:formatNumber value="${thuoc.donGia}" type="currency" currencySymbol="đ" maxFractionDigits="0"/></td>
-                                        <td class="text-right">${thuoc.soLuongTonKho}</td>
+                                        <td class="text-right">
+                                           
+                                            <button class="stock-button update-stock-btn
+                                                    <c:if test='${thuoc.soLuongTonKho == 0}'>stock-empty</c:if>
+                                                    <c:if test='${thuoc.soLuongTonKho > 0 && thuoc.soLuongTonKho <= 20}'>stock-low</c:if>" 
+                                                    data-id="${thuoc.id}" 
+                                                    data-name="${thuoc.tenThuoc}" 
+                                                    data-current-stock="${thuoc.soLuongTonKho}">
+
+                                                <i class="fas fa-box-open"></i> <span>${thuoc.soLuongTonKho}</span>
+
+                                            </button>
+                                        </td>
                                         <td class="actions text-center">
                                             <a href="<c:url value='/MainController?action=showUpdateForm&id=${thuoc.id}'/>" class="btn btn-edit">
                                                 <i class="fas fa-pencil-alt"></i> Sửa
@@ -122,5 +132,34 @@
             </div>
         </div>
 
+        <div id="stock-modal-overlay" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="stock-modal-title">Cập nhật tồn kho</h2>
+                    <button class="close-button" id="stock-close-button" aria-label="Đóng">&times;</button>
+                </div>
+                <form id="stock-modal-form" action="<c:url value='/MainController'/>" method="POST">
+                    <input type="hidden" name="action" value="updateStock">
+                    <input type="hidden" id="stock-thuocId-input" name="thuocId">
+                    <div class="modal-body">
+                        <p>Thuốc: <strong id="stock-thuocName"></strong></p>
+                        <p>Tồn kho hiện tại: <strong id="stock-current"></strong></p>
+                        <div class="form-group">
+                            <label for="soLuongThayDoi">Số lượng Thay đổi (*)</label>
+                            <input type="number" id="soLuongThayDoi" name="soLuongThayDoi" class="form-control" 
+                                   placeholder="Nhập số dương để thêm, số âm để bớt" required>
+                            <small>Ví dụ: Nhập `100` để thêm 100. Nhập `-25` để bớt 25.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="stock-cancel-button" class="btn btn-secondary">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script src="<c:url value='/js/darkmode.js'/>"></script>
+        <script src="<c:url value='/js/danhSachThuoc.js'/>"></script>
     </body>
 </html>
