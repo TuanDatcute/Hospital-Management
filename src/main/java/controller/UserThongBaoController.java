@@ -34,7 +34,7 @@ public class UserThongBaoController extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
-        TaiKhoanDTO user = (TaiKhoanDTO) session.getAttribute("USER");
+        TaiKhoanDTO user = (TaiKhoanDTO) session.getAttribute("user");
 
         if (user == null) {
             response.sendRedirect("login.jsp"); // Chuyển về trang đăng nhập
@@ -68,7 +68,7 @@ public class UserThongBaoController extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
-        TaiKhoanDTO user = (TaiKhoanDTO) session.getAttribute("USER");
+        TaiKhoanDTO user = (TaiKhoanDTO) session.getAttribute("user");
 
         if (user == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Bạn cần đăng nhập.");

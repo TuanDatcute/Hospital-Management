@@ -17,7 +17,7 @@
 }
 
 /* 🎨 Chế độ TỐI "BẠC ĐEN" */
-body.dark-mode {
+html.dark-mode {
     --primary-color: #77A5D9;
     --success-color: #3d8c5a;
     --danger-color: #e57373;

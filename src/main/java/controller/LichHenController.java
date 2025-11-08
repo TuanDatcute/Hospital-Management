@@ -15,10 +15,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.dto.BenhNhanDTO;
+import model.dto.KhoaDTO;
 import model.dto.LichHenDTO;
 import model.dto.NhanVienDTO;
 import service.BenhNhanService;
+import service.KhoaService;
 import service.LichHenService;
+import service.NhanVienService;
+import com.google.gson.Gson;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import model.dto.NhanVienDTO;
 import service.NhanVienService;
 
 /**
@@ -36,22 +45,26 @@ public class LichHenController extends HttpServlet {
     private final LichHenService lichHenService = new LichHenService();
     private final BenhNhanService benhNhanService = new BenhNhanService();
     private final NhanVienService nhanVienService = new NhanVienService();
+    private final KhoaService khoaService = new KhoaService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+
         request.setCharacterEncoding("UTF-8");
-
         String action = request.getParameter("action");
-        String url = LICHHEN_LIST_PAGE;
 
+        // Các yêu cầu này sẽ tự xử lý response và kết thúc (return)
+        String url = ERROR_PAGE; // Đặt URL lỗi làm mặc định
         try {
             if (action == null || action.isEmpty()) {
-                action = "listLichHen";
+                action = "listLichHen"; // Đặt action mặc định
             }
 
             switch (action) {
+                case "getDoctorsByKhoa":
+                    handleGetDoctorsByKhoa(request, response);
+                    return; // Đã xử lý, không forward
                 case "listLichHen":
                     url = listLichHen(request);
                     break;
@@ -60,23 +73,21 @@ public class LichHenController extends HttpServlet {
                     request.setAttribute("formAction", "createLichHen");
                     url = LICHHEN_FORM_PAGE;
                     break;
-                    
-                    //===Dat=====
                 case "showCreateAppointmentForm":
                     url = loadAppointmentFormDependencies(request);
                     break;
-                    //====end dat=====
-                    
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho GET.");
-                    url = ERROR_PAGE;
+
             }
+
+            request.getRequestDispatcher(url).forward(request, response);
+
         } catch (Exception e) {
             log("Lỗi tại LichHenController (doGet): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi: " + e.getMessage());
-            url = ERROR_PAGE;
-        } finally {
-            request.getRequestDispatcher(url).forward(request, response);
+            // Forward đến trang lỗi khi có exception
+            request.getRequestDispatcher(ERROR_PAGE).forward(request, response);
         }
     }
 
@@ -103,7 +114,7 @@ public class LichHenController extends HttpServlet {
                     url = updateLichHenStatus(request);
                     break;
                 case "createAppointment":
-                    url = createAppointment(request,response);
+                    url = createAppointment(request, response);
                     break;
                 default:
                     loadListAfterSuccess = false;
@@ -282,16 +293,57 @@ public class LichHenController extends HttpServlet {
     private String loadAppointmentFormDependencies(HttpServletRequest request) {
         try {
             List<BenhNhanDTO> danhSachBenhNhan = benhNhanService.getAllBenhNhan();
-            List<NhanVienDTO> danhSachBacSi = nhanVienService.findDoctorsBySpecialty(); 
+            // Lấy danh sách Khoa, KHÔNG lấy danh sách Bác sĩ
+            List<KhoaDTO> danhSachKhoa = khoaService.getAllKhoa();
 
             request.setAttribute("danhSachBenhNhan", danhSachBenhNhan);
-            request.setAttribute("danhSachBacSi", danhSachBacSi);
-
+            request.setAttribute("danhSachKhoa", danhSachKhoa); // Gửi danh sách Khoa
             return "lichHenDat.jsp";
         } catch (Exception e) {
             log("Không thể tải dữ liệu cho form tạo lịch hẹn: " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Không thể tải danh sách bệnh nhân và bác sĩ.");
             return "error.jsp";
+        }
+    }
+
+    protected void handleGetDoctorsByKhoa(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json;charset=UTF-8");
+
+        try {
+            String khoaIdParam = request.getParameter("khoaId");
+
+            if (khoaIdParam == null || khoaIdParam.trim().isEmpty()) {
+                response.getWriter().write("[]"); // Trả về mảng rỗng
+                return;
+            }
+
+            int khoaId = Integer.parseInt(khoaIdParam);
+
+            // Gọi service để lấy danh sách bác sĩ
+            List<NhanVienDTO> danhSachBacSi = nhanVienService.getDoctorsByKhoaId(khoaId);
+
+            // Tạo danh sách JSON
+            List<Map<String, Object>> bacSiJsonList = new ArrayList<>();
+            for (NhanVienDTO bacSi : danhSachBacSi) {
+                Map<String, Object> bacSiMap = new HashMap<>();
+                bacSiMap.put("id", bacSi.getId());
+                bacSiMap.put("hoTen", bacSi.getHoTen());
+                bacSiMap.put("chuyenMon", bacSi.getChuyenMon() != null ? bacSi.getChuyenMon() : "");
+                bacSiJsonList.add(bacSiMap);
+            }
+
+            // Chuyển thành JSON
+            String json = new Gson().toJson(bacSiJsonList);
+            response.getWriter().write(json);
+
+        } catch (NumberFormatException e) {
+            log("Lỗi định dạng khoaId: " + e.getMessage());
+            response.getWriter().write("[]"); // Trả về mảng rỗng khi lỗi
+        } catch (Exception e) {
+            log("Lỗi khi lấy danh sách bác sĩ: " + e.getMessage(), e);
+            response.getWriter().write("[]"); // Trả về mảng rỗng khi lỗi
         }
     }
 

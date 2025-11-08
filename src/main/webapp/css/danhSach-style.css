@@ -18,7 +18,7 @@
 /* ==========================================================================
    DARK MODE "BẠC ĐEN" (SILVER-BLACK) VARIABLES
    ========================================================================== */
-body.dark-mode {
+html.dark-mode {
     --danger-color: #e57373;
     --primary-color: #77A5D9;
     --success-color: #3d8c5a;

@@ -1,0 +1,210 @@
+/* ==========================================================================
+   CSS CHO SIDEBAR (ĐÃ SỬA LỖI VÀ CẬP NHẬT)
+   ========================================================================== */
+
+/* --- 1. Hiệu ứng chuyển động mượt mà --- */
+.sidebar-nav, .main-content {
+    transition: width 0.3s ease-in-out, margin-left 0.3s ease-in-out;
+}
+
+/* --- 2. Định nghĩa Sidebar (Mở rộng) --- */
+.sidebar-nav {
+    width: 260px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    background-color: var(--surface-color);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+.sidebar-header {
+    padding: 0 15px 0 20px; /* Căn lề cho logo và nút */
+    border-bottom: 1px solid var(--border-color);
+    height: 60px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.sidebar-logo i {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+.sidebar-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.sidebar-toggle-btn:hover {
+    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
+    color: var(--primary-color);
+}
+.sidebar-toggle-btn i {
+    transition: transform 0.3s ease-in-out; /* Hiệu ứng xoay icon */
+}
+
+/* --- Menu Links --- */
+.sidebar-menu {
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+.sidebar-menu .menu-divider {
+    padding: 15px 25px 5px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.sidebar-menu li {
+    margin: 0 10px;
+}
+.sidebar-menu .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.nav-link i {
+    width: 20px;
+    font-size: 1rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+.nav-link:hover {
+    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
+    color: var(--text-primary);
+}
+.nav-link.active {
+    background-color: color-mix(in srgb, var(--primary-color) 15%, transparent);
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+/* --- 3. Bố cục nội dung chính --- */
+.main-content {
+    flex-grow: 1;
+    margin-left: 260px; /* Bằng chiều rộng sidebar (mở rộng) */
+    padding: 20px;
+    background-color: var(--bg-color);
+    overflow: hidden;
+    /* ✨ THÊM: Đảm bảo body có 100% chiều cao */
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* Đây là class .main-container cũ của bạn, giờ nó nằm BÊN TRONG .main-content */
+.main-content .main-container {
+    margin: 0 auto;
+    max-width: 1300px;
+    padding: 30px 40px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    position: relative;
+}
+
+/* ==========================================================================
+   TRẠNG THÁI KHI BỊ THU GỌN (CLASS .sidebar-collapsed)
+   ========================================================================== */
+
+.sidebar-nav.sidebar-collapsed {
+    width: 80px; /* Chiều rộng khi thu gọn */
+}
+.main-content.sidebar-collapsed {
+    margin-left: 80px;
+}
+
+/* Ẩn chữ */
+.sidebar-nav.sidebar-collapsed .sidebar-logo span,
+.sidebar-nav.sidebar-collapsed .nav-text {
+    opacity: 0;
+    width: 0;
+    visibility: hidden;
+}
+
+/* Căn chỉnh lại */
+.sidebar-nav.sidebar-collapsed .sidebar-header {
+    justify-content: center;
+}
+.sidebar-nav.sidebar-collapsed .sidebar-logo {
+    display: none; /* Ẩn logo khi thu gọn */
+}
+.sidebar-nav.sidebar-collapsed .menu-divider {
+    padding: 10px 20px;
+    margin: 5px 0;
+    border-top: 1px solid var(--border-color);
+}
+.sidebar-nav.sidebar-collapsed .nav-link {
+    justify-content: center;
+    gap: 0;
+}
+
+/* Xoay icon của nút gạt */
+.sidebar-nav.sidebar-collapsed #sidebar-toggle-btn i {
+    transform: rotate(180deg);
+}
+
+/* ==========================================================================
+   BỐ CỤC CHUNG CỦA BODY
+   ========================================================================== */
+body {
+    display: flex; /* Đây là chìa khóa để sidebar và main-content nằm cạnh nhau */
+    padding: 0; /* Xóa padding mặc định của body */
+    margin: 0;
+}
+
+/* Responsive: Ẩn sidebar trên điện thoại */
+@media (max-width: 992px) {
+    .sidebar-nav {
+        width: 80px;
+    }
+    .main-content {
+        margin-left: 80px;
+    }
+    .sidebar-nav .sidebar-logo span,
+    .sidebar-nav .nav-text,
+    .sidebar-nav .menu-divider {
+        display: none;
+    }
+    .sidebar-header {
+        justify-content: center;
+    }
+    .sidebar-logo {
+        display: none;
+    }
+    .nav-link {
+        justify-content: center;
+    }
+}

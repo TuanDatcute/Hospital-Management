@@ -42,6 +42,7 @@ public class ThongBaoService {
      * CẬP NHẬT: Sửa lại định dạng hiển thị tên tài khoản cho khớp với dropdown
      */
     public List<GroupedThongBaoDTO> searchGroupedNotifications(String keyword) {
+        // ... (Code gộp nhóm và tra cứu tên của bạn giữ nguyên)
         List<GroupedThongBaoDTO> groupedList;
         if (keyword == null || keyword.trim().isEmpty()) {
             groupedList = thongBaoDAO.findAllGrouped();
