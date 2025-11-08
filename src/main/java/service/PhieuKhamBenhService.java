@@ -409,4 +409,15 @@ public class PhieuKhamBenhService {
         }
         return dto;
     }
+
+    //====================Dat=============
+    // Trong file: service/PhieuKhamBenhService.java
+    public List<PhieuKhamBenhDTO> getHistoryForPatient(int benhNhanId) {
+        List<PhieuKhamBenh> entities = phieuKhamDAO.findByPatientId(benhNhanId);
+
+        // Dùng hàm toDTOForListing (gọn nhẹ) để hiển thị danh sách
+        return entities.stream()
+                .map(this::toDTOForListing)
+                .collect(Collectors.toList());
+    }
 }

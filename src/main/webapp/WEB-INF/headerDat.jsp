@@ -59,7 +59,9 @@
                                    class="${isHome ? 'active' : ''}">Trang chủ</a></li>
                             <li><a href="${pageContext.request.contextPath}/MainController?action=showLichHenCreateForm" 
                                    class="${fn:contains(currentAction, 'LichHen') ? 'active' : ''}">Đặt lịch hẹn</a></li>
-                            <li><a href="#">Lịch sử khám bệnh</a></li>
+
+                            <li><a href="${pageContext.request.contextPath}/MainController?action=viewMyHistory">Lịch sử khám bệnh</a></li>
+
                             <li>
                                 <a href="${pageContext.request.contextPath}/MainController?action=showProfile" 
                                    class="${currentAction == 'showProfile' ? 'active' : ''}">

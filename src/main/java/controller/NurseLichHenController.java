@@ -125,7 +125,7 @@ public class NurseLichHenController extends HttpServlet {
             throws ServletException, IOException {
 
         LichHenDTO dto = new LichHenDTO();
-        String redirectUrl = "redirect:/MainController?action=admin/danhSachLichHen.jsp"; // URL nếu thành công
+        String redirectUrl = "redirect:/MainController?action=listLichHenNurse&keyword="; // URL nếu thành công
 
         try {
             // 1. Lấy dữ liệu từ form
@@ -143,11 +143,11 @@ public class NurseLichHenController extends HttpServlet {
             dto.setGhiChu(request.getParameter("ghiChu"));
 
             // 2. Gọi Service để thực hiện nghiệp vụ
-            lichHenService.createAppointmentByNurse(dto);
-
+            LichHenDTO result = lichHenService.createAppointmentByNurse(dto);
+            String encodedKeyword = java.net.URLEncoder.encode(result.getTenBenhNhan(), "UTF-8");
             // 3. Xử lý thành công
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Tạo lịch hẹn thành công!");
-            return redirectUrl;
+            return redirectUrl + encodedKeyword;
 
         } catch (ValidationException | DateTimeParseException e) {
             // 4. Xử lý lỗi nghiệp vụ hoặc lỗi định dạng
@@ -211,8 +211,7 @@ public class NurseLichHenController extends HttpServlet {
     }
 
     /**
-     *  Lấy danh sách Lịch hẹn (có tìm kiếm) và chuyển đến trang hiển
-     * thị.
+     * Lấy danh sách Lịch hẹn (có tìm kiếm) và chuyển đến trang hiển thị.
      */
     private String listLichHen(HttpServletRequest request) {
         String keyword = request.getParameter("keyword");

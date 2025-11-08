@@ -81,7 +81,7 @@ public class MainController extends HttpServlet {
             "saveProfile", // (Lưu hồ sơ)
             "confirmAndLink", // (Nút "Liên kết ngay")
             "showEditProfileWithExisting", // (Nút "Cần cập nhật")
-            "updateAndLink" // (Lưu sau khi "Cần cập nhật")
+            "updateAndLink","viewMyHistory" // (Lưu sau khi "Cần cập nhật")
     };
 
         // **MERGE:** Lấy các mảng mới từ nhánh 'main'
