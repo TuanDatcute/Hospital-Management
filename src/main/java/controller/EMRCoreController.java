@@ -212,7 +212,7 @@ public class EMRCoreController extends HttpServlet {
             }
 
             // 2. Lấy danh sách dịch vụ cho dropdown 
-            List<DichVuDTO> danhSachDichVu = dv.getAllServices();
+            List<DichVuDTO> danhSachDichVu = dv.getAllServicesActive();
             List<ChiTietDonThuocDTO> danhSachDonThuoc = donThuocService.getChiTietByPhieuKhamId(id);
 
             // 3. Gửi các đối tượng cần thiết cho JSP

@@ -47,6 +47,15 @@ public class ThuocDAO {
             return Collections.emptyList();
         }
     }
+    
+    public List<Thuoc> getAllActive() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Thuoc WHERE trangThai = 'SU_DUNG'", Thuoc.class).list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
 
     public void update(Thuoc thuoc) {
         Transaction transaction = null;

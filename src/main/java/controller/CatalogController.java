@@ -444,13 +444,13 @@ public class CatalogController extends HttpServlet {
      * @return URL để redirect về lại trang danh sách.
      */
     private String updateServiceStatus(HttpServletRequest request, String newStatus) {
-        String redirectUrl = "/MainController?action=listServices"; // URL trang danh sách
+        String redirectUrl = "/MainController?action=listAndSearchServices"; // URL trang danh sách
         try {
             int id = Integer.parseInt(request.getParameter("id"));
 
             dichVuService.updateServiceStatus(id, newStatus);
 
-            String message = "NGUNG_SU_DUNG".equals(newStatus) ? "Ngừng sử dụng" : "Kích hoạt lại";
+            String message = "NGUNG_SU_DUNG".equals(newStatus) ? "ngừng sử dụng" : "kích hoạt lại";
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã " + message + " dịch vụ thành công!");
 
         } catch (ValidationException e) {
@@ -476,7 +476,7 @@ public class CatalogController extends HttpServlet {
             int id = Integer.parseInt(request.getParameter("id"));
             thuocService.updateThuocStatus(id, newStatus);
 
-            String message = "NGUNG_SU_DUNG".equals(newStatus) ? "Ngừng sử dụng" : "Kích hoạt lại";
+            String message = "NGUNG_SU_DUNG".equals(newStatus) ? "ngừng sử dụng" : "kích hoạt lại";
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã " + message + " thuốc thành công!");
 
         } catch (ValidationException e) {

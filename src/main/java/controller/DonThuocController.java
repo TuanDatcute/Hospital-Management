@@ -114,7 +114,7 @@ public class DonThuocController extends HttpServlet {
     }
 
     private String showCreateForm(HttpServletRequest request) {
-        List<ThuocDTO> danhSachThuoc = thuocService.getAllMedications();
+        List<ThuocDTO> danhSachThuoc = thuocService.getAllMedicationsActive();
         request.setAttribute("danhSachThuoc", danhSachThuoc);
         return DON_THUOC_FORM_PAGE;
     }
