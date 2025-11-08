@@ -110,7 +110,7 @@
 
             <div class="footer-controls">
                 <a href="<c:url value='MainController?action=viewEncounterDetails&id=${donThuoc.phieuKhamId}'/>" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Quay lại Phiếu khám
+                    <i class="fas fa-arrow-left"></i> Phiếu khám liên quan
                 </a>
                 <a href="<c:url value='MainController?action=listAll'/>" class="btn btn-secondary">
                     <i class="fas fa-list"></i> DS Đơn thuốc

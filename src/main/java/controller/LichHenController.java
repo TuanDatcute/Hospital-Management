@@ -62,9 +62,7 @@ public class LichHenController extends HttpServlet {
             }
 
             switch (action) {
-                case "getDoctorsByKhoa":
-                    handleGetDoctorsByKhoa(request, response);
-                    return; // Đã xử lý, không forward
+               
                 case "listLichHen":
                     url = listLichHen(request);
                     break;
@@ -73,9 +71,7 @@ public class LichHenController extends HttpServlet {
                     request.setAttribute("formAction", "createLichHen");
                     url = LICHHEN_FORM_PAGE;
                     break;
-                case "showCreateAppointmentForm":
-                    url = loadAppointmentFormDependencies(request);
-                    break;
+                
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho GET.");
 
@@ -112,10 +108,7 @@ public class LichHenController extends HttpServlet {
                     break;
                 case "updateLichHenStatus":
                     url = updateLichHenStatus(request);
-                    break;
-                case "createAppointment":
-                    url = createAppointment(request, response);
-                    break;
+                    break;            
                 default:
                     loadListAfterSuccess = false;
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho POST.");
@@ -249,104 +242,6 @@ public class LichHenController extends HttpServlet {
 
         return dto;
     }
-
-    //====================================================Dat=================================================
-    private String createAppointment(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        LichHenDTO dto = new LichHenDTO();
-        String redirectUrl = "redirect:/MainController?action=admin/danhSachLichHen.jsp"; // URL nếu thành công
-
-        try {
-            // 1. Lấy dữ liệu từ form
-            dto.setBenhNhanId(Integer.parseInt(request.getParameter("benhNhanId")));
-            dto.setBacSiId(Integer.parseInt(request.getParameter("bacSiId")));
-
-            // Chuyển đổi chuỗi "yyyy-MM-ddTHH:mm" từ input datetime-local
-            String thoiGianHenStr = request.getParameter("thoiGianHen");
-            LocalDateTime ldt = LocalDateTime.parse(thoiGianHenStr);
-            // Chuyển sang OffsetDateTime (giả sử múi giờ +7)
-            OffsetDateTime odt = ldt.atOffset(ZoneOffset.of("+07:00"));
-            dto.setThoiGianHen(odt);
-
-            dto.setLyDoKham(request.getParameter("lyDoKham"));
-            dto.setGhiChu(request.getParameter("ghiChu"));
-
-            // 2. Gọi Service để thực hiện nghiệp vụ
-            lichHenService.createAppointmentByNurse(dto);
-
-            // 3. Xử lý thành công
-            request.getSession().setAttribute("SUCCESS_MESSAGE", "Tạo lịch hẹn thành công!");
-            return redirectUrl;
-
-        } catch (ValidationException | DateTimeParseException e) {
-            // 4. Xử lý lỗi nghiệp vụ hoặc lỗi định dạng
-            request.setAttribute("ERROR_MESSAGE", e.getMessage());
-            // Tải lại các dropdown nếu cần
-            loadAppointmentFormDependencies(request);
-            return "lichHenDat.jsp";
-        } catch (Exception e) {
-            return "lichHenDat.jsp";
-        }
-    }
-
-    private String loadAppointmentFormDependencies(HttpServletRequest request) {
-        try {
-            List<BenhNhanDTO> danhSachBenhNhan = benhNhanService.getAllBenhNhan();
-            // Lấy danh sách Khoa, KHÔNG lấy danh sách Bác sĩ
-            List<KhoaDTO> danhSachKhoa = khoaService.getAllKhoa();
-
-            request.setAttribute("danhSachBenhNhan", danhSachBenhNhan);
-            request.setAttribute("danhSachKhoa", danhSachKhoa); // Gửi danh sách Khoa
-            return "lichHenDat.jsp";
-        } catch (Exception e) {
-            log("Không thể tải dữ liệu cho form tạo lịch hẹn: " + e.getMessage(), e);
-            request.setAttribute("ERROR_MESSAGE", "Không thể tải danh sách bệnh nhân và bác sĩ.");
-            return "error.jsp";
-        }
-    }
-
-    protected void handleGetDoctorsByKhoa(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        response.setContentType("application/json;charset=UTF-8");
-
-        try {
-            String khoaIdParam = request.getParameter("khoaId");
-
-            if (khoaIdParam == null || khoaIdParam.trim().isEmpty()) {
-                response.getWriter().write("[]"); // Trả về mảng rỗng
-                return;
-            }
-
-            int khoaId = Integer.parseInt(khoaIdParam);
-
-            // Gọi service để lấy danh sách bác sĩ
-            List<NhanVienDTO> danhSachBacSi = nhanVienService.getDoctorsByKhoaId(khoaId);
-
-            // Tạo danh sách JSON
-            List<Map<String, Object>> bacSiJsonList = new ArrayList<>();
-            for (NhanVienDTO bacSi : danhSachBacSi) {
-                Map<String, Object> bacSiMap = new HashMap<>();
-                bacSiMap.put("id", bacSi.getId());
-                bacSiMap.put("hoTen", bacSi.getHoTen());
-                bacSiMap.put("chuyenMon", bacSi.getChuyenMon() != null ? bacSi.getChuyenMon() : "");
-                bacSiJsonList.add(bacSiMap);
-            }
-
-            // Chuyển thành JSON
-            String json = new Gson().toJson(bacSiJsonList);
-            response.getWriter().write(json);
-
-        } catch (NumberFormatException e) {
-            log("Lỗi định dạng khoaId: " + e.getMessage());
-            response.getWriter().write("[]"); // Trả về mảng rỗng khi lỗi
-        } catch (Exception e) {
-            log("Lỗi khi lấy danh sách bác sĩ: " + e.getMessage(), e);
-            response.getWriter().write("[]"); // Trả về mảng rỗng khi lỗi
-        }
-    }
-
     @Override
     public String getServletInfo() {
         return "Controller quản lý các nghiệp vụ liên quan đến Lịch Hẹn.";

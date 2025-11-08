@@ -35,6 +35,7 @@ public class MainController extends HttpServlet {
     private static final String THONG_BAO_CONTROLLER = "ThongBaoController";
     private static final String USER_THONG_BAO_CONTROLLER = "UserThongBaoController";
     private static final String PATIENT_LICH_HEN_CONTROLLER = "PatientLichHenController";
+    private static final String NURSE_LICH_HEN_CONTROLLER = "NurseLichHenController";
 
     // --- (Các Controller từ nhánh Auth của bạn) ---
     private static final String VERIFY_CONTROLLER = "VerifyController";
@@ -53,9 +54,10 @@ public class MainController extends HttpServlet {
         // 2. Nhóm các action cho từng controller
         String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deleteService"};
+        String[] NurseLichHenActions = {"showCreateAppointmentForm", "createAppointment", "getDoctorsByKhoa"};
 
         // **MERGE:** Lấy 'lichHenActions' từ nhánh 'main' (vì nó đầy đủ hơn)
-        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus", "showCreateAppointmentForm", "createAppointment","getDoctorsByKhoa"};
+        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus"};
 
         // **MERGE:** Lấy 'userActions' từ nhánh của bạn (vì nó có logic Auth mới)
         String[] userActions = {"login", "logout", "listUsers",
@@ -142,6 +144,8 @@ public class MainController extends HttpServlet {
             url = USER_THONG_BAO_CONTROLLER;
         } else if (Arrays.asList(patientLichHenActions).contains(action)) {
             url = PATIENT_LICH_HEN_CONTROLLER;
+        } else if (Arrays.asList(NurseLichHenActions).contains(action)) {
+            url = NURSE_LICH_HEN_CONTROLLER;
         }
 
         // 4. Forward đến controller tương ứng
