@@ -198,8 +198,30 @@ public class NhanVienService {
         // Lọc thêm trạng thái HOAT_DONG
         return entities.stream()
                 .filter(nv -> nv.getTaiKhoan() != null && TRANG_THAI_HOAT_DONG.equals(nv.getTaiKhoan().getTrangThai()))
-                .map(this::toDTO)
+                .map(this::toDTODat)
                 .collect(Collectors.toList());
+    }
+    
+    private NhanVienDTO toDTODat(NhanVien entity) {
+        if (entity == null) {
+            return null;
+        }
+        NhanVienDTO dto = new NhanVienDTO();
+
+        dto.setId(entity.getId());
+        dto.setHoTen(entity.getHoTen());
+        dto.setNgaySinh(entity.getNgaySinh());
+        dto.setGioiTinh(entity.getGioiTinh());
+        dto.setDiaChi(entity.getDiaChi());
+        dto.setSoDienThoai(entity.getSoDienThoai());
+        dto.setChuyenMon(entity.getChuyenMon());
+        dto.setBangCap(entity.getBangCap());
+
+        if (entity.getTaiKhoan() != null) {
+            dto.setTaiKhoanId(entity.getTaiKhoan().getId());
+            dto.setVaiTro(entity.getTaiKhoan().getVaiTro());
+        }
+        return dto;
     }
 
     /**
@@ -242,8 +264,7 @@ public class NhanVienService {
         }
 
         if (entity.getKhoa() != null) {
-            dto.setKhoaId(entity.getKhoa().getId());
-            // Đã xóa: dto.setTenKhoa(...)
+            dto.setKhoaId(entity.getKhoa().getId());           
         }
 
         return dto;
