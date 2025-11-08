@@ -90,7 +90,7 @@ public class MainController extends HttpServlet {
         String[] hoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice", "printInvoice"};
         String[] thongBaoActions = {"createThongBao", "listNotifications"};
         String[] userThongBaoActions = {"viewMyNotifications", "markNotificationAsRead", "deleteMyNotification"};
-        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "myAppointments", "bookAppointment"};
+        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "myAppointments", "bookAppointment", "getBacSiByKhoa", "cancelAppointment"};
 
         // **MERGE:** Lấy các mảng mới từ nhánh của bạn
         String[] verifyActions = {"verify"}; // Chỉ xử lý 'verify'
