@@ -16,6 +16,8 @@ import java.util.ArrayList; // THÊM MỚI
 import java.util.Arrays; // Import Arrays để dùng List
 import java.util.List;
 import java.util.stream.Collectors;
+import model.Entity.TaiKhoan;
+import util.EmailUtils;
 
 /**
  * Lớp Service chứa logic nghiệp vụ cho LichHen.
@@ -366,10 +368,80 @@ public class LichHenService {
         // --- BƯỚC 5: GỌI DAO ĐỂ LƯU ---
         LichHen savedEntity = lichHenDAO.create(entity);
 
-        // --- BƯỚC 6: TRẢ VỀ DTO ---
-        // Tải lại bản đầy đủ (vì Trigger CSDL có thể đã cập nhật STT)
+        // --- BƯỚC 6: TẢI LẠI VÀ CHUYỂN SANG DTO ---
         LichHen fullSavedEntity = lichHenDAO.getByIdWithRelations(savedEntity.getId());
-        return toDTO(fullSavedEntity);
+        LichHenDTO finalDTO = toDTO(fullSavedEntity); // DTO đã "làm phẳng" (có tên BS, BN)
+
+        // === THÊM MỚI: GỬI EMAIL THÔNG BÁO ===
+        try {
+            // Lấy email của bệnh nhân (từ TaiKhoan liên kết)
+            TaiKhoan taiKhoanBenhNhan = benhNhanEntity.getTaiKhoan();
+            if (taiKhoanBenhNhan != null && taiKhoanBenhNhan.getEmail() != null) {
+                System.out.println("Đang gửi email xác nhận đặt lịch tới: " + taiKhoanBenhNhan.getEmail());
+                // Gọi hàm EmailUtils (sẽ tạo ở Bước 2)
+                EmailUtils.sendAppointmentConfirmationEmail(
+                        taiKhoanBenhNhan.getEmail(),
+                        finalDTO // Gửi DTO đã "làm phẳng"
+                );
+            } else {
+                System.err.println("Không thể gửi email: Bệnh nhân " + benhNhanEntity.getHoTen() + " không có email hoặc tài khoản.");
+            }
+        } catch (Exception e) {
+            // QUAN TRỌNG: Không ném lỗi (throw e) ở đây
+            // Việc gửi mail thất bại KHÔNG nên làm hỏng toàn bộ chức năng đặt lịch.
+            e.printStackTrace();
+            System.err.println("LỖI GỬI EMAIL: Đặt lịch vẫn thành công, nhưng gửi email thất bại. " + e.getMessage());
+        }
+        // ===================================
+
+        // --- BƯỚC 7: TRẢ VỀ DTO ---
+        return finalDTO;
+    }
+
+    /**
+     * HÀM MỚI: Bệnh nhân tự hủy lịch hẹn (an toàn)
+     */
+    public void cancelAppointmentByPatient(int lichHenId, int taiKhoanIdCuaBenhNhan) throws Exception {
+        // 1. Tìm bệnh nhân từ tài khoản
+        BenhNhan benhNhan = benhNhanDAO.findByTaiKhoanId(taiKhoanIdCuaBenhNhan);
+        if (benhNhan == null) {
+            throw new ValidationException("Không tìm thấy hồ sơ bệnh nhân của bạn.");
+        }
+
+        // 2. Lấy lịch hẹn (an toàn)
+        // SỬA: Phải lấy "WithRelations" để có thông tin Bác sĩ
+        LichHen lichHen = lichHenDAO.getByIdAndBenhNhanIdWithRelations(lichHenId, benhNhan.getId()); // <-- Cần hàm DAO mới này
+        if (lichHen == null) {
+            throw new ValidationException("Không tìm thấy lịch hẹn hoặc bạn không có quyền hủy lịch này.");
+        }
+
+        // 3. Kiểm tra logic trạng thái
+        String currentTrangThai = lichHen.getTrangThai();
+        if (!"CHO_XAC_NHAN".equals(currentTrangThai) && !"DA_XAC_NHAN".equals(currentTrangThai)) {
+            throw new ValidationException("Chỉ có thể hủy lịch hẹn đang 'Chờ xác nhận' hoặc 'Đã xác nhận'.");
+        }
+
+        // 4. Cập nhật
+        lichHen.setTrangThai("DA_HUY"); // Cập nhật trạng thái
+        lichHenDAO.update(lichHen); // Gọi DAO để lưu
+
+        // === THÊM MỚI: GỬI EMAIL THÔNG BÁO HỦY ===
+        try {
+            TaiKhoan taiKhoanBenhNhan = benhNhan.getTaiKhoan();
+            if (taiKhoanBenhNhan != null && taiKhoanBenhNhan.getEmail() != null) {
+                System.out.println("Đang gửi email HỦY lịch tới: " + taiKhoanBenhNhan.getEmail());
+                // Gọi hàm EmailUtils (sẽ tạo ở Bước 2)
+                EmailUtils.sendAppointmentCancellationEmail(
+                        taiKhoanBenhNhan.getEmail(),
+                        toDTO(lichHen) // Chuyển entity đã cập nhật sang DTO
+                );
+            } else {
+                System.err.println("Không thể gửi email hủy: Bệnh nhân " + benhNhan.getHoTen() + " không có email hoặc tài khoản.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("LỖI GỬI EMAIL: Hủy lịch vẫn thành công, nhưng gửi email thất bại. " + e.getMessage());
+        }
     }
 
 } // Kết thúc class
