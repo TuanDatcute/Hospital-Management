@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 /**
  * Lớp Service chứa logic nghiệp vụ cho NhanVien. (ĐÃ GỘP LẠI)
  *
- * - Giữ lại Phân trang, Tìm kiếm, và 'tenKhoa' trong toDTO từ phiên bản 2.
- * - Giữ lại khối code 'Dat' từ phiên bản 1.
- * - Thêm lại hàm getAllNhanVien() (không phân trang) từ phiên bản 1.
+ * - Giữ lại Phân trang, Tìm kiếm, và 'tenKhoa' trong toDTO từ phiên bản 2. -
+ * Giữ lại khối code 'Dat' từ phiên bản 1. - Thêm lại hàm getAllNhanVien()
+ * (không phân trang) từ phiên bản 1.
  */
 public class NhanVienService {
 
@@ -39,8 +39,8 @@ public class NhanVienService {
     // --- KẾT THÚC THÊM MỚI ---
 
     /**
-     * Dịch vụ tạo một Nhân Viên mới.
-     * (Sử dụng logic từ phiên bản 2 - Lấy lại entity đầy đủ)
+     * Dịch vụ tạo một Nhân Viên mới. (Sử dụng logic từ phiên bản 2 - Lấy lại
+     * entity đầy đủ)
      */
     public NhanVienDTO createNhanVien(NhanVienDTO dto) throws ValidationException, Exception {
         // --- BƯỚC 1: VALIDATION ---
@@ -84,8 +84,7 @@ public class NhanVienService {
     }
 
     /**
-     * Dịch vụ cập nhật thông tin Nhân Viên.
-     * (Sử dụng logic từ phiên bản 2)
+     * Dịch vụ cập nhật thông tin Nhân Viên. (Sử dụng logic từ phiên bản 2)
      */
     public NhanVienDTO updateNhanVien(int nhanVienId, NhanVienDTO dto) throws ValidationException, Exception {
         NhanVien existingEntity = nhanVienDAO.getByIdWithRelations(nhanVienId);
@@ -136,8 +135,8 @@ public class NhanVienService {
     }
 
     /**
-     * Dịch vụ thực hiện Soft Delete cho Nhân Viên.
-     * (Giữ logic từ phiên bản 2 - giống hệt phiên bản 1)
+     * Dịch vụ thực hiện Soft Delete cho Nhân Viên. (Giữ logic từ phiên bản 2 -
+     * giống hệt phiên bản 1)
      */
     public void softDeleteNhanVien(int nhanVienId) throws ValidationException, Exception {
         NhanVien nhanVien = nhanVienDAO.getByIdWithRelations(nhanVienId);
@@ -162,8 +161,8 @@ public class NhanVienService {
     }
 
     /**
-     * Lấy nhân viên bằng ID (chỉ trả về nếu tài khoản đang hoạt động).
-     * (Giữ logic từ phiên bản 2 - giống hệt phiên bản 1)
+     * Lấy nhân viên bằng ID (chỉ trả về nếu tài khoản đang hoạt động). (Giữ
+     * logic từ phiên bản 2 - giống hệt phiên bản 1)
      */
     public NhanVienDTO getNhanVienById(int id) throws ValidationException {
         NhanVien entity = nhanVienDAO.getByIdWithRelations(id);
@@ -175,8 +174,7 @@ public class NhanVienService {
     }
 
     /**
-     * Lấy tất cả nhân viên đang hoạt động.
-     * (ĐƯỢC THÊM LẠI TỪ PHIÊN BẢN 1)
+     * Lấy tất cả nhân viên đang hoạt động. (ĐƯỢC THÊM LẠI TỪ PHIÊN BẢN 1)
      */
     public List<NhanVienDTO> getAllNhanVien() {
         List<NhanVien> entities = nhanVienDAO.getAllWithRelations();
@@ -213,8 +211,8 @@ public class NhanVienService {
     // === KẾT THÚC HÀM TỪ PHIÊN BẢN 2 ===
 
     /**
-     * Dịch vụ tìm tất cả bác sĩ đang hoạt động.
-     * (Giữ logic từ phiên bản 2 - giống hệt phiên bản 1)
+     * Dịch vụ tìm tất cả bác sĩ đang hoạt động. (Giữ logic từ phiên bản 2 -
+     * giống hệt phiên bản 1)
      */
     public List<NhanVienDTO> findDoctorsBySpecialty() {
         List<NhanVien> entities = nhanVienDAO.findDoctorsBySpecialty();
@@ -224,14 +222,36 @@ public class NhanVienService {
         // Lọc thêm trạng thái HOAT_DONG
         return entities.stream()
                 .filter(nv -> nv.getTaiKhoan() != null && TRANG_THAI_HOAT_DONG.equals(nv.getTaiKhoan().getTrangThai()))
-                .map(this::toDTO)
+                .map(this::toDTODat)
                 .collect(Collectors.toList());
+    }
+
+    private NhanVienDTO toDTODat(NhanVien entity) {
+        if (entity == null) {
+            return null;
+        }
+        NhanVienDTO dto = new NhanVienDTO();
+
+        dto.setId(entity.getId());
+        dto.setHoTen(entity.getHoTen());
+        dto.setNgaySinh(entity.getNgaySinh());
+        dto.setGioiTinh(entity.getGioiTinh());
+        dto.setDiaChi(entity.getDiaChi());
+        dto.setSoDienThoai(entity.getSoDienThoai());
+        dto.setChuyenMon(entity.getChuyenMon());
+        dto.setBangCap(entity.getBangCap());
+
+        if (entity.getTaiKhoan() != null) {
+            dto.setTaiKhoanId(entity.getTaiKhoan().getId());
+            dto.setVaiTro(entity.getTaiKhoan().getVaiTro());
+        }
+        return dto;
     }
 
     /**
      * HÀM MỚI: Lấy danh sách Bác Sĩ (DTO) theo Khoa ID (Chỉ lấy bác sĩ đang
-     * HOAT_DONG)
-     * (Giữ logic từ phiên bản 2 - giống hệt phiên bản 1, bao gồm cả System.out)
+     * HOAT_DONG) (Giữ logic từ phiên bản 2 - giống hệt phiên bản 1, bao gồm cả
+     * System.out)
      */
     public List<NhanVienDTO> getBacSiByKhoa(int khoaId) {
         System.out.println("Service: Bắt đầu gọi DAO với khoaId: " + khoaId);
@@ -245,8 +265,8 @@ public class NhanVienService {
     }
 
     /**
-     * Chuyển NhanVien (Entity) sang NhanVienDTO
-     * (SỬA: Giữ lại logic 'tenKhoa' từ phiên bản 2)
+     * Chuyển NhanVien (Entity) sang NhanVienDTO (SỬA: Giữ lại logic 'tenKhoa'
+     * từ phiên bản 2)
      */
     private NhanVienDTO toDTO(NhanVien entity) {
         if (entity == null) {
@@ -272,13 +292,12 @@ public class NhanVienService {
             // Giữ lại logic "làm phẳng" DTO từ phiên bản 2
             dto.setTenKhoa(entity.getKhoa().getTenKhoa());
         }
-
         return dto;
     }
 
     /**
-     * Chuyển NhanVienDTO sang NhanVien (Entity)
-     * (Giữ logic từ phiên bản 2 - giống hệt phiên bản 1)
+     * Chuyển NhanVienDTO sang NhanVien (Entity) (Giữ logic từ phiên bản 2 -
+     * giống hệt phiên bản 1)
      */
     private NhanVien toEntity(NhanVienDTO dto, TaiKhoan taiKhoan, Khoa khoa) {
         NhanVien entity = new NhanVien();
@@ -295,8 +314,8 @@ public class NhanVienService {
     }
 
     /**
-     * HÀM VALIDATE TẬP TRUNG (DRY)
-     * (Giữ logic từ phiên bản 2 - giống hệt phiên bản 1)
+     * HÀM VALIDATE TẬP TRUNG (DRY) (Giữ logic từ phiên bản 2 - giống hệt phiên
+     * bản 1)
      */
     private void validateNhanVienData(NhanVienDTO dto, NhanVien existingEntity) throws ValidationException {
         if (dto.getHoTen() == null || dto.getHoTen().trim().isEmpty()) {
@@ -359,5 +378,5 @@ public class NhanVienService {
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
-    
+
 }

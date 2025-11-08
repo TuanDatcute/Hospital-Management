@@ -183,7 +183,6 @@ public class LichHenService {
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
-    
 
     /**
      * HÀM MỚI (TỪ FILE 2): Lấy tất cả lịch hẹn (có phân trang).
@@ -222,14 +221,13 @@ public class LichHenService {
     /**
      * GỘP (TỪ FILE 1): Lấy tất cả lịch hẹn của một bệnh nhân (có tìm kiếm)
      */
-    public List<LichHenDTO> getLichHenByBenhNhan(int benhNhanId) throws Exception {
+    public List<LichHenDTO> getLichHenByBenhNhan(int benhNhanId, String keyword) throws Exception {
         if (benhNhanDAO.getById(benhNhanId) == null) {
             throw new Exception("Không tìm thấy Bệnh nhân với ID: " + benhNhanId);
         }
         // Gọi hàm DAO đã cập nhật (có keyword) - từ File 1
         List<LichHen> entities = lichHenDAO.findByBenhNhanId(benhNhanId, keyword);
 
-        // Sửa lại: Dùng vòng lặp for an toàn
         List<LichHenDTO> dtos = new ArrayList<>();
         for (LichHen entity : entities) {
             dtos.add(toDTO(entity));
@@ -370,6 +368,48 @@ public class LichHenService {
     }
     // (KẾT THÚC KHỐI CODE CỦA DAT)
 
+    /**
+     * Lấy tất cả các lịch hẹn (dưới dạng DTO).
+     */
+    public List<LichHenDTO> getAllAppointments() {
+        List<LichHen> entities = lichHenDAO.getAll();
+        return entities.stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Tìm kiếm lịch hẹn theo từ khóa (dưới dạng DTO).
+     */
+    public List<LichHenDTO> searchAppointments(String keyword) {
+        List<LichHen> entities = lichHenDAO.search(keyword);
+        return entities.stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * NGHIỆP VỤ: Cập nhật trạng thái của một lịch hẹn.
+     *
+     * @param lichHenId ID của lịch hẹn cần cập nhật.
+     * @param newStatus Trạng thái mới.
+     * @return DTO của lịch hẹn sau khi đã cập nhật.
+     * @throws ValidationException nếu không tìm thấy lịch hẹn.
+     */
+    public LichHenDTO updateAppointmentStatus(int lichHenId, String newStatus) throws ValidationException {
+        // 1. Lấy Entity gốc
+        LichHen existingLichHen = lichHenDAO.getByIdWithRelations(lichHenId);
+        if (existingLichHen == null) {
+            throw new ValidationException("Không tìm thấy lịch hẹn với ID: " + lichHenId);
+        }
+
+        // (Bạn có thể thêm logic kiểm tra ở đây, ví dụ: không cho phép đổi từ DA_HUY sang DA_XAC_NHAN)
+        // 2. Cập nhật trạng thái
+        existingLichHen.setTrangThai(newStatus);
+
+        // 3. Lưu lại
+        lichHenDAO.update(existingLichHen);
+
+        // 4. Trả về DTO mới
+        return toDTO(existingLichHen);
+    }
+
     //===================================================Quang=======================================
     // (KHỐI CODE NÀY ĐƯỢC SAO CHÉP NGUYÊN BẢN TỪ FILE 1 THEO YÊU CẦU)
     // ===================================================
@@ -509,6 +549,23 @@ public class LichHenService {
             e.printStackTrace();
             System.err.println("LỖI GỬI EMAIL: Hủy lịch vẫn thành công, nhưng gửi email thất bại. " + e.getMessage());
         }
+    }
+
+    /**
+     * Lấy tất cả lịch hẹn của một bệnh nhân (tải đủ quan hệ).
+     */
+    public List<LichHenDTO> getLichHenByBenhNhan(int benhNhanId) throws Exception {
+        if (benhNhanDAO.getById(benhNhanId) == null) {
+            throw new Exception("Không tìm thấy Bệnh nhân với ID: " + benhNhanId);
+        }
+        List<LichHen> entities = lichHenDAO.findByBenhNhanId(benhNhanId);
+
+        // Sửa lại: Dùng vòng lặp for an toàn
+        List<LichHenDTO> dtos = new ArrayList<>();
+        for (LichHen entity : entities) {
+            dtos.add(toDTO(entity));
+        }
+        return dtos;
     }
     // (KẾT THÚC KHỐI CODE CỦA QUANG)
 } // Kết thúc class

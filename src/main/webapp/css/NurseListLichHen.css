@@ -1,0 +1,435 @@
+/* ==========================================================================
+   BIẾN TOÀN CỤC & KIỂU DÁNG CHUNG (ĐỒNG BỘ)
+   ========================================================================== */
+
+/* 🎨 Chế độ SÁNG */
+:root {
+    --primary-color: #4a90e2;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --edit-color: #8B5CF6;
+
+    --bg-color: #f4f7f9;
+    --surface-color: #ffffff;
+    --border-color: #e9ecef;
+    --text-primary: #343a40;
+    --text-secondary: #6c757d;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+}
+
+/* 🎨 Chế độ TỐI "BẠC ĐEN" */
+html.dark-mode {
+    --primary-color: #77A5D9;
+    --success-color: #3d8c5a;
+    --danger-color: #e57373;
+    --warning-color: #c7811a;
+    --edit-color: #a78bfa;
+
+    --bg-color: #121212;
+    --surface-color: #1E1E1E;
+    --border-color: #333333;
+    --text-primary: #E0E0E0;
+    --text-secondary: #888888;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* ==========================================================================
+   LAYOUT CHÍNH & HEADER (ĐỒNG BỘ VỚI SIDEBAR)
+   ========================================================================== */
+/* .main-content đã được định nghĩa trong _sidebar.css */
+/* Định dạng .main-container bên trong .main-content */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    position: relative;
+}
+
+h1 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+
+.header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.search-form {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    min-width: 300px;
+}
+
+.search-form .form-control {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 15px 10px 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.2s ease-in-out;
+}
+.search-form .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+.search-form .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   BẢNG DỮ LIỆU
+   ========================================================================== */
+.table-responsive {
+    overflow-x: auto;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.data-table th, .data-table td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+    vertical-align: middle;
+}
+.data-table thead th {
+    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+.data-table tbody tr:hover {
+    background-color: color-mix(in srgb, var(--bg-color) 70%, var(--surface-color));
+}
+.text-right {
+    text-align: right;
+}
+.text-center {
+    text-align: center;
+}
+.no-results {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 40px;
+}
+
+/* ==========================================================================
+   NÚT BẤM
+   ========================================================================== */
+.btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+}
+.btn:hover {
+    transform: translateY(-2px);
+}
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+.btn-success {
+    background-color: var(--success-color);
+    color: white;
+}
+.btn-secondary {
+    background-color: var(--text-secondary);
+    color: white;
+}
+.btn-edit {
+    background-color: var(--edit-color);
+    color: white;
+}
+.btn-delete {
+    background-color: var(--danger-color);
+    color: white;
+}
+.actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+.actions .btn {
+    padding: 8px 12px;
+}
+
+/* ==========================================================================
+   ALERT
+   ========================================================================== */
+.alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+}
+.alert-success {
+    background-color: color-mix(in srgb, var(--success-color) 15%, transparent);
+    color: var(--success-color);
+}
+html.dark-mode .alert-success {
+    color: #81c784;
+}
+.alert-danger {
+    background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
+    color: var(--danger-color);
+}
+html.dark-mode .alert-danger {
+    color: #f79494;
+}
+
+/* ==========================================================================
+   ✨ CSS MỚI: TRẠNG THÁI LỊCH HẸN (ĐÃ SỬA LỖI DARK MODE)
+   ========================================================================== */
+.status {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    display: inline-block; /* Cho thẻ span */
+}
+
+/* Định dạng cho dropdown trạng thái */
+.status-select {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s;
+
+    /* Tắt kiểu dáng OS mặc định */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    /* Thêm icon mũi tên tùy chỉnh (cho light mode) */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 10px;
+    padding-right: 28px; /* Thêm padding cho mũi tên */
+}
+.status-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+
+/* ✨ SỬA LỖI DARK MODE CHO DROPDOWN ✨ */
+html.dark-mode .status-select {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    /* Icon mũi tên màu sáng hơn (cho dark mode) */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23888888' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* ✨ SỬA LỖI DARK MODE CHO CÁC OPTION BÊN TRONG ✨ */
+html.dark-mode .status-select option {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+}
+
+
+/* --- Các màu nền và viền cho từng trạng thái --- */
+
+/* Chờ xử lý (Màu vàng) */
+.status-CHO_XAC_NHAN {
+    background-color: color-mix(in srgb, var(--warning-color) 20%, transparent);
+    color: #b45309;
+}
+html.dark-mode .status-CHO_XAC_NHAN {
+    color: #fcd34d;
+    background-color: color-mix(in srgb, var(--warning-color) 20%, transparent);
+}
+.status-select.status-CHO_XAC_NHAN {
+    border-color: var(--warning-color);
+}
+
+/* Đã xác nhận (Màu xanh dương) */
+.status-DA_XAC_NHAN {
+    background-color: color-mix(in srgb, var(--primary-color) 20%, transparent);
+    color: var(--primary-color);
+}
+html.dark-mode .status-DA_XAC_NHAN {
+    color: #a5b4fc;
+    background-color: color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+.status-select.status-DA_XAC_NHAN {
+    border-color: var(--primary-color);
+}
+
+/* Đã hủy (Màu đỏ) */
+.status-DA_HUY {
+    background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
+    color: var(--danger-color);
+}
+html.dark-mode .status-DA_HUY {
+    color: #f79494;
+    background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
+}
+.status-select.status-DA_HUY {
+    border-color: var(--danger-color);
+}
+
+/* Hoàn thành (Màu xanh lá) */
+.status-HOAN_THANH, .status-DA_DEN_KHAM {
+    background-color: color-mix(in srgb, var(--success-color) 15%, transparent);
+    color: var(--success-color);
+}
+html.dark-mode .status-HOAN_THANH, html.dark-mode .status-DA_DEN_KHAM {
+    color: #81c784;
+    background-color: color-mix(in srgb, var(--success-color) 15%, transparent);
+}
+
+
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 992px) {
+    .header-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-form .form-control {
+        max-width: 100%;
+    }
+}
+/* ==========================================================================
+   NÚT GẠT CHUYỂN CHẾ ĐỘ
+   ========================================================================== */
+/* --- Bắt đầu đoạn mã đã chỉnh sửa để căn chỉnh và đổi màu icon --- */
+
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theme-switch {
+    display: inline-block;
+    height: 24px;
+    position: relative;
+    width: 50px;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 24px;
+
+    display: flex;
+    align-items: center;
+    /* Dùng justify-content: space-between để icon nằm ở hai đầu */
+    justify-content: space-between;
+    padding: 0 5px; /* Giữ padding để icon không quá sát mép */
+}
+
+.slider:before {
+    background-color: #fff;
+    content: "";
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    position: absolute;
+    left: 4px; /* Vị trí ban đầu của nút tròn */
+    top: 4px; /* Căn giữa theo chiều dọc */
+    transition: .4s;
+    z-index: 1;
+}
+
+/* Cập nhật màu sắc icon theo yêu cầu */
+.sun-icon,
+.moon-icon {
+    font-size: 12px;
+    transition: opacity 0.4s ease;
+    z-index: 2; /* Đảm bảo icon nổi lên trên nút tròn */
+    position: relative; /* Thêm để đảm bảo z-index hoạt động tốt với các icon */
+    line-height: 1; /* Căn chỉnh icon tốt hơn */
+}
+
+.sun-icon {
+    color: #FFD700; /* Màu vàng mặt trời */
+    opacity: 1;
+    /* Điều chỉnh vị trí của icon mặt trời */
+    margin-left: 0.8px; /* Đẩy icon mặt trời vào trong một chút */
+}
+
+.moon-icon {
+    color: #4682B4; /* Màu xanh nước biển cho mặt trăng */
+    opacity: 0;
+    /* Điều chỉnh vị trí của icon mặt trăng */
+    margin-right: 3px; /* Đẩy icon mặt trăng vào trong một chút */
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color); /* Giữ màu nền slider khi được check */
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px); /* Khoảng cách di chuyển của nút tròn */
+}
+
+input:checked + .slider .sun-icon {
+    opacity: 0;
+}
+
+input:checked + .slider .moon-icon {
+    opacity: 1;
+}

@@ -221,16 +221,14 @@ public class LichHenDAO {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             // Không cần JOIN FETCH ở đây vì Service chỉ cần kiểm tra
             String hql = "FROM LichHen lh "
-                    + "JOIN FETCH lh.benhNhan "
-                    + "JOIN FETCH lh.bacSi "
-                    + "WHERE lh.benhNhan.id = :bnId "
-                    + "ORDER BY lh.thoiGianHen DESC";
+                    + "WHERE lh.id = :lichHenId AND lh.benhNhan.id = :benhNhanId";
             Query<LichHen> query = session.createQuery(hql, LichHen.class);
-            query.setParameter("bnId", benhNhanId);
-            return query.list();
+            query.setParameter("lichHenId", lichHenId);
+            query.setParameter("benhNhanId", benhNhanId);
+            return query.uniqueResult();
         } catch (Exception e) {
             e.printStackTrace();
-            return new ArrayList<>();
+            return null;
         }
     }
 
@@ -262,7 +260,6 @@ public class LichHenDAO {
     }
 
     //============================================DẠT===================================================
-    // (KHỐI CODE NÀY ĐƯỢC SAO CHÉP NGUYÊN BẢN TỪ FILE 1 THEO YÊU CẦU)
     /**
      * Đếm số lượng lịch hẹn đã có trong một ngày cụ thể CHO MỘT BÁC SĨ CỤ THỂ.
      *
@@ -348,5 +345,95 @@ public class LichHenDAO {
             return Collections.emptyList();
         }
     }
-    // (KẾT THÚC KHỐI CODE CỦA DẠT)
+
+    /**
+     * Lấy tất cả lịch hẹn, tải sẵn thông tin bệnh nhân và bác sĩ. Sắp xếp theo
+     * STT và thời gian hẹn.
+     */
+    public List<LichHen> getAll() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<LichHen> query = session.createQuery(
+                    "SELECT lh FROM LichHen lh "
+                    + "LEFT JOIN FETCH lh.benhNhan "
+                    + "LEFT JOIN FETCH lh.bacSi "
+                    + "ORDER BY "
+                    + "  CASE lh.trangThai "
+                    + "    WHEN 'CHO_XAC_NHAN' THEN 1 "
+                    + "    WHEN 'DA_XAC_NHAN' THEN 2 "
+                    + "    ELSE 3 "
+                    + "  END ASC, "
+                    + "  lh.thoiGianHen DESC, "
+                    + "  lh.stt ASC",
+                    LichHen.class
+            );
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Tìm kiếm lịch hẹn theo từ khóa (tên bệnh nhân, tên bác sĩ, lý do, trạng
+     * thái).
+     */
+    public List<LichHen> search(String keyword) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<LichHen> query = session.createQuery(
+                    "SELECT DISTINCT lh FROM LichHen lh "
+                    + "JOIN FETCH lh.benhNhan bn "
+                    + "JOIN FETCH lh.bacSi bs "
+                    + "WHERE bn.hoTen LIKE :keyword "
+                    + "OR bs.hoTen LIKE :keyword "
+                    + "OR lh.lyDoKham LIKE :keyword "
+                    + "OR lh.trangThai LIKE :keyword "
+                    + "ORDER BY lh.thoiGianHen DESC",
+                    LichHen.class
+            );
+            query.setParameter("keyword", "%" + keyword + "%");
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    public LichHen getByIdAndBenhNhanIdWithRelations(int lichHenId, int benhNhanId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "FROM LichHen lh "
+                    + "JOIN FETCH lh.benhNhan "
+                    + "JOIN FETCH lh.bacSi "
+                    + "WHERE lh.id = :lichHenId AND lh.benhNhan.id = :benhNhanId";
+            Query<LichHen> query = session.createQuery(hql, LichHen.class);
+            query.setParameter("lichHenId", lichHenId);
+            query.setParameter("benhNhanId", benhNhanId);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Tìm tất cả lịch hẹn của một Bệnh Nhân cụ thể.
+     *
+     * @param benhNhanId ID của bệnh nhân
+     * @return Danh sách LichHen (đã tải relations).
+     */
+    public List<LichHen> findByBenhNhanId(int benhNhanId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "FROM LichHen lh "
+                    + "JOIN FETCH lh.benhNhan "
+                    + "JOIN FETCH lh.bacSi "
+                    + "WHERE lh.benhNhan.id = :bnId "
+                    + "ORDER BY lh.thoiGianHen DESC";
+            Query<LichHen> query = session.createQuery(hql, LichHen.class);
+            query.setParameter("bnId", benhNhanId);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
 }

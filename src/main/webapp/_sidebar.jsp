@@ -1,6 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
 <nav class="sidebar-nav" id="sidebar-nav">
     <div class="sidebar-header">
         <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="sidebar-logo">
@@ -13,7 +16,7 @@
     </div>
 
     <ul class="sidebar-menu">
-        
+
         <li>
             <a href="<c:url value='/MainController?action=showCreateEncounterForm'/>" class="nav-link" data-link="showCreateEncounterForm">
                 <i class="fas fa-plus-circle"></i>
@@ -22,11 +25,11 @@
         </li>
         <li>
             <a href="<c:url value='/MainController?action=showCreateAppointmentForm'/>" class="nav-link" data-link="showCreateAppointmentForm">
-                <i class="fas fa-plus-circle"></i>
+                <i class="bi bi-file-earmark-plus"></i>
                 <span class="nav-text">Tạo Lịch Hẹn</span>
             </a>
         </li>
-        
+
         <li class="menu-divider"><span class="nav-text">Quản lý</span></li>
         <li>
             <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="nav-link" data-link="listAllEncounters">
@@ -36,12 +39,12 @@
         </li>
         <li>
             <a href="<c:url value='/MainController?action=listAll'/>" class="nav-link" data-link="listAll">
-                <i class="fas fa-notes-medical"></i>
+                <i class="bi bi-file-medical"></i>
                 <span class="nav-text">DS. Đơn Thuốc</span>
             </a>
         </li>
         <li>
-            <a href="<c:url value='/MainController?action=listAppointments'/>" class="nav-link" data-link="listAppointments">
+            <a href="<c:url value='/MainController?action=listLichHenNurse'/>" class="nav-link" data-link="listLichHenNurse">
                 <i class="fas fa-calendar-alt"></i>
                 <span class="nav-text">Lịch Hẹn</span>
             </a>

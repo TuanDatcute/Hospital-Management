@@ -185,7 +185,9 @@
                 <div class="button-group">
                     <c:choose>
                         <c:when test="${empty phieuKham.id}">
-                            <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="btn btn-secondary">Hủy</a>
+                            <a href="javascript:history.back()" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Quay lại
+                            </a>
                         </c:when>
                         <c:otherwise>
                             <a href="<c:url value='MainController?action=viewEncounterDetails&id=${phieuKham.id}'/>" class="btn btn-secondary">Quay Lại</a>

@@ -89,8 +89,8 @@
                 </div>
 
                 <div class="button-group">
-                    <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Hủy
+                    <a href="javascript:history.back()" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Lưu Lịch Hẹn
