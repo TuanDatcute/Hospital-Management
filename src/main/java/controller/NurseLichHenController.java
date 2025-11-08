@@ -32,7 +32,7 @@ import service.NhanVienService;
 public class NurseLichHenController extends HttpServlet {
 
     // Khai báo URL cho các trang JSP
-    private static final String LICHHEN_LIST_PAGE = "admin/danhSachLichHen.jsp";
+    private static final String LICHHEN_LIST_PAGE = "NurseListLichHen.jsp";
     private static final String ERROR_PAGE = "error.jsp";
 
     // Khởi tạo các Service cần thiết
@@ -56,6 +56,9 @@ public class NurseLichHenController extends HttpServlet {
             }
 
             switch (action) {
+                case "listLichHenNurse":
+                    url = listLichHen(request);
+                    break;
                 case "getDoctorsByKhoa":
                     handleGetDoctorsByKhoa(request, response);
                     return; // Đã xử lý, không forward              
@@ -94,6 +97,9 @@ public class NurseLichHenController extends HttpServlet {
             switch (action) {
                 case "createAppointment":
                     url = createAppointment(request, response);
+                    break;
+                case "updateAppointmentStatus":
+                    url = updateAppointmentStatus(request);
                     break;
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho POST.");
@@ -202,6 +208,54 @@ public class NurseLichHenController extends HttpServlet {
             out.print(gson.toJson(Collections.singletonMap("error", "Lỗi tải danh sách bác sĩ: " + e.getMessage())));
         }
         out.flush();
+    }
+
+    /**
+     *  Lấy danh sách Lịch hẹn (có tìm kiếm) và chuyển đến trang hiển
+     * thị.
+     */
+    private String listLichHen(HttpServletRequest request) {
+        String keyword = request.getParameter("keyword");
+        List<LichHenDTO> danhSachLichHen;
+
+        try {
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                danhSachLichHen = lichHenService.searchAppointments(keyword);
+                request.setAttribute("searchKeyword", keyword);
+            } else {
+                danhSachLichHen = lichHenService.getAllAppointments();
+            }
+            request.setAttribute("danhSachLichHen", danhSachLichHen);
+        } catch (Exception e) {
+            log("Lỗi khi lấy danh sách lịch hẹn: ", e);
+            request.setAttribute("ERROR_MESSAGE", "Không thể tải danh sách lịch hẹn.");
+        }
+        return LICHHEN_LIST_PAGE;
+    }
+
+    /**
+     * Xử lý yêu cầu cập nhật trạng thái của một lịch hẹn.
+     *
+     * @return URL để redirect về lại trang danh sách.
+     */
+    private String updateAppointmentStatus(HttpServletRequest request) {
+        String redirectUrl = "redirect:/MainController?action=listLichHenNurse";
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            String newStatus = request.getParameter("trangThaiMoi");
+
+            lichHenService.updateAppointmentStatus(id, newStatus);
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Cập nhật trạng thái lịch hẹn thành công!");
+
+        } catch (ValidationException | NumberFormatException e) {
+            request.getSession().setAttribute("ERROR_MESSAGE", e.getMessage());
+        } catch (Exception e) {
+            log("Lỗi khi cập nhật trạng thái lịch hẹn: ", e);
+            request.getSession().setAttribute("ERROR_MESSAGE", "Đã xảy ra lỗi hệ thống.");
+        }
+
+        // Luôn redirect về trang danh sách
+        return redirectUrl;
     }
 
     @Override

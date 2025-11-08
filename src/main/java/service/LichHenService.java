@@ -330,6 +330,48 @@ public class LichHenService {
 
     }
 
+    /**
+     * Lấy tất cả các lịch hẹn (dưới dạng DTO).
+     */
+    public List<LichHenDTO> getAllAppointments() {
+        List<LichHen> entities = lichHenDAO.getAll();
+        return entities.stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Tìm kiếm lịch hẹn theo từ khóa (dưới dạng DTO).
+     */
+    public List<LichHenDTO> searchAppointments(String keyword) {
+        List<LichHen> entities = lichHenDAO.search(keyword);
+        return entities.stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * NGHIỆP VỤ: Cập nhật trạng thái của một lịch hẹn.
+     *
+     * @param lichHenId ID của lịch hẹn cần cập nhật.
+     * @param newStatus Trạng thái mới.
+     * @return DTO của lịch hẹn sau khi đã cập nhật.
+     * @throws ValidationException nếu không tìm thấy lịch hẹn.
+     */
+    public LichHenDTO updateAppointmentStatus(int lichHenId, String newStatus) throws ValidationException {
+        // 1. Lấy Entity gốc
+        LichHen existingLichHen = lichHenDAO.getByIdWithRelations(lichHenId);
+        if (existingLichHen == null) {
+            throw new ValidationException("Không tìm thấy lịch hẹn với ID: " + lichHenId);
+        }
+
+        // (Bạn có thể thêm logic kiểm tra ở đây, ví dụ: không cho phép đổi từ DA_HUY sang DA_XAC_NHAN)
+        // 2. Cập nhật trạng thái
+        existingLichHen.setTrangThai(newStatus);
+
+        // 3. Lưu lại
+        lichHenDAO.update(existingLichHen);
+
+        // 4. Trả về DTO mới
+        return toDTO(existingLichHen);
+    }
+
     //===================================================Quang=======================================
     // ===================================================
     // === HÀM CHO BỆNH NHÂN TỰ ĐẶT LỊCH ===

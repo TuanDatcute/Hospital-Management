@@ -279,10 +279,17 @@ public class LichHenDAO {
     public List<LichHen> getAll() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<LichHen> query = session.createQuery(
-                    "SELECT DISTINCT lh FROM LichHen lh "
+                    "SELECT lh FROM LichHen lh "
                     + "LEFT JOIN FETCH lh.benhNhan "
                     + "LEFT JOIN FETCH lh.bacSi "
-                    + "ORDER BY lh.thoiGianHen DESC, lh.stt ASC",
+                    + "ORDER BY "
+                    + "  CASE lh.trangThai "
+                    + "    WHEN 'CHO_XAC_NHAN' THEN 1 "
+                    + "    WHEN 'DA_XAC_NHAN' THEN 2 "
+                    + "    ELSE 3 "
+                    + "  END ASC, "
+                    + "  lh.thoiGianHen DESC, "
+                    + "  lh.stt ASC",
                     LichHen.class
             );
             return query.list();

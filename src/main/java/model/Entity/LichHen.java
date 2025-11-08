@@ -29,7 +29,7 @@ public class LichHen {
     @Column(name = "ly_do_kham", columnDefinition = "NVARCHAR(MAX)")
     private String lyDoKham;
 
-    @Column(name = "trang_thai", nullable = false, columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "trang_thai", nullable = false, columnDefinition = "NVARCHAR(60)")
     private String trangThai;
 
     @Column(name = "ghi_chu", columnDefinition = "NVARCHAR(MAX)")
