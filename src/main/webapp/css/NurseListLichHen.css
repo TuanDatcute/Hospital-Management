@@ -7,7 +7,8 @@
     --primary-color: #4a90e2;
     --success-color: #28a745;
     --danger-color: #dc3545;
-    --edit-color: #8B5CF6; /* Màu tím cho nút sửa */
+    --warning-color: #ffc107;
+    --edit-color: #8B5CF6;
 
     --bg-color: #f4f7f9;
     --surface-color: #ffffff;
@@ -22,6 +23,7 @@ html.dark-mode {
     --primary-color: #77A5D9;
     --success-color: #3d8c5a;
     --danger-color: #e57373;
+    --warning-color: #c7811a;
     --edit-color: #a78bfa;
 
     --bg-color: #121212;
@@ -36,24 +38,24 @@ body {
     font-family: 'Be Vietnam Pro', sans-serif;
     background-color: var(--bg-color);
     margin: 0;
-    
     color: var(--text-primary);
     transition: background-color 0.3s, color 0.3s;
 }
 
 /* ==========================================================================
-   LAYOUT CHÍNH & HEADER
+   LAYOUT CHÍNH & HEADER (ĐỒNG BỘ VỚI SIDEBAR)
    ========================================================================== */
+/* .main-content đã được định nghĩa trong _sidebar.css */
+/* Định dạng .main-container bên trong .main-content */
 .main-container {
     max-width: 1200px;
-    margin: 20px auto;
+    margin: 0 auto;
     padding: 30px 40px;
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     box-shadow: var(--card-shadow);
-    position: relative; /* Cần thiết để định vị nút gạt */
-
+    position: relative;
 }
 
 h1 {
@@ -69,7 +71,7 @@ h1 {
     align-items: center;
     margin-bottom: 30px;
     gap: 20px;
-    flex-wrap: wrap; /* Cho phép xuống dòng trên màn hình nhỏ */
+    flex-wrap: wrap;
 }
 
 .search-form {
@@ -78,7 +80,7 @@ h1 {
     align-items: center;
     gap: 10px;
     position: relative;
-    min-width: 300px; /* Chiều rộng tối thiểu */
+    min-width: 300px;
 }
 
 .search-form .form-control {
@@ -165,7 +167,6 @@ h1 {
 .btn-primary {
     background-color: var(--primary-color);
     color: white;
-    
 }
 .btn-success {
     background-color: var(--success-color);
@@ -205,17 +206,141 @@ h1 {
     background-color: color-mix(in srgb, var(--success-color) 15%, transparent);
     color: var(--success-color);
 }
-body.dark-mode .alert-success {
+html.dark-mode .alert-success {
     color: #81c784;
 }
 .alert-danger {
     background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
     color: var(--danger-color);
 }
-body.dark-mode .alert-danger {
+html.dark-mode .alert-danger {
     color: #f79494;
 }
 
+/* ==========================================================================
+   ✨ CSS MỚI: TRẠNG THÁI LỊCH HẸN (ĐÃ SỬA LỖI DARK MODE)
+   ========================================================================== */
+.status {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    display: inline-block; /* Cho thẻ span */
+}
+
+/* Định dạng cho dropdown trạng thái */
+.status-select {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s;
+
+    /* Tắt kiểu dáng OS mặc định */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    /* Thêm icon mũi tên tùy chỉnh (cho light mode) */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 10px;
+    padding-right: 28px; /* Thêm padding cho mũi tên */
+}
+.status-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+
+/* ✨ SỬA LỖI DARK MODE CHO DROPDOWN ✨ */
+html.dark-mode .status-select {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    /* Icon mũi tên màu sáng hơn (cho dark mode) */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23888888' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* ✨ SỬA LỖI DARK MODE CHO CÁC OPTION BÊN TRONG ✨ */
+html.dark-mode .status-select option {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+}
+
+
+/* --- Các màu nền và viền cho từng trạng thái --- */
+
+/* Chờ xử lý (Màu vàng) */
+.status-CHO_XAC_NHAN {
+    background-color: color-mix(in srgb, var(--warning-color) 20%, transparent);
+    color: #b45309;
+}
+html.dark-mode .status-CHO_XAC_NHAN {
+    color: #fcd34d;
+    background-color: color-mix(in srgb, var(--warning-color) 20%, transparent);
+}
+.status-select.status-CHO_XAC_NHAN {
+    border-color: var(--warning-color);
+}
+
+/* Đã xác nhận (Màu xanh dương) */
+.status-DA_XAC_NHAN {
+    background-color: color-mix(in srgb, var(--primary-color) 20%, transparent);
+    color: var(--primary-color);
+}
+html.dark-mode .status-DA_XAC_NHAN {
+    color: #a5b4fc;
+    background-color: color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+.status-select.status-DA_XAC_NHAN {
+    border-color: var(--primary-color);
+}
+
+/* Đã hủy (Màu đỏ) */
+.status-DA_HUY {
+    background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
+    color: var(--danger-color);
+}
+html.dark-mode .status-DA_HUY {
+    color: #f79494;
+    background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
+}
+.status-select.status-DA_HUY {
+    border-color: var(--danger-color);
+}
+
+/* Hoàn thành (Màu xanh lá) */
+.status-HOAN_THANH, .status-DA_DEN_KHAM {
+    background-color: color-mix(in srgb, var(--success-color) 15%, transparent);
+    color: var(--success-color);
+}
+html.dark-mode .status-HOAN_THANH, html.dark-mode .status-DA_DEN_KHAM {
+    color: #81c784;
+    background-color: color-mix(in srgb, var(--success-color) 15%, transparent);
+}
+
+
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 992px) {
+    .header-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-form .form-control {
+        max-width: 100%;
+    }
+}
 /* ==========================================================================
    NÚT GẠT CHUYỂN CHẾ ĐỘ
    ========================================================================== */
@@ -307,163 +432,4 @@ input:checked + .slider .sun-icon {
 
 input:checked + .slider .moon-icon {
     opacity: 1;
-}
-/* ==========================================================================
-   MODAL / POPUP (CHO CẬP NHẬT TỒN KHO)
-   ========================================================================== */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(17, 24, 39, 0.6);
-    backdrop-filter: blur(5px);
-
-    /* 1. Ẩn đi mặc định */
-    display: none;
-
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    z-index: 1000;
-    transition: opacity 0.3s ease;
-}
-
-/* 2. Hiện ra khi JS thêm class .active */
-.modal-overlay.active {
-    display: flex;
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-content {
-    background-color: var(--surface-color);
-    border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    transform: scale(0.95);
-    transition: transform 0.3s ease;
-    border: 1px solid var(--border-color);
-}
-.modal-overlay.active .modal-content {
-    transform: scale(1);
-}
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    border-bottom: 1px solid var(--border-color);
-}
-.modal-header h2 {
-    margin: 0;
-    font-size: 1.2rem;
-}
-.close-button {
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--text-secondary);
-    border: none;
-    background: none;
-}
-.modal-body {
-    padding: 25px;
-}
-.modal-body p {
-    margin-top: 0;
-}
-.form-group {
-    margin-bottom: 20px;
-}
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: var(--text-secondary);
-}
-.form-group small {
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-    margin-top: 5px;
-    display: block;
-}
-.form-control {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background-color: var(--surface-color);
-    color: var(--text-primary);
-    font-size: 1rem;
-}
-.form-control:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
-}
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 15px 20px;
-    border-top: 1px solid var(--border-color);
-    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
-}/* ==========================================================================
-   NÚT TỒN KHO (ĐÃ NÂNG CẤP)
-   ========================================================================== */
-.stock-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: all 0.2s ease-in-out;
-
-    /* Màu mặc định (cho tồn kho > 20) */
-    background-color: var(--surface-color);
-    color: var(--text-secondary);
-}
-.stock-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-html.dark-mode .stock-button:hover {
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-/* Kiểu cho tồn kho sắp hết (1-20) */
-.stock-button.stock-low {
-    background-color: color-mix(in srgb, var(--warning-color) 15%, transparent);
-    color: #b45309; /* Màu chữ vàng đậm */
-    border-color: #fde68a;
-}
-html.dark-mode .stock-button.stock-low {
-    color: #fcd34d;
-}
-
-/* Kiểu cho hết hàng (0) */
-.stock-button.stock-empty {
-    background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
-    color: var(--danger-color);
-    border-color: color-mix(in srgb, var(--danger-color) 40%, transparent);
-}
-html.dark-mode .stock-button.stock-empty {
-    color: #f79494;
-}
-
-/* Đổi màu khi hover các nút đặc biệt */
-.stock-button.stock-low:hover {
-    background-color: var(--warning-color);
-    color: #1E1E1E; /* Chữ đen trên nền vàng */
-}
-.stock-button.stock-empty:hover {
-    background-color: var(--danger-color);
-    color: white;
 }

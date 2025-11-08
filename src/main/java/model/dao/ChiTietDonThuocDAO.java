@@ -18,8 +18,37 @@ import util.HibernateUtil;
 
 public class ChiTietDonThuocDAO {
 
-    public static boolean isMedicationInUse(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    /**
+     * Kiểm tra xem một loại thuốc có đang được sử dụng trong bất kỳ đơn thuốc
+     * nào không. Phương thức này an toàn để gọi trước khi thực hiện thao tác
+     * xóa.
+     *
+     * @param thuocId ID của thuốc cần kiểm tra.
+     * @return true nếu thuốc đang được sử dụng (có trong ít nhất 1 đơn thuốc),
+     * false nếu thuốc không được sử dụng.
+     */
+    public static boolean isMedicationInUse(int thuocId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+
+            // Tạo câu truy vấn HQL để đếm số lượng bản ghi ChiTietDonThuoc
+            // có liên kết đến thuocId này.
+            Query<Long> query = session.createQuery(
+                    // ct.thuoc.id là cách truy vấn HQL, nó tự động join đến bảng Thuoc
+                    "SELECT count(ct.id) FROM ChiTietDonThuoc ct WHERE ct.thuoc.id = :thuocId",
+                    Long.class
+            );
+
+            query.setParameter("thuocId", thuocId);
+            Long count = query.uniqueResult();
+
+            // Nếu số lượng lớn hơn 0, nghĩa là thuốc đang được sử dụng
+            return (count != null && count > 0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return true;
+        }
     }
 
     public ChiTietDonThuoc create(ChiTietDonThuoc chiTiet) {

@@ -1,6 +1,7 @@
 package model.dto;
 
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -8,19 +9,22 @@ import java.time.OffsetDateTime;
  */
 // Xóa @Entity và @Id
 public class LichHenDTO {
-    
+
     private int id;
     private Integer stt;
     private OffsetDateTime thoiGianHen; // Dùng kiểu hiện đại
     private String lyDoKham;
     private String trangThai; // Dùng String để khớp CSDL
     private String ghiChu; // Thêm trường bị thiếu
-    
+
     // =====DAT=======
     private int benhNhanId;
     private int bacSiId; // Đổi tên từ nhanVienId thành bacSiId cho khớp
     private String tenBenhNhan;
     private String tenBacSi;
+    private static final DateTimeFormatter FORMATTER
+            = DateTimeFormatter.ofPattern("HH:mm 'ngày' dd/MM/yyyy");
+
     //================datend===
     public LichHenDTO() {
     }
@@ -115,5 +119,40 @@ public class LichHenDTO {
 
     public void setBacSiId(int bacSiId) {
         this.bacSiId = bacSiId;
+    }
+
+    //============================Dat============================
+    /**
+     * @return Trả về thời gian hẹn đã được định dạng (ví dụ: "14:30 ngày
+     * 08/11/2025")
+     */
+    public String getThoiGianHenFormatted() {
+        if (this.thoiGianHen == null) {
+            return "Chưa có";
+        }
+        return this.thoiGianHen.format(FORMATTER);
+    }
+
+    /**
+     * @return Trả về trạng thái bằng tiếng Việt
+     */
+    public String getTrangThaiDisplay() {
+        if (this.trangThai == null) {
+            return "Không rõ";
+        }
+        switch (this.trangThai) {
+            case "CHO_XAC_NHAN":
+                return "Chờ xác nhận";
+            case "DA_XAC_NHAN":
+                return "Đã xác nhận";
+            case "DA_DEN_KHAM":
+                return "Đã đến khám";
+            case "HOAN_THANH":
+                return "Hoàn thành";
+            case "DA_HUY":
+                return "Đã hủy";
+            default:
+                return this.trangThai;
+        }
     }
 }

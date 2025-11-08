@@ -20,7 +20,7 @@
         <%-- (MỚI) Nhúng file CSS cụ thể cho trang này SAU --%>
         <link rel="stylesheet" href="<c:url value='/css/ThongBao.css'/>">
 
-        <script src="<c:url value='/js/darkmode.js'/>" defer></script>
+        <script src="<c:url value='/js/darkmodeQuang.js'/>" defer></script>
     </head>
     <body>
         <jsp:include page="/WEB-INF/header.jsp" /> 

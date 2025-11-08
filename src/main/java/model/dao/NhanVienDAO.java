@@ -378,7 +378,8 @@ public class NhanVienDAO {
             query.setParameter("khoaId", khoaId);
             return query.list();
         } catch (Exception e) {
-            return Collections.EMPTY_LIST;
+            e.printStackTrace();
+            return Collections.emptyList();
         }
     }
 

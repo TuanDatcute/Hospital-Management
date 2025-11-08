@@ -1,0 +1,195 @@
+/* ==========================================================================
+   THANH ĐIỀU HƯỚNG BÊN TRÁI (SIDEBAR)
+   ========================================================================== */
+
+.sidebar-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px; /* Chiều rộng của sidebar */
+    height: 100vh;
+    background-color: var(--surface-color);
+    border-right: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+.sidebar-header a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+.sidebar-header i {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto; /* Tự động cuộn nếu menu quá dài */
+}
+.sidebar-menu .menu-divider {
+    padding: 15px 20px 5px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+.sidebar-menu li {
+    margin: 0 10px; /* Thụt lề cho các nút */
+}
+.sidebar-menu .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+.nav-link i {
+    width: 20px; /* Giữ icon thẳng hàng */
+    font-size: 1rem;
+    text-align: center;
+}
+.nav-link:hover {
+    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
+    color: var(--text-primary);
+}
+.nav-link.active {
+    background-color: color-mix(in srgb, var(--primary-color) 15%, transparent);
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   BỐ CỤC TRANG CHÍNH (ĐỂ CHỪA CHỖ CHO SIDEBAR)
+   ========================================================================== */
+
+/* Thẻ body sẽ chứa sidebar và nội dung */
+body {
+    display: flex;
+}
+
+/* ✨ QUAN TRỌNG: 
+   Bọc toàn bộ nội dung trang (ví dụ .main-container) 
+   bằng một class mới tên là .main-content 
+*/
+.main-content {
+    flex-grow: 1; /* Chiếm toàn bộ không gian còn lại */
+    margin-left: 250px; /* Bằng chiều rộng của sidebar */
+    padding: 20px;
+    background-color: var(--bg-color);
+}
+
+/* Điều chỉnh lại .main-container (nếu bạn dùng nó) */
+.main-content .main-container {
+    margin: 0 auto; /* Xóa margin-top cũ */
+    max-width: 1300px;
+    padding: 30px 40px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    position: relative;
+}
+
+/* Responsive: Ẩn sidebar trên điện thoại */
+@media (max-width: 992px) {
+    .sidebar-nav {
+        /* Bạn có thể chọn ẩn hoàn toàn hoặc làm nó nhỏ lại */
+        width: 70px;
+    }
+    .sidebar-nav .sidebar-header span,
+    .sidebar-nav .nav-link span,
+    .sidebar-nav .menu-divider {
+        display: none; /* Ẩn chữ, chỉ hiện icon */
+    }
+    .main-content {
+        margin-left: 70px; /* Điều chỉnh lề */
+    }
+}
+
+/* ==========================================================================
+   CSS CHO SIDEBAR CÓ THỂ THU GỌN (COLLAPSIBLE)
+   ========================================================================== */
+
+/* Thêm hiệu ứng chuyển động mượt mà */
+.sidebar-nav, .main-content {
+    transition: width 0.3s ease-in-out, margin-left 0.3s ease-in-out;
+}
+
+/* --- Nút gạt (Toggle Button) --- */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.sidebar-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.sidebar-toggle-btn:hover {
+    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
+    color: var(--primary-color);
+}
+
+/* ==========================================================================
+   TRẠNG THÁI KHI BỊ THU GỌN (COLLAPSED)
+   ========================================================================== */
+
+/* 1. Sidebar bị thu gọn */
+.sidebar-nav.collapsed {
+    width: 70px; /* Chiều rộng khi thu gọn */
+}
+
+/* 2. Nội dung chính được đẩy ra ít hơn */
+.main-content.collapsed {
+    margin-left: 70px; /* Bằng chiều rộng khi thu gọn */
+}
+
+/* 3. Ẩn chữ và các yếu tố không cần thiết */
+.sidebar-nav.collapsed .sidebar-logo span,
+.sidebar-nav.collapsed .nav-link span,
+.sidebar-nav.collapsed .menu-divider {
+    display: none;
+}
+
+/* 4. Căn chỉnh lại logo và menu */
+.sidebar-nav.collapsed .sidebar-header {
+    justify-content: center; /* Đưa nút gạt ra giữa */
+}
+.sidebar-nav.collapsed .sidebar-logo {
+    display: none; /* Ẩn logo khi thu gọn */
+}
+.sidebar-nav.collapsed .nav-link {
+    justify-content: center; /* Đưa icon ra giữa */
+}
+
+/* 5. Hiện lại nút gạt khi sidebar bị thu gọn */
+.sidebar-nav.collapsed .sidebar-toggle-btn {
+    display: block;
+}
+
