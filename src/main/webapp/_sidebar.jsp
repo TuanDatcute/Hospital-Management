@@ -64,5 +64,29 @@
                 <span class="nav-text">Bệnh Nhân</span>
             </a>
         </li>
+        <li>
+            <a href="<c:url value='/MainController?action=listInvoices'/>" class="nav-link" data-link="listInvoices">
+                <i class="fas fa-user-injured"></i>
+                <span class="nav-text">Hóa đơn</span>
+            </a>
+        </li>
+        <li>
+            <a href="<c:url value='/MainController?action=listRooms'/>" class="nav-link" data-link="listRooms">
+                <i class="fas fa-user-injured"></i>
+                <span class="nav-text">Phòng bệnh</span>
+            </a>
+        </li>
+        <li>
+            <a href="<c:url value='/MainController?action=listBeds'/>" class="nav-link" data-link="listBeds">
+                <i class="fas fa-user-injured"></i>
+                <span class="nav-text">Giường bệnh</span>
+            </a>
+        </li>
+        <li>
+            <a href="<c:url value='/MainController?action=viewMyNotifications'/>" class="nav-link" data-link="viewMyNotifications">
+                <i class="fas fa-user-injured"></i>
+                <span class="nav-text">Thông báo</span>
+            </a>
+        </li>
     </ul>
 </nav>
