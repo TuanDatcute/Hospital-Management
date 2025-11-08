@@ -19,6 +19,8 @@ import model.dto.NhanVienDTO;
 import model.dto.TaiKhoanDTO;
 import model.dao.BenhNhanDAO;
 import model.Entity.BenhNhan;
+import model.Entity.Khoa;
+import model.dao.KhoaDAO;
 import service.LichHenService;
 import service.NhanVienService;
 
@@ -35,6 +37,7 @@ public class PatientLichHenController extends HttpServlet {
     private final LichHenService lichHenService = new LichHenService();
     private final NhanVienService nhanVienService = new NhanVienService();
     private final BenhNhanDAO benhNhanDAO = new BenhNhanDAO();
+    private final KhoaDAO khoaDAO = new KhoaDAO();
 
     // (doGet giữ nguyên, không thay đổi)
     @Override
@@ -76,7 +79,6 @@ public class PatientLichHenController extends HttpServlet {
             request.getRequestDispatcher(url).forward(request, response);
         }
     }
-
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -134,8 +136,15 @@ public class PatientLichHenController extends HttpServlet {
 
     // --- CÁC HÀM HELPER (Giữ nguyên) ---
     private void loadPatientBookingFormDependencies(HttpServletRequest request) throws Exception {
-        List<NhanVienDTO> bacSiList = nhanVienService.findDoctorsBySpecialty();
-        request.setAttribute("bacSiList", bacSiList);
+        // 1. Lấy danh sách Khoa từ DAO
+        // (Giả sử hàm của bạn là getAllKhoa() hoặc tương tự)
+        List<Khoa> listKhoa = khoaDAO.getAll();
+
+        // 2. Đặt attribute với đúng tên mà JSP cần
+        request.setAttribute("khoaList", listKhoa);
+
+        // 3. KHÔNG tải danh sách bác sĩ ở đây. 
+        // Việc đó là của JavaScript sau khi người dùng chọn khoa.
     }
 
     private String showPatientBookingForm(HttpServletRequest request) throws Exception {
