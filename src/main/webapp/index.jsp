@@ -1,186 +1,257 @@
-<%--
-    Document   : index.jsp (Đã cập nhật JavaScript cho cả 2 thanh cuộn)
-    Created on : Oct 28, 2025
-    Author     : ADMIN
---%>
-
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %> <%-- Bắt buộc phải có cho menu động --%>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Bệnh viện ABC - Đặt Lịch Khám Dễ Dàng</title>
+        <title>Bệnh viện Quốc tế HQĐ</title>
 
-        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+        <%-- Tăng version CSS --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css?v=1.2">
     </head>
     <body>
 
-        <%-- 2. Nhúng Header --%>
-        <jsp:include page="/WEB-INF/header.jsp" /> 
+        <%-- 1. Nhúng Header (Không đổi) --%>
+        <jsp:include page="/WEB-INF/headerDat.jsp" /> 
 
-        <%-- 3. Nội dung riêng của trang Index --%>
+        <%-- 2. Nội dung riêng của trang Index --%>
         <div class="page-content">
 
-            <section class="hero">
+            <%-- ✨ HERO SLIDER - CẤU TRÚC MỚI --%>
+            <section class="swiper-hero-section">
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper">
+
+                        <%-- SLIDE 1 --%>
+                        <div class="swiper-slide slide-1">
+                            <div class="hero-content">
+                                <p class="hero-subtitle-small">Chào mừng đến với HQĐ Hospital</p>
+                                <p class="hero-subtitle">Sức khỏe của bạn là ưu tiên hàng đầu</p>
+                                <h1>CHĂM SÓC TOÀN DIỆN<br>BẰNG CẢ TRÁI TIM</h1>
+                                <p class="hero-description">
+                                    Tại Bệnh viện HQĐ, chúng tôi cam kết mang đến dịch vụ chăm sóc y tế
+                                    toàn diện với đội ngũ bác sĩ chuyên nghiệp.
+                                </p>
+                                <div class="hero-buttons">
+                                    <a href="#" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
+                                    <a href="#" class="btn-secondary-outline hero-btn">Xem Dịch Vụ <i class="fas fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <%-- SLIDE 2 --%>
+                        <div class="swiper-slide slide-2">
+                            <div class="hero-content">
+                                <p class="hero-subtitle-small">Đội ngũ chuyên gia hàng đầu</p>
+                                <p class="hero-subtitle">Chúng tôi sử dụng</p>
+                                <h1>CÔNG NGHỆ HIỆN ĐẠI<br>CHO SỨC KHỎE VÀNG</h1>
+                                <p class="hero-description">
+                                    Trang thiết bị y tế tiên tiến nhất, hỗ trợ chẩn đoán chính xác
+                                    và điều trị hiệu quả.
+                                </p>
+                                <div class="hero-buttons">
+                                    <a href="#" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <%-- SLIDE 3 (Giống hình ảnh mẫu) --%>
+                        <div class="swiper-slide slide-3">
+                            <div class="hero-content">
+                                <p class="hero-subtitle-small">Dịch vụ y tế cao cấp</p>
+                                <p class="hero-subtitle">Sức khỏe của bạn là ưu tiên hàng đầu</p>
+                                <h1>TRẢI NGHIỆM KHÁM CHỮA BỆNH TẬN TÂM NHẤT</h1>
+                                <p class="hero-description">
+                                    Không chỉ là điều trị, chúng tôi mang đến sự an tâm và thoải mái
+                                    cho mọi bệnh nhân.
+                                </p>
+                                <div class="hero-buttons">
+                                    <a href="#" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
+                                    <a href="#" class="btn-secondary-outline hero-btn">Xem Dịch Vụ <i class="fas fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <%-- Nút bấm và dấu chấm --%>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </section>
+            <%-- KẾT THÚC SLIDER MỚI --%>
+
+            <%-- Form Đặt Lịch Hẹn Nhanh (Không đổi, nó sẽ tự động đè lên slider) --%>
+            <section class="appointment-form-section">
                 <div class="container">
-                    <h1>Đặt Lịch Khám Dễ Dàng</h1>
-                    <p class="subtitle">Tìm kiếm và đặt hẹn với bác sĩ chuyên khoa tại Bệnh viện ABC nhanh chóng.</p>
-                    <div class="search-box">
-                        <input type="text" placeholder="Tìm kiếm bác sĩ, chuyên khoa, triệu chứng...">
-                        <button type="button"><i class="fas fa-search"></i> Tìm kiếm</button>
+                    <div class="appointment-form-card">
+                        <h3>Đặt Lịch Hẹn Ngay</h3>
+                        <div class="form-group">
+                            <label for="location"><i class="fa-solid fa-thumbs-up"></i> Chuyên nghiệp</label>
+                           
+                        </div>
+                        <div class="form-group">
+                            <label for="department"><i class="fa-solid fa-heart"></i> Tận tình</label>
+                           
+                        </div>
+                        <div class="form-group">
+                            <label for="date"><i class="fa-solid fa-check"></i> Chất lượng</label>
+                           
+                        </div>
+                        <button class="btn-secondary">Đặt Lịch Ngay Để Nhận Tư Vấn</button>
                     </div>
                 </div>
             </section>
 
-            <%-- Section Danh mục nổi bật (Đã thêm ID và nút bấm) --%>
-            <section class="features-section" id="features">
-                <%-- **THÊM WRAPPER VÀ ID** --%>
-                <div class="features-scroll-wrapper" id="featuresScroller">
-                    <div class="features-grid">
-                        <a href="#" class="feature-item"><img src="${pageContext.request.contextPath}/images/icon-kham-chuyen-khoa.png" alt="Khám chuyên khoa"><span>Khám Chuyên Khoa</span></a>
-                        <a href="#" class="feature-item"><img src="${pageContext.request.contextPath}/images/icon-kham-tong-quat.png" alt="Khám tổng quát"><span>Khám Tổng Quát</span></a>
-                        <a href="#" class="feature-item"><img src="${pageContext.request.contextPath}/images/icon-xet-nghiem.png" alt="Xét nghiệm"><span>Xét Nghiệm</span></a>
-                        <a href="#" class="feature-item"><img src="${pageContext.request.contextPath}/images/icon-kham-suc-khoe.png" alt="Khám sức khỏe"><span>Khám Sức Khỏe</span></a>
-                        <a href="#" class="feature-item"><img src="${pageContext.request.contextPath}/images/icon-y-te-co-quan.png" alt="Y tế cơ quan"><span>Y Tế Cơ Quan</span></a>
-                            <%-- Thêm thẻ khác nếu muốn (ví dụ: 'Gọi video bác sĩ', 'Mua thuốc') --%>
-                        <a href="#" class="feature-item"><img src="${pageContext.request.contextPath}/images/icon-goi-video.png" alt="Gọi video bác sĩ"><span>Gọi video bác sĩ</span></a>
-                        <a href="#" class="feature-item"><img src="${pageContext.request.contextPath}/images/icon-mua-thuoc.png" alt="Mua thuốc"><span>Mua thuốc</span></a>
+            <%-- Các Đặc Điểm Nổi Bật (Features) (Không đổi) --%>
+            <section class="info-features-section">
+                <div class="container">
+                    <div class="info-feature-item">
+                        <i class="fas fa-microscope"></i>
+                        <h4>Trang Thiết Bị Hiện Đại</h4>
+                        <p>Chúng tôi luôn cập nhật công nghệ và thiết bị y tế tiên tiến nhất.</p>
+                        <a href="#" class="learn-more">Đọc thêm <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="info-feature-item">
+                        <i class="fas fa-user-tie"></i>
+                        <h4>Đội Ngũ Bác Sĩ Chuyên Gia</h4>
+                        <p>Với các bác sĩ hàng đầu, giàu kinh nghiệm, tận tâm với bệnh nhân.</p>
+                        <a href="#" class="learn-more">Đọc thêm <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="info-feature-item">
+                        <i class="fas fa-virus"></i>
+                        <h4>Xét Nghiệm COVID-19</h4>
+                        <p>Cung cấp dịch vụ xét nghiệm nhanh chóng, chính xác và an toàn.</p>
+                        <a href="#" class="learn-more">Đọc thêm <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
-                <%-- **THÊM NÚT BẤM CUỘN** (Tái sử dụng class .scroll-button) --%>
-                <button class="scroll-button left" id="featuresScrollLeftBtn" onclick="scrollFeatures(-1)">&#10094;</button>
-                <button class="scroll-button right" id="featuresScrollRightBtn" onclick="scrollFeatures(1)">&#10095;</button>
             </section>
 
-            <%-- Section Chuyên Khoa (Giữ nguyên) --%>
-            <section class="specialties-section" id="specialties">
-                <div class="container-title">
-                    <h2 class="section-title">Chuyên Khoa Nổi Bật</h2>
-                </div>
-                <div class="specialties-scroll-wrapper" id="specialtiesScroller">
-                    <div class="specialty-grid">
-                        <%-- Các thẻ chuyên khoa --%>
-                        <div class="specialty-card"> <div class="icon"><i class="fas fa-heartbeat"></i></div><h4>Tim mạch</h4><p>Khám, chẩn đoán...</p><a href="#" class="learn-more">Xem chi tiết →</a></div>
-                        <div class="specialty-card"> <div class="icon"><i class="fas fa-female"></i></div><h4>Sản - Phụ khoa</h4><p>Chăm sóc sức khỏe...</p><a href="#" class="learn-more">Xem chi tiết →</a></div>
-                        <div class="specialty-card"> <div class="icon"><i class="fas fa-bone"></i></div><h4>Cơ Xương Khớp</h4><p>Điều trị các vấn đề...</p><a href="#" class="learn-more">Xem chi tiết →</a></div>
-                        <div class="specialty-card"> <div class="icon"><i class="fas fa-stethoscope"></i></div><h4>Nội tổng quát</h4><p>Khám và tư vấn...</p><a href="#" class="learn-more">Xem chi tiết →</a></div>
-                        <div class="specialty-card"> <div class="icon"><i class="fas fa-child"></i></div><h4>Nhi khoa</h4><p>Chăm sóc sức khỏe...</p><a href="#" class="learn-more">Xem chi tiết →</a></div>
-                        <div class="specialty-card"> <div class="icon"><i class="fas fa-head-side-cough"></i></div><h4>Tai Mũi Họng</h4><p>Điều trị các bệnh...</p><a href="#" class="learn-more">Xem chi tiết →</a></div>
-                        <div class="specialty-card"> <div class="icon"><i class="fas fa-eye"></i></div><h4>Mắt</h4><p>Khám và điều trị...</p><a href="#" class="learn-more">Xem chi tiết →</a></div>
+            <%-- Giới thiệu (About Us) (Không đổi, nhưng đã sửa link ảnh ở lần trước) --%>
+            <section class="about-section">
+                <div class="container">
+                    <div class="about-content">
+                        <h2 class="section-title">CHÚNG TÔI MANG ĐẾN NHỮNG <br>DỊCH VỤ Y TẾ TỐT NHẤT</h2>
+                        <p class="about-description">
+                            Bệnh viện HQĐ tự hào là địa chỉ tin cậy cho hàng ngàn bệnh nhân với các dịch vụ y tế chất lượng cao. Chúng tôi luôn đặt sức khỏe và sự hài lòng của bạn lên hàng đầu.
+                        </p>
+                        <div class="about-services-grid">
+                            <div class="about-service-item">
+                                <h5><i class="fas fa-stomach"></i> Xét nghiệm dạ dày</h5>
+                                <p>Chẩn đoán chính xác các bệnh lý liên quan đến đường tiêu hóa.</p>
+                            </div>
+                            <div class="about-service-item">
+                                <h5><i class="fas fa-kidney"></i> Kiểm tra chức năng thận</h5>
+                                <p>Phát hiện sớm các vấn đề về thận, giúp điều trị kịp thời.</p>
+                            </div>
+                        </div>
+                        <div class="about-doctors">
+                            <img src="data:image/webp;base64,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" alt="Bác sĩ A" class="doctor-avatar">
+                            <img src="https://th.bing.com/th/id/OIP.jyydels4t1Muexdx-fbNqgHaHa?w=162&h=180&c=7&r=0&o=7&cb=ucfimg2&pid=1.7&rm=3&ucfimg=1" alt="Bác sĩ B" class="doctor-avatar">
+                            <div class="doctor-quote">"Chúng tôi cam kết chăm sóc bạn tận tình." <br> - Nguyễn Đình Tuấn Đạt (Giám đốc Y khoa)</div>
+                        </div>
+                    </div>
+                    <div class="about-image">
+                        <img src="images/chungtoi1.jpg" alt="Về chúng tôi"/>
+                        <img src="images/chungtoi.jpg" alt="Các bác sĩ" class="small-image">
                     </div>
                 </div>
-                <button class="scroll-button left" id="specialtiesScrollLeftBtn" onclick="scrollSpecialties(-1)">&#10094;</button>
-                <button class="scroll-button right" id="specialtiesScrollRightBtn" onclick="scrollSpecialties(1)">&#10095;</button>
             </section>
 
-            <section class="section" id="about">
-                <h3 class="section-title">Về Bệnh viện ABC</h3>
-                <p>Nội dung giới thiệu...</p>
-            </section>
-            <section class="section" id="contact">
-                <h3 class="section-title">Thông tin Liên hệ</h3>
-                <p>Địa chỉ, Điện thoại, Email...</p>
+            <%-- Dịch vụ Nổi bật --%>
+            <section class="our-services-section">
+                <div class="container">
+                    <h2 class="section-title"> CÁC DỊCH VỤ Y TẾ <br> ĐẲNG CẤP CHẤT LƯỢNG CAO</h2>
+                    <div class="services-grid">
+                        <div class="service-card">
+                            <div class="service-icon"><i class="fa-duotone fa-solid fa-lungs"></i></div>
+                            <h4>Bệnh về phổi</h4>
+                            <p>Chẩn đoán và điều trị các bệnh lý hô hấp.</p>
+
+                        </div>
+                        <div class="service-card">
+                            <div class="service-icon"><i class="fas fa-heartbeat"></i></div>
+                            <h4>Bệnh tim mạch</h4>
+                            <p>Chăm sóc sức khỏe tim mạch với công nghệ tiên tiến.</p>
+
+                        </div>
+                        <div class="service-card">
+                            <div class="service-icon"><i class="fas fa-bone"></i></div>
+                            <h4>Chỉnh hình</h4>
+                            <p>Điều trị các vấn đề xương khớp, phục hồi chức năng.</p>
+
+                        </div>
+                        <div class="service-card">
+                            <div class="service-icon"><i class="fas fa-tooth"></i></div>
+                            <h4>Chăm sóc răng miệng</h4>
+                            <p>Dịch vụ nha khoa toàn diện, từ cơ bản đến chuyên sâu.</p>
+
+                        </div>
+                        <div class="service-card">
+                            <div class="service-icon"><i class="fas fa-running"></i></div>
+                            <h4>Y học thể thao</h4>
+                            <p>Hỗ trợ phục hồi chấn thương, tối ưu hóa hiệu suất vận động.</p>
+
+                        </div>
+                        <div class="service-card">
+                            <div class="service-icon"><i class="fas fa-user-md"></i></div>
+                            <h4>Phẫu thuật tổng quát</h4>
+                            <p>Thực hiện các ca phẫu thuật an toàn với đội ngũ chuyên môn cao.</p>
+
+                        </div>
+                    </div>
+                </div>
             </section>
 
-            <%-- 4. Nhúng Footer --%>
-            <jsp:include page="/WEB-INF/footer.jsp" /> 
+            <%-- Gọi hành động (Call to Action) --%>
+            <section class="cta-section">
+                <div class="container">
+                    <div class="cta-content">
+                        <h2 class="section-title">ĐẶT LỊCH HẸN VỚI BÁC SĨ ONLINE</h2>
+                        <p>Với đội ngũ bác sĩ chuyên khoa đa dạng, bạn có thể dễ dàng tìm và đặt lịch hẹn online chỉ với vài bước đơn giản.</p>
+                        <a href="#" class="btn-primary btn1">Đặt Lịch Hẹn Ngay</a>
+                    </div>
+                    <div class="cta-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">200+</div>
+                            <div class="stat-label">Bác sĩ</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">3980+</div>
+                            <div class="stat-label">Bệnh nhân hài lòng</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">1000+</div>
+                            <div class="stat-label">Ca phẫu thuật thành công</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <%-- Footer --%>
+            <footer class="main-footer">
+                <div class="container">
+                    <jsp:include page="/WEB-INF/footer.jsp" /> 
+                </div>
+            </footer>
         </div> 
 
-        <%-- 5. JavaScript (Đã cập nhật cho cả 2 thanh cuộn) --%>
-        <script>
-            // --- SCRIPT CHO THANH CUỘN CHUYÊN KHOA ---
-            const specialtiesScroller = document.getElementById('specialtiesScroller');
-            const specialtiesBtnLeft = document.getElementById('specialtiesScrollLeftBtn'); // Sửa ID
-            const specialtiesBtnRight = document.getElementById('specialtiesScrollRightBtn'); // Sửa ID
-            const specialtyFirstCard = specialtiesScroller ? specialtiesScroller.querySelector('.specialty-card') : null;
+        <%-- ✨ 3. THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-            let specialtyCardWidth = 280;
-            let specialtyGap = 20;
-            if (specialtyFirstCard) {
-                specialtyCardWidth = specialtyFirstCard.offsetWidth;
-                const gridStyle = window.getComputedStyle(specialtyFirstCard.parentElement);
-                specialtyGap = parseFloat(gridStyle.gap) || 20;
-            }
-            const specialtyScrollAmount = 3 * (specialtyCardWidth + specialtyGap);
+        <%-- ✨ 4. LINK TỚI FILE JS (Sẽ cập nhật ở Bước 3) --%>
+        <script src="<c:url value='/js/index.js'/>"></script>
 
-            function scrollSpecialties(direction) {
-                if (specialtiesScroller) {
-                    const newScrollLeft = specialtiesScroller.scrollLeft + direction * specialtyScrollAmount;
-                    specialtiesScroller.scrollTo({left: newScrollLeft, behavior: 'smooth'});
-                }
-            }
-            function checkSpecialtiesScrollButtons() {
-                if (!specialtiesScroller || !specialtiesBtnLeft || !specialtiesBtnRight)
-                    return;
-                setTimeout(() => {
-                    const maxScrollLeft = specialtiesScroller.scrollWidth - specialtiesScroller.clientWidth;
-                    const currentScroll = Math.round(specialtiesScroller.scrollLeft);
-                    specialtiesBtnLeft.classList.toggle('disabled', currentScroll < specialtyGap);
-                    specialtiesBtnRight.classList.toggle('disabled', currentScroll >= (maxScrollLeft - specialtyGap));
-                }, 350);
-            }
-
-
-            // --- **SCRIPT MỚI CHO THANH CUỘN DANH MỤC (FEATURES)** ---
-            const featuresScroller = document.getElementById('featuresScroller');
-            const featuresBtnLeft = document.getElementById('featuresScrollLeftBtn');
-            const featuresBtnRight = document.getElementById('featuresScrollRightBtn');
-            const featureFirstCard = featuresScroller ? featuresScroller.querySelector('.feature-item') : null;
-
-            let featureCardWidth = 170;
-            let featureGap = 15;
-            if (featureFirstCard) {
-                featureCardWidth = featureFirstCard.offsetWidth;
-                const gridStyle = window.getComputedStyle(featureFirstCard.parentElement);
-                featureGap = parseFloat(gridStyle.gap) || 15;
-            }
-            const featuresScrollAmount = 4 * (featureCardWidth + featureGap); // Cuộn 4 thẻ
-
-            function scrollFeatures(direction) {
-                if (featuresScroller) {
-                    const newScrollLeft = featuresScroller.scrollLeft + direction * featuresScrollAmount;
-                    featuresScroller.scrollTo({left: newScrollLeft, behavior: 'smooth'});
-                }
-            }
-            function checkFeaturesScrollButtons() {
-                if (!featuresScroller || !featuresBtnLeft || !featuresBtnRight)
-                    return;
-                setTimeout(() => {
-                    const maxScrollLeft = featuresScroller.scrollWidth - featuresScroller.clientWidth;
-                    const currentScroll = Math.round(featuresScroller.scrollLeft);
-                    featuresBtnLeft.style.display = currentScroll < featureGap ? 'none' : 'flex';
-                    featuresBtnRight.style.display = currentScroll >= (maxScrollLeft - featureGap) ? 'none' : 'flex';
-                }, 100);
-            }
-
-
-            // --- GỌI CÁC HÀM CHECK KHI TẢI TRANG VÀ RESIZE ---
-            document.addEventListener('DOMContentLoaded', () => {
-                checkSpecialtiesScrollButtons();
-                checkFeaturesScrollButtons(); // <-- Gọi hàm check mới
-            });
-
-            if (specialtiesScroller) {
-                specialtiesScroller.addEventListener('scroll', checkSpecialtiesScrollButtons);
-            }
-            if (featuresScroller) {
-                featuresScroller.addEventListener('scroll', checkFeaturesScrollButtons); // <-- Gắn event listener mới
-            }
-
-            let resizeTimer;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(() => {
-                    checkSpecialtiesScrollButtons();
-                    checkFeaturesScrollButtons(); // <-- Gọi hàm check mới
-                }, 250);
-            });
-        </script>
     </body>
 </html>

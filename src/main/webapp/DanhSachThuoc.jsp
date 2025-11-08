@@ -201,6 +201,6 @@
 
         <%-- Tải các file JS ở cuối --%>
         <script src="<c:url value='/js/darkmode.js'/>"></script>
-        <script src="<c:url value='/js/danhSachThuoc.js'/>"></script>
+        <script src="<c:url value='/js/theme.js'/>"></script>
     </body>
 </html>
