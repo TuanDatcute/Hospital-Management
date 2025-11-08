@@ -47,7 +47,7 @@
                         <div class="icon"><i class="fas fa-history"></i></div>
                         <span>Xem Lịch sử khám</span>
                     </a>
-                    <a href="MainController?action=showLichHenCreateForm" class="function-card">
+                    <a href="MainController?action=myAppointments" class="function-card">
                         <div class="icon"><i class="fas fa-calendar-plus"></i></div>
                         <span>Đặt Lịch hẹn</span>
                     </a>

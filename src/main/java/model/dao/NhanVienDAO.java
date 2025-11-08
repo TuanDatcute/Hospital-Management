@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  *
- * @author ADMIN
+ * @author ADMIN (PHIÊN BẢN ĐÃ GỘP: Giữ lại Phân Trang + Quang San + Dat)
  */
 public class NhanVienDAO {
 
@@ -185,9 +185,11 @@ public class NhanVienDAO {
     public List<NhanVien> findDoctorsBySpecialty() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<NhanVien> query = session.createQuery(
-                    "SELECT nv FROM NhanVien nv "
-                    + "JOIN FETCH nv.taiKhoan "
-                    + "WHERE nv.taiKhoan.vaiTro = :role",
+                    "SELECT DISTINCT nv FROM NhanVien nv "
+                    + "JOIN FETCH nv.taiKhoan tk "
+                    + "LEFT JOIN FETCH nv.khoa k " // <-- SỬA LỖI: Thêm dòng này
+                    + "WHERE tk.vaiTro = :role "
+                    + "AND tk.trangThai = 'HOAT_DONG'", // (Thêm lọc Xóa Mềm)
                     NhanVien.class
             );
             query.setParameter("role", "BAC_SI");
@@ -198,7 +200,143 @@ public class NhanVienDAO {
         }
     }
 
+    // === BẮT ĐẦU CÁC HÀM NÂNG CẤP (TỪ FILE 2) ===
+    /**
+     * (Đã nâng cấp) Lấy danh sách đã phân trang (Đã lọc Xóa Mềm) (Ghi chú: Xóa
+     * Mềm của Nhân Viên được lọc qua 'tk.trangThai')
+     */
+    public List<NhanVien> getAllWithRelations(int page, int pageSize) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT DISTINCT n FROM NhanVien n "
+                    + "LEFT JOIN FETCH n.taiKhoan tk "
+                    + "LEFT JOIN FETCH n.khoa "
+                    + "WHERE tk.trangThai = 'HOAT_DONG' " // <-- Lọc Xóa Mềm
+                    + "ORDER BY n.id ASC";
+
+            Query<NhanVien> query = session.createQuery(hql, NhanVien.class);
+            int offset = (page - 1) * pageSize;
+            query.setFirstResult(offset);
+            query.setMaxResults(pageSize);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * (Đã nâng cấp) Đếm tổng số nhân viên (Đã lọc Xóa Mềm)
+     */
+    public long getTotalNhanVienCount() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT count(n.id) FROM NhanVien n JOIN n.taiKhoan tk WHERE tk.trangThai = 'HOAT_DONG'"; // <-- Lọc Xóa Mềm
+            Query<Long> query = session.createQuery(hql, Long.class);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * (Đã nâng cấp) Tìm kiếm nhân viên (có phân trang, ĐÃ LỌC XÓA MỀM)
+     */
+    public List<NhanVien> searchNhanVienPaginated(String keyword, int page, int pageSize) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT DISTINCT n FROM NhanVien n "
+                    + "LEFT JOIN FETCH n.taiKhoan tk "
+                    + "LEFT JOIN FETCH n.khoa "
+                    + "WHERE (tk.trangThai = 'HOAT_DONG') " // Lọc Xóa Mềm
+                    + "AND (n.hoTen LIKE :keyword OR n.soDienThoai LIKE :keyword OR n.chuyenMon LIKE :keyword) "
+                    + "ORDER BY n.id ASC";
+
+            Query<NhanVien> query = session.createQuery(hql, NhanVien.class);
+            query.setParameter("keyword", "%" + keyword + "%");
+
+            int offset = (page - 1) * pageSize;
+            query.setFirstResult(offset);
+            query.setMaxResults(pageSize);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * (Đã nâng cấp) Đếm kết quả tìm kiếm nhân viên (ĐÃ LỌC XÓA MỀM)
+     */
+    public long getNhanVienSearchCount(String keyword) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT count(DISTINCT n.id) FROM NhanVien n "
+                    + "LEFT JOIN n.taiKhoan tk "
+                    + "WHERE (tk.trangThai = 'HOAT_DONG') " // Lọc Xóa Mềm
+                    + "AND (n.hoTen LIKE :keyword OR n.soDienThoai LIKE :keyword OR n.chuyenMon LIKE :keyword)";
+
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("keyword", "%" + keyword + "%");
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * (Đã nâng cấp) Đếm nhân viên đang hoạt động theo Khoa
+     */
+    public long countActiveNhanVienByKhoaId(int khoaId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT count(n.id) FROM NhanVien n "
+                    + "JOIN n.taiKhoan tk "
+                    + "WHERE n.khoa.id = :khoaId AND tk.trangThai = 'HOAT_DONG'"; // Lọc Xóa Mềm
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("khoaId", khoaId);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 999;
+        }
+    }
+    // === KẾT THÚC CÁC HÀM NÂNG CẤP ===
+
+    //===================================Quang San ==============================================
+    // (KHỐI CODE NÀY ĐƯỢC GIỮ NGUYÊN TỪ FILE 1)
+    public List<NhanVien> findBacSiByKhoaId(int khoaId) {
+        // Thêm Log để kiểm tra ID đang được truy vấn
+        System.out.println("DAO: Đang truy vấn bác sĩ cho Khoa ID: " + khoaId);
+
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+
+            // HQL ĐÃ SỬA:
+            // 1. SELECT nv FROM NhanVien nv
+            // 2. INNER JOIN FETCH nv.taiKhoan tk (Giải quyết Lazy Loading cho TaiKhoan)
+            // 3. INNER JOIN FETCH nv.khoa k (Giải quyết Lazy Loading cho Khoa)
+            // 4. Bổ sung lại các điều kiện lọc Vai trò và Trạng thái
+            String hql = "SELECT nv FROM NhanVien nv "
+                    + "INNER JOIN FETCH nv.taiKhoan tk "
+                    + "INNER JOIN FETCH nv.khoa k " // <--- Đã FETCH Khoa (Khắc phục lỗi Lazy Loading/500)
+                    + "WHERE nv.khoa.id = :khoaId "
+                    + "AND tk.vaiTro = 'BAC_SI' " // <--- Thêm lại điều kiện lọc vai trò
+                    + "AND tk.trangThai = 'HOAT_DONG'"; // <--- Thêm lại điều kiện lọc trạng thái
+
+            Query<NhanVien> query = session.createQuery(hql, NhanVien.class);
+            query.setParameter("khoaId", khoaId);
+
+            List<NhanVien> result = query.list();
+            System.out.println("DAO: Số lượng bác sĩ tìm thấy: " + result.size());
+            return result;
+
+        } catch (Exception e) {
+            System.err.println("LỖI DAO khi tìm bác sĩ theo khoa ID: " + khoaId);
+
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
     //=============================Dat================
+    // (KHỐI CODE NÀY ĐƯỢC GIỮ NGUYÊN TỪ FILE 1)
     /**
      * Tìm nhân viên bằng taiKhoanId.
      *
@@ -227,38 +365,22 @@ public class NhanVienDAO {
         }
     }
 
-    /**
-     * HÀM SỬA: Tìm các bác sĩ (NhanVien) theo Khoa ID.
-     */
-    public List<NhanVien> findBacSiByKhoaId(int khoaId) {
-        // Thêm Log để kiểm tra ID đang được truy vấn
-        System.out.println("DAO: Đang truy vấn bác sĩ cho Khoa ID: " + khoaId);
-
+    // Trong file dao/NhanVienDAO.java
+    public List<NhanVien> findDoctorsByKhoaId(int khoaId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-
-            // HQL ĐÃ SỬA:
-            // 1. SELECT nv FROM NhanVien nv
-            // 2. INNER JOIN FETCH nv.taiKhoan tk (Giải quyết Lazy Loading cho TaiKhoan)
-            // 3. INNER JOIN FETCH nv.khoa k (Giải quyết Lazy Loading cho Khoa)
-            // 4. Bổ sung lại các điều kiện lọc Vai trò và Trạng thái
-            String hql = "SELECT nv FROM NhanVien nv "
-                    + "INNER JOIN FETCH nv.taiKhoan tk "
-                    + "INNER JOIN FETCH nv.khoa k " // <--- Đã FETCH Khoa (Khắc phục lỗi Lazy Loading/500)
-                    + "WHERE nv.khoa.id = :khoaId "
-                    + "AND tk.vaiTro = 'BAC_SI' " // <--- Thêm lại điều kiện lọc vai trò
-                    + "AND tk.trangThai = 'HOAT_DONG'"; // <--- Thêm lại điều kiện lọc trạng thái
-
-            Query<NhanVien> query = session.createQuery(hql, NhanVien.class);
+            Query<NhanVien> query = session.createQuery(
+                    "SELECT nv FROM NhanVien nv "
+                    + "JOIN FETCH nv.taiKhoan "
+                    + // Lọc theo khoa.id VÀ vaiTro là BAC_SI
+                    "WHERE nv.khoa.id = :khoaId AND nv.taiKhoan.vaiTro = 'BAC_SI'",
+                    NhanVien.class
+            );
             query.setParameter("khoaId", khoaId);
-
-            List<NhanVien> result = query.list();
-            System.out.println("DAO: Số lượng bác sĩ tìm thấy: " + result.size());
-            return result;
-
+            return query.list();
         } catch (Exception e) {
-            System.err.println("LỖI DAO khi tìm bác sĩ theo khoa ID: " + khoaId);
             e.printStackTrace();
             return Collections.emptyList();
         }
     }
+
 }

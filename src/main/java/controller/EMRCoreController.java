@@ -112,6 +112,7 @@ public class EMRCoreController extends HttpServlet {
             }
 
             switch (action) {
+                
                 case "updateEncounter":
                     url = updateEncounter(request);
                     break;
@@ -211,7 +212,7 @@ public class EMRCoreController extends HttpServlet {
             }
 
             // 2. Lấy danh sách dịch vụ cho dropdown 
-            List<DichVuDTO> danhSachDichVu = dv.getAllServices();
+            List<DichVuDTO> danhSachDichVu = dv.getAllServicesActive();
             List<ChiTietDonThuocDTO> danhSachDonThuoc = donThuocService.getChiTietByPhieuKhamId(id);
 
             // 3. Gửi các đối tượng cần thiết cho JSP
@@ -537,6 +538,8 @@ public class EMRCoreController extends HttpServlet {
         // Luôn redirect về lại trang chi tiết để xem kết quả
         return "redirect:/MainController?action=viewEncounterDetails&id=" + phieuKhamIdStr;
     }
+
+   
 
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     @Override

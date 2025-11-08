@@ -65,6 +65,20 @@ public class DichVuDAO {
         }
     }
 
+    public List<DichVu> getAllActiveServices() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<DichVu> query = session.createQuery(
+                    // ✨ THÊM ĐIỀU KIỆN WHERE MỚI ✨
+                    "FROM DichVu WHERE trangThai = 'SU_DUNG' ORDER BY tenDichVu ASC",
+                    DichVu.class
+            );
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
     /**
      * Cập nhật thông tin một dịch vụ đã có.
      *
@@ -127,9 +141,9 @@ public class DichVuDAO {
         }
     }
 
-   public List<DichVu> searchByIdOrName(String keyword) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            
+    public List<DichVu> searchByIdOrName(String keyword) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+
             // --- BƯỚC 1: CỐ GẮNG CHUYỂN ĐỔI TỪ KHÓA THÀNH SỐ ---
             int keywordAsId = 0; // Mặc định là một ID không tồn tại
             try {

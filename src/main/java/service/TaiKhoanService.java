@@ -62,7 +62,7 @@ public class TaiKhoanService {
      */
     public TaiKhoanDTO createTaiKhoan(TaiKhoanDTO dto, String matKhau) throws ValidationException, Exception {
 
-        // (Validation... giữ nguyên)
+        // --- 1. VALIDATE CHUNG (Tên đăng nhập & Mật khẩu) ---
         if (dto.getTenDangNhap() == null || dto.getTenDangNhap().trim().isEmpty()) {
             throw new ValidationException("Tên đăng nhập không được để trống.");
         }
@@ -75,39 +75,59 @@ public class TaiKhoanService {
         if (taiKhoanDAO.isTenDangNhapExisted(dto.getTenDangNhap())) {
             throw new ValidationException("Tên đăng nhập '" + dto.getTenDangNhap() + "' đã tồn tại.");
         }
-        if (dto.getEmail() != null && !dto.getEmail().trim().isEmpty()) {
+
+        String hashedMatKhau = PasswordHasher.hashPassword(matKhau);
+        TaiKhoan entity = toEntity(dto, hashedMatKhau); // Chuyển đổi cơ bản
+        entity.setCreatedAt(LocalDateTime.now());
+        entity.setUpdatedAt(LocalDateTime.now());
+
+        // --- 2. LOGIC NGHIỆP VỤ (TÙY THEO VAI TRÒ) ---
+        String vaiTro = dto.getVaiTro();
+
+        if ("BENH_NHAN".equals(vaiTro)) {
+            // Kịch bản 1: BỆNH NHÂN TỰ ĐĂNG KÝ
+            // 1a. Bắt buộc Email
+            if (dto.getEmail() == null || dto.getEmail().trim().isEmpty()) {
+                throw new ValidationException("Email là bắt buộc để đăng ký tài khoản bệnh nhân.");
+            }
             if (!Pattern.matches(EMAIL_REGEX, dto.getEmail())) {
                 throw new ValidationException("Định dạng Email không hợp lệ.");
             }
             if (taiKhoanDAO.isEmailExisted(dto.getEmail())) {
                 throw new ValidationException("Email '" + dto.getEmail() + "' đã tồn tại.");
             }
+            // 1b. Gán logic Token (giữ nguyên code của bạn)
+            String token = UUID.randomUUID().toString();
+            entity.setVerificationToken(token);
+            entity.setTokenExpiryDate(LocalDateTime.now().plusHours(24));
+            entity.setTrangThai(TRANG_THAI_CHUA_XAC_THUC);
+            entity.setTrangThaiMatKhau("DA_DOI"); // (Giữ nguyên logic của bạn)
+
         } else {
-            throw new ValidationException("Email là bắt buộc để đăng ký.");
+            // Kịch bản 2: ADMIN TẠO TÀI KHOẢN NHÂN VIÊN
+            // 2a. Email là tùy chọn
+            if (dto.getEmail() != null && !dto.getEmail().trim().isEmpty()) {
+                // Nếu Admin có nhập email, thì VẪN validate nó
+                if (!Pattern.matches(EMAIL_REGEX, dto.getEmail())) {
+                    throw new ValidationException("Định dạng Email không hợp lệ.");
+                }
+                if (taiKhoanDAO.isEmailExisted(dto.getEmail())) {
+                    throw new ValidationException("Email '" + dto.getEmail() + "' đã tồn tại.");
+                }
+                // Gán email đã validate
+                entity.setEmail(dto.getEmail().trim());
+            } else {
+                // Admin không nhập email -> Hoàn toàn hợp lệ
+                entity.setEmail(null);
+            }
+            // 2b. Gán logic cho Nhân viên (đúng như bạn yêu cầu)
+            entity.setVerificationToken(null);
+            entity.setTokenExpiryDate(null);
+            entity.setTrangThai(TRANG_THAI_HOAT_DONG);
+            entity.setTrangThaiMatKhau("CAN_DOI"); // <-- BẮT BUỘC ĐỔI MK
         }
 
-        String hashedMatKhau = PasswordHasher.hashPassword(matKhau);
-        TaiKhoan entity = toEntity(dto, hashedMatKhau);
-
-        // --- **MERGE:** Lấy khối logic token từ nhánh 'main' (có comment) ---
-        String token = UUID.randomUUID().toString();
-        entity.setVerificationToken(token);
-        entity.setTokenExpiryDate(LocalDateTime.now().plusHours(24)); // Hết hạn sau 24h
-
-        // Set trạng thái mặc định là CHUA_XAC_THUC
-        entity.setTrangThai(TRANG_THAI_CHUA_XAC_THUC);
-        // --- **KẾT THÚC MERGE** ---
-
-        entity.setCreatedAt(LocalDateTime.now());
-        entity.setUpdatedAt(LocalDateTime.now());
-
-        String vaiTro = dto.getVaiTro();
-        if ("BENH_NHAN".equals(vaiTro)) {
-            entity.setTrangThaiMatKhau("DA_DOI");
-        } else {
-            entity.setTrangThaiMatKhau("CAN_DOI");
-        }
-
+        // --- 3. LƯU VÀO CSDL ---
         try {
             TaiKhoan savedEntity = taiKhoanDAO.create(entity);
             return (savedEntity != null) ? toDTO(savedEntity) : null;
@@ -192,7 +212,6 @@ public class TaiKhoanService {
         }
     }
 
-    // --- **MERGE:** Lấy hàm 'resendVerificationEmail' từ nhánh của bạn (HEAD) ---
     /**
      * **HÀM MỚI (Gửi lại Xác thực):** Tạo token MỚI cho user CHUA_XAC_THUC.
      */
@@ -383,7 +402,8 @@ public class TaiKhoanService {
     // --- **MERGE:** Lấy hàm 'getDistinctRoles' từ nhánh 'main' ---
     /**
      * Lấy danh sách các vai trò duy nhất từ CSDL.
-     * @return 
+     *
+     * @return
      */
     public List<String> getDistinctRoles() {
         return taiKhoanDAO.getDistinctVaiTro();
@@ -435,4 +455,40 @@ public class TaiKhoanService {
         return toDTO(benhNhan.getTaiKhoan());
     }
     // --- **KẾT THÚC MERGE** ---
+
+    public List<TaiKhoanDTO> getAllTaiKhoanPaginated(int page, int pageSize) {
+        // Gọi hàm DAO mới
+        List<TaiKhoan> entities = taiKhoanDAO.getAllTaiKhoan(page, pageSize);
+        return entities.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * HÀM MỚI (PHÂN TRANG): Đếm tổng số Tài khoản
+     */
+    public long getTaiKhoanCount() {
+        // Gọi hàm DAO mới
+        return taiKhoanDAO.getTotalTaiKhoanCount();
+    }
+
+    /**
+     * HÀM MỚI (TÌM KIẾM): Tìm kiếm Tài khoản (có phân trang)
+     */
+    public List<TaiKhoanDTO> searchTaiKhoanPaginated(String keyword, int page, int pageSize) {
+        // Gọi hàm DAO mới
+        List<TaiKhoan> entities = taiKhoanDAO.searchTaiKhoanPaginated(keyword, page, pageSize);
+        return entities.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * HÀM MỚI (TÌM KIẾM): Đếm kết quả tìm kiếm Tài khoản
+     */
+    public long getTaiKhoanSearchCount(String keyword) {
+        // Gọi hàm DAO mới
+        return taiKhoanDAO.getTaiKhoanSearchCount(keyword);
+    }
+
 }

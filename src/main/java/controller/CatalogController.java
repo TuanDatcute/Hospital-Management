@@ -100,6 +100,18 @@ public class CatalogController extends HttpServlet {
             }
 
             switch (action) {
+                case "deactivateService":
+                    url = updateServiceStatus(request, "NGUNG_SU_DUNG");
+                    break;
+                case "activateService":
+                    url = updateServiceStatus(request, "SU_DUNG");
+                    break;
+                case "deactivateMedication":
+                    url = updateThuocStatus(request, "NGUNG_SU_DUNG");
+                    break;
+                case "activateMedication":
+                    url = updateThuocStatus(request, "SU_DUNG");
+                    break;
                 case "updateService":
                     url = updateService(request);
                     break;
@@ -261,7 +273,7 @@ public class CatalogController extends HttpServlet {
             // 4. XỬ LÝ KẾT QUẢ THÀNH CÔNG
             request.setAttribute("SUCCESS_MESSAGE", "Đã tạo thuốc '" + result.getTenThuoc() + "' thành công!");
             // Có thể chuyển hướng về trang danh sách thuốc
-            return THUOC_LIST_PAGE;
+            return "redirect:/MainController?action=listMedications&keyword=" + result.getTenThuoc();
 
         } catch (ValidationException e) {
             log("Lỗi nghiệp vụ khi tạo thuốc: " + e.getMessage());
@@ -298,7 +310,7 @@ public class CatalogController extends HttpServlet {
 
             // Đặt thông báo thành công vào session để hiển thị sau khi redirect
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Cập nhật thông tin thuốc thành công!");
-            return THUOC_LIST_PAGE; // Chuyển về trang danh sách
+            return "redirect:/MainController?action=listMedications&keyword=" + dto.getTenThuoc();
 
         } catch (ValidationException e) {
             request.setAttribute("ERROR_MESSAGE", e.getMessage());
@@ -314,10 +326,9 @@ public class CatalogController extends HttpServlet {
      * Xử lý cập nhật số lượng tồn kho. chưa làm xong cần thêm ...
      */
     private String updateMedicationStock(HttpServletRequest request) {
+        int thuocId = Integer.parseInt(request.getParameter("thuocId"));
+        int soLuongThayDoi = Integer.parseInt(request.getParameter("soLuongThayDoi"));
         try {
-            int thuocId = Integer.parseInt(request.getParameter("thuocId"));
-            int soLuongThayDoi = Integer.parseInt(request.getParameter("soLuongThayDoi"));
-
             thuocService.updateStockQuantity(thuocId, soLuongThayDoi);
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Cập nhật tồn kho thành công!");
 
@@ -326,7 +337,7 @@ public class CatalogController extends HttpServlet {
         } catch (Exception e) {
             request.getSession().setAttribute("ERROR_MESSAGE", "Lỗi hệ thống khi cập nhật tồn kho.");
         }
-        return THUOC_LIST_PAGE; // Luôn quay về trang danh sách
+        return "redirect:/MainController?action=listMedications&keyword=" + thuocId; // Luôn quay về trang danh sách
     }
 
     private String deleteMedication(HttpServletRequest request) throws Exception {
@@ -341,10 +352,11 @@ public class CatalogController extends HttpServlet {
 
         } catch (ValidationException e) {
             request.getSession().setAttribute("ERROR_MESSAGE", e.getMessage());
+            return "redirect:/MainController?action=listMedications";
         } catch (NumberFormatException e) {
             throw new Exception("ID thuốc không hợp lệ.");
         }
-        return "redirect:/MainController?action=listAndSearchServices&keyword";
+        return "redirect:/MainController?action=listMedications";
     }
 
     // Thêm phương thức này và gọi nó trong doGet
@@ -421,6 +433,59 @@ public class CatalogController extends HttpServlet {
             request.getSession().setAttribute("ERROR_MESSAGE", "ID dịch vụ không hợp lệ.");
         }
         return "redirect:/MainController?action=listAndSearchServices&keyword";
+    }
+
+    /**
+     * ✨ HÀM MỚI ✨ Phương thức chung để xử lý việc cập nhật trạng thái của một
+     * dịch vụ.
+     *
+     * @param request HttpServletRequest
+     * @param newStatus Trạng thái mới cần đặt ("SU_DUNG" hoặc "NGUNG_SU_DUNG")
+     * @return URL để redirect về lại trang danh sách.
+     */
+    private String updateServiceStatus(HttpServletRequest request, String newStatus) {
+        String redirectUrl = "/MainController?action=listAndSearchServices"; // URL trang danh sách
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+
+            dichVuService.updateServiceStatus(id, newStatus);
+
+            String message = "NGUNG_SU_DUNG".equals(newStatus) ? "ngừng sử dụng" : "kích hoạt lại";
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã " + message + " dịch vụ thành công!");
+
+        } catch (ValidationException e) {
+            request.getSession().setAttribute("ERROR_MESSAGE", e.getMessage());
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("ERROR_MESSAGE", "ID dịch vụ không hợp lệ.");
+        } catch (Exception e) {
+            log("Lỗi khi cập nhật trạng thái dịch vụ: ", e);
+            request.getSession().setAttribute("ERROR_MESSAGE", "Lỗi hệ thống: " + e.getMessage());
+        }
+
+        // Luôn redirect về trang danh sách
+        return "redirect:" + redirectUrl;
+    }
+
+    /**
+     *  Phương thức chung để xử lý việc cập nhật trạng thái của một
+     * Thuốc.
+     */
+    private String updateThuocStatus(HttpServletRequest request, String newStatus) {
+        String redirectUrl = "/MainController?action=listMedications"; // URL trang danh sách thuốc
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            thuocService.updateThuocStatus(id, newStatus);
+
+            String message = "NGUNG_SU_DUNG".equals(newStatus) ? "ngừng sử dụng" : "kích hoạt lại";
+            request.getSession().setAttribute("SUCCESS_MESSAGE", "Đã " + message + " thuốc thành công!");
+
+        } catch (ValidationException e) {
+            request.getSession().setAttribute("ERROR_MESSAGE", e.getMessage());
+        } catch (Exception e) {
+            log("Lỗi khi cập nhật trạng thái thuốc: ", e);
+            request.getSession().setAttribute("ERROR_MESSAGE", "Lỗi hệ thống: " + e.getMessage());
+        }
+        return "redirect:" + redirectUrl;
     }
 
     @Override

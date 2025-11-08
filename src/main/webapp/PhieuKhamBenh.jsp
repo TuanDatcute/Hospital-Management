@@ -14,8 +14,22 @@
         </c:choose>
 
         <link rel="stylesheet" href="<c:url value='/css/pkb-style.css'/>">
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+        <script>
+            (function () {
+                // Key này (theme-preference) phải khớp với key trong theme.js
+                var themeKey = 'theme-preference';
+                var theme = localStorage.getItem(themeKey);
+
+                if (theme === 'dark') {
+                    // ✨ SỬA 3: Không đổi màu nền, mà thêm class vào <html>
+                    document.documentElement.classList.add('dark-mode');
+                }
+            })();
+        </script>
+
     </head>
     <body>
         <c:if test="${not empty LOGIN_USER_INFO and not empty LOGIN_ACCOUNT}">
@@ -171,7 +185,9 @@
                 <div class="button-group">
                     <c:choose>
                         <c:when test="${empty phieuKham.id}">
-                            <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="btn btn-secondary">Hủy</a>
+                            <a href="javascript:history.back()" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Quay lại
+                            </a>
                         </c:when>
                         <c:otherwise>
                             <a href="<c:url value='MainController?action=viewEncounterDetails&id=${phieuKham.id}'/>" class="btn btn-secondary">Quay Lại</a>

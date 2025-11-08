@@ -18,18 +18,30 @@ public class ThuocDTO {
     private String donViTinh;
     private BigDecimal donGia;
     private int soLuongTonKho;
+    private String trangThai;    
+// Constructors
 
-    // Constructors
     public ThuocDTO() {
     }
 
-    public ThuocDTO(int id, String tenThuoc, String hoatChat, String donViTinh, BigDecimal donGia, int soLuongTonKho) {
+    public ThuocDTO(int id, String tenThuoc, String hoatChat, String donViTinh, BigDecimal donGia, int soLuongTonKho, String trangThai) {
         this.id = id;
         this.tenThuoc = tenThuoc;
         this.hoatChat = hoatChat;
         this.donViTinh = donViTinh;
         this.donGia = donGia;
         this.soLuongTonKho = soLuongTonKho;
+        this.trangThai = trangThai;
+    }
+
+    
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
     }
 
     // Getters and Setters...
