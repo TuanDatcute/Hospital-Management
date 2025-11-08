@@ -48,7 +48,6 @@ public class Thuoc {
     private Set<ChiTietDonThuoc> danhSachChiTietDonThuoc;
 
     public Thuoc() {
-        this.trangThai = "SU_DUNG";
     }
 
     public String getTrangThai() {

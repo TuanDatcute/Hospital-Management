@@ -97,15 +97,17 @@
 
                                             <%-- ✨ SỬA 4: Gộp tất cả các nút vào cột Hành động (cột 6) --%>
                                             <td class="actions text-center">
-                                                <a href="<c:url value='/MainController?action=showUpdateServiceForm&id=${dv.id}'/>" class="btn btn-edit">
-                                                    <i class="fas fa-pencil-alt"></i> Sửa
+                                                <a href="<c:url value='/MainController?action=showUpdateServiceForm&id=${dv.id}'/>" class="btn btn-edit" title="Sửa thông tin dịch vụ">
+                                                    <i class="fas fa-pencil-alt"></i>
                                                 </a>
 
                                                 <c:if test="${dv.trangThai == 'SU_DUNG'}">
                                                     <form action="<c:url value='/MainController'/>" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn ngừng sử dụng dịch vụ này?');">
                                                         <input type="hidden" name="action" value="deactivateService">
                                                         <input type="hidden" name="id" value="${dv.id}">
-                                                        <button type="submit" class="btn btn-delete">Ngừng</button>
+                                                        <button type="submit" class="btn btn-delete" title="Ngừng sử dụng">
+                                                            <i class="fas fa-toggle-off"></i>
+                                                        </button>
                                                     </form>
                                                 </c:if>
 
@@ -114,7 +116,9 @@
                                                     <form action="<c:url value='/MainController'/>" method="POST" style="display:inline;">
                                                         <input type="hidden" name="action" value="activateService">
                                                         <input type="hidden" name="id" value="${dv.id}">
-                                                        <button type="submit" class="btn btn-success">Kích hoạt</button>
+                                                        <button type="submit" class="btn btn-success" title="Kích hoạt lại">
+                                                            <i class="fas fa-toggle-on"></i>
+                                                        </button>
                                                     </form>
                                                 </c:if>
 

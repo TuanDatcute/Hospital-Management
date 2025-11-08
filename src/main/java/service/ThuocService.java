@@ -35,6 +35,11 @@ public class ThuocService {
         List<Thuoc> entities = thuocDAO.getAll();
         return entities.stream().map(this::toDTO).collect(Collectors.toList());
     }
+    
+    public List<ThuocDTO> getAllMedicationsActive() {
+        List<Thuoc> entities = thuocDAO.getAllActive();
+        return entities.stream().map(this::toDTO).collect(Collectors.toList());
+    }
 
     public ThuocDTO updateMedicationInfo(int id, ThuocDTO dto) throws ValidationException {
         // --- Logic nghiệp vụ: Kiểm tra ---
@@ -167,7 +172,8 @@ public class ThuocService {
                 entity.getHoatChat(),
                 entity.getDonViTinh(),
                 entity.getDonGia(),
-                entity.getSoLuongTonKho()
+                entity.getSoLuongTonKho(),
+                entity.getTrangThai()
         );
     }
 

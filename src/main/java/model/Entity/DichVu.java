@@ -49,7 +49,6 @@ public class DichVu {
     }
 
     public DichVu() {
-        this.trangThai = "SU_DUNG"; 
     }
 
     public DichVu(String tenDichVu, String moTa, BigDecimal donGia) {
