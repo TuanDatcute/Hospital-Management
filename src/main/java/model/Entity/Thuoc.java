@@ -26,13 +26,13 @@ public class Thuoc {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "ten_thuoc", nullable = false, unique = true,columnDefinition = "NVARCHAR(255)")
+    @Column(name = "ten_thuoc", nullable = false, unique = true, columnDefinition = "NVARCHAR(255)")
     private String tenThuoc;
 
-    @Column(name = "hoat_chat",columnDefinition = "NVARCHAR(255)")
+    @Column(name = "hoat_chat", columnDefinition = "NVARCHAR(255)")
     private String hoatChat;
 
-    @Column(name = "don_vi_tinh", nullable = false,columnDefinition = "NVARCHAR(50)")
+    @Column(name = "don_vi_tinh", nullable = false, columnDefinition = "NVARCHAR(50)")
     private String donViTinh;
 
     @Column(name = "don_gia", nullable = false)
@@ -41,10 +41,22 @@ public class Thuoc {
     @Column(name = "so_luong_ton_kho", nullable = false)
     private int soLuongTonKho;
 
+    @Column(name = "trang_thai", nullable = true, columnDefinition = "NVARCHAR(50)")
+    private String trangThai; // Sẽ được gán là "SU_DUNG" hoặc "NGUNG_SU_DUNG"
+
     @OneToMany(mappedBy = "thuoc")
     private Set<ChiTietDonThuoc> danhSachChiTietDonThuoc;
 
     public Thuoc() {
+        this.trangThai = "SU_DUNG";
+    }
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
     }
 
     public Thuoc(String tenThuoc, String hoatChat, String donViTinh, BigDecimal donGia, int soLuongTonKho) {
@@ -111,5 +123,4 @@ public class Thuoc {
         this.danhSachChiTietDonThuoc = danhSachChiTietDonThuoc;
     }
 
-    
 }

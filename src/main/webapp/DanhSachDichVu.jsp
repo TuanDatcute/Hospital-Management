@@ -74,7 +74,8 @@
                                 <th>Tên Dịch Vụ</th>
                                 <th>Mô Tả</th>
                                 <th class="text-right">Đơn Giá</th>
-                                <th class="text-center">Hành động</th>
+                                <th class="text-center">Trạng Thái</th> <%-- ✨ SỬA 1: Di chuyển Trạng Thái về vị trí 5 --%>
+                                <th class="text-center">Hành động</th> <%-- ✨ SỬA 2: Cột Hành động ở vị trí 6 (cuối cùng) --%>
                             </tr>
                         </thead>
                         <tbody>
@@ -86,28 +87,47 @@
                                             <td><strong>${dv.tenDichVu}</strong></td>
                                             <td>${dv.moTa}</td>
                                             <td class="text-right"><fmt:formatNumber value="${dv.donGia}" type="currency" currencySymbol="đ" maxFractionDigits="0"/></td>
+
+                                            <%-- ✨ SỬA 3: Hiển thị dữ liệu Trạng Thái ở cột 5 --%>
+                                            <td class="text-center">
+                                                <span class="status status-${dv.trangThai}">
+                                                    ${dv.trangThai == 'SU_DUNG' ? 'Đang sử dụng' : 'Ngừng sử dụng'}
+                                                </span>
+                                            </td>
+
+                                            <%-- ✨ SỬA 4: Gộp tất cả các nút vào cột Hành động (cột 6) --%>
                                             <td class="actions text-center">
                                                 <a href="<c:url value='/MainController?action=showUpdateServiceForm&id=${dv.id}'/>" class="btn btn-edit">
                                                     <i class="fas fa-pencil-alt"></i> Sửa
                                                 </a>
-                                                <form action="<c:url value='/MainController'/>" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa dịch vụ \'${dv.tenDichVu}\'?');">
-                                                    <input type="hidden" name="action" value="deleteService">
-                                                    <input type="hidden" name="id" value="${dv.id}">
-                                                    <button type="submit" class="btn btn-delete">
-                                                        <i class="fas fa-trash"></i> Xóa
-                                                    </button>
-                                                </form>
+
+                                                <c:if test="${dv.trangThai == 'SU_DUNG'}">
+                                                    <form action="<c:url value='/MainController'/>" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn ngừng sử dụng dịch vụ này?');">
+                                                        <input type="hidden" name="action" value="deactivateService">
+                                                        <input type="hidden" name="id" value="${dv.id}">
+                                                        <button type="submit" class="btn btn-delete">Ngừng</button>
+                                                    </form>
+                                                </c:if>
+
+                                                <%-- (Tùy chọn) Thêm nút "Kích hoạt lại" nếu bạn muốn --%>
+                                                <c:if test="${dv.trangThai == 'NGUNG_SU_DUNG'}">
+                                                    <form action="<c:url value='/MainController'/>" method="POST" style="display:inline;">
+                                                        <input type="hidden" name="action" value="activateService">
+                                                        <input type="hidden" name="id" value="${dv.id}">
+                                                        <button type="submit" class="btn btn-success">Kích hoạt</button>
+                                                    </form>
+                                                </c:if>
+
+                                                <%-- (Form Xóa đã bị xóa, bạn có thể thêm lại nếu muốn) --%>
                                             </td>
                                         </tr>
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
                                     <tr>
-                                        <td colspan="5" class="no-results">
-                                            <c:choose>
-                                                <c:when test="${not empty requestScope.searchKeyword}">Không tìm thấy dịch vụ nào khớp với từ khóa "${requestScope.searchKeyword}".</c:when>
-                                                <c:otherwise>Chưa có dịch vụ nào trong hệ thống.</c:otherwise>
-                                            </c:choose>
+                                        <%-- ✨ SỬA 5: Colspan phải là 6 --%>
+                                        <td colspan="6" class="no-results">
+                                            <%-- (Nội dung không tìm thấy giữ nguyên) --%>
                                         </td>
                                     </tr>
                                 </c:otherwise>

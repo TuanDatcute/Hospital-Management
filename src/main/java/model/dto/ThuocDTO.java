@@ -18,8 +18,9 @@ public class ThuocDTO {
     private String donViTinh;
     private BigDecimal donGia;
     private int soLuongTonKho;
+    private String trangThai;    
+// Constructors
 
-    // Constructors
     public ThuocDTO() {
     }
 
@@ -30,6 +31,14 @@ public class ThuocDTO {
         this.donViTinh = donViTinh;
         this.donGia = donGia;
         this.soLuongTonKho = soLuongTonKho;
+    }
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
     }
 
     // Getters and Setters...

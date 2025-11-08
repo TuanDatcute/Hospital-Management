@@ -16,7 +16,7 @@ import model.dao.DichVuDAO;
 public class DichVuService {
 
     private DichVuDAO dichVuDAO = new DichVuDAO();
-
+ private ChiDinhDichVuDAO chiDinhDAO = new ChiDinhDichVuDAO();
     /**
      * Lấy danh sách tất cả dịch vụ.
      *
@@ -29,6 +29,11 @@ public class DichVuService {
             dtoList.add(toDTO(entity));
         }
         return dtoList;
+    }
+
+    public List<DichVuDTO> getAllServicesActive() {
+        List<DichVu> entities = dichVuDAO.getAllActiveServices();
+        return entities.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     /**
@@ -129,8 +134,6 @@ public class DichVuService {
         return dichVuDAO.searchByIdOrName(keyword).stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-
-
     // --- CÁC PHƯƠNG THỨC CHUYỂN ĐỔI (HELPER METHODS) ---
     /**
      * Chuyển đổi từ DTO sang Entity.
@@ -148,11 +151,41 @@ public class DichVuService {
      * Chuyển đổi từ Entity sang DTO.
      */
     private DichVuDTO toDTO(DichVu entity) {
-        return new DichVuDTO(
-                entity.getId(),
-                entity.getTenDichVu(),
-                entity.getMoTa(),
-                entity.getDonGia()
-        );
+        DichVuDTO dto = new DichVuDTO();
+        dto.setId(entity.getId());
+        dto.setTenDichVu(entity.getTenDichVu());
+        dto.setMoTa(entity.getMoTa());
+        dto.setDonGia(entity.getDonGia());
+        dto.setTrangThai(entity.getTrangThai()); // ✨ Đảm bảo có dòng này
+        return dto;
+    }
+
+    /**
+     * ✨ HÀM MỚI ✨ NGHIỆP VỤ: Cập nhật trạng thái của một dịch vụ.
+     *
+     * @param id ID của dịch vụ cần cập nhật.
+     * @param newStatus Trạng thái mới (ví dụ: "NGUNG_SU_DUNG").
+     * @throws ValidationException nếu có lỗi nghiệp vụ.
+     */
+    public void updateServiceStatus(int id, String newStatus) throws ValidationException {
+        // 1. Lấy Entity gốc
+        DichVu existingService = dichVuDAO.getById(id);
+        if (existingService == null) {
+            throw new ValidationException("Không tìm thấy dịch vụ với ID: " + id);
+        }
+
+        // 2. Kiểm tra logic nghiệp vụ
+        if ("NGUNG_SU_DUNG".equals(newStatus)) {
+            // Kiểm tra xem dịch vụ có đang được sử dụng không
+            if (chiDinhDAO.isServiceInUse(id)) {
+                throw new ValidationException("Không thể ngừng: Dịch vụ đang được sử dụng trong một phiếu khám.");
+            }
+        }
+
+        // 3. Cập nhật trạng thái
+        existingService.setTrangThai(newStatus);
+
+        // 4. Gọi DAO để lưu thay đổi
+        dichVuDAO.update(existingService);
     }
 }

@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import service.NhanVienService;
 
-
 /**
  * Servlet điều hướng chính (Front Controller). **ĐÃ CẬP NHẬT:** Đã merge (kết
  * hợp) các tính năng Auth và tính năng Main.
@@ -53,7 +52,7 @@ public class MainController extends HttpServlet {
 
         // 2. Nhóm các action cho từng controller
         String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
-        String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "deleteMedication", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deleteService"};
+        String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deactivateService", "activateService","activateMedication","deactivateMedication"};
         String[] NurseLichHenActions = {"showCreateAppointmentForm", "createAppointment", "getDoctorsByKhoa", "listLichHenNurse", "updateAppointmentStatus"};
 
         // **MERGE:** Lấy 'lichHenActions' từ nhánh 'main' (vì nó đầy đủ hơn)
@@ -104,7 +103,6 @@ public class MainController extends HttpServlet {
         };
 
         // 3. Điều hướng dựa trên action (ĐÃ KẾT HỢP CẢ 2 NHÁNH)
-       
         if (action == null || action.isEmpty()) {
             url = LOGIN_PAGE;
         } // --- (Auth features - từ nhánh của bạn) ---
@@ -151,8 +149,6 @@ public class MainController extends HttpServlet {
         // 4. Forward đến controller tương ứng
         request.getRequestDispatcher(url).forward(request, response);
     }
-
-   
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     @Override
