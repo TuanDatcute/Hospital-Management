@@ -88,19 +88,24 @@ public class PhieuKhamBenhDAO {
     public PhieuKhamBenh getDetailsByIdToUpdateStatus(int id) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             // Câu query này đã lấy sẵn danh sách chỉ định, hoàn hảo cho nghiệp vụ của chúng ta
-           Query<PhieuKhamBenh> query = session.createQuery(
-            "SELECT pkb FROM PhieuKhamBenh pkb " +
-            "LEFT JOIN FETCH pkb.benhNhan bn " +
-            "LEFT JOIN FETCH bn.taiKhoan " + // Lấy tài khoản để gửi email
-            "LEFT JOIN FETCH pkb.bacSi " + // Lấy bác sĩ
-            "LEFT JOIN FETCH pkb.danhSachChiDinh cdd " + // Lấy danh sách chỉ định
-            "LEFT JOIN FETCH cdd.dichVu " +
-            "LEFT JOIN FETCH pkb.donThuoc dt " + // Lấy đơn thuốc
-            "LEFT JOIN FETCH dt.chiTietDonThuoc cdt " + // Lấy chi tiết đơn thuốc
-            "LEFT JOIN FETCH cdt.thuoc " +
-            "WHERE pkb.id = :id", 
-            PhieuKhamBenh.class
-        );
+            Query<PhieuKhamBenh> query = session.createQuery(
+                    "SELECT pkb FROM PhieuKhamBenh pkb "
+                    + "LEFT JOIN FETCH pkb.benhNhan bn "
+                    + "LEFT JOIN FETCH bn.taiKhoan "
+                    + // Lấy tài khoản để gửi email
+                    "LEFT JOIN FETCH pkb.bacSi "
+                    + // Lấy bác sĩ
+                    "LEFT JOIN FETCH pkb.danhSachChiDinh cdd "
+                    + // Lấy danh sách chỉ định
+                    "LEFT JOIN FETCH cdd.dichVu "
+                    + "LEFT JOIN FETCH pkb.donThuoc dt "
+                    + // Lấy đơn thuốc
+                    "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
+                    + // Lấy chi tiết đơn thuốc
+                    "LEFT JOIN FETCH cdt.thuoc "
+                    + "WHERE pkb.id = :id",
+                    PhieuKhamBenh.class
+            );
             query.setParameter("id", id);
             return query.uniqueResult();
         } catch (Exception e) {
@@ -358,6 +363,25 @@ public class PhieuKhamBenhDAO {
             );
             query.setParameter("bacSiId", bacSiId);
             query.setParameter("keyword", "%" + keyword + "%");
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+    // Trong file: model/dao/PhieuKhamBenhDAO.java
+
+    public List<PhieuKhamBenh> findByPatientId(int benhNhanId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<PhieuKhamBenh> query = session.createQuery(
+                    "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb "
+                    + "LEFT JOIN FETCH pkb.bacSi "
+                    + "LEFT JOIN FETCH pkb.benhNhan "
+                    + "WHERE pkb.benhNhan.id = :benhNhanId "
+                    + "ORDER BY pkb.thoiGianKham DESC", // Mới nhất lên đầu
+                    PhieuKhamBenh.class
+            );
+            query.setParameter("benhNhanId", benhNhanId);
             return query.list();
         } catch (Exception e) {
             e.printStackTrace();
