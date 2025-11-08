@@ -1,4 +1,4 @@
-package model.Entity; 
+package model.Entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,6 +21,9 @@ public class Khoa {
 
     @Column(name = "mo_ta", columnDefinition = "NVARCHAR(MAX)")
     private String moTa;
+
+    @Column(name = "trang_thai", nullable = false, length = 50)
+    private String trangThai = "HOAT_DONG"; // Đặt giá trị mặc định
 
     // Constructors
     public Khoa() {
@@ -49,5 +52,13 @@ public class Khoa {
 
     public void setMoTa(String moTa) {
         this.moTa = moTa;
+    }
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
     }
 }

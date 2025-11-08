@@ -63,7 +63,7 @@
             </c:if>
 
             <%-- **SỬA LẠI: Dùng .data-form với style đã reset** --%>
-            <form action="MainController" method="post" class="data-form">
+            <form action="${pageContext.request.contextPath}/MainController" method="post" class="data-form">
 
                 <input type="hidden" name="action" value="changePassword" />
 

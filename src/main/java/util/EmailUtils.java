@@ -10,6 +10,9 @@ import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import model.dto.LichHenDTO;
 import model.dto.PhieuKhamBenhDTO;
 
 /**
@@ -88,7 +91,7 @@ public class EmailUtils {
     }
 
     /**
-     *  Gửi email thông báo KHI PHIẾU KHÁM HOÀN THÀNH.
+     * Gửi email thông báo KHI PHIẾU KHÁM HOÀN THÀNH.
      *
      * @param toEmail Email của bệnh nhân.
      * @param phieuKham DTO chứa thông tin phiếu khám.
@@ -243,6 +246,107 @@ public class EmailUtils {
                 + "</html>";
     }
     // --- **KẾT THÚC THÊM MỚI** ---
+
+    /**
+     * HÀM MỚI: Gửi email XÁC NHẬN khi bệnh nhân đặt lịch hẹn
+     */
+    public static void sendAppointmentConfirmationEmail(String toEmail, LichHenDTO lichHen) throws MessagingException {
+        // 1. Xây dựng Tiêu đề
+        String subject = "Xác nhận Lịch hẹn #" + lichHen.getId() + " - STT: " + lichHen.getStt();
+
+        // 2. Xây dựng Nội dung HTML
+        String htmlContent = buildAppointmentConfirmationHtml(toEmail, lichHen);
+
+        // 3. Gọi hàm gửi
+        private_sendEmail(toEmail, subject, htmlContent);
+    }
+
+    /**
+     * HÀM MỚI: Gửi email THÔNG BÁO khi bệnh nhân hủy lịch hẹn
+     */
+    public static void sendAppointmentCancellationEmail(String toEmail, LichHenDTO lichHen) throws MessagingException {
+        // 1. Xây dựng Tiêu đề
+        String subject = "Thông báo Hủy Lịch hẹn #" + lichHen.getId();
+
+        // 2. Xây dựng Nội dung HTML
+        String htmlContent = buildAppointmentCancellationHtml(toEmail, lichHen);
+
+        // 3. Gọi hàm gửi
+        private_sendEmail(toEmail, subject, htmlContent);
+    }
+
+    /**
+     * HÀM MỚI (Helper): Tạo HTML cho email Xác nhận đặt lịch
+     */
+    private static String buildAppointmentConfirmationHtml(String toEmail, LichHenDTO lichHen) {
+        // Định dạng lại thời gian
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm 'ngày' dd/MM/yyyy");
+        // Giả sử múi giờ +07:00
+        String thoiGianHenFormatted = lichHen.getThoiGianHen().withOffsetSameInstant(ZoneOffset.ofHours(7)).format(formatter);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html><body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>");
+        sb.append("<div style='max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>");
+
+        sb.append("<h2 style='color: #007bff; margin-top: 0;'>Xác nhận Đặt lịch hẹn thành công</h2>");
+        sb.append("<p>Xin chào <strong>").append(lichHen.getTenBenhNhan()).append("</strong>,</p>");
+        sb.append("<p>Bạn đã đặt lịch hẹn thành công tại Bệnh viện Quốc tế HQD. Vui lòng kiểm tra thông tin dưới đây:</p>");
+        sb.append("<hr style='border: 0; border-top: 1px solid #eee;'>");
+
+        sb.append("<h3 style='color: #4a90e2;'>Chi tiết Lịch hẹn</h3>");
+        sb.append("<ul style='list-style: none; padding-left: 0;'>");
+        sb.append("<li><strong>Bác sĩ:</strong> ").append(lichHen.getTenBacSi()).append("</li>");
+        sb.append("<li><strong>Thời gian:</strong> <strong style='color: #c00;'>").append(thoiGianHenFormatted).append("</strong></li>");
+        sb.append("<li><strong>Số thứ tự (STT):</strong> <strong style='color: #c00;'>").append(lichHen.getStt()).append("</strong></li>");
+        sb.append("<li><strong>Lý do khám:</strong> ").append(lichHen.getLyDoKham()).append("</li>");
+        sb.append("<li><strong>Trạng thái:</strong> ").append(lichHen.getTrangThai()).append(" (Sẽ được nhân viên y tế xác nhận sớm)</li>");
+        sb.append("</ul>");
+
+        sb.append("<p>Vui lòng có mặt trước 15 phút. Nếu muốn hủy lịch, bạn có thể đăng nhập vào hệ thống.</p>");
+
+        sb.append("<div style='text-align: center; margin: 30px 0;'>");
+        sb.append("<a href='").append(APP_BASE_URL).append("' style='background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Đăng nhập hệ thống</a>");
+        sb.append("</div>");
+
+        sb.append("<p style='font-size: 0.9em; color: #777; text-align: center;'>Trân trọng,<br>Bệnh viện HospitalManagement</p>");
+        sb.append("</div></body></html>");
+
+        return sb.toString();
+    }
+
+    /**
+     * HÀM MỚI (Helper): Tạo HTML cho email Hủy lịch
+     */
+    private static String buildAppointmentCancellationHtml(String toEmail, LichHenDTO lichHen) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm 'ngày' dd/MM/yyyy");
+        String thoiGianHenFormatted = lichHen.getThoiGianHen().withOffsetSameInstant(ZoneOffset.ofHours(7)).format(formatter);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html><body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>");
+        sb.append("<div style='max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>");
+
+        sb.append("<h2 style='color: #dc3545; margin-top: 0;'>Thông báo Hủy lịch hẹn</h2>");
+        sb.append("<p>Xin chào <strong>").append(lichHen.getTenBenhNhan()).append("</strong>,</p>");
+        sb.append("<p>Lịch hẹn của bạn đã được hủy thành công.</p>");
+        sb.append("<hr style='border: 0; border-top: 1px solid #eee;'>");
+
+        sb.append("<h3 style='color: #4a90e2;'>Chi tiết Lịch hẹn đã hủy</h3>");
+        sb.append("<ul style='list-style: none; padding-left: 0;'>");
+        sb.append("<li><strong>Bác sĩ:</strong> ").append(lichHen.getTenBacSi()).append("</li>");
+        sb.append("<li><strong>Thời gian:</strong> ").append(thoiGianHenFormatted).append("</li>");
+        sb.append("<li><strong>Trạng thái:</strong> <strong style='color: #dc3545;'>ĐÃ HỦY</strong></li>");
+        sb.append("</ul>");
+
+        sb.append("<p>Nếu bạn không phải là người thực hiện hủy lịch, vui lòng liên hệ với chúng tôi ngay lập tức.</p>");
+
+        sb.append("<div style='text-align: center; margin: 30px 0;'>");
+        sb.append("<a href='").append(APP_BASE_URL).append("' style='background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Đăng nhập hệ thống</a>");
+        sb.append("</div>");
+
+        sb.append("</div></body></html>");
+
+        return sb.toString();
+    }
 
     /**
      * **HÀM TEST (THỬ NGHIỆM)** **CẬP NHẬT:** Test cả 2 hàm.
