@@ -242,9 +242,6 @@ public class LichHenController extends HttpServlet {
 
         return dto;
     }
-
-   
-
     @Override
     public String getServletInfo() {
         return "Controller quản lý các nghiệp vụ liên quan đến Lịch Hẹn.";

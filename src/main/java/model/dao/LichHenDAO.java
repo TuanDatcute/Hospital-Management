@@ -271,4 +271,50 @@ public class LichHenDAO {
             return Collections.emptyList();
         }
     }
+
+    /**
+     * Lấy tất cả lịch hẹn, tải sẵn thông tin bệnh nhân và bác sĩ. Sắp xếp theo
+     * STT và thời gian hẹn.
+     */
+    public List<LichHen> getAll() {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<LichHen> query = session.createQuery(
+                    "SELECT DISTINCT lh FROM LichHen lh "
+                    + "LEFT JOIN FETCH lh.benhNhan "
+                    + "LEFT JOIN FETCH lh.bacSi "
+                    + "ORDER BY lh.thoiGianHen DESC, lh.stt ASC",
+                    LichHen.class
+            );
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Tìm kiếm lịch hẹn theo từ khóa (tên bệnh nhân, tên bác sĩ, lý do, trạng
+     * thái).
+     */
+    public List<LichHen> search(String keyword) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<LichHen> query = session.createQuery(
+                    "SELECT DISTINCT lh FROM LichHen lh "
+                    + "JOIN FETCH lh.benhNhan bn "
+                    + "JOIN FETCH lh.bacSi bs "
+                    + "WHERE bn.hoTen LIKE :keyword "
+                    + "OR bs.hoTen LIKE :keyword "
+                    + "OR lh.lyDoKham LIKE :keyword "
+                    + "OR lh.trangThai LIKE :keyword "
+                    + "ORDER BY lh.thoiGianHen DESC",
+                    LichHen.class
+            );
+            query.setParameter("keyword", "%" + keyword + "%");
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
 }

@@ -35,6 +35,12 @@
             </a>
         </li>
         <li>
+            <a href="<c:url value='/MainController?action=listAll'/>" class="nav-link" data-link="listAll">
+                <i class="fas fa-notes-medical"></i>
+                <span class="nav-text">DS. Đơn Thuốc</span>
+            </a>
+        </li>
+        <li>
             <a href="<c:url value='/MainController?action=listAppointments'/>" class="nav-link" data-link="listAppointments">
                 <i class="fas fa-calendar-alt"></i>
                 <span class="nav-text">Lịch Hẹn</span>
