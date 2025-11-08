@@ -340,10 +340,11 @@ public class CatalogController extends HttpServlet {
 
         } catch (ValidationException e) {
             request.getSession().setAttribute("ERROR_MESSAGE", e.getMessage());
+            return "redirect:/MainController?action=listMedications";
         } catch (NumberFormatException e) {
             throw new Exception("ID thuốc không hợp lệ.");
         }
-        return THUOC_LIST_PAGE;
+        return "redirect:/MainController?action=listMedications";
     }
 
     // Thêm phương thức này và gọi nó trong doGet
