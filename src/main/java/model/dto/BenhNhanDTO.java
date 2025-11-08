@@ -23,6 +23,7 @@ public class BenhNhanDTO implements Serializable {
     private Integer taiKhoanId;
     private Integer khoaId;
     private String tenKhoa; // Trường đã "làm phẳng"
+    private String avatarBase64;
 
     // Constructors
     public BenhNhanDTO() {
@@ -132,4 +133,13 @@ public class BenhNhanDTO implements Serializable {
     public void setTenKhoa(String tenKhoa) {
         this.tenKhoa = tenKhoa;
     }
+
+    public String getAvatarBase64() {
+        return avatarBase64;
+    }
+
+    public void setAvatarBase64(String avatarBase64) {
+        this.avatarBase64 = avatarBase64;
+    }
+
 }
