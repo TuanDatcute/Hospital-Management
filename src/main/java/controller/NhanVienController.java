@@ -106,7 +106,7 @@ public class NhanVienController extends HttpServlet {
                 case "updateNhanVien":
                     url = updateNhanVien(request);
                     break;
-                case "deleteNhanVien": // Xử lý Soft Delete
+                case "softDeleteNhanVien": // Xử lý Soft Delete
                     url = softDeleteNhanVien(request);
                     break;
                 default:

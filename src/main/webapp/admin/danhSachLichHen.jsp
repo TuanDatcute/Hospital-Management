@@ -90,10 +90,6 @@
             </c:if>
             <%-- === KẾT THÚC SỬA LỖI PRG === --%>
 
-            <a href="MainController?action=showLichHenCreateForm" class="add-new-btn">
-                <i class="fas fa-calendar-plus"></i> Tạo Lịch hẹn Mới
-            </a>
-
             <%-- (CHƯA THÊM TÌM KIẾM CHO LỊCH HẸN) --%>
 
             <table class="data-table">
@@ -104,8 +100,6 @@
                         <th>Bệnh nhân</th>
                         <th>Bác sĩ</th>
                         <th>Trạng thái</th>
-                        <th style="width: 250px;">Cập nhật Trạng thái</th>
-                        <th style="width: 50px;">Sửa</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -126,30 +120,6 @@
                                     <c:when test="${lh.trangThai == 'CHO_XAC_NHAN'}"><span style="color: orange; font-weight: bold;">Chờ xác nhận</span></c:when>
                                     <c:otherwise><c:out value="${lh.trangThai}"/></c:otherwise>
                                 </c:choose>
-                            </td>
-                            <td class="actions">
-                                <c:if test="${lh.trangThai != 'HOAN_THANH' && lh.trangThai != 'DA_HUY'}">
-                                    <form action="MainController" method="post" class="table-form">
-                                        <input type="hidden" name="action" value="updateLichHenStatus" />
-                                        <input type="hidden" name="id" value="${lh.id}" />
-                                        <select name="trangThai" class="form-control-sm">
-                                            <option value="DA_XAC_NHAN" ${lh.trangThai == 'DA_XAC_NHAN' ? 'selected' : ''}>Đã xác nhận</option>
-                                            <option value="DA_DEN_KHAM" ${lh.trangThai == 'DA_DEN_KHAM' ? 'selected' : ''}>Đã đến khám</option>
-                                            <option value="HOAN_THANH" ${lh.trangThai == 'HOAN_THANH' ? 'selected' : ''}>Hoàn thành</option>
-                                            <option value="DA_HUY" ${lh.trangThai == 'DA_HUY' ? 'selected' : ''}>Hủy lịch</option>
-                                        </select>
-                                        <button type="submit" class="btn-sm" title="Cập nhật">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    </form>
-                                </c:if>
-                            </td>
-                            <td>
-                                <c:if test="${lh.trangThai != 'HOAN_THANH' && lh.trangThai != 'DA_HUY'}">
-                                    <a href="MainController?action=showLichHenEditForm&id=${lh.id}" class="edit-btn" title="Sửa lịch hẹn">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                </c:if>
                             </td>
                         </tr>
                     </c:forEach>

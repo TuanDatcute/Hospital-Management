@@ -7,9 +7,10 @@
         <title>Lịch hẹn của tôi</title>
         <%-- THÊM CSS MỚI --%>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/LichHenQuang.css">
-        <%-- Xóa thẻ <style> cũ --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
     </head>
     <body>
+        <jsp:include page="/WEB-INF/header.jsp" /> 
         <h2>Lịch hẹn của tôi</h2>
 
         <%-- Thông báo (Giữ nguyên) --%>
@@ -78,6 +79,6 @@
                 </c:forEach>
             </tbody>
         </table>
-
+        <jsp:include page="/WEB-INF/footer.jsp" /> 
     </body>
 </html>
