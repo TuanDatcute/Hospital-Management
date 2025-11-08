@@ -3,7 +3,7 @@ package model.dto; // DTO nên nằm trong package riêng
 import java.math.BigDecimal;
 
 /**
- * DTO (Data Transfer Object) 
+ * DTO (Data Transfer Object)
  */
 public class DichVuDTO {
 
@@ -11,6 +11,7 @@ public class DichVuDTO {
     private String tenDichVu;
     private String moTa;
     private BigDecimal donGia;
+    private String trangThai;
 
     // --- Constructors ---
     public DichVuDTO() {
@@ -21,6 +22,14 @@ public class DichVuDTO {
         this.tenDichVu = tenDichVu;
         this.moTa = moTa;
         this.donGia = donGia;
+    }
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
     }
 
     // --- Getters and Setters ---

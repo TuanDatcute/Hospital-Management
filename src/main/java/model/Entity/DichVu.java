@@ -29,7 +29,7 @@ public class DichVu {
     @Column(name = "ten_dich_vu", nullable = false, unique = true, columnDefinition = "NVARCHAR(255)")
     private String tenDichVu;
 
-    @Column(name = "mo_ta",columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "mo_ta", columnDefinition = "NVARCHAR(MAX)")
     private String moTa;
 
     @Column(name = "don_gia", nullable = false)
@@ -37,8 +37,19 @@ public class DichVu {
 
     @OneToMany(mappedBy = "dichVu")
     private Set<ChiDinhDichVu> danhSachChiDinh;
+    @Column(name = "trang_thai", nullable = true, columnDefinition = "NVARCHAR(50)")
+    private String trangThai;
+
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
+    }
 
     public DichVu() {
+        this.trangThai = "SU_DUNG"; 
     }
 
     public DichVu(String tenDichVu, String moTa, BigDecimal donGia) {
@@ -54,7 +65,6 @@ public class DichVu {
     public void setId(Integer id) {
         this.id = id;
     }
-
 
     public String getTenDichVu() {
         return tenDichVu;

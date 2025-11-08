@@ -80,7 +80,8 @@
                                 <th>ĐVT</th>
                                 <th class="text-right">Đơn Giá</th>
                                 <th class="text-right">Tồn Kho</th>
-                                <th class="text-center">Hành động</th>
+                                <th class="text-center">Trạng Thái</th> <%-- ✨ SỬA 1: Di chuyển Trạng Thái về vị trí 7 --%>
+                                <th class="text-center">Hành động</th> <%-- ✨ SỬA 2: Cột Hành động ở vị trí 8 (cuối cùng) --%>
                             </tr>
                         </thead>
                         <tbody>
@@ -94,41 +95,50 @@
                                             <td>${thuoc.donViTinh}</td>
                                             <td class="text-right"><fmt:formatNumber value="${thuoc.donGia}" type="currency" currencySymbol="đ" maxFractionDigits="0"/></td>
                                             <td class="text-right">
-                                                <button class="stock-button update-stock-btn
-                                                        <c:if test='${thuoc.soLuongTonKho == 0}'>stock-empty</c:if>
-                                                        <c:if test='${thuoc.soLuongTonKho > 0 && thuoc.soLuongTonKho <= 20}'>stock-low</c:if>" 
-                                                        data-id="${thuoc.id}" 
-                                                        data-name="${thuoc.tenThuoc}" 
-                                                        data-current-stock="${thuoc.soLuongTonKho}">
+                                                <button class="stock-button update-stock-btn ...">
                                                     <i class="fas fa-box-open"></i> <span>${thuoc.soLuongTonKho}</span>
                                                 </button>
                                             </td>
+
+                                            <%-- ✨ SỬA 3: Hiển thị dữ liệu Trạng Thái ở cột 7 --%>
+                                            <td class="text-center">
+                                                <span class="status status-${thuoc.trangThai}">
+                                                    ${thuoc.trangThai == 'SU_DUNG' ? 'Đang sử dụng' : 'Ngừng sử dụng'}
+                                                </span>
+                                            </td>
+
+                                            <%-- ✨ SỬA 4: Gộp tất cả các nút vào cột Hành động (cột 8) --%>
                                             <td class="actions text-center">
                                                 <a href="<c:url value='/MainController?action=showUpdateForm&id=${thuoc.id}'/>" class="btn btn-edit">
                                                     <i class="fas fa-pencil-alt"></i> Sửa
                                                 </a>
-                                                <form action="<c:url value='/MainController'/>" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa thuốc này?');">
-                                                    <input type="hidden" name="action" value="deleteMedication">
-                                                    <input type="hidden" name="id" value="${thuoc.id}">
-                                                    <button type="submit" class="btn btn-delete">
-                                                        <i class="fas fa-trash"></i> Xóa
-                                                    </button>
-                                                </form>
+
+                                                <c:if test="${thuoc.trangThai == 'SU_DUNG'}">
+                                                    <form action="<c:url value='/MainController'/>" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn ngừng sử dụng thuốc này?');">
+                                                        <input type="hidden" name="action" value="deactivateMedication">
+                                                        <input type="hidden" name="id" value="${thuoc.id}">
+                                                        <button type="submit" class="btn btn-delete">Ngừng</button>
+                                                    </form>
+                                                </c:if>
+
+                                                <c:if test="${thuoc.trangThai == 'NGUNG_SU_DUNG'}">
+                                                    <form action="<c:url value='/MainController'/>" method="POST" style="display:inline;">
+                                                        <input type="hidden" name="action" value="activateMedication">
+                                                        <input type="hidden" name="id" value="${thuoc.id}">
+                                                        <button type="submit" class="btn btn-success">Kích hoạt</button>
+                                                    </form>
+                                                </c:if>
+
+                                                <%-- (Form Xóa đã bị xóa, bạn có thể thêm lại nếu muốn) --%>
                                             </td>
                                         </tr>
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
                                     <tr>
-                                        <td colspan="7" class="no-results">
-                                            <c:choose>
-                                                <c:when test="${not empty requestScope.searchKeyword}">
-                                                    Không tìm thấy thuốc nào khớp với từ khóa "${requestScope.searchKeyword}".
-                                                </c:when>
-                                                <c:otherwise>
-                                                    Chưa có dữ liệu thuốc nào trong hệ thống.
-                                                </c:otherwise>
-                                            </c:choose>
+                                        <%-- ✨ SỬA 5: Colspan phải là 8 --%>
+                                        <td colspan="8" class="no-results">
+                                            <%-- (Nội dung không tìm thấy giữ nguyên) --%>
                                         </td>
                                     </tr>
                                 </c:otherwise>

@@ -11,6 +11,7 @@ import model.dao.ChiTietDonThuocDAO;
 public class ThuocService {
 
     private final ThuocDAO thuocDAO = new ThuocDAO();
+    private final ChiTietDonThuocDAO chiTietDonThuocDAO = new ChiTietDonThuocDAO(); // ✨ Khởi tạo DAO
 
     public ThuocDTO createMedication(ThuocDTO dto) throws ValidationException {
         if (dto.getTenThuoc() == null || dto.getTenThuoc().trim().isEmpty()) {
@@ -66,10 +67,10 @@ public class ThuocService {
         if (existingThuoc == null) {
             throw new ValidationException("Không tìm thấy thuốc để xóa.");
         }
-  
-         if (ChiTietDonThuocDAO.isMedicationInUse(id)) {
-             throw new ValidationException("Không thể xóa thuốc này vì nó đang được sử dụng trong các đơn thuốc đã kê.");
-         }
+
+        if (ChiTietDonThuocDAO.isMedicationInUse(id)) {
+            throw new ValidationException("Không thể xóa thuốc này vì nó đang được sử dụng trong các đơn thuốc đã kê.");
+        }
         thuocDAO.delete(id);
     }
 
@@ -100,7 +101,6 @@ public class ThuocService {
         return toDTO(thuoc);
     }
 
-
     public List<ThuocDTO> searchMedicationsByName(String name) throws Exception {
         // --- Logic nghiệp vụ: Kiểm tra đầu vào ---
         if (name == null || name.trim().isEmpty()) {
@@ -116,6 +116,35 @@ public class ThuocService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * ✨ HÀM MỚI ✨ NGHIỆP VỤ: Cập nhật trạng thái của một loại thuốc.
+     *
+     * @param id ID của thuốc cần cập nhật.
+     * @param newStatus Trạng thái mới (ví dụ: "NGUNG_SU_DUNG").
+     * @throws ValidationException nếu có lỗi nghiệp vụ.
+     */
+    public void updateThuocStatus(int id, String newStatus) throws ValidationException {
+        // 1. Lấy Entity gốc
+        Thuoc existingThuoc = thuocDAO.getById(id);
+        if (existingThuoc == null) {
+            throw new ValidationException("Không tìm thấy thuốc với ID: " + id);
+        }
+
+        // 2. Kiểm tra logic nghiệp vụ
+        if ("NGUNG_SU_DUNG".equals(newStatus)) {
+            // Kiểm tra xem thuốc có đang được sử dụng không
+            if (chiTietDonThuocDAO.isMedicationInUse(id)) {
+                throw new ValidationException("Không thể ngừng: Thuốc đang được sử dụng trong một đơn thuốc đã kê.");
+            }
+        }
+
+        // 3. Cập nhật trạng thái
+        existingThuoc.setTrangThai(newStatus);
+
+        // 4. Gọi DAO để lưu thay đổi
+        thuocDAO.update(existingThuoc);
+    }
+
     // --- Phương thức chuyển đổi ---
     private Thuoc toEntity(ThuocDTO dto) {
         Thuoc entity = new Thuoc();
@@ -124,6 +153,7 @@ public class ThuocService {
         entity.setDonViTinh(dto.getDonViTinh());
         entity.setDonGia(dto.getDonGia());
         entity.setSoLuongTonKho(dto.getSoLuongTonKho());
+        dto.setTrangThai(entity.getTrangThai()); 
         return entity;
     }
 
