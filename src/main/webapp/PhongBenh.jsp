@@ -16,7 +16,7 @@
         <link rel="stylesheet" href="css/PhongBenh.css">
 
         <%-- defer: Giúp trang tải nhanh hơn, JS chạy sau khi HTML tải xong --%>
-        <script src="<c:url value='/js/darkmode.js'/>" defer></script>
+        <script src="<c:url value='/js/darkmodeQuang.js'/>" defer></script>
         <script src="<c:url value='/js/danhSachPhieuKham.js'/>" defer></script>
 
     </head>

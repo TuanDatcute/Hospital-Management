@@ -19,7 +19,7 @@
         <%-- (MỚI) Nhúng file CSS cụ thể cho trang này SAU --%>
         <link rel="stylesheet" href="<c:url value='/css/UserThongBao.css'/>">
 
-        <script src="<c:url value='/js/darkmode.js'/>" defer></script>
+        <script src="<c:url value='/js/darkmodeQuang.js'/>" defer></script>
     </head>
     <body>
 
@@ -96,7 +96,7 @@
                                     <input type="hidden" name="id" value="${noti.id}">
                                     <%-- (SỬA) Dùng class .btn chuẩn --%>
                                     <button type="submit" class="btn btn-sm btn-success">
-                                        <i class="fa-solid fa-check"></i> Đánh dấu đã đọc
+                                        <i class="fa-solid fa-check"></i> Đã đọc
                                     </button>
                                 </form>
                             </c:if>

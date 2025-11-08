@@ -12,10 +12,12 @@ import model.dto.LichHenDTO;
 import model.dto.NhanVienDTO; // Cần import NhanVienDTO
 import service.NhanVienService; // Cần import NhanVienService
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
+import java.util.ArrayList; // THÊM MỚI
 import java.util.Arrays; // Import Arrays để dùng List
 import java.util.List;
 import java.util.stream.Collectors;
+import model.Entity.TaiKhoan;
+import util.EmailUtils;
 
 /**
  * Lớp Service chứa logic nghiệp vụ cho LichHen. (ĐÃ GỘP: Giữ lại Phân trang,
@@ -72,11 +74,12 @@ public class LichHenService {
         }
 
         LichHen entity = toEntity(dto, benhNhanEntity, bacSiEntity);
-        entity.setTrangThai("CHO_XAC_NHAN");
+        entity.setTrangThai("CHO_XAC_NHAN"); // Trạng thái mặc định
 
         LichHen savedEntity = lichHenDAO.create(entity);
 
         if (savedEntity != null) {
+            // Tải lại bản đầy đủ (Trigger CSDL đã gán STT)
             LichHen fullSavedEntity = lichHenDAO.getByIdWithRelations(savedEntity.getId());
             return toDTO(fullSavedEntity);
         }
@@ -205,7 +208,7 @@ public class LichHenService {
      */
     public List<LichHenDTO> getLichHenByBacSi(int bacSiId) throws Exception {
         try {
-            nhanVienService.getNhanVienById(bacSiId);
+            nhanVienService.getNhanVienById(bacSiId); // Kiểm tra ID và trạng thái
         } catch (Exception e) {
             throw new Exception("Không tìm thấy Bác sĩ đang hoạt động với ID: " + bacSiId);
         }
@@ -219,13 +222,14 @@ public class LichHenService {
     /**
      * GỘP (TỪ FILE 1): Lấy tất cả lịch hẹn của một bệnh nhân (có tìm kiếm)
      */
-    public List<LichHenDTO> getLichHenByBenhNhan(int benhNhanId, String keyword) throws Exception {
+    public List<LichHenDTO> getLichHenByBenhNhan(int benhNhanId) throws Exception {
         if (benhNhanDAO.getById(benhNhanId) == null) {
             throw new Exception("Không tìm thấy Bệnh nhân với ID: " + benhNhanId);
         }
         // Gọi hàm DAO đã cập nhật (có keyword) - từ File 1
         List<LichHen> entities = lichHenDAO.findByBenhNhanId(benhNhanId, keyword);
 
+        // Sửa lại: Dùng vòng lặp for an toàn
         List<LichHenDTO> dtos = new ArrayList<>();
         for (LichHen entity : entities) {
             dtos.add(toDTO(entity));
@@ -291,10 +295,10 @@ public class LichHenService {
         if (dto.getThoiGianHen() == null) {
             throw new ValidationException("Thời gian hẹn không được để trống.");
         }
-        if (dto.getBenhNhanId() <= 0) {
+        if (dto.getBenhNhanId() <= 0) { // Thêm kiểm tra
             throw new ValidationException("Vui lòng chọn bệnh nhân.");
         }
-        if (dto.getBacSiId() <= 0) {
+        if (dto.getBacSiId() <= 0) { // Thêm kiểm tra
             throw new ValidationException("Vui lòng chọn bác sĩ.");
         }
 
@@ -308,21 +312,16 @@ public class LichHenService {
             throw new ValidationException("Không tìm thấy bác sĩ.");
         }
 
-        // **THÊM KIỂM TRA GIỚI HẠN (cho cả Y tá)**
-        LocalDate appointmentDateCheck = dto.getThoiGianHen().toLocalDate();
-        long countCheck = lichHenDAO.countAppointmentsByDateAndDoctor(appointmentDateCheck, bacSi.getId());
-        if (countCheck >= MAX_APPOINTMENTS_PER_DAY) {
-            throw new ValidationException("Bác sĩ [" + bacSi.getHoTen() + "] đã nhận đủ " + MAX_APPOINTMENTS_PER_DAY + " lịch hẹn trong ngày này.");
-        }
-        // **KẾT THÚC KIỂM TRA**
-
-        // --- BƯỚC 2: LOGIC NGHIỆP VỤ TẠO STT ---
+        // --- BƯỚC 2: LOGIC NGHIỆP VỤ TẠO STT (CỐT LÕI) ---
         LocalDate appointmentDate = dto.getThoiGianHen().toLocalDate();
         long count = lichHenDAO.countAppointmentsByDateAndDoctor(appointmentDate, bacSi.getId());
         int newStt = (int) count + 1;
 
-        // --- BƯỚC 3: CHUYỂN DTO -> ENTITY ---
+        // --- BƯỚC 3: CHUYỂN DTO -> ENTITY (toEntity) ---
+        // (Dùng hàm toEntity helper)
         LichHen newLichHen = toEntity(dto, benhNhan, bacSi);
+
+        // Gán các giá trị tự động
         newLichHen.setStt(newStt);
         newLichHen.setTrangThai("CHO_XAC_NHAN");
 
@@ -334,72 +333,56 @@ public class LichHenService {
     }
 
     /**
-     *
      * Đánh dấu một lịch hẹn là đã được xử lý (ví dụ: ĐÃ KHÁM).
-     *
      */
     public void updateAppointmentStatus(Integer lichHenId, String newStatus) throws ValidationException {
-
         if (lichHenId == null) {
-
             return;
-
         }
 
         LichHen lichHen = lichHenDAO.getById(lichHenId);
-
         if (lichHen != null) {
-
             lichHen.setTrangThai(newStatus);
-
             lichHenDAO.update(lichHen); // Giả sử DAO có hàm update
-
         } else {
-
             throw new ValidationException("Không tìm thấy lịch hẹn với ID: " + lichHenId);
-
         }
-
     }
 
     /**
-     *
      * Lấy tất cả các lịch hẹn đang ở trạng thái chờ khám (chưa hoàn thành).
-     *
      */
     public List<LichHenDTO> getAllPendingAppointments() {
-
         List<LichHen> entities = lichHenDAO.getAllPendingAppointments();
-
         return entities.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
-
     }
 
     /**
-     *
      * Lấy tất cả các lịch hẹn đang chờ của một bác sĩ cụ thể.
-     *
      */
     public List<LichHenDTO> getPendingAppointmentsForDoctor(int bacSiId) {
-
         List<LichHen> entities = lichHenDAO.getPendingAppointmentsForDoctor(bacSiId);
-
         return entities.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
-
     }
     // (KẾT THÚC KHỐI CODE CỦA DAT)
 
     //===================================================Quang=======================================
     // (KHỐI CODE NÀY ĐƯỢC SAO CHÉP NGUYÊN BẢN TỪ FILE 1 THEO YÊU CẦU)
     // ===================================================
-    // === HÀM CHO BỆNH NHÂN TỰ ĐẶT LỊCH ===
+    // === HÀM MỚI CHO BỆNH NHÂN TỰ ĐẶT LỊCH ===
     // ===================================================
     /**
-     * CẬP NHẬT: Dành cho Bệnh nhân tự đặt lịch (Đã thêm 5-limit).
+     * HÀM MỚI: Dành cho Bệnh nhân tự đặt lịch. Tự động lấy BenhNhanId từ
+     * TaiKhoanId trong session.
+     *
+     * @param dto DTO chứa (bacSiId, thoiGianHen, lyDoKham)
+     * @param taiKhoanIdCuaBenhNhan ID tài khoản của bệnh nhân (LẤY TỪ SESSION)
+     * @return DTO của lịch hẹn đã tạo
+     * @throws Exception
      */
     public LichHenDTO createAppointmentByPatient(LichHenDTO dto, int taiKhoanIdCuaBenhNhan) throws Exception {
 
@@ -415,11 +398,13 @@ public class LichHenService {
         }
 
         // --- BƯỚC 2: LẤY ENTITY LIÊN QUAN (QUAN TRỌNG) ---
-        BenhNhan benhNhanEntity = benhNhanDAO.findByTaiKhoanId(taiKhoanIdCuaBenhNhan);
+        // Lấy Bệnh nhân TỪ TÀI KHOẢN ĐĂNG NHẬP (An toàn)
+        BenhNhan benhNhanEntity = benhNhanDAO.findByTaiKhoanId(taiKhoanIdCuaBenhNhan); // (Cần hàm này trong BenhNhanDAO)
         if (benhNhanEntity == null) {
             throw new Exception("Không tìm thấy hồ sơ bệnh nhân tương ứng với tài khoản của bạn.");
         }
 
+        // Kiểm tra Bác sĩ
         NhanVien bacSiEntity = nhanVienDAO.getById(dto.getBacSiId());
         if (bacSiEntity == null) {
             throw new Exception("Không tìm thấy bác sĩ đã chọn.");
@@ -430,29 +415,54 @@ public class LichHenService {
             throw new Exception("Bác sĩ bạn chọn hiện không hoạt động.");
         }
 
-        // --- BƯỚC 3: LOGIC NGHIỆP VỤ (KIỂM TRA GIỚI HẠN VÀ LẤY STT) ---
+        // --- BƯỚC 3: LOGIC NGHIỆP VỤ (Lấy STT TỰ ĐỘNG) ---
         LocalDate appointmentDate = dto.getThoiGianHen().toLocalDate();
-
-        // **THÊM MỚI: KIỂM TRA GIỚI HẠN LỊCH HẸN**
         long count = lichHenDAO.countAppointmentsByDateAndDoctor(appointmentDate, bacSiEntity.getId());
-        if (count >= MAX_APPOINTMENTS_PER_DAY) {
-            throw new ValidationException("Bác sĩ [" + bacSiEntity.getHoTen() + "] đã nhận đủ " + MAX_APPOINTMENTS_PER_DAY + " lịch hẹn trong ngày này. Vui lòng chọn ngày khác hoặc bác sĩ khác.");
-        }
-        // **KẾT THÚC KIỂM TRA**
-
         int newStt = (int) count + 1;
 
         // --- BƯỚC 4: CHUYỂN ĐỔI (MAP) ---
-        LichHen entity = toEntity(dto, benhNhanEntity, bacSiEntity);
-        entity.setStt(newStt);
-        entity.setTrangThai("CHO_XAC_NHAN");
+        LichHen entity = new LichHen();
+        entity.setThoiGianHen(dto.getThoiGianHen());
+        entity.setLyDoKham(dto.getLyDoKham().trim());
+        entity.setGhiChu(dto.getGhiChu());
+
+        entity.setBenhNhan(benhNhanEntity); // Gán bệnh nhân từ session
+        entity.setBacSi(bacSiEntity);       // Gán bác sĩ từ form
+
+        entity.setStt(newStt); // Gán STT (Trigger sẽ ghi đè nếu có)
+        entity.setTrangThai("CHO_XAC_NHAN"); // Mặc định
 
         // --- BƯỚC 5: GỌI DAO ĐỂ LƯU ---
         LichHen savedEntity = lichHenDAO.create(entity);
 
-        // --- BƯỚC 6: TRẢ VỀ DTO ---
+        // --- BƯỚC 6: TẢI LẠI VÀ CHUYỂN SANG DTO ---
         LichHen fullSavedEntity = lichHenDAO.getByIdWithRelations(savedEntity.getId());
-        return toDTO(fullSavedEntity);
+        LichHenDTO finalDTO = toDTO(fullSavedEntity); // DTO đã "làm phẳng" (có tên BS, BN)
+
+        // === THÊM MỚI: GỬI EMAIL THÔNG BÁO ===
+        try {
+            // Lấy email của bệnh nhân (từ TaiKhoan liên kết)
+            TaiKhoan taiKhoanBenhNhan = benhNhanEntity.getTaiKhoan();
+            if (taiKhoanBenhNhan != null && taiKhoanBenhNhan.getEmail() != null) {
+                System.out.println("Đang gửi email xác nhận đặt lịch tới: " + taiKhoanBenhNhan.getEmail());
+                // Gọi hàm EmailUtils (sẽ tạo ở Bước 2)
+                EmailUtils.sendAppointmentConfirmationEmail(
+                        taiKhoanBenhNhan.getEmail(),
+                        finalDTO // Gửi DTO đã "làm phẳng"
+                );
+            } else {
+                System.err.println("Không thể gửi email: Bệnh nhân " + benhNhanEntity.getHoTen() + " không có email hoặc tài khoản.");
+            }
+        } catch (Exception e) {
+            // QUAN TRỌNG: Không ném lỗi (throw e) ở đây
+            // Việc gửi mail thất bại KHÔNG nên làm hỏng toàn bộ chức năng đặt lịch.
+            e.printStackTrace();
+            System.err.println("LỖI GỬI EMAIL: Đặt lịch vẫn thành công, nhưng gửi email thất bại. " + e.getMessage());
+        }
+        // ===================================
+
+        // --- BƯỚC 7: TRẢ VỀ DTO ---
+        return finalDTO;
     }
 
     /**
@@ -465,8 +475,9 @@ public class LichHenService {
             throw new ValidationException("Không tìm thấy hồ sơ bệnh nhân của bạn.");
         }
 
-        // 2. Lấy lịch hẹn VÀ kiểm tra xem có đúng là của bệnh nhân này không
-        LichHen lichHen = lichHenDAO.getByIdAndBenhNhanId(lichHenId, benhNhan.getId());
+        // 2. Lấy lịch hẹn (an toàn)
+        // SỬA: Phải lấy "WithRelations" để có thông tin Bác sĩ
+        LichHen lichHen = lichHenDAO.getByIdAndBenhNhanIdWithRelations(lichHenId, benhNhan.getId()); // <-- Cần hàm DAO mới này
         if (lichHen == null) {
             throw new ValidationException("Không tìm thấy lịch hẹn hoặc bạn không có quyền hủy lịch này.");
         }
@@ -480,6 +491,24 @@ public class LichHenService {
         // 4. Cập nhật
         lichHen.setTrangThai("DA_HUY"); // Cập nhật trạng thái
         lichHenDAO.update(lichHen); // Gọi DAO để lưu
+
+        // === THÊM MỚI: GỬI EMAIL THÔNG BÁO HỦY ===
+        try {
+            TaiKhoan taiKhoanBenhNhan = benhNhan.getTaiKhoan();
+            if (taiKhoanBenhNhan != null && taiKhoanBenhNhan.getEmail() != null) {
+                System.out.println("Đang gửi email HỦY lịch tới: " + taiKhoanBenhNhan.getEmail());
+                // Gọi hàm EmailUtils (sẽ tạo ở Bước 2)
+                EmailUtils.sendAppointmentCancellationEmail(
+                        taiKhoanBenhNhan.getEmail(),
+                        toDTO(lichHen) // Chuyển entity đã cập nhật sang DTO
+                );
+            } else {
+                System.err.println("Không thể gửi email hủy: Bệnh nhân " + benhNhan.getHoTen() + " không có email hoặc tài khoản.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("LỖI GỬI EMAIL: Hủy lịch vẫn thành công, nhưng gửi email thất bại. " + e.getMessage());
+        }
     }
     // (KẾT THÚC KHỐI CODE CỦA QUANG)
 } // Kết thúc class

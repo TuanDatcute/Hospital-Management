@@ -29,14 +29,14 @@ public class LichHenDAO {
             transaction = session.beginTransaction();
             session.save(lichHen);
             transaction.commit();
+            // Sau khi commit, 'lichHen' sẽ được cập nhật ID và STT (từ trigger)
             return lichHen;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
             e.printStackTrace();
-            // Ném lỗi ra để Service biết
-            throw new RuntimeException("Lỗi khi tạo lịch hẹn: " + e.getMessage(), e);
+            return null;
         }
     }
 
@@ -56,13 +56,15 @@ public class LichHenDAO {
                 transaction.rollback();
             }
             e.printStackTrace();
-            // Ném lỗi ra để Service biết
-            throw new RuntimeException("Lỗi khi cập nhật lịch hẹn: " + e.getMessage(), e);
+            return false;
         }
     }
 
     /**
      * Lấy thông tin lịch hẹn bằng ID (không tải BenhNhan, BacSi).
+     *
+     * @param id ID của lịch hẹn
+     * @return Đối tượng LichHen hoặc null nếu không tìm thấy.
      */
     public LichHen getById(int id) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -78,6 +80,7 @@ public class LichHenDAO {
      */
     public LichHen getByIdWithRelations(int id) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Dùng HQL với JOIN FETCH để tải cả BenhNhan và BacSi
             String hql = "FROM LichHen lh "
                     + "LEFT JOIN FETCH lh.benhNhan bn " // Sửa: Dùng LEFT JOIN
                     + "LEFT JOIN FETCH lh.bacSi bs " // Sửa: Dùng LEFT JOIN
@@ -218,14 +221,16 @@ public class LichHenDAO {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             // Không cần JOIN FETCH ở đây vì Service chỉ cần kiểm tra
             String hql = "FROM LichHen lh "
-                    + "WHERE lh.id = :lichHenId AND lh.benhNhan.id = :benhNhanId";
+                    + "JOIN FETCH lh.benhNhan "
+                    + "JOIN FETCH lh.bacSi "
+                    + "WHERE lh.benhNhan.id = :bnId "
+                    + "ORDER BY lh.thoiGianHen DESC";
             Query<LichHen> query = session.createQuery(hql, LichHen.class);
-            query.setParameter("lichHenId", lichHenId);
-            query.setParameter("benhNhanId", benhNhanId);
-            return query.uniqueResult();
+            query.setParameter("bnId", benhNhanId);
+            return query.list();
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -235,6 +240,7 @@ public class LichHenDAO {
      */
     public List<LichHen> findByBacSiIdAndDate(int bacSiId, LocalDate date) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // HQL dùng hàm date() để chỉ so sánh phần ngày của OffsetDateTime
             String hql = "FROM LichHen lh "
                     + "LEFT JOIN FETCH lh.benhNhan bn "
                     + "LEFT JOIN FETCH lh.bacSi bs "
@@ -259,24 +265,28 @@ public class LichHenDAO {
     // (KHỐI CODE NÀY ĐƯỢC SAO CHÉP NGUYÊN BẢN TỪ FILE 1 THEO YÊU CẦU)
     /**
      * Đếm số lượng lịch hẹn đã có trong một ngày cụ thể CHO MỘT BÁC SĨ CỤ THỂ.
+     *
+     * @param date Ngày cần đếm.
+     * @param bacSiId ID của bác sĩ cần lọc.
+     * @return Tổng số lịch hẹn của bác sĩ đó trong ngày.
      */
     public long countAppointmentsByDateAndDoctor(LocalDate date, int bacSiId) {
+        // Xác định thời điểm bắt đầu và kết thúc của ngày (giữ nguyên)
         ZoneOffset zoneOffset = ZoneOffset.of("+07:00");
         OffsetDateTime startOfDay = date.atStartOfDay().atOffset(zoneOffset);
         OffsetDateTime endOfDay = date.plusDays(1).atStartOfDay().atOffset(zoneOffset);
 
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // Thêm điều kiện KHÔNG TÍNH lịch đã hủy
+            // ✨ THÊM ĐIỀU KIỆN 'lh.bacSi.id = :bacSiId' VÀO TRUY VẤN ✨
             Query<Long> query = session.createQuery(
                     "SELECT count(lh.id) FROM LichHen lh "
                     + "WHERE lh.thoiGianHen >= :start AND lh.thoiGianHen < :end "
-                    + "AND lh.bacSi.id = :bacSiId "
-                    + "AND lh.trangThai != 'DA_HUY'", // <-- Thêm kiểm tra
+                    + "AND lh.bacSi.id = :bacSiId",
                     Long.class
             );
             query.setParameter("start", startOfDay);
             query.setParameter("end", endOfDay);
-            query.setParameter("bacSiId", bacSiId);
+            query.setParameter("bacSiId", bacSiId); // Gán tham số bacSiId
 
             return query.uniqueResult();
         } catch (Exception e) {
@@ -287,16 +297,22 @@ public class LichHenDAO {
 
     /**
      * Lấy tất cả các lịch hẹn CHƯA HOÀN THÀNH.
+     *
+     * @return Danh sách các LichHen.
      */
     public List<LichHen> getAllPendingAppointments() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+
+            // ✨ SỬ DỤNG JOIN FETCH ĐỂ TẢI SẴN DỮ LIỆU LIÊN QUAN ✨
             Query<LichHen> query = session.createQuery(
+                    // Sử dụng 'SELECT DISTINCT lh' để đảm bảo kết quả là duy nhất
                     "SELECT DISTINCT lh FROM LichHen lh "
                     + "JOIN FETCH lh.benhNhan "
                     + "JOIN FETCH lh.bacSi "
                     + "WHERE lh.trangThai NOT IN ('HOAN_THANH', 'DA_DEN_KHAM', 'DA_HUY')",
                     LichHen.class
             );
+
             return query.list();
         } catch (Exception e) {
             e.printStackTrace();
@@ -305,19 +321,27 @@ public class LichHenDAO {
     }
 
     /**
-     * Lấy tất cả các lịch hẹn CHƯA HOÀN THÀNH của MỘT BÁC SĨ CỤ THỂ.
+     * Lấy tất cả các lịch hẹn CHƯA HOÀN THÀNH của MỘT BÁC SĨ CỤ THỂ. Tải sẵn
+     * thông tin BenhNhan và BacSi.
+     *
+     * @param bacSiId ID của bác sĩ cần tìm lịch hẹn.
+     * @return Danh sách các LichHen của bác sĩ đó.
      */
     public List<LichHen> getPendingAppointmentsForDoctor(int bacSiId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+
             Query<LichHen> query = session.createQuery(
                     "SELECT DISTINCT lh FROM LichHen lh "
                     + "JOIN FETCH lh.benhNhan "
                     + "JOIN FETCH lh.bacSi "
-                    + "WHERE lh.bacSi.id = :bacSiId "
+                    + // ✨ THÊM ĐIỀU KIỆN LỌC THEO BÁC SĨ ✨
+                    "WHERE lh.bacSi.id = :bacSiId "
                     + "AND lh.trangThai NOT IN ('HOAN_THANH', 'DA_DEN_KHAM', 'DA_HUY')",
                     LichHen.class
             );
+
             query.setParameter("bacSiId", bacSiId);
+
             return query.list();
         } catch (Exception e) {
             e.printStackTrace();

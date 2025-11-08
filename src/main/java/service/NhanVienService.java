@@ -31,9 +31,12 @@ public class NhanVienService {
     private final KhoaDAO khoaDAO = new KhoaDAO();
 
     private static final String PHONE_NUMBER_REGEX = "^(0[3|5|7|8|9])+([0-9]{8})$";
+    // **KẾT THÚC SỬA**
+
     private static final String NAME_REGEX = "^[\\p{L} .'-]{2,50}$";
     private static final String TRANG_THAI_HOAT_DONG = "HOAT_DONG";
     private static final String TRANG_THAI_BI_KHOA = "BI_KHOA";
+    // --- KẾT THÚC THÊM MỚI ---
 
     /**
      * Dịch vụ tạo một Nhân Viên mới.
@@ -43,6 +46,7 @@ public class NhanVienService {
         // --- BƯỚC 1: VALIDATION ---
         validateNhanVienData(dto, null);
 
+        // Validation riêng cho 'create' (Kiểm tra Tài khoản)
         if (dto.getTaiKhoanId() <= 0) {
             throw new ValidationException("ID Tài khoản không hợp lệ. Phải gán một tài khoản.");
         }
@@ -95,6 +99,7 @@ public class NhanVienService {
         }
 
         // --- BƯỚC 2: VALIDATION ---
+        // Gọi hàm helper, truyền 'existingEntity' để check logic update
         validateNhanVienData(dto, existingEntity);
 
         // (Cập nhật các trường...)
@@ -260,7 +265,6 @@ public class NhanVienService {
 
         if (entity.getTaiKhoan() != null) {
             dto.setTaiKhoanId(entity.getTaiKhoan().getId());
-            dto.setVaiTro(entity.getTaiKhoan().getVaiTro());
         }
 
         if (entity.getKhoa() != null) {
@@ -303,13 +307,16 @@ public class NhanVienService {
             throw new ValidationException("Họ tên không hợp lệ (chỉ chứa chữ cái, dấu cách, và dài 2-50 ký tự).");
         }
 
-        // 2. Kiểm tra Số điện thoại
+        // 2. Kiểm tra Số điện thoại (chỉ check nếu có nhập)
         String newSdt = dto.getSoDienThoai();
         if (newSdt != null && !newSdt.trim().isEmpty()) {
+            // 2a. Check định dạng (Regex)
+            // Dòng này giờ đã đúng vì PHONE_NUMBER_REGEX là String
             if (!Pattern.matches(PHONE_NUMBER_REGEX, newSdt)) {
                 throw new ValidationException("Số điện thoại không hợp lệ (phải là 10 số, bắt đầu bằng 03, 05, 07, 08, 09).");
             }
 
+            // 2b. Check tính duy nhất (Unique)
             boolean isCreating = (existingEntity == null);
             boolean isUpdatingAndChanged = (!isCreating && !newSdt.equals(existingEntity.getSoDienThoai()));
 
@@ -317,17 +324,15 @@ public class NhanVienService {
                 throw new ValidationException("Số điện thoại '" + newSdt + "' đã tồn tại.");
             }
         }
+
+        // (Bạn có thể thêm các validation khác cho chuyenMon, bangCap... ở đây nếu cần)
     }
 
     //=======================================================Dat==============================================
-    /**
-     * CẬP NHẬT: Dùng hàm toDTO() chính
-     */
     public NhanVienDTO getNhanVienByTaiKhoanId(int taiKhoanId) {
         NhanVien entity = nhanVienDAO.findByTaiKhoanId(taiKhoanId);
         return toDTO(entity); // <-- SỬA: Dùng hàm 'toDTO' chính (sẽ dùng hàm toDTO có tenKhoa ở trên)
     }
-
 
     private NhanVienDTO toDTOFotGetByTaiKhoan(NhanVien entity) {
         if (entity == null) {

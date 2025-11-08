@@ -261,7 +261,7 @@ public class CatalogController extends HttpServlet {
             // 4. XỬ LÝ KẾT QUẢ THÀNH CÔNG
             request.setAttribute("SUCCESS_MESSAGE", "Đã tạo thuốc '" + result.getTenThuoc() + "' thành công!");
             // Có thể chuyển hướng về trang danh sách thuốc
-            return THUOC_LIST_PAGE;
+            return "redirect:/MainController?action=listMedications&keyword=" + result.getTenThuoc();
 
         } catch (ValidationException e) {
             log("Lỗi nghiệp vụ khi tạo thuốc: " + e.getMessage());
@@ -298,7 +298,7 @@ public class CatalogController extends HttpServlet {
 
             // Đặt thông báo thành công vào session để hiển thị sau khi redirect
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Cập nhật thông tin thuốc thành công!");
-            return THUOC_LIST_PAGE; // Chuyển về trang danh sách
+            return "redirect:/MainController?action=listMedications&keyword=" + dto.getTenThuoc();
 
         } catch (ValidationException e) {
             request.setAttribute("ERROR_MESSAGE", e.getMessage());
@@ -314,10 +314,9 @@ public class CatalogController extends HttpServlet {
      * Xử lý cập nhật số lượng tồn kho. chưa làm xong cần thêm ...
      */
     private String updateMedicationStock(HttpServletRequest request) {
+        int thuocId = Integer.parseInt(request.getParameter("thuocId"));
+        int soLuongThayDoi = Integer.parseInt(request.getParameter("soLuongThayDoi"));
         try {
-            int thuocId = Integer.parseInt(request.getParameter("thuocId"));
-            int soLuongThayDoi = Integer.parseInt(request.getParameter("soLuongThayDoi"));
-
             thuocService.updateStockQuantity(thuocId, soLuongThayDoi);
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Cập nhật tồn kho thành công!");
 
@@ -326,7 +325,7 @@ public class CatalogController extends HttpServlet {
         } catch (Exception e) {
             request.getSession().setAttribute("ERROR_MESSAGE", "Lỗi hệ thống khi cập nhật tồn kho.");
         }
-        return THUOC_LIST_PAGE; // Luôn quay về trang danh sách
+        return "redirect:/MainController?action=listMedications&keyword=" + thuocId; // Luôn quay về trang danh sách
     }
 
     private String deleteMedication(HttpServletRequest request) throws Exception {
@@ -344,7 +343,7 @@ public class CatalogController extends HttpServlet {
         } catch (NumberFormatException e) {
             throw new Exception("ID thuốc không hợp lệ.");
         }
-        return "redirect:/MainController?action=listAndSearchServices&keyword";
+        return THUOC_LIST_PAGE;
     }
 
     // Thêm phương thức này và gọi nó trong doGet

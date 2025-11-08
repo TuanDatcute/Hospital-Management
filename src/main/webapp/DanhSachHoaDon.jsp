@@ -14,7 +14,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">    
         <%-- Các file JS (cần thiết cho dark mode và chuyển đổi view) --%>
-        <script src="<c:url value='/js/darkmode.js'/>"></script>
+        <script src="<c:url value='/js/darkmodeQuang.js'/>"></script>
         <script src="<c:url value='/js/danhSachPhieuKham.js'/>"></script>
     </head>
     <body>
