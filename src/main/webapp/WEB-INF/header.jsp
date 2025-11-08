@@ -111,8 +111,8 @@
                     <c:when test="${sessionScope.ROLE == 'BENH_NHAN'}">
                         <c:set var="isHome" value="${fn:endsWith(servletPath, '/home.jsp')}" />
                         <li><a href="${pageContext.request.contextPath}/home.jsp" 
-                               class="${isHome ? 'active' : ''}">Trang chủ</a></li>
-                        <li><a href="${pageContext.request.contextPath}/MainController?action=showLichHenCreateForm" 
+                               class="${isHome ? 'active' : ''}">Bảng điều khiển</a></li>
+                        <li><a href="${pageContext.request.contextPath}/MainController?action=myAppointments" 
                                class="${fn:contains(currentAction, 'LichHen') ? 'active' : ''}">Đặt lịch hẹn</a></li>
                         <li><a href="#">Lịch sử khám bệnh</a></li>
                         <li>

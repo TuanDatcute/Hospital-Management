@@ -69,14 +69,14 @@ public class MainController extends HttpServlet {
         };
 
         String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa",
-            "showKhoaEditForm", "updateKhoa", "deleteKhoa"};
+            "showKhoaEditForm", "updateKhoa", "softDeleteKhoa"};
         String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien",
-            "showNhanVienEditForm", "updateNhanVien", "deleteNhanVien"};
+            "showNhanVienEditForm", "updateNhanVien", "softDeleteNhanVien"};
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm", "createPrescription"};
 
         // **MERGE:** Lấy 'benhNhanActions' từ nhánh của bạn (vì nó có logic hồ sơ mới)
         String[] benhNhanActions = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan",
-            "showBenhNhanEditForm", "updateBenhNhan", "deleteBenhNhan",
+            "showBenhNhanEditForm", "updateBenhNhan", "softDeleteBenhNhan",
             "showProfile", // (Xem hồ sơ)
             "showEditProfile", // (Sửa hồ sơ)
             "saveProfile", // (Lưu hồ sơ)

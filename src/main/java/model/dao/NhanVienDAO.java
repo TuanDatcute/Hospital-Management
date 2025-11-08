@@ -185,9 +185,11 @@ public class NhanVienDAO {
     public List<NhanVien> findDoctorsBySpecialty() {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<NhanVien> query = session.createQuery(
-                    "SELECT nv FROM NhanVien nv "
-                    + "JOIN FETCH nv.taiKhoan "
-                    + "WHERE nv.taiKhoan.vaiTro = :role",
+                    "SELECT DISTINCT nv FROM NhanVien nv "
+                    + "JOIN FETCH nv.taiKhoan tk "
+                    + "LEFT JOIN FETCH nv.khoa k " // <-- SỬA LỖI: Thêm dòng này
+                    + "WHERE tk.vaiTro = :role "
+                    + "AND tk.trangThai = 'HOAT_DONG'", // (Thêm lọc Xóa Mềm)
                     NhanVien.class
             );
             query.setParameter("role", "BAC_SI");
@@ -293,7 +295,7 @@ public class NhanVienDAO {
             return query.uniqueResult();
         } catch (Exception e) {
             e.printStackTrace();
-            return 999; 
+            return 999;
         }
     }
     // === KẾT THÚC CÁC HÀM NÂNG CẤP ===

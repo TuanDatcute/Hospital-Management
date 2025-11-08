@@ -5,6 +5,11 @@
 <html>
     <head>
         <title>Lịch hẹn của tôi</title>
+
+        <%-- THÊM CSS MỚI --%>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/LichHenQuang.css">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
+
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -49,6 +54,7 @@
         </style>
     </head>
     <body>
+        <jsp:include page="/WEB-INF/header.jsp" /> 
         <h2>Lịch hẹn của tôi</h2>
 
         <%-- Hiển thị thông báo (khi đặt lịch thành công hoặc khi tải trang bị lỗi) --%>
@@ -106,6 +112,6 @@
                 </c:if>
             </tbody>
         </table>
-
+        <jsp:include page="/WEB-INF/footer.jsp" /> 
     </body>
 </html>
