@@ -302,8 +302,8 @@ public class BenhNhanController extends HttpServlet {
         // loadFormDependencies(request, formAction); // (Không cần tải lại)
     }
 
-/**
-     * === NÂNG CẤP (THÊM AVATAR BASE64) ===
+    /**
+     * === SỬA (LỖI NGÀY SINH & BỎ TÀI KHOẢN) ===
      */
     private BenhNhanDTO createDTOFromRequest(HttpServletRequest request) {
         BenhNhanDTO dto = new BenhNhanDTO();
@@ -315,16 +315,17 @@ public class BenhNhanController extends HttpServlet {
                 /* ignore */ }
         }
         java.util.function.Function<String, String> safeTrim = (s) -> (s != null) ? s.trim() : null;
-        dto.setMaBenhNhan(safeTrim.apply(request.getParameter("maBenhNhan"))); 
+        dto.setMaBenhNhan(safeTrim.apply(request.getParameter("maBenhNhan"))); // Sẽ là null khi Tạo mới
         dto.setHoTen(safeTrim.apply(request.getParameter("hoTen")));
         dto.setGioiTinh(safeTrim.apply(request.getParameter("gioiTinh")));
         dto.setDiaChi(safeTrim.apply(request.getParameter("diaChi")));
         dto.setSoDienThoai(safeTrim.apply(request.getParameter("soDienThoai")));
         dto.setNhomMau(safeTrim.apply(request.getParameter("nhomMau")));
         dto.setTienSuBenh(safeTrim.apply(request.getParameter("tienSuBenh")));
-        dto.setCccd(safeTrim.apply(request.getParameter("cccd"))); 
+        dto.setCccd(safeTrim.apply(request.getParameter("cccd"))); // Đã thêm CCCD
 
         // === SỬA LỖI (PARSE NGÀY SINH) ===
+        // (Input type="date" sẽ gửi "yyyy-MM-dd")
         String ngaySinhStr = request.getParameter("ngaySinh");
         if (ngaySinhStr != null && !ngaySinhStr.isEmpty()) {
             try {
@@ -333,20 +334,9 @@ public class BenhNhanController extends HttpServlet {
                 log("Lỗi parse ngày sinh: " + ngaySinhStr + ". Yêu cầu định dạng yyyy-MM-dd.");
             }
         }
-        
-        // ================================================================
-        // === ✨ BẮT ĐẦU THÊM MỚI (UPLOAD AVATAR) ✨ ===
-        // ================================================================
-        // Giả sử input ẩn của bạn tên là "avatarBenhNhanBase64"
-        String avatarString = request.getParameter("avatarBenhNhanBase64");
-        if (avatarString != null) { 
-            // Không cần trim() vì chuỗi base64 không có khoảng trắng thừa
-            dto.setAvatarBase64(avatarString);
-        }
-        // ================================================================
-        // === ✨ KẾT THÚC THÊM MỚI ✨ ===
-        // ================================================================
+        // === KẾT THÚC SỬA LỖI ===
 
+        // (Đã xóa logic lấy taiKhoanId)
         dto.setTaiKhoanId(null);
 
         return dto;

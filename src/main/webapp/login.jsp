@@ -57,6 +57,7 @@
                     <%-- **THÊM MỚI: ICON SOCIAL** --%>
                     <div class="social-icons">
                         <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                        <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
                     </div>
                     <span>hoặc dùng email của bạn để đăng ký</span>
 

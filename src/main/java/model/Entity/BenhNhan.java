@@ -13,7 +13,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Lob;
 
 @Entity
 @Table(name = "BenhNhan")
@@ -52,16 +51,6 @@ public class BenhNhan implements Serializable {
 
     @Column(name = "tien_su_benh", columnDefinition = "NVARCHAR(MAX)", nullable = true)
     private String tienSuBenh;
-
-    /**
-     * Lưu ảnh đại diện dưới dạng chuỗi Base64.
-     *
-     * @Lob nói cho Hibernate biết đây là một "Đối tượng Lớn", nó sẽ map sang
-     * kiểu TEXT, LONGTEXT, hoặc NVARCHAR(MAX).
-     */
-    @Lob
-    @Column(name = "avatarBase64", columnDefinition = "NVARCHAR(MAX)") // <-- Thêm cái này
-    private String avatarBase64;
 
     // Giữ quan hệ với TaiKhoan
     @OneToOne(fetch = FetchType.LAZY, optional = true)
@@ -188,14 +177,4 @@ public class BenhNhan implements Serializable {
         this.trangThai = trangThai;
     }
     // === KẾT THÚC THÊM MỚI ===
-
-    public String getAvatarBase64() {
-        return avatarBase64;
-    }
-
-    public void setAvatarBase64(String avatarBase64) {
-        this.avatarBase64 = avatarBase64;
-    }
-    
-    
 }
