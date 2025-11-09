@@ -184,7 +184,7 @@ public class UserController extends HttpServlet {
         }
     }
 
-// (Hàm login giữ nguyên từ Bản 1 - ĐÃ SỬA THEO YÊU CẦU CỦA BẠN)
+    // (Hàm login giữ nguyên từ Bản 1)
     private String login(HttpServletRequest request, HttpServletResponse response) throws ValidationException, Exception {
         String tenDangNhap = request.getParameter("username");
         String matKhau = request.getParameter("password");
@@ -207,24 +207,15 @@ public class UserController extends HttpServlet {
             session.setAttribute("FORCE_CHANGE_PASS_MSG", "Đây là lần đăng nhập đầu tiên. Vì lý do bảo mật, bạn phải đổi mật khẩu ngay lập tức.");
             return getRedirectUrl(request, CHANGE_PASSWORD_PAGE);
         }
-
-        // === BẮT ĐẦU THAY ĐỔI ===
         if ("QUAN_TRI".equals(user.getVaiTro())) {
             return getRedirectUrl(request, ADMIN_DASHBOARD_PAGE);
-
-        } else if ("BAC_SI".equals(user.getVaiTro())) {
-            // YÊU CẦU CỦA BẠN: Chuyển hướng Bác Sĩ đến action listAllEncounters
-            // Chúng ta trả về chuỗi "redirect:" giống như các hàm createUser/updateUserStatus
-            return "redirect:mainController?action=listAllEncounters";
-
-        } else if ("LE_TAN".equals(user.getVaiTro())
+        } else if ("BAC_SI".equals(user.getVaiTro())
+                || "LE_TAN".equals(user.getVaiTro())
                 || "DUOC_SI".equals(user.getVaiTro())
                 || "Y_TA".equals(user.getVaiTro())
                 || "KY_THUAT_VIEN".equals(user.getVaiTro())) {
-            // Các vai trò nhân viên khác vẫn vào dashboard chung
             return getRedirectUrl(request, STAFF_DASHBOARD_PAGE);
-
-        } else { // Vai trò còn lại là BENH_NHAN
+        } else {
             BenhNhanDTO profile = null;
             try {
                 profile = benhNhanService.getBenhNhanByTaiKhoanId(user.getId());
@@ -237,7 +228,6 @@ public class UserController extends HttpServlet {
                 return getRedirectUrl(request, HOME_PAGE);
             }
         }
-        // === KẾT THÚC THAY ĐỔI ===
     }
 
     /**

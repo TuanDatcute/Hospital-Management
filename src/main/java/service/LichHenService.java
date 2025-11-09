@@ -200,6 +200,20 @@ public class LichHenService {
     public long getLichHenCount() {
         return lichHenDAO.getTotalLichHenCount();
     }
+    
+    public List<LichHenDTO> searchLichHenPaginated(String keyword, int page, int pageSize) {
+        List<LichHen> entities = lichHenDAO.searchLichHenPaginated(keyword, page, pageSize);
+        
+        // Dùng stream để chuyển đổi List<Entity> sang List<DTO>
+        return entities.stream()
+                .map(this::toDTO) // Gọi hàm toDTO để chuyển đổi
+                .collect(Collectors.toList());
+    }
+
+    public long getLichHenSearchCount(String keyword) {
+        return lichHenDAO.getLichHenSearchCount(keyword);
+    }
+    
 
     /**
      * Lấy tất cả lịch hẹn của một bác sĩ đang hoạt động (tải đủ quan hệ). (Giữ
@@ -281,6 +295,8 @@ public class LichHenService {
 
         return entity;
     }
+    
+    
 
     //===================================================Dat=======================================
     // (KHỐI CODE NÀY ĐƯỢC SAO CHÉP NGUYÊN BẢN TỪ FILE 1 THEO YÊU CẦU)
