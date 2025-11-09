@@ -1,20 +1,38 @@
-<%-- /WEB-INF/footer.jsp --%>
+<%-- /WEB-INF/footer.jsp (Bản nâng cấp) --%>
 <%@ page pageEncoding="UTF-8" %>
-<%-- File này KHÔNG chứa <html>, <body>, v.v. --%>
+
 <div class="footer-column">
     <h4>Bệnh viện HQĐ</h4>
-    <p>Chăm sóc sức khỏe toàn diện với đội ngũ chuyên gia hàng đầu.</p>
-    <p>&copy; 2025 Hospital Management. All rights reserved.</p>
+    <p>Chăm sóc sức khỏe toàn diện với đội ngũ chuyên gia hàng đầu và trang thiết bị y tế hiện đại.</p>
+    <div class="social-links">
+        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" title="Tiktok"><i class="fab fa-tiktok"></i></a>
+        <a href="#" title="Youtube"><i class="fab fa-youtube"></i></a>
+    </div>
 </div>
 <div class="footer-column">
     <h4>Liên kết nhanh</h4>
-    <p><a href="#">Trang chủ</a></p>
-    <p><a href="#">Về chúng tôi</a></p>
-    <p><a href="#">Dịch vụ</a></p>
+    <ul>
+        <li><a href="#">Trang chủ</a></li>
+        <li><a href="#">Về chúng tôi</a></li>
+        <li><a href="#">Dịch vụ</a></li>
+        <li><a href="#">Tin tức</a></li>
+        <li><a href="#">Liên hệ</a></li>
+    </ul>
 </div>
 <div class="footer-column">
     <h4>Liên hệ</h4>
-    <p>123 Đường ABC, Quận 1, TP. HCM</p>
-    <p>Hotline: 1900 0000</p>
-    <p>Email: contact@hqd.com</p>
+    <div class="contact-info">
+        <p><i class="fas fa-map-marker-alt"></i> 123 Đường ABC, Quận 1, TP. HCM</p>
+        <p><i class="fas fa-phone-alt"></i> Hotline: 1900 0000</p>
+        <p><i class="fas fa-envelope"></i> Email: contact@hqd.com</p>
+    </div>
+</div>
+<div class="footer-column">
+    <h4>Giờ làm việc</h4>
+    <div class="contact-info">
+        <p><i class="fas fa-clock"></i> Thứ 2 - Thứ 6: 7:00 - 18:00</p>
+        <p><i class="fas fa-clock"></i> Thứ 7: 7:00 - 12:00</p>
+        <p><i class="fas fa-clock"></i> Chủ Nhật: Nghỉ</p>
+    </div>
 </div>
