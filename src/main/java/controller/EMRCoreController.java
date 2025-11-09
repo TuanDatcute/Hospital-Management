@@ -1,8 +1,10 @@
 package controller;
 
+import com.google.gson.Gson;
 import exception.ValidationException;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -42,8 +44,8 @@ public class EMRCoreController extends HttpServlet {
     private static final String ENCOUNTER_LIST_PAGE = "DanhSachPhieuKham.jsp";
     private static final String ENCOUNTER_DETAIL_PAGE = "ChiTietPhieuKham.jsp";
     private static final String PRINT_ENCOUNTER_PAGE = "inBenhAn.jsp";
+    private final Gson gson = new Gson();
 
-    // Khởi tạo các Service cần thiết ở cấp lớp để tái sử dụng
     private final PhieuKhamBenhService phieuKhamService = new PhieuKhamBenhService();
     private final BenhNhanService benhNhanService = new BenhNhanService();
     private final NhanVienService nhanVienService = new NhanVienService();
@@ -70,6 +72,12 @@ public class EMRCoreController extends HttpServlet {
             }
 
             switch (action) {
+                case "searchPatients":
+                    handleSearchPatients(request, response);
+                    return;
+                case "getAppointmentsByDate":
+                    handleGetAppointmentsByDate(request, response);
+                    return;
                 case "printEncounter":
                     url = printEncounter(request);
                     break;
@@ -112,7 +120,7 @@ public class EMRCoreController extends HttpServlet {
             }
 
             switch (action) {
-                
+
                 case "updateEncounter":
                     url = updateEncounter(request);
                     break;
@@ -330,28 +338,47 @@ public class EMRCoreController extends HttpServlet {
             NhanVienDTO currentUser = (NhanVienDTO) session.getAttribute("LOGIN_USER_INFO");
 
             List<LichHenDTO> danhSachLichHen;
-
-            // Kiểm tra xem người dùng có phải là Bác sĩ không
-            if (currentUser != null && "BAC_SI".equals(currentUser.getVaiTro())) {
-                // Nếu là Bác sĩ, chỉ lấy lịch hẹn của chính họ
-                danhSachLichHen = lichHenService.getPendingAppointmentsForDoctor(currentUser.getId());
-            } else {
-                // Nếu là Y tá hoặc Admin, lấy lịch hẹn của tất cả (hoặc bạn có thể tạo hàm riêng)
-                // Tạm thời dùng lại hàm cũ nếu có
-                danhSachLichHen = lichHenService.getAllPendingAppointments();
-
-                // Hoặc đơn giản là không tải gì cả nếu y tá không có quyền này
-//                danhSachLichHen = new ArrayList<>();
-            }
-
-            request.setAttribute("danhSachLichHen", danhSachLichHen);
+     
             request.setAttribute("danhSachBenhNhan", danhSachBenhNhan);
-            request.setAttribute("danhSachBacSi", danhSachBacSi);
-
-            request.setAttribute("danhSachLichHen", danhSachLichHen);
+            request.setAttribute("danhSachBacSi", danhSachBacSi);     
         } catch (Exception e) {
             log("Không thể tải dữ liệu cho form tạo phiếu khám: " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Không thể tải danh sách bệnh nhân và bác sĩ.");
+        }
+    }
+
+    //  Lấy lịch hẹn theo ngày
+    private void handleGetAppointmentsByDate(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        try {
+            HttpSession session = request.getSession(false);
+            NhanVienDTO currentUser = (NhanVienDTO) session.getAttribute("LOGIN_USER_INFO");
+            if (currentUser == null || !"BAC_SI".equals(currentUser.getVaiTro())) {
+                throw new Exception("Người dùng không phải là Bác sĩ.");
+            }
+            int bacSiId = currentUser.getId();
+            LocalDate date = LocalDate.parse(request.getParameter("date"));
+            List<LichHenDTO> lichHens = lichHenService.getPendingAppointments(date, bacSiId);
+            response.getWriter().write(gson.toJson(lichHens));
+        } catch (Exception e) {
+            response.setStatus(500);
+            response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
+        }
+    }
+
+    // ✨  Tìm bệnh nhân
+    private void handleSearchPatients(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        try {
+            String keyword = request.getParameter("keyword");
+            List<BenhNhanDTO> patients = benhNhanService.searchBenhNhan(keyword);
+            response.getWriter().write(gson.toJson(patients));
+        } catch (Exception e) {
+            response.setStatus(500);
+            response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
 
@@ -538,8 +565,6 @@ public class EMRCoreController extends HttpServlet {
         // Luôn redirect về lại trang chi tiết để xem kết quả
         return "redirect:/MainController?action=viewEncounterDetails&id=" + phieuKhamIdStr;
     }
-
-   
 
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     @Override

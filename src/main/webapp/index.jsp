@@ -6,7 +6,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Bệnh viện Quốc tế HQĐ</title>
+        <title>Bệnh viện Quốc tế HQD</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,11 +35,11 @@
                         <%-- SLIDE 1 --%>
                         <div class="swiper-slide slide-1">
                             <div class="hero-content">
-                                <p class="hero-subtitle-small">Chào mừng đến với HQĐ Hospital</p>
+                                <p class="hero-subtitle-small">Chào mừng đến với HQD Hospital</p>
                                 <p class="hero-subtitle">Sức khỏe của bạn là ưu tiên hàng đầu</p>
                                 <h1>CHĂM SÓC TOÀN DIỆN<br>BẰNG CẢ TRÁI TIM</h1>
                                 <p class="hero-description">
-                                    Tại Bệnh viện HQĐ, chúng tôi cam kết mang đến dịch vụ chăm sóc y tế
+                                    Tại Bệnh viện HQD, chúng tôi cam kết mang đến dịch vụ chăm sóc y tế
                                     toàn diện với đội ngũ bác sĩ chuyên nghiệp.
                                 </p>
                                 <div class="hero-buttons">
@@ -248,10 +248,9 @@
             </footer>
         </div> 
 
-        <%-- ✨ 3. THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+        
         <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-        <%-- ✨ 4. LINK TỚI FILE JS (Sẽ cập nhật ở Bước 3) --%>
         <script src="<c:url value='/js/index.js'/>"></script>
 
     </body>

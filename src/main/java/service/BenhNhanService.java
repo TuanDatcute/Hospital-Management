@@ -493,5 +493,9 @@ public class BenhNhanService {
             }
         }
     }
-
+//===================dat===========
+    public List<BenhNhanDTO> searchBenhNhan(String keyword) {
+        List<BenhNhan> entities = benhNhanDAO.searchByNameOrMaBN(keyword);
+        return entities.stream().map(this::toDTO).collect(Collectors.toList());
+    }
 }

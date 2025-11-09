@@ -472,4 +472,20 @@ public class BenhNhanDAO {
             return Collections.emptyList();
         }
     }
+
+   
+    public List<BenhNhan> searchByNameOrMaBN(String keyword) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<BenhNhan> query = session.createQuery(
+                    "FROM BenhNhan bn WHERE bn.hoTen LIKE :keyword OR bn.maBenhNhan LIKE :keyword",
+                    BenhNhan.class
+            );
+            query.setParameter("keyword", "%" + keyword + "%");
+            query.setMaxResults(10); 
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
 }

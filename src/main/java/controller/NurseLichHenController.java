@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import exception.ValidationException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -56,6 +57,7 @@ public class NurseLichHenController extends HttpServlet {
             }
 
             switch (action) {
+                
                 case "listLichHenNurse":
                     url = listLichHen(request);
                     break;
@@ -257,6 +259,9 @@ public class NurseLichHenController extends HttpServlet {
         return redirectUrl;
     }
 
+    
+
+  
     @Override
     public String getServletInfo() {
         return "Controller quản lý các nghiệp vụ liên quan đến Lịch Hẹn.";

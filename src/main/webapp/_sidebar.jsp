@@ -12,17 +12,17 @@
     <div class="sidebar-header">
 
         <%-- Logo link cho Bác Sĩ (quay về trang DS Phiếu Khám) --%>
-        <c:if test="${sessionScope.userRole == 'BAC_SI'}">
+        <c:if test="${sessionScope.USER.vaiTro == 'BAC_SI'}">
             <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="sidebar-logo">
-                <i class="fas fa-hospital-user"></i>
+                <img src="images/logo.png" alt="alt"/>
                 <span>Hospital MIS</span>
             </a>
         </c:if>
 
         <%-- Logo link cho Lễ Tân (quay về trang Hóa đơn) --%>
-        <c:if test="${sessionScope.userRole == 'LE_TAN'}">
+        <c:if test="${sessionScope.USER.vaiTro  == 'LE_TAN'}">
             <a href="<c:url value='/MainController?action=listInvoices'/>" class="sidebar-logo">
-                <i class="fas fa-hospital-user"></i>
+               <img src="images/logo.png" alt="alt"/>
                 <span>Hospital MIS</span>
             </a>
         </c:if>
@@ -35,7 +35,7 @@
     <ul class="sidebar-menu">
 
         <%-- ===== CHỨC NĂNG CỦA BÁC SĨ (TẠO MỚI) ===== --%>
-        <c:if test="${sessionScope.userRole == 'BAC_SI'}">
+        <c:if test="${sessionScope.USER.vaiTro  == 'BAC_SI'}">
             <li>
                 <a href="<c:url value='/MainController?action=showCreateEncounterForm'/>" class="nav-link" data-link="showCreateEncounterForm">
                     <i class="fas fa-plus-circle"></i>
@@ -53,7 +53,7 @@
         <li class="menu-divider"><span class="nav-text">Quản lý</span></li>
 
         <%-- ===== CHỨC NĂNG CỦA BÁC SĨ (QUẢN LÝ) ===== --%>
-        <c:if test="${sessionScope.userRole == 'BAC_SI'}">
+        <c:if test="${sessionScope.USER.vaiTro  == 'BAC_SI'}">
             <li>
                 <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="nav-link" data-link="listAllEncounters">
                     <i class="fas fa-notes-medical"></i>
@@ -84,16 +84,17 @@
                     <span class="nav-text">Dịch Vụ</span>
                 </a>
             </li>    
-            <li>
-                <a href="<c:url value='/MainController?action=listPatients'/>" class="nav-link" data-link="listPatients">
-                    <i class="fas fa-user-injured"></i>
-                    <span class="nav-text">Bệnh Nhân</span>
-                </a>
-            </li>
+            
         </c:if>
 
         <%-- ===== CHỨC NĂNG CỦA LỄ TÂN (QUẢN LÝ) ===== --%>
-        <c:if test="${sessionScope.userRole == 'LE_TAN'}">
+        <c:if test="${sessionScope.USER.vaiTro  == 'LE_TAN'}">
+            <li>
+                <a href="<c:url value='/MainController?action=listLichHenNurse'/>" class="nav-link" data-link="listLichHenNurse">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="nav-text">Lịch Hẹn</span>
+                </a>
+            </li>
             <li>
                 <a href="<c:url value='/MainController?action=listInvoices'/>" class="nav-link" data-link="listInvoices">
                     <i class="fas fa-file-invoice-dollar"></i>
@@ -112,6 +113,7 @@
                     <span class="nav-text">Giường bệnh</span>
                 </a>
             </li>
+            
         </c:if>
 
         <%-- ===== CHỨC NĂNG CHUNG (CHO CẢ HAI) ===== --%>

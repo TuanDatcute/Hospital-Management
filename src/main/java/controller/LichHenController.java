@@ -22,6 +22,7 @@ import service.NhanVienService;
 import service.KhoaService; // Thêm import KhoaService
 import com.google.gson.Gson; // Thêm import Gson
 import java.io.PrintWriter; // Thêm import PrintWriter
+import java.time.LocalDate;
 import java.util.ArrayList; // Thêm import
 import java.util.HashMap; // Thêm import
 import java.util.Map; // Thêm import
@@ -44,7 +45,7 @@ public class LichHenController extends HttpServlet {
     private final BenhNhanService benhNhanService = new BenhNhanService();
     private final NhanVienService nhanVienService = new NhanVienService();
     private final KhoaService khoaService = new KhoaService(); // Thêm KhoaService
-
+    private final Gson gson = new Gson();
     // Hằng số cho phân trang
     private static final int PAGE_SIZE = 10;
 

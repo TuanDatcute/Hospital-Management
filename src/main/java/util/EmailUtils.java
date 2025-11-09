@@ -145,7 +145,7 @@ public class EmailUtils {
         sb.append("<a href='").append(APP_BASE_URL).append("' style='background-color: #4a90e2; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Đăng nhập hệ thống</a>");
         sb.append("</div>");
 
-        sb.append("<p style='font-size: 0.9em; color: #777; text-align: center;'>Trân trọng,<br>Bệnh viện HospitalManagement</p>");
+        sb.append("<p style='font-size: 0.9em; color: #777; text-align: center;'>Trân trọng,<br>Bệnh viện Quốc tế HQD</p>");
         sb.append("</div></body></html>");
 
         return sb.toString();
