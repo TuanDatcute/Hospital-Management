@@ -96,11 +96,15 @@ public class EMRCoreController extends HttpServlet {
                 default:
                     request.setAttribute("ERROR_MESSAGE", "Hành động '" + action + "' không hợp lệ cho phương thức GET.");
             }
+            if (url.startsWith("redirect:")) {
+                String redirectUrl = url.substring("redirect:".length());
+                response.sendRedirect(request.getContextPath() + redirectUrl);
+            } else {
+                request.getRequestDispatcher(url).forward(request, response);
+            }
         } catch (Exception e) {
             log("Lỗi tại EMRCoreController (doGet): " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Đã có lỗi xảy ra: " + e.getMessage());
-        } finally {
-            request.getRequestDispatcher(url).forward(request, response);
         }
     }
 
@@ -332,37 +336,52 @@ public class EMRCoreController extends HttpServlet {
     private void loadCreateFormDependencies(HttpServletRequest request) {
         try {
             List<BenhNhanDTO> danhSachBenhNhan = benhNhanService.getAllBenhNhan();
-            List<NhanVienDTO> danhSachBacSi = nhanVienService.findDoctorsBySpecialty();
-
-            HttpSession session = request.getSession(false);
-            NhanVienDTO currentUser = (NhanVienDTO) session.getAttribute("LOGIN_USER_INFO");
-
-            List<LichHenDTO> danhSachLichHen;
-     
+            List<NhanVienDTO> danhSachBacSi = nhanVienService.findDoctorsBySpecialty();       
             request.setAttribute("danhSachBenhNhan", danhSachBenhNhan);
-            request.setAttribute("danhSachBacSi", danhSachBacSi);     
+            request.setAttribute("danhSachBacSi", danhSachBacSi);
         } catch (Exception e) {
             log("Không thể tải dữ liệu cho form tạo phiếu khám: " + e.getMessage(), e);
             request.setAttribute("ERROR_MESSAGE", "Không thể tải danh sách bệnh nhân và bác sĩ.");
         }
     }
 
-    //  Lấy lịch hẹn theo ngày
+    // Trong file controller/EMRCoreController.java
     private void handleGetAppointmentsByDate(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
+            // --- BƯỚC 1: LẤY ĐÚNG ĐỐI TƯỢNG TỪ SESSION ---
             HttpSession session = request.getSession(false);
-            NhanVienDTO currentUser = (NhanVienDTO) session.getAttribute("LOGIN_USER_INFO");
-            if (currentUser == null || !"BAC_SI".equals(currentUser.getVaiTro())) {
+            if (session == null) {
+                throw new Exception("Phiên làm việc không tồn tại hoặc đã hết hạn.");
+            }
+
+            // Lấy TÀI KHOẢN để kiểm tra vai trò
+            TaiKhoanDTO currentUserAccount = (TaiKhoanDTO) session.getAttribute("USER");
+            // Lấy THÔNG TIN NHÂN VIÊN để lấy ID Bác sĩ
+            NhanVienDTO currentUserInfo = (NhanVienDTO) session.getAttribute("LOGIN_USER_INFO");
+
+            // --- BƯỚC 2: KIỂM TRA VAI TRÒ VÀ THÔNG TIN ---
+            if (currentUserAccount == null || currentUserInfo == null) {
+                throw new Exception("Người dùng chưa đăng nhập hoặc thông tin không hợp lệ.");
+            }
+
+            if (!"BAC_SI".equals(currentUserAccount.getVaiTro())) {
                 throw new Exception("Người dùng không phải là Bác sĩ.");
             }
-            int bacSiId = currentUser.getId();
+
+            // --- BƯỚC 3: LẤY THAM SỐ VÀ GỌI SERVICE ---
+            int bacSiId = currentUserInfo.getId(); // Lấy ID bác sĩ từ NhanVienDTO
             LocalDate date = LocalDate.parse(request.getParameter("date"));
+
             List<LichHenDTO> lichHens = lichHenService.getPendingAppointments(date, bacSiId);
+
+            // --- BƯỚC 4: TRẢ VỀ JSON ---
             response.getWriter().write(gson.toJson(lichHens));
+
         } catch (Exception e) {
+            e.printStackTrace(); // In lỗi ra log server
             response.setStatus(500);
             response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
         }
@@ -377,6 +396,8 @@ public class EMRCoreController extends HttpServlet {
             List<BenhNhanDTO> patients = benhNhanService.searchBenhNhan(keyword);
             response.getWriter().write(gson.toJson(patients));
         } catch (Exception e) {
+            e.printStackTrace();
+            // Thất bại: Gửi JSON lỗi và status 500
             response.setStatus(500);
             response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
         }

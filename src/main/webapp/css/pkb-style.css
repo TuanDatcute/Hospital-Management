@@ -33,7 +33,7 @@ body {
     font-family: 'Roboto', sans-serif;
     background-color: var(--bg-color);
     margin: 0;
-    /* padding-top: 60px; /* Khoảng trống cho thanh user bar */
+    padding-top: 60px; /* Khoảng trống cho thanh user bar */
     color: var(--text-primary);
     transition: background-color 0.3s, color 0.3s;
 }
@@ -85,7 +85,7 @@ html.dark-mode .user-info-bar {
 .container {
     max-width: 900px;
     margin: 30px auto;
-    margin-top: 80px; /* Thêm margin-top để không bị thanh user-info-bar che */
+    /* margin-top: 80px; /* Thêm margin-top để không bị thanh user-info-bar che */
     padding: 30px 40px;
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
@@ -147,7 +147,7 @@ textarea.form-control {
     color: var(--text-secondary);
 }
 
-/* ✨ CSS MỚI: Khối lọc lịch hẹn */
+/* Khối lọc lịch hẹn */
 .appointment-group {
     grid-column: 1 / -1;
     display: grid;
@@ -163,19 +163,19 @@ textarea.form-control {
     flex-direction: column;
 }
 
-/* ✨ CSS MỚI: Khối tìm kiếm bệnh nhân */
+/* Khối tìm kiếm bệnh nhân */
 .patient-search-trigger {
     display: flex;
     gap: 10px;
 }
 .patient-search-trigger .readonly-input {
-    cursor: pointer; /* Cho người dùng biết có thể nhấn vào */
+    cursor: pointer;
 }
 .patient-search-trigger .readonly-input:hover {
     border-color: var(--primary-color);
 }
 .patient-search-trigger .btn {
-    flex-shrink: 0; /* Không co nút lại */
+    flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -188,7 +188,7 @@ textarea.form-control {
     display: flex;
     justify-content: flex-end;
     gap: 15px;
-    grid-column: 1 / -1; /* Đảm bảo nhóm nút luôn ở dưới cùng */
+    grid-column: 1 / -1;
 }
 .btn {
     padding: 10px 20px;
@@ -304,7 +304,7 @@ input:checked + .slider .moon-icon {
 }
 
 /* ==========================================================================
-   ✨ CSS MỚI: POPUP TÌM KIẾM BỆNH NHÂN
+   POPUP TÌM KIẾM BỆNH NHÂN
    ========================================================================== */
 .modal-overlay {
     position: fixed;
@@ -330,14 +330,14 @@ input:checked + .slider .moon-icon {
     background-color: var(--surface-color);
     border-radius: 12px;
     width: 90%;
-    max-width: 600px; /* Rộng hơn 1 chút để chứa bảng */
+    max-width: 600px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     transform: scale(0.95);
     transition: transform 0.3s ease;
     border: 1px solid var(--border-color);
-    display: flex; /* Cho phép co giãn */
+    display: flex;
     flex-direction: column;
-    max-height: 80vh; /* Giới hạn chiều cao */
+    max-height: 80vh;
 }
 .modal-overlay.active .modal-content {
     transform: scale(1);
@@ -363,13 +363,10 @@ input:checked + .slider .moon-icon {
 }
 .modal-body {
     padding: 25px;
-    overflow-y: auto; /* Cho phép cuộn nếu kết quả dài */
+    overflow-y: auto;
 }
 .modal-body p {
     margin-top: 0;
-}
-.form-group {
-    margin-bottom: 20px;
 }
 .modal-footer {
     display: flex;
@@ -382,12 +379,12 @@ input:checked + .slider .moon-icon {
 }
 #patient-search-results {
     margin-top: 20px;
-    max-height: 300px; /* Giới hạn chiều cao kết quả */
+    max-height: 300px;
     overflow-y: auto;
     border: 1px solid var(--border-color);
     border-radius: 8px;
 }
-/* CSS cho bảng kết quả tìm kiếm */
+/* Bảng kết quả tìm kiếm */
 .patient-result-table {
     width: 100%;
     border-collapse: collapse;
@@ -412,7 +409,6 @@ input:checked + .slider .moon-icon {
     text-align: center;
     color: var(--text-secondary);
 }
-
 
 /* ==========================================================================
    RESPONSIVE
