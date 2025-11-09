@@ -1,7 +1,8 @@
 <%--
-    Document   : formNhanVien.jsp (Đã sửa Chuyên môn thành Dropdown)
-    Created on : Oct 29, 2025
-    Author     : ADMIN
+    Document    : formNhanVien.jsp (Đã sửa Chuyên môn thành Dropdown)
+    Created on  : Oct 29, 2025
+    Author      : ADMIN
+    (ĐÃ NÂNG CẤP: Giao diện V2.1 - Tách file admin-form.css)
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -15,13 +16,23 @@
         <c:set var="isCreating" value="${requestScope.formAction == 'createNhanVien'}" />
         <title>${isCreating ? 'Thêm Nhân viên' : 'Cập nhật Nhân viên'}</title>
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+        <%-- CSS Chung --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css?v=1.5">
+
+        <%-- ✨ LIÊN KẾT TỚI FILE CSS CHO FORM MỚI ✨ --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/admin-form.css?v=1.0">
     </head>
     <body>
 
-        <jsp:include page="/WEB-INF/header.jsp" /> 
+        <jsp:include page="/WEB-INF/headerDat.jsp" /> 
 
         <div class="container page-content" style="padding-top: 30px;">
 
@@ -76,11 +87,6 @@
                 <%-- *** BẮT ĐẦU SỬA LỖI: Chuyển 'chuyenMon' thành <select> *** --%>
                 <div class="form-group">
                     <label for="chuyenMon">Chuyên môn (Vai trò):</label>
-                    <%-- 
-                        Lưu ý: Bạn nên chọn <option value=""> để bắt buộc Admin phải chọn.
-                        Giá trị value (ví dụ: "Bác sĩ") phải khớp 100% với giá trị 
-                        mà NhanVienService (hàm findDoctorsBySpecialty) đang tìm kiếm.
-                    --%>
                     <select id="chuyenMon" name="chuyenMon" required="required">
                         <option value="">-- Chọn chuyên môn --</option>
                         <option value="Bác sĩ" ${requestScope.NHANVIEN_DATA.chuyenMon == 'Bác sĩ' ? 'selected' : ''}>Bác sĩ</option>
@@ -145,7 +151,20 @@
 
         </div>
 
-        <jsp:include page="/WEB-INF/footer.jsp" /> 
+        <%-- Footer --%>
+        <footer class="main-footer">
+            <div class="container">
+                <jsp:include page="/WEB-INF/footer.jsp" /> 
+            </div>
+        </footer>
+
+        <%-- (Tôi đã xóa bớt 1 thẻ </div> thừa ở đây so với file gốc của bạn) --%>
+
+        <%-- ✨ 3. THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+        <%-- ✨ 4. LINK TỚI FILE JS (Sẽ cập nhật ở Bước 3) --%>
+        <script src="<c:url value='/js/index.js'/>"></script>
 
     </body>
 </html>

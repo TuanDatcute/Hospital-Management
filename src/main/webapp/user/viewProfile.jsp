@@ -169,7 +169,7 @@
                     <i class="fas fa-edit"></i> Chỉnh sửa thông tin hồ sơ
                 </a>
 
-                <a href="${pageContext.request.contextPath}/home.jsp" class="home-link" title="Quay về Trang chủ">
+                <a href="${pageContext.request.contextPath}/index.jsp" class="home-link" title="Quay về Trang chủ">
                     <i class="fas fa-home"></i>
                 </a> 
             </div>

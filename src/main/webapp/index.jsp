@@ -16,19 +16,18 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
         <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-
-        <%-- Tăng version CSS --%>
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css?v=1.2">
+        <%-- ✨ ÉP TẢI LẠI CSS PHIÊN BẢN MỚI NHẤT --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css?v=1.5">
     </head>
     <body>
 
-        <%-- 1. Nhúng Header (Không đổi) --%>
+        <%-- 1. Nhúng Header --%>
         <jsp:include page="/WEB-INF/headerDat.jsp" /> 
 
         <%-- 2. Nội dung riêng của trang Index --%>
         <div class="page-content">
 
-            <%-- ✨ HERO SLIDER - CẤU TRÚC MỚI --%>
+            <%-- HERO SLIDER (Không đổi) --%>
             <section class="swiper-hero-section">
                 <div class="swiper mySwiper">
                     <div class="swiper-wrapper">
@@ -44,7 +43,7 @@
                                     toàn diện với đội ngũ bác sĩ chuyên nghiệp.
                                 </p>
                                 <div class="hero-buttons">
-                                    <a href="#" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
+                                    <a href="MainController?action=myAppointments" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
                                     <a href="#" class="btn-secondary-outline hero-btn">Xem Dịch Vụ <i class="fas fa-arrow-right"></i></a>
                                 </div>
                             </div>
@@ -61,12 +60,12 @@
                                     và điều trị hiệu quả.
                                 </p>
                                 <div class="hero-buttons">
-                                    <a href="#" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
+                                    <a href="MainController?action=myAppointments" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div>
 
-                        <%-- SLIDE 3 (Giống hình ảnh mẫu) --%>
+                        <%-- SLIDE 3 --%>
                         <div class="swiper-slide slide-3">
                             <div class="hero-content">
                                 <p class="hero-subtitle-small">Dịch vụ y tế cao cấp</p>
@@ -77,7 +76,7 @@
                                     cho mọi bệnh nhân.
                                 </p>
                                 <div class="hero-buttons">
-                                    <a href="#" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
+                                    <a href="MainController?action=myAppointments" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
                                     <a href="#" class="btn-secondary-outline hero-btn">Xem Dịch Vụ <i class="fas fa-arrow-right"></i></a>
                                 </div>
                             </div>
@@ -92,31 +91,33 @@
             </section>
             <%-- KẾT THÚC SLIDER MỚI --%>
 
-            <%-- Form Đặt Lịch Hẹn Nhanh (Không đổi, nó sẽ tự động đè lên slider) --%>
+            <%-- Form Đặt Lịch Hẹn Nhanh --%>
             <section class="appointment-form-section">
                 <div class="container">
                     <div class="appointment-form-card">
                         <h3>Đặt Lịch Hẹn Ngay</h3>
                         <div class="form-group">
                             <label for="location"><i class="fa-solid fa-thumbs-up"></i> Chuyên nghiệp</label>
-                           
+
                         </div>
                         <div class="form-group">
                             <label for="department"><i class="fa-solid fa-heart"></i> Tận tình</label>
-                           
+
                         </div>
                         <div class="form-group">
                             <label for="date"><i class="fa-solid fa-check"></i> Chất lượng</label>
-                           
+
                         </div>
-                        <button class="btn-secondary">Đặt Lịch Ngay Để Nhận Tư Vấn</button>
+                        <a href="MainController?action=myAppointments" class="btn-secondary" role="button">
+                            Đặt Lịch Ngay Để Nhận Tư Vấn
+                        </a>
                     </div>
                 </div>
             </section>
 
-            <%-- Các Đặc Điểm Nổi Bật (Features) (Không đổi) --%>
+            <%-- Các Đặc Điểm Nổi Bật (Features) --%>
             <section class="info-features-section">
-                <div class="container">
+                <div class="container"> <%-- ✨ Container này sẽ được style lại trên mobile --%>
                     <div class="info-feature-item">
                         <i class="fas fa-microscope"></i>
                         <h4>Trang Thiết Bị Hiện Đại</h4>

@@ -1,7 +1,8 @@
 <%--
-    Document   : formKhoa.jsp
-    Created on : Oct 29, 2025
-    Author     : ADMIN
+    Document    : formKhoa.jsp
+    Created on  : Oct 29, 2025
+    Author      : ADMIN
+    (ĐÃ NÂNG CẤP: Giao diện V2.1 - Tách file admin-form.css)
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -17,18 +18,23 @@
         <title>${isCreating ? 'Thêm Khoa Mới' : 'Cập nhật Khoa'}</title>
 
         <%-- Nhúng CSS/Font chung --%>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-        <%-- 
-            LƯU Ý: 
-            Trang này sử dụng các class từ style.css:
-            .data-form, .form-group, .btn-submit, .btn-cancel
-        --%>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+        <%-- CSS Chung --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css?v=1.5">
+
+        <%-- ✨ LIÊN KẾT TỚI FILE CSS CHO FORM MỚI ✨ --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/admin-form.css?v=1.0">
     </head>
     <body>
 
-        <jsp:include page="/WEB-INF/header.jsp" /> 
+        <jsp:include page="/WEB-INF/headerDat.jsp" /> 
 
         <div class="container page-content" style="padding-top: 30px;">
 
@@ -42,11 +48,6 @@
                 <p class="error-message">${requestScope.ERROR_MESSAGE}</p>
             </c:if>
 
-            <%-- 
-                Form này sẽ gửi đến MainController.
-                Action sẽ là 'createKhoa' (nếu tạo mới) hoặc 'updateKhoa' (nếu cập nhật).
-                Biến 'formAction' được KhoaController set ở doGet.
-            --%>
             <form action="MainController" method="post" class="data-form">
 
                 <%-- Truyền action (createKhoa/updateKhoa) --%>
@@ -59,10 +60,6 @@
 
                 <div class="form-group">
                     <label for="tenKhoa">Tên Khoa:</label>
-                    <%-- 
-                        Dùng <c:out> để điền lại dữ liệu cũ 
-                        (khi sửa, hoặc khi tạo mới bị lỗi validation)
-                    --%>
                     <input type="text" id="tenKhoa" name="tenKhoa" value="<c:out value="${requestScope.KHOA_DATA.tenKhoa}"/>" required="required">
                 </div>
 
@@ -81,7 +78,19 @@
 
         </div>
 
-        <jsp:include page="/WEB-INF/footer.jsp" /> 
+        <%-- Footer --%>
+        <footer class="main-footer">
+            <div class="container">
+                <jsp:include page="/WEB-INF/footer.jsp" /> 
+            </div>
+        </footer>
 
+        <%-- (Tôi đã xóa bớt 1 thẻ </div> thừa ở đây so với file gốc của bạn) --%>
+
+        <%-- ✨ 3. THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+        <%-- ✨ 4. LINK TỚI FILE JS (Sẽ cập nhật ở Bước 3) --%>
+        <script src="<c:url value='/js/index.js'/>"></script>
     </body>
 </html>
