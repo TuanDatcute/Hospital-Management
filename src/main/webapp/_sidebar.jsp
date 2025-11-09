@@ -42,12 +42,7 @@
                     <span class="nav-text">Tạo Phiếu Khám</span>
                 </a>
             </li>
-            <li>
-                <a href="<c:url value='/MainController?action=showCreateAppointmentForm'/>" class="nav-link" data-link="showCreateAppointmentForm">
-                    <i class="bi bi-file-earmark-plus"></i>
-                    <span class="nav-text">Tạo Lịch Hẹn</span>
-                </a>
-            </li>
+            
         </c:if>
 
         <li class="menu-divider"><span class="nav-text">Quản lý</span></li>

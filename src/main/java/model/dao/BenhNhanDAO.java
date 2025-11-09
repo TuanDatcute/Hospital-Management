@@ -75,7 +75,7 @@ public class BenhNhanDAO {
      */
     public BenhNhan getById(int id) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "FROM BenhNhan bn WHERE bn.id = :id AND bn.trangThai = 'HOAT_DONG'";
+            String hql = "FROM BenhNhan bn JOIN FETCH bn.taiKhoan WHERE bn.id = :id AND bn.trangThai = 'HOAT_DONG'";
             Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
             query.setParameter("id", id);
             return query.uniqueResult();

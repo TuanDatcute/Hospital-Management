@@ -122,7 +122,7 @@ public class PhieuKhamBenhDAO {
             // BƯỚC 1: Lấy Phiếu Khám và các mối quan hệ ĐƠN LẺ (@ManyToOne, @OneToOne)
             PhieuKhamBenh phieuKham = session.createQuery(
                     "SELECT pkb FROM PhieuKhamBenh pkb "
-                    + "LEFT JOIN FETCH pkb.benhNhan "
+                    + "LEFT JOIN FETCH pkb.benhNhan bn "
                     + "LEFT JOIN FETCH pkb.bacSi "
                     + "LEFT JOIN FETCH pkb.lichHen "
                     + "WHERE pkb.id = :id",

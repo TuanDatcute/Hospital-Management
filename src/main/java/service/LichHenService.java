@@ -325,6 +325,26 @@ public class LichHenService {
 
         // --- BƯỚC 4: LƯU VÀO CSDL ---
         LichHen savedEntity = lichHenDAO.create(newLichHen);
+        LichHenDTO finalDTO = toDTO(savedEntity);
+        try {
+            // Lấy email của bệnh nhân (từ TaiKhoan liên kết)
+            TaiKhoan taiKhoanBenhNhan = benhNhan.getTaiKhoan();
+            if (taiKhoanBenhNhan != null && taiKhoanBenhNhan.getEmail() != null) {
+                System.out.println("Đang gửi email xác nhận đặt lịch tới: " + taiKhoanBenhNhan.getEmail());
+                // Gọi hàm EmailUtils (sẽ tạo ở Bước 2)
+                EmailUtils.sendAppointmentConfirmationEmail(
+                        taiKhoanBenhNhan.getEmail(),
+                        finalDTO // Gửi DTO đã "làm phẳng"
+                );
+            } else {
+                System.err.println("Không thể gửi email: Bệnh nhân " + benhNhan.getHoTen() + " không có email hoặc tài khoản.");
+            }
+        } catch (Exception e) {
+            // QUAN TRỌNG: Không ném lỗi (throw e) ở đây
+            // Việc gửi mail thất bại KHÔNG nên làm hỏng toàn bộ chức năng đặt lịch.
+            e.printStackTrace();
+            System.err.println("LỖI GỬI EMAIL: Đặt lịch vẫn thành công, nhưng gửi email thất bại. " + e.getMessage());
+        }
 
         // --- BƯỚC 5: TRẢ VỀ DTO ---
         return toDTO(savedEntity);
