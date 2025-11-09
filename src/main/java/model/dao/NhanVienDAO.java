@@ -383,4 +383,48 @@ public class NhanVienDAO {
         }
     }
 
+    /**
+     * Tìm kiếm bác sĩ theo Tên VÀ/HOẶC ID Khoa. Tải sẵn thông tin
+     * Khoa và Tài khoản.
+     *
+     * @param keyword Tên bác sĩ (nếu rỗng, sẽ bị bỏ qua).
+     * @param khoaId ID của khoa (nếu <= 0, sẽ bị bỏ qua). @return Danh
+     * sách các NhanVien (Bác sĩ) khớp điều kiện.
+     */
+    public List<NhanVien> searchDoctors(String keyword, int khoaId) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+
+            // Bắt đầu câu truy vấn HQL cơ bản
+            String hql = "SELECT nv FROM NhanVien nv "
+                    + "JOIN FETCH nv.taiKhoan tk "
+                    + "LEFT JOIN FETCH nv.khoa k "
+                    + "WHERE tk.vaiTro = 'BAC_SI' "; // Chỉ lấy bác sĩ
+
+            // Thêm điều kiện lọc động
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                hql += " AND nv.hoTen LIKE :keyword";
+            }
+            if (khoaId > 0) {
+                hql += " AND k.id = :khoaId";
+            }
+
+            hql += " ORDER BY nv.hoTen ASC";
+
+            Query<NhanVien> query = session.createQuery(hql, NhanVien.class);
+
+            // Gán tham số nếu chúng tồn tại
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                query.setParameter("keyword", "%" + keyword + "%");
+            }
+            if (khoaId > 0) {
+                query.setParameter("khoaId", khoaId);
+            }
+
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
 }

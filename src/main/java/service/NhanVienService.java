@@ -353,6 +353,16 @@ public class NhanVienService {
         return toDTO(entity); // <-- SỬA: Dùng hàm 'toDTO' chính (sẽ dùng hàm toDTO có tenKhoa ở trên)
     }
 
+    /**
+     *  Nghiệp vụ tìm kiếm bác sĩ theo các tiêu chí.
+     */
+    public List<NhanVienDTO> searchDoctors(String keyword, int khoaId) {
+        List<NhanVien> entities = nhanVienDAO.searchDoctors(keyword, khoaId);
+        return entities.stream()
+                .map(this::toDTO) // Dùng hàm toDTO của bạn
+                .collect(Collectors.toList());
+    }
+
     private NhanVienDTO toDTOFotGetByTaiKhoan(NhanVien entity) {
         if (entity == null) {
             return null;

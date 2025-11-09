@@ -35,6 +35,7 @@ public class MainController extends HttpServlet {
     private static final String USER_THONG_BAO_CONTROLLER = "UserThongBaoController";
     private static final String PATIENT_LICH_HEN_CONTROLLER = "PatientLichHenController";
     private static final String NURSE_LICH_HEN_CONTROLLER = "NurseLichHenController";
+    private static final String PUBLIC_CONTROLLER = "PublicController";
 
     // --- (Các Controller từ nhánh Auth của bạn) ---
     private static final String VERIFY_CONTROLLER = "VerifyController";
@@ -52,9 +53,9 @@ public class MainController extends HttpServlet {
 
         // 2. Nhóm các action cho từng controller
         String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
-        String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deactivateService", "activateService","activateMedication","deactivateMedication"};
+        String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deactivateService", "activateService", "activateMedication", "deactivateMedication"};
         String[] NurseLichHenActions = {"showCreateAppointmentForm", "createAppointment", "getDoctorsByKhoa", "listLichHenNurse", "updateAppointmentStatus"};
-
+        String[] publicActions = {"viewDoctors"};
         // **MERGE:** Lấy 'lichHenActions' từ nhánh 'main' (vì nó đầy đủ hơn)
         String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus"};
 
@@ -81,7 +82,7 @@ public class MainController extends HttpServlet {
             "saveProfile", // (Lưu hồ sơ)
             "confirmAndLink", // (Nút "Liên kết ngay")
             "showEditProfileWithExisting", // (Nút "Cần cập nhật")
-            "updateAndLink","viewMyHistory" // (Lưu sau khi "Cần cập nhật")
+            "updateAndLink", "viewMyHistory" // (Lưu sau khi "Cần cập nhật")
     };
 
         // **MERGE:** Lấy các mảng mới từ nhánh 'main'
@@ -144,6 +145,8 @@ public class MainController extends HttpServlet {
             url = PATIENT_LICH_HEN_CONTROLLER;
         } else if (Arrays.asList(NurseLichHenActions).contains(action)) {
             url = NURSE_LICH_HEN_CONTROLLER;
+        }else if (Arrays.asList(publicActions).contains(action)) {
+            url = PUBLIC_CONTROLLER;
         }
 
         // 4. Forward đến controller tương ứng
