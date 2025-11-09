@@ -39,6 +39,7 @@ public class BenhNhanController extends HttpServlet {
     private static final String HISTORY_PAGE = "LichSuKhamBenh.jsp";
 
     private final PhieuKhamBenhService phieuKhamService = new PhieuKhamBenhService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -66,9 +67,11 @@ public class BenhNhanController extends HttpServlet {
                     break;
 
                 // --- Logic Bệnh nhân (Giữ nguyên) ---
+                //=====================Dat===============
                 case "viewMyHistory":
                     url = viewMyHistory(request);
                     break;
+                //=-===========================
                 case "showProfile":
                     url = showViewProfile(request);
                     if (url.startsWith("BenhNhanController")) {
@@ -488,27 +491,33 @@ public class BenhNhanController extends HttpServlet {
     /**
      * Lấy lịch sử khám bệnh của bệnh nhân đang đăng nhập.
      */
-    private String viewMyHistory(HttpServletRequest request) throws Exception {
+    private String viewMyHistory(HttpServletRequest request) throws ValidationException {
         HttpSession session = request.getSession(false);
+        try {
+            // 1. Lấy tài khoản từ session
+            TaiKhoanDTO taiKhoan = (TaiKhoanDTO) session.getAttribute("USER");
+            if (taiKhoan == null) {
+                throw new ValidationException("Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.");
+            }
 
-        // 1. Lấy tài khoản từ session
-        TaiKhoanDTO taiKhoan = (TaiKhoanDTO) session.getAttribute("USER");
-        if (taiKhoan == null) {
-            throw new Exception("Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.");
+            // 2. Lấy thông tin Bệnh nhân từ Tài khoản
+            BenhNhanDTO benhNhan = benhNhanService.getBenhNhanByTaiKhoanId(taiKhoan.getId());
+            if (benhNhan == null) {
+                throw new ValidationException("Không tìm thấy hồ sơ bệnh nhân cho tài khoản này.");
+            }
+
+            // 3. Lấy lịch sử khám từ ID Bệnh nhân
+            List<PhieuKhamBenhDTO> lichSuKham = phieuKhamService.getHistoryForPatient(benhNhan.getId());
+
+            // 4. Gửi danh sách đến JSP
+            request.setAttribute("danhSachLichSuKham", lichSuKham);
+            request.setAttribute("benhNhan", benhNhan); 
+
+        } catch (ValidationException e) {
+            request.getSession().setAttribute("ERROR_MESSAGE", e.getMessage());
+        } catch (Exception e) {
+            request.getSession().setAttribute("ERROR_MESSAGE","Vui lòng thử lại sau");
         }
-
-        // 2. Lấy thông tin Bệnh nhân từ Tài khoản
-        BenhNhanDTO benhNhan = benhNhanService.getBenhNhanByTaiKhoanId(taiKhoan.getId());
-        if (benhNhan == null) {
-            throw new Exception("Không tìm thấy hồ sơ bệnh nhân cho tài khoản này.");
-        }
-
-        // 3. Lấy lịch sử khám từ ID Bệnh nhân
-        List<PhieuKhamBenhDTO> lichSuKham = phieuKhamService.getHistoryForPatient(benhNhan.getId());
-
-        // 4. Gửi danh sách đến JSP
-        request.setAttribute("danhSachLichSuKham", lichSuKham);
-        request.setAttribute("benhNhan", benhNhan); // Gửi cả thông tin bệnh nhân nếu cần
 
         return HISTORY_PAGE;
     }

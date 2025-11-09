@@ -7,6 +7,7 @@ package model.dao;
 import java.time.LocalDateTime;
 import model.Entity.PhieuKhamBenh;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -369,20 +370,48 @@ public class PhieuKhamBenhDAO {
             return Collections.emptyList();
         }
     }
-    // Trong file: model/dao/PhieuKhamBenhDAO.java
 
     public List<PhieuKhamBenh> findByPatientId(int benhNhanId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query<PhieuKhamBenh> query = session.createQuery(
+            List<PhieuKhamBenh> phieuKhams;
+
+            // BƯỚC 1: Lấy phiếu khám, bác sĩ, bệnh nhân
+            phieuKhams = session.createQuery(
                     "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb "
                     + "LEFT JOIN FETCH pkb.bacSi "
                     + "LEFT JOIN FETCH pkb.benhNhan "
-                    + "WHERE pkb.benhNhan.id = :benhNhanId "
-                    + "ORDER BY pkb.thoiGianKham DESC", // Mới nhất lên đầu
+                    + "WHERE pkb.benhNhan.id = :benhNhanId",
                     PhieuKhamBenh.class
-            );
-            query.setParameter("benhNhanId", benhNhanId);
-            return query.list();
+            ).setParameter("benhNhanId", benhNhanId).list();
+
+            if (phieuKhams.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            // BƯỚC 2: Tải danh sách Chỉ Định Dịch Vụ
+            session.createQuery(
+                    "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb "
+                    + "LEFT JOIN FETCH pkb.danhSachChiDinh cdd "
+                    + "LEFT JOIN FETCH cdd.dichVu "
+                    + "WHERE pkb IN (:phieuKhams)",
+                    PhieuKhamBenh.class
+            ).setParameter("phieuKhams", phieuKhams).list();
+
+            // BƯỚC 3: Tải danh sách Đơn Thuốc
+            session.createQuery(
+                    "SELECT DISTINCT pkb FROM PhieuKhamBenh pkb "
+                    + "LEFT JOIN FETCH pkb.donThuoc dt "
+                    + "LEFT JOIN FETCH dt.chiTietDonThuoc cdt "
+                    + "LEFT JOIN FETCH cdt.thuoc "
+                    + "WHERE pkb IN (:phieuKhams)",
+                    PhieuKhamBenh.class
+            ).setParameter("phieuKhams", phieuKhams).list();
+
+            // Sắp xếp lại bằng Java
+            phieuKhams.sort(Comparator.comparing(PhieuKhamBenh::getThoiGianKham).reversed());
+
+            return phieuKhams;
+
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
