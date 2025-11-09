@@ -12,10 +12,11 @@
         <link rel="stylesheet" href="<c:url value='/css/index.css'/>">
         <script src="<c:url value='/js/index.js'/>"></script>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/LichHenQuang.css">
+
     </head>
     <body>
-
         <jsp:include page="/WEB-INF/headerDat.jsp" />
+
 
         <div class="page-container">
             <h2>Lịch hẹn của tôi</h2>
@@ -97,5 +98,17 @@
                 </table>
             </div>
         </div>
+        <%-- Footer --%>
+        <footer class="main-footer">
+            <div class="container">
+                <jsp:include page="/WEB-INF/footer.jsp" /> 
+            </div>
+        </footer>
+
+        <%-- THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+        <%-- LINK TỚI FILE JS --%>
+        <script src="<c:url value='/js/index.js'/>"></script>
     </body>
 </html>

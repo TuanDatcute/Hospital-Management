@@ -14,12 +14,12 @@
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
         <%-- BẮT BUỘC: Nhúng file CSS chung TRƯỚC --%>
-        <link rel="stylesheet" href="<c:url value='/css/StyleChungCuaQuang.css'/>"> <%-- Hoặc base.css --%>
+        <link rel="stylesheet" href="<c:url value='/css/StyleChungCuaQuang_1.css'/>"> <%-- Hoặc base.css --%>
 
         <%-- (MỚI) Nhúng file CSS cụ thể cho trang này SAU --%>
         <link rel="stylesheet" href="<c:url value='/css/UserThongBao.css'/>">
         <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-        
+
 
         <script src="<c:url value='/js/darkmodeQuang.js'/>" defer></script>
         <script src="<c:url value='/js/theme.js'/>"></script>
@@ -41,7 +41,7 @@
         </c:choose>
         <div class="main-content">
             <%-- (SỬA) Bọc toàn bộ trang trong .container --%>
-            <div class="container" style="max-width: 900px;"> <%-- Container hẹp hơn cho giao diện hộp thư --%>
+            <div class="containerQuang" style="max-width: 900px;"> <%-- Container hẹp hơn cho giao diện hộp thư --%>
 
                 <div class="page-header">
                     <h1>Thông báo của tôi</h1>
@@ -149,6 +149,19 @@
         <%-- (MỚI) Nhúng file JS cho logic xác nhận xóa --%>
         <%-- ========================================================== --%>
         <script src="<c:url value='/js/UserThongBao.js'/>" defer></script>
+        <c:if test="${sessionScope.USER.vaiTro == 'BENH_NHAN'}">
+            <%-- Footer --%>
+            <footer class="main-footer">
+                <div class="container">
+                    <jsp:include page="/WEB-INF/footer.jsp" /> 
+                </div>
+            </footer>
 
+            <%-- THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+            <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+            <%-- LINK TỚI FILE JS --%>
+            <script src="<c:url value='/js/index.js'/>"></script>
+        </c:if>
     </body>
 </html>
