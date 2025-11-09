@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %> 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -13,23 +13,20 @@
             <c:otherwise><title>Chỉnh Sửa Phiếu Khám</title></c:otherwise>
         </c:choose>
 
-        <link rel="stylesheet" href="<c:url value='/css/pkb-style.css'/>">
+        <link rel="stylesheet" href="<c:url value='/css/pkb-style.css?v=1.2'/>">
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
         <script>
             (function () {
-                // Key này (theme-preference) phải khớp với key trong theme.js
                 var themeKey = 'theme-preference';
                 var theme = localStorage.getItem(themeKey);
-
                 if (theme === 'dark') {
-                    // ✨ SỬA 3: Không đổi màu nền, mà thêm class vào <html>
                     document.documentElement.classList.add('dark-mode');
                 }
             })();
         </script>
-
 
     </head>
     <body>
@@ -42,7 +39,6 @@
                         <span>${fn:replace(LOGIN_ACCOUNT.vaiTro, '_', ' ')}</span>
                     </div>
                 </div>
-                <%-- Nút đăng xuất có thể thêm ở đây --%>
             </div>
         </c:if>
 
@@ -83,7 +79,9 @@
                         <label for="maPhieuKham">Mã Phiếu Khám</label>
                         <input type="text" id="maPhieuKham" name="maPhieuKham" class="form-control readonly-input" 
                                value="${empty phieuKham.maPhieuKham ? 'Tự động tạo' : phieuKham.maPhieuKham}" readonly>
-                    </div><div class="form-group">
+                    </div>
+
+                    <div class="form-group">
                         <label for="bacSiId">Bác sĩ</label>
                         <c:choose>
                             <c:when test="${not empty LOGIN_ACCOUNT and LOGIN_ACCOUNT.vaiTro == 'BAC_SI'}">
@@ -103,18 +101,36 @@
                         </c:choose>
                     </div>
 
-                    <div class="form-group appointment-group">
-                        <div class="form-group-inner">
-                            <label for="appointmentDate">Lọc lịch hẹn theo ngày</label>
-                            <input type="date" id="appointmentDate" class="form-control">
-                        </div>
-                        <div class="form-group-inner">
-                            <label for="lichHenId">Lịch Hẹn (nếu có)</label>
-                            <select id="lichHenId" name="lichHenId" class="form-control">
-                                <option value="">-- Chọn ngày để lọc lịch hẹn --</option>
-                            </select>
-                        </div>
-                    </div>
+                    <c:choose>
+                        <c:when test="${empty phieuKham.id or phieuKham.id == 0}">
+                            <div class="form-group appointment-group">
+                                <div class="form-group-inner">
+                                    <label for="appointmentDate">Lọc lịch hẹn theo ngày</label>
+                                    <input type="date" id="appointmentDate" class="form-control">
+                                </div>
+                                <div class="form-group-inner">
+                                    <label for="lichHenId">Lịch Hẹn (nếu có)</label>
+                                    <select id="lichHenId" name="lichHenId" class="form-control">
+                                        <option value="">-- Chọn ngày để lọc lịch hẹn --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="form-group">
+                                <label>Lịch Hẹn Đã Ghi Nhận</label>
+                                <c:choose>
+                                    <c:when test="${not empty phieuKham.lichHenId}">
+                                        <input type="text" value="Đã liên kết với Lịch Hẹn ID: ${phieuKham.lichHenId}" readonly class="form-control readonly-input">
+                                        <input type="hidden" name="lichHenId" value="${phieuKham.lichHenId}">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <input type="text" value="Không có" readonly class="form-control readonly-input">
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
 
                     <jsp:useBean id="now" class="java.util.Date" />
                     <c:choose>
@@ -132,27 +148,22 @@
                                value="${thoiGianKhamValue}" required>
                     </div>
 
-
                     <div class="form-group">
                         <label for="benhNhanDisplay">Bệnh Nhân (*)</label>
                         <c:choose>
-                            <%-- Cho phép tìm kiếm --%>
                             <c:when test="${empty phieuKham.id or phieuKham.id == 0}">
                                 <div class="patient-search-trigger">
-                                    <input type="text" id="benhNhanDisplay" class="form-control readonly-input" placeholder="Tìm kiếm bệnh nhân" readonly required>
+                                    <input type="text" id="benhNhanDisplay" class="form-control readonly-input" placeholder="-- Chọn bệnh nhân --" readonly required>
                                     <input type="hidden" id="benhNhanId_hidden" name="benhNhanId">
                                     <button type="button" class="btn btn-primary" id="openPatientSearchModal"><i class="fas fa-search"></i></button>
                                 </div>
                             </c:when>
-                            <%-- CHẾ ĐỘ SỬA: Khóa bệnh nhân --%>
                             <c:otherwise>
                                 <input type="text" value="${phieuKham.tenBenhNhan}" readonly class="form-control readonly-input">
                                 <input type="hidden" name="benhNhanId" value="${phieuKham.benhNhanId}">
                             </c:otherwise>
                         </c:choose>
                     </div>
-
-
 
                     <div class="form-group">
                         <label for="ngayTaiKham">Ngày Tái Khám</label>
@@ -225,8 +236,8 @@
                 </div>
             </div>
         </div>
-
         <script src="<c:url value='/js/darkmode.js'/>"></script>
+        <script src="<c:url value='/js/theme.js'/>"></script>
         <script src="<c:url value='/js/pkb-form.js'/>"></script>
     </body>
 </html>
