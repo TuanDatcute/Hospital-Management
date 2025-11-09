@@ -45,15 +45,18 @@
 
                 <div class="page-header">
                     <h1>Thông báo của tôi</h1>
-                    <div class="theme-switch-wrapper">
-                        <label class="theme-switch" for="theme-toggle">
-                            <input type="checkbox" id="theme-toggle" />
-                            <span class="slider">
-                                <i class="fa-solid fa-sun sun-icon"></i>
-                                <i class="fa-solid fa-moon moon-icon"></i>
-                            </span>
-                        </label>
-                    </div>
+                    <%-- nút chuyển đổi darkmode --%>
+                    <c:if test="${sessionScope.USER.vaiTro != 'BENH_NHAN'}">
+                        <div class="theme-switch-wrapper">
+                            <label class="theme-switch" for="theme-toggle">
+                                <input type="checkbox" id="theme-toggle" />
+                                <span class="slider">
+                                    <i class="fa-solid fa-sun sun-icon"></i>
+                                    <i class="fa-solid fa-moon moon-icon"></i>
+                                </span>
+                            </label>
+                        </div>
+                    </c:if>
                 </div>
 
                 <%-- (SỬA) Thay thế form tìm kiếm cũ bằng component .search-form chuẩn --%>
