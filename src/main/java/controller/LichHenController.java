@@ -169,24 +169,62 @@ public class LichHenController extends HttpServlet {
     /**
      * (Đã Nâng cấp: Phân trang)
      */
+// BÊN TRONG LichHenController.java
+
+    /**
+     * (Đã Nâng cấp: Gộp Phân trang VÀ Tìm kiếm)
+     */
     private String listLichHen(HttpServletRequest request) throws Exception {
+        
+        // 1. Xử lý lấy số trang (page)
         int page = 1;
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.isEmpty()) {
             try {
                 page = Integer.parseInt(pageStr);
             } catch (NumberFormatException e) {
+                log("Tham số 'page' không hợp lệ, sử dụng trang 1.", e);
                 page = 1;
             }
         }
+        if (page < 1) {
+            page = 1; // Đảm bảo trang không bao giờ < 1
+        }
 
-        List<LichHenDTO> list = lichHenService.getAllLichHenPaginated(page, PAGE_SIZE);
-        long totalLichHen = lichHenService.getLichHenCount();
+        // 2. Xử lý lấy từ khóa tìm kiếm (keyword)
+        String keyword = request.getParameter("keyword");
+        List<LichHenDTO> list;
+        long totalLichHen;
+
+        // 3. Phân nhánh logic: Có tìm kiếm hay chỉ phân trang?
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            // --- TRƯỜNG HỢP CÓ TÌM KIẾM ---
+            String trimmedKeyword = keyword.trim();
+            
+            // Gọi service tìm kiếm CÓ PHÂN TRANG
+            list = lichHenService.searchLichHenPaginated(trimmedKeyword, page, PAGE_SIZE);
+            
+            // Gọi service đếm kết quả TÌM KIẾM
+            totalLichHen = lichHenService.getLichHenSearchCount(trimmedKeyword);
+            
+            // Gửi lại keyword về JSP
+            request.setAttribute("searchKeyword", keyword); 
+            
+        } else {
+            // --- TRƯỜNG HỢP CHỈ XEM DANH SÁCH (KHÔNG TÌM KIẾM) ---
+            
+            // Đây là code cũ của bạn
+            list = lichHenService.getAllLichHenPaginated(page, PAGE_SIZE);
+            totalLichHen = lichHenService.getLichHenCount();
+        }
+
+        // 4. Tính toán và gửi thông tin phân trang về JSP
         long totalPages = (long) Math.ceil((double) totalLichHen / PAGE_SIZE);
-
-        request.setAttribute("LIST_LICHHEN", list);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
+        
+        request.setAttribute("LIST_LICHHEN", list);       // Danh sách để hiển thị
+        request.setAttribute("currentPage", page);         // Trang hiện tại
+        request.setAttribute("totalPages", totalPages);    // Tổng số trang
+        request.setAttribute("totalItems", totalLichHen); // (Tùy chọn) Tổng số mục
 
         return LICHHEN_LIST_PAGE;
     }

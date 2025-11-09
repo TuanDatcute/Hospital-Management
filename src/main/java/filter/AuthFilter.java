@@ -68,7 +68,7 @@ public class AuthFilter implements Filter {
         String[] NurseLichHenActions = {"showCreateAppointmentForm", "createAppointment", "getDoctorsByKhoa", "listLichHenNurse", "updateAppointmentStatus"};
         // Lễ tân quản lý thông tin bệnh nhân (thêm mới, sửa)
         String[] benhNhanActions_Reception = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan", "showBenhNhanEditForm", "updateBenhNhan", "softDeleteBenhNhan"};
-        
+
         receptionistActions.addAll(Arrays.asList(hoaDon_GiaoDichThanhToanActions)); // Yêu cầu: "hóa đơn"
         receptionistActions.addAll(Arrays.asList(phongBenhActions)); // Yêu cầu: "phòng bệnh"
         receptionistActions.addAll(Arrays.asList(giuongBenhActions)); // Yêu cầu: "giường bệnh"
@@ -76,27 +76,32 @@ public class AuthFilter implements Filter {
         receptionistActions.addAll(Arrays.asList(benhNhanActions_Reception)); // Lễ tân quản lý bệnh nhân
 
         // --- 5. Nhóm BÁC SĨ (DOCTOR) ---
-        String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter","getAppointmentsByDate", "searchPatients"};
+        String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter", "getAppointmentsByDate", "searchPatients"};
         String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm", "createPrescription"};
         String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deactivateService", "activateService", "activateMedication", "deactivateMedication"};
         String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus"};
         String[] benhNhanActions_Doctor = {"listBenhNhan", "viewMyHistory", "showProfile"}; // Bác sĩ xem DS và lịch sử
-        
+
         doctorActions.addAll(Arrays.asList(EMRCoreActions)); // Yêu cầu: "còn lại là của bác sĩ"
-        doctorActions.addAll(Arrays.asList(DonThuocActions)); 
-        doctorActions.addAll(Arrays.asList(CatalogActions)); 
-        doctorActions.addAll(Arrays.asList(lichHenActions)); 
-        doctorActions.addAll(Arrays.asList(benhNhanActions_Doctor)); 
+        doctorActions.addAll(Arrays.asList(DonThuocActions));
+        doctorActions.addAll(Arrays.asList(CatalogActions));
+        doctorActions.addAll(Arrays.asList(lichHenActions));
+        doctorActions.addAll(Arrays.asList(benhNhanActions_Doctor));
 
         // --- 6. Nhóm ADMIN ---
         String[] userActions_Admin = {"listUsers", "showUserCreateForm", "createUser", "showUserEditForm", "updateUserStatus", "showChangePasswordForm", "changePassword"};
         String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa", "showKhoaEditForm", "updateKhoa", "softDeleteKhoa"};
         String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien", "showNhanVienEditForm", "updateNhanVien", "softDeleteNhanVien"};
-        
+
         adminActions.addAll(Arrays.asList(userActions_Admin)); // Quản lý tài khoản
         adminActions.addAll(Arrays.asList(khoaActions)); // Quản lý khoa
         adminActions.addAll(Arrays.asList(nhanVienActions)); // Quản lý nhân viên
         adminActions.addAll(Arrays.asList(thongBaoActions)); // Admin tạo thông báo
+        adminActions.addAll(Arrays.asList(benhNhanActions_Reception)); // Admin quản lý bệnh nhân
+
+        // <<< THÊM CÁC DÒNG NÀY: Cho phép Admin quản lý lịch hẹn (giống Lễ tân/Bác sĩ)
+        adminActions.addAll(Arrays.asList(NurseLichHenActions));
+        adminActions.addAll(Arrays.asList(lichHenActions));
     }
 
     @Override
@@ -105,7 +110,7 @@ public class AuthFilter implements Filter {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        HttpSession session = httpRequest.getSession(false); 
+        HttpSession session = httpRequest.getSession(false);
 
         String action = httpRequest.getParameter("action");
 
@@ -116,7 +121,7 @@ public class AuthFilter implements Filter {
         }
 
         // 2. Kiểm tra xem đã đăng nhập chưa
-        TaiKhoanDTO user = null; 
+        TaiKhoanDTO user = null;
         if (session != null) {
             // Lấy "USER" từ session
             user = (TaiKhoanDTO) session.getAttribute("USER");
@@ -135,21 +140,16 @@ public class AuthFilter implements Filter {
         }
 
         // 5. Kiểm tra phân quyền (Authorization) dựa trên vai trò
-        // !! THAY ĐỔI: Sử dụng getVaiTro() theo yêu cầu của bạn
-        String role = user.getVaiTro(); 
+        String role = user.getVaiTro();
         boolean authorized = false;
 
-        // !! QUAN TRỌNG:
         // Đảm bảo String trả về từ user.getVaiTro() khớp CHÍNH XÁC
-        // với các case dưới đây (ví dụ: "ADMIN", "BÁC SĨ", "LỄ TÂN", "BỆNH NHÂN")
+        // với các case dưới đây (ví dụ: "QUAN_TRI", "BAC_SI", "LE_TAN", "BENH_NHAN")
         switch (role) {
             case "QUAN_TRI":
                 if (adminActions.contains(action)) {
                     authorized = true;
                 }
-                // (Tùy chọn) Admin làm được tất cả
-                // else if (doctorActions.contains(action)) authorized = true;
-                // else if (receptionistActions.contains(action)) authorized = true;
                 break;
             case "BAC_SI":
                 if (doctorActions.contains(action)) {
@@ -176,12 +176,9 @@ public class AuthFilter implements Filter {
             chain.doFilter(request, response);
         } else {
             // 7. Không được phép -> Chuyển đến trang lỗi
-            
-            // !! THAY ĐỔI (Dự đoán): Dùng getTenDangNhap() để log. 
-            // Sửa lại nếu tên phương thức là getUsername() hay getEmail()
             System.out.println("CẢNH BÁO: User '" + user.getTenDangNhap() + "' (Vai trò: " + role + ") "
                     + "đã cố gắng truy cập action bị cấm: " + action);
-            
+
             request.setAttribute("errorMessage", "Bạn không có quyền truy cập chức năng này.");
             httpRequest.getRequestDispatcher("error.jsp").forward(httpRequest, httpResponse);
         }
