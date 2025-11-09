@@ -1,11 +1,11 @@
 /* ==========================================================================
-   STYLE MEDIKEL - TÔNG MÀU XANH NHẠT, TÍM LAVENDER (V1.2)
+   STYLE MEDIKEL - (V1.6 - SỬA LỖI BREAKPOINT TABLET)
    ========================================================================== */
 :root {
     --font-primary: 'Be Vietnam Pro', sans-serif;
-    --primary-color: #5d5dff; /* Xanh tím đậm */
-    --primary-light: #f0f0ff; /* Xanh tím nhạt cho nền */
-    --accent-color: #00bcd4; /* Xanh aqua làm điểm nhấn */
+    --primary-color: #5d5dff;
+    --primary-light: #f0f0ff;
+    --accent-color: #00bcd4;
     --text-dark: #333333;
     --text-medium: #555555;
     --text-light: #777777;
@@ -27,6 +27,9 @@ body {
     line-height: 1.6;
     padding-top: 80px;
 }
+body.mobile-nav-active {
+    overflow: hidden;
+}
 
 .container {
     max-width: 1200px;
@@ -46,7 +49,7 @@ body {
     display: none;
 }
 
-/* --- CÁC NÚT BẤM CHUNG (Đã thêm nút viền) --- */
+/* --- CÁC NÚT BẤM CHUNG --- */
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -88,14 +91,13 @@ body {
     background-color: #00a8bd;
 }
 
-/* ✨ NÚT VIỀN MỚI (CHO SLIDER) */
 .btn-secondary-outline {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     background-color: transparent;
     color: var(--text-white);
-    padding: 13px 30px; /* 13px + 2px border = 15px (bằng btn-primary) */
+    padding: 13px 30px;
     border-radius: var(--border-radius-btn);
     text-decoration: none;
     font-weight: 600;
@@ -110,7 +112,7 @@ body {
 }
 
 /* ==========================================================================
-   HEADER (Giữ nguyên)
+   HEADER
    ========================================================================== */
 .header-wrapper {
     position: fixed;
@@ -121,7 +123,7 @@ body {
     box-shadow: var(--shadow-sm);
     z-index: 1000;
     padding: 10px 0;
-    height: 60px;
+    height: 80px;
     display: flex;
     align-items: center;
 }
@@ -143,20 +145,20 @@ body {
     gap: 30px;
 }
 .logo img {
-    max-height: 80px;
+    max-height: 60px;
     display: block;
 }
 .support-info {
     display: none;
 }
-nav ul {
+nav.desktop-nav ul {
     display: flex;
     list-style: none;
     margin: 0;
     padding: 0;
     gap: 30px;
 }
-nav ul li a {
+nav.desktop-nav ul li a {
     text-decoration: none;
     color: var(--text-medium);
     font-weight: 500;
@@ -165,7 +167,7 @@ nav ul li a {
     position: relative;
     transition: color 0.3s ease;
 }
-nav ul li a::after {
+nav.desktop-nav ul li a::after {
     content: '';
     position: absolute;
     left: 0;
@@ -175,13 +177,13 @@ nav ul li a::after {
     background-color: var(--primary-color);
     transition: width 0.3s ease;
 }
-nav ul li a:hover, nav ul li a.active {
+nav.desktop-nav ul li a:hover, nav.desktop-nav ul li a.active {
     color: var(--primary-color);
 }
-nav ul li a:hover::after, nav ul li a.active::after {
+nav.desktop-nav ul li a:hover::after, nav.desktop-nav ul li a.active::after {
     width: 100%;
 }
-nav ul li a .dropdown-icon {
+nav.desktop-nav ul li a .dropdown-icon {
     font-size: 0.7rem;
     margin-left: 4px;
 }
@@ -209,8 +211,8 @@ nav ul li a .dropdown-icon {
     background-color: var(--primary-light);
     color: var(--primary-color);
     padding: 10px 20px;
-    border-radius: var(--border-radius-btn);
     border: 1px solid var(--primary-color);
+    border-radius: var(--border-radius-btn);
 }
 .top-actions a.btn-account:only-child:hover {
     background-color: var(--primary-color);
@@ -280,7 +282,7 @@ nav ul li a .dropdown-icon {
    NỘI DUNG TRANG
    ========================================================================== */
 
-/* ✨ 1. HERO SLIDER (ĐÃ SỬA LỖI ĐÈ CHỮ VÀ LẸM NÚT) */
+/* --- HERO SLIDER --- */
 .swiper-hero-section {
     position: relative;
     width: 100%;
@@ -291,13 +293,11 @@ nav ul li a .dropdown-icon {
     width: 100%;
     height: 100%;
 }
-
 .swiper-slide {
     text-align: left;
     font-size: 18px;
     display: flex;
     justify-content: center;
-    /* THAY ĐỔI 1: Căn nội dung lên trên, không căn giữa nữa */
     align-items: flex-start;
     position: relative;
     background-size: cover;
@@ -313,8 +313,6 @@ nav ul li a .dropdown-icon {
     background: linear-gradient(90deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 100%);
     z-index: 1;
 }
-
-/* Hình nền cho các slide (Giữ nguyên) */
 .slide-1 {
     background-image: url('https://dam.mediacorp.sg/image/upload/s---q0j68rb--/c_fill,g_auto,h_468,w_830/f_auto,q_auto/v1/mediacorp/cna/image/2022/01/26/istock-1160049261.jpg?itok=hgE3ftwu');
 }
@@ -325,7 +323,6 @@ nav ul li a .dropdown-icon {
     background-image: url('https://images.adsttc.com/media/images/6686/bb5b/483c/b329/cfd0/84b6/newsletter/springfield-university-hospital-cf-moller_24.jpg?1720105835');
 }
 
-/* Style cho nội dung trong slide (Đã cập nhật) */
 .swiper-slide .hero-content {
     position: relative;
     z-index: 2;
@@ -334,28 +331,19 @@ nav ul li a .dropdown-icon {
     padding: 80px 15px 120px 15px;
     box-sizing: border-box;
 }
-
-/* ✨ BẮT ĐẦU SỬA LỖI ĐÈ CHỮ
-Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
-*/
-
-/* Subtitle nhỏ màu xanh */
 .hero-subtitle-small {
     font-weight: 500;
     color: var(--accent-color);
     font-size: 1.1rem;
     margin-bottom: 5px;
-
     opacity: 0;
     transition: opacity 0.3s ease-out;
 }
-/* Subtitle lớn màu trắng */
 .swiper-slide .hero-subtitle {
     font-weight: 600;
     color: var(--text-white);
     font-size: 1.3rem;
     margin-bottom: 10px;
-
     opacity: 0;
     transition: opacity 0.3s ease-out;
 }
@@ -366,7 +354,6 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
     color: var(--text-white);
     margin: 10px 0 20px 0;
     max-width: 750px;
-
     opacity: 0;
     transition: opacity 0.3s ease-out;
 }
@@ -375,22 +362,16 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
     color: rgba(255, 255, 255, 0.85);
     margin-bottom: 30px;
     max-width: 600px;
-
     opacity: 0;
     transition: opacity 0.3s ease-out;
 }
-/* Container cho 2 nút bấm */
 .hero-buttons {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
-
     opacity: 0;
     transition: opacity 0.3s ease-out;
 }
-/* ✨ KẾT THÚC SỬA LỖI */
-
-/* Style các nút điều khiển Swiper (Giữ nguyên) */
 .swiper-button-next,
 .swiper-button-prev {
     color: var(--text-white);
@@ -420,7 +401,8 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
 .swiper-pagination-bullet-active {
     background-color: var(--primary-color);
 }
-/* --- APPOINTMENT FORM SECTION (Giữ nguyên) --- */
+
+/* --- APPOINTMENT FORM SECTION (Style cho form mới) --- */
 .appointment-form-section {
     margin-top: -100px;
     position: relative;
@@ -433,7 +415,8 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
     box-shadow: var(--shadow);
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-end;
+    align-items: center;
+    justify-content: space-between;
     gap: 20px;
 }
 .appointment-form-card h3 {
@@ -445,42 +428,30 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
 }
 .appointment-form-card .form-group {
     flex: 1;
-    min-width: 200px;
+    min-width: 150px;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
 }
 .appointment-form-card .form-group label {
-    font-weight: 500;
-    color: var(--text-medium);
-    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 1.1rem;
 }
 .appointment-form-card .form-group label i {
     color: var(--primary-color);
-    margin-right: 5px;
+    font-size: 1.5rem;
+    width: 25px;
 }
 .appointment-form-card input,
 .appointment-form-card select {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-family: var(--font-primary);
-    font-size: 0.95rem;
-    color: var(--text-dark);
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.1C287.9%2068.2%20288.4%2067.1%20288.4%2065.9c0-1.1-.5-2.2-1.4-3.1L146.7%200.7c-1.9-1.9-5-1.9-6.9%200L1.4%2062.8c-.9.9-1.4%202-.4%203.1-.9.9-1.4%202-1.4%203.1.5%201.1.9%202.2%201.4%203.1L146.7%20291.7c1.9%201.9%205%201.9%206.9%200L287%2069.1z%22%2F%3E%3C%2Fsvg%3E');
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-    background-size: 10px;
-    box-sizing: border-box;
+    display: none;
 }
 .appointment-form-card button {
     margin-top: 0;
-    padding: 12px 25px;
-    font-size: 0.95rem;
+    padding: 15px 30px;
+    font-size: 1rem;
     flex-shrink: 0;
     background-color: var(--accent-color);
     color: var(--text-white);
@@ -494,7 +465,7 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
     background-color: #00a8bd;
 }
 
-/* --- INFO FEATURES SECTION (Giữ nguyên) --- */
+/* --- INFO FEATURES SECTION --- */
 .info-features-section {
     padding: 80px 0;
 }
@@ -544,7 +515,7 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
     text-decoration: underline;
 }
 
-/* --- ABOUT SECTION (Giữ nguyên) --- */
+/* --- ABOUT SECTION --- */
 .about-section {
     padding: 80px 0;
     background-color: var(--bg-white);
@@ -639,7 +610,7 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
     box-shadow: var(--shadow);
 }
 
-/* --- OUR SERVICES SECTION (Giữ nguyên) --- */
+/* --- OUR SERVICES SECTION --- */
 .our-services-section {
     padding: 80px 0;
 }
@@ -691,20 +662,8 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
     color: var(--text-light);
     margin-bottom: 20px;
 }
-.service-card .explore-btn {
-    color: var(--accent-color);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-.service-card .explore-btn:hover {
-    text-decoration: underline;
-}
 
-/* --- CTA SECTION (Giữ nguyên) --- */
+/* --- CTA SECTION --- */
 .cta-section {
     background-color: var(--primary-color);
     padding: 80px 0;
@@ -759,40 +718,90 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
     color: rgba(255, 255, 255, 0.8);
 }
 
-/* --- FOOTER (Giữ nguyên) --- */
+/* --- FOOTER --- */
 .main-footer {
-    background-color: #222222;
-    color: #cccccc;
-    padding: 50px 0;
+    background-color: #2a2a3e;
+    color: #b0b0cc;
+    padding: 60px 0 30px 0; /* Giảm padding dưới 1 chút */
     margin-top: 0;
+    position: relative; /* Thêm position */
 }
 .main-footer .container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
+    gap: 40px;
 }
 .main-footer h4 {
     color: var(--text-white);
     font-family: var(--font-primary);
-    margin-bottom: 15px;
+    margin-bottom: 25px;
     font-size: 1.3rem;
     font-weight: 600;
     position: relative;
 }
+.main-footer h4::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 40px;
+    height: 3px;
+    background-color: var(--primary-color);
+}
 .main-footer p, .main-footer a {
-    color: #aaaaaa;
+    color: #b0b0cc;
     text-decoration: none;
     font-size: 0.95rem;
-    line-height: 1.7;
+    line-height: 1.8;
 }
 .main-footer a:hover {
-    color: var(--primary-color);
+    color: var(--text-white);
     text-decoration: underline;
 }
+/* Style cho footer mới */
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.footer-column ul li {
+    margin-bottom: 10px;
+}
+.footer-column .contact-info p {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+}
+.footer-column .contact-info i {
+    margin-right: 12px;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    width: 20px;
+    padding-top: 4px;
+}
+.footer-column .social-links {
+    margin-top: 20px;
+}
+.footer-column .social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-white);
+    background-color: rgba(255, 255, 255, 0.1);
+    width: 38px;
+    height: 38px;
+    line-height: 38px;
+    border-radius: 50%;
+    text-align: center;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+.footer-column .social-links a:hover {
+    background-color: var(--primary-color);
+}
 
-/* ==========================================================================
-   KEYFRAMES (Cập nhật cho cấu trúc mới)
-   ========================================================================== */
+
+/* --- KEYFRAMES --- */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -813,8 +822,6 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
         transform: translateY(0);
     }
 }
-
-/* ✨ Áp dụng animation cho cấu trúc mới */
 .swiper-slide-active .hero-subtitle-small {
     animation: fadeInDown 0.8s ease-out 0.3s both;
 }
@@ -831,14 +838,86 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
     animation: fadeInUp 0.8s ease-out 1.1s both;
 }
 
+
 /* ==========================================================================
-   RESPONSIVE DESIGN (Giữ nguyên và cập nhật)
+   MOBILE NAVIGATION
+   ========================================================================== */
+.mobile-nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(93, 93, 255, 0.98);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-100%);
+    transition: all 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+}
+.mobile-nav-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.mobile-nav-close {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    background: none;
+    border: none;
+    color: var(--text-white);
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 5px;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+.mobile-nav-close:hover {
+    transform: rotate(90deg);
+}
+.mobile-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+}
+.mobile-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.mobile-nav ul li {
+    margin: 15px 0;
+}
+.mobile-nav ul li a {
+    text-decoration: none;
+    color: var(--text-white);
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    display: block;
+    transition: letter-spacing 0.3s ease;
+}
+.mobile-nav ul li a:hover,
+.mobile-nav ul li a.active {
+    letter-spacing: 1px;
+    background: rgba(255,255,255, 0.1);
+    border-radius: var(--border-radius-btn);
+}
+
+
+/* ==========================================================================
+   ✨✨ RESPONSIVE DESIGN (SỬA LỖI TỔNG THỂ V1.5) ✨✨
    ========================================================================== */
 @media (max-width: 992px) {
     .section-title br {
         display: inline;
     }
-    nav {
+    nav.desktop-nav {
         display: none;
     }
     .mobile-nav-toggle {
@@ -849,19 +928,49 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
     .swiper-hero-section {
         height: 500px;
     }
+    .swiper-slide .hero-content {
+        padding: 60px 15px 100px 15px;
+    }
     .swiper-slide .hero-content h1 {
         font-size: 2.8rem;
     }
+    .swiper-slide .hero-description {
+        max-width: 500px;
+    }
 
-    /* Responsive các section khác */
+    /* ✨ SỬA LỖI (Tablet): Form không đè lên slide */
+    .appointment-form-section {
+        margin-top: 0; /* TẮT ĐÈ LÊN */
+        padding: 40px 0; /* Tạo khoảng cách */
+    }
     .appointment-form-card {
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 25px;
+    }
+    .appointment-form-card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
     }
     .appointment-form-card .form-group {
         min-width: unset;
         width: 100%;
     }
+    .appointment-form-card .form-group label {
+        font-size: 1rem;
+    }
+    .appointment-form-card .form-group label i {
+        font-size: 1.3rem;
+    }
+    .appointment-form-card button {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+    }
+
+    /* Responsive các section khác */
     .about-section .container {
         flex-direction: column;
     }
@@ -892,14 +1001,28 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
     .cta-content .section-title {
         text-align: center;
     }
+    .cta-content p {
+        font-size: 1rem;
+    }
+    .cta-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .main-footer .container {
+        grid-template-columns: 1fr 1fr; /* 2 cột trên tablet */
+    }
 }
 
 @media (max-width: 768px) {
     body {
         padding-top: 80px;
     }
+    .header-wrapper {
+        height: 80px;
+        padding: 5px 0;
+    }
     .logo img {
-        max-height: 35px;
+        max-height: 60px;
     }
 
     /* Responsive Header */
@@ -929,16 +1052,10 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
 
     /* Responsive Slider */
     .swiper-hero-section {
-        height: 500px;
-    } /* Tăng chiều cao 1 chút cho mobile */
-    .swiper-button-next,
-    .swiper-button-prev {
-        width: 40px;
-        height: 40px;
+        height: 450px;
     }
-    .swiper-button-next::after,
-    .swiper-button-prev::after {
-        font-size: 1.2rem;
+    .swiper-slide .hero-content {
+        padding: 60px 15px;
     }
     .swiper-slide .hero-content h1 {
         font-size: 2.2rem;
@@ -950,17 +1067,170 @@ Thêm 'opacity: 0' và 'transition' làm trạng thái mặc định.
         padding: 12px 25px;
         font-size: 0.9rem;
     }
+    .swiper-button-next, .swiper-button-prev {
+        display: none;
+    }
+    .swiper-pagination {
+        bottom: 10px !important;
+    }
+
+    /* ✨ SỬA LỖI 1 (Form đặt lịch): KHÔNG ĐÈ LÊN SLIDE */
+    .appointment-form-section {
+        margin-top: 0; /* KHÔNG đè lên slide nữa */
+        padding: 30px 0; /* Thay vào đó, tạo khoảng cách */
+    }
+    .appointment-form-card {
+        padding: 25px;
+    }
+    .appointment-form-card .form-group label {
+        font-size: 1rem;
+    }
+    .appointment-form-card .form-group label i {
+        font-size: 1.2rem;
+    }
+    .appointment-form-card button {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    /* ✨ SỬA LỖI 3 (Card tính năng): CUỘN NGANG */
+    .info-features-section {
+        padding: 0 0 30px 0; /* Bỏ padding trên, chỉ giữ dưới */
+    }
+    .info-features-section .container {
+        display: flex; /* Chuyển sang flexbox */
+        overflow-x: auto; /* Bật cuộn ngang */
+        gap: 15px; /* Khoảng cách giữa các card */
+
+        /* Căn lề cho đẹp */
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 15px;
+        padding-right: 15px;
+
+        /* Ẩn thanh cuộn */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .info-features-section .container::-webkit-scrollbar {
+        display: none;
+    }
+    .info-feature-item {
+        flex: 0 0 260px; /* Quan trọng: Đặt chiều rộng cố định cho card */
+        padding: 20px;
+        text-align: left;
+    }
+    .info-feature-item i {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+    }
+    .info-feature-item h4 {
+        font-size: 1.1rem;
+    }
+    .info-feature-item p {
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+    }
+    .info-feature-item .learn-more {
+        font-size: 0.8rem;
+    }
 
     /* Responsive các section khác */
     .section-title {
-        font-size: 2rem;
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
     }
-    .info-features-section .container,
+    .about-section {
+        padding: 40px 0;
+    }
+    .about-content .section-title {
+        font-size: 1.8rem;
+    }
+    .about-description {
+        font-size: 0.9rem;
+    }
+    .about-service-item h5 {
+        font-size: 1rem;
+    }
+    .about-service-item h5 i {
+        font-size: 1.1rem;
+    }
+    .about-service-item p {
+        font-size: 0.8rem;
+    }
+    .about-image .small-image {
+        width: 90%;
+        margin: 20px auto 0 auto;
+        display: block;
+    }
+
+    .our-services-section {
+        padding: 40px 0;
+    }
+    .our-services-section .section-title {
+        font-size: 1.8rem;
+    }
     .services-grid {
         grid-template-columns: 1fr;
+    } /* Stack */
+    .service-card .service-icon {
+        width: 60px;
+        height: 60px;
     }
-    .about-doctors {
-        flex-direction: column;
+    .service-card .service-icon i {
+        font-size: 2rem;
+    }
+    .service-card h4 {
+        font-size: 1.2rem;
+    }
+    .service-card p {
+        font-size: 0.85rem;
+    }
+
+    .cta-section {
+        padding: 60px 0;
+        margin-top: 40px;
+    }
+    .cta-content .section-title {
+        font-size: 1.8rem;
+    }
+    .cta-content p {
+        font-size: 0.9rem;
+    }
+    .stat-item {
+        padding: 20px;
+    }
+    .stat-item .stat-number {
+        font-size: 2rem;
+    }
+    .stat-item .stat-label {
+        font-size: 0.9rem;
+    }
+
+    /* ✨ SỬA LỖI 2 (Footer): Căn giữa các cột */
+    .main-footer {
+        padding: 50px 0 30px 0;
+    }
+    .main-footer .container {
+        grid-template-columns: 1fr; /* Mỗi cột 1 hàng */
+        text-align: center; /* Căn giữa nội dung */
+        gap: 30px;
+    }
+    .main-footer h4 {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+    .main-footer h4::after {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: -8px;
+    }
+    /* Căn trái lại nội dung bên trong */
+    .footer-column ul, .footer-column .contact-info {
+        display: inline-block;
+        text-align: left;
+    }
+    .footer-column .social-links {
         text-align: center;
     }
 }
