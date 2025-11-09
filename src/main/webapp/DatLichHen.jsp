@@ -76,6 +76,18 @@
         <%-- Tải JavaScript (Giữ nguyên) --%>
         <script src="<c:url value='/js/index.js'/>"></script>
         <script src="${pageContext.request.contextPath}/js/LichHenQuang.js"></script>
+        <%-- Footer --%>
+        <footer class="main-footer">
+            <div class="container">
+                <jsp:include page="/WEB-INF/footer.jsp" /> 
+            </div>
+        </footer>
+
+        <%-- THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+        <%-- LINK TỚI FILE JS --%>
+        <script src="<c:url value='/js/index.js'/>"></script>
 
     </body>
 </html>
