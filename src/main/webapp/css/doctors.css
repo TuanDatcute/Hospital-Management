@@ -1,0 +1,139 @@
+/* Tệp: css/doctors.css */
+
+/* --- Tiêu đề trang --- */
+.page-title-section {
+    padding: 30px 0;
+    background-color: var(--bg-white);
+    border-bottom: 1px solid var(--border-color);
+}
+.breadcrumb {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin: 0 0 5px 0;
+}
+.page-title-section h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+/* --- Bộ lọc --- */
+.doctor-filters {
+    padding: 30px 0;
+    background-color: var(--primary-light);
+}
+.filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+}
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+}
+.filter-group label {
+    font-weight: 600;
+    color: var(--text-medium);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+.filter-group input,
+.filter-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-btn);
+    font-family: var(--font-primary);
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    box-sizing: border-box; /* Quan trọng */
+}
+.filter-container button {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+/* --- Lưới Bác Sĩ --- */
+.doctor-grid-section {
+    padding: 60px 0;
+}
+.doctor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.doctor-card {
+    background: var(--bg-white);
+    border-radius: var(--border-radius-card);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    text-align: center;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+.doctor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+}
+.doctor-card-image {
+    width: 100%;
+    height: 300px;
+}
+.doctor-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top; /* Ưu tiên hiển thị khuôn mặt */
+}
+.doctor-card-content {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Giúp các card có chiều cao bằng nhau */
+}
+.doctor-card h4 {
+    margin: 0 0 5px 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+.doctor-specialty {
+    margin: 0 0 15px 0;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+.doctor-bio {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    flex-grow: 1; /* Đẩy nút bấm xuống dưới */
+    margin-bottom: 20px;
+}
+
+/* --- Responsive --- */
+@media (max-width: 992px) {
+    .doctor-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (max-width: 768px) {
+    .page-title-section h1 {
+        font-size: 2.2rem;
+    }
+    .filter-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-container button {
+        width: 100%;
+    }
+    .doctor-grid {
+        grid-template-columns: 1fr;
+    }
+}
