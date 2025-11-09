@@ -12,16 +12,16 @@
         <%-- BẮT BUỘC: Thêm Font Awesome cho icon --%>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
+
         <%-- BẮT BUỘC: Nhúng file CSS chung TRƯỚC --%>
         <%-- (Đây là file DanhSachHoaDon.css đã được gộp, hoặc file base.css) --%>
-        <link rel="stylesheet" href="<c:url value='/css/StyleChungCuaQuang.css'/>"> 
+        <link rel="stylesheet" href="<c:url value='/css/StyleChungCuaQuang_1.css'/>"> 
         <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-       
+
         <link rel="stylesheet" href="<c:url value='/css/index.css'/>">
         <script src="<c:url value='/js/index.js'/>"></script>
 
@@ -35,7 +35,7 @@
         <jsp:include page="/WEB-INF/headerDat.jsp" />
 
         <%-- Bọc toàn bộ trang trong .container --%>
-        <div class="container">
+        <div class="containerQuang">
 
             <div class="page-header">
                 <%-- Đặt H1 và Dark mode toggle vào header --%>
@@ -185,6 +185,17 @@
 
         <%-- Bước 2: Tải file JS logic (defer để chạy sau khi DOM tải) --%>
         <script src="<c:url value='/js/ThongBao.js'/>" defer></script>
+        <%-- Footer --%>
+        <footer class="main-footer">
+            <div class="container">
+                <jsp:include page="/WEB-INF/footer.jsp" /> 
+            </div>
+        </footer>
 
+        <%-- THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+        <%-- LINK TỚI FILE JS --%>
+        <script src="<c:url value='/js/index.js'/>"></script>
     </body>
 </html>
