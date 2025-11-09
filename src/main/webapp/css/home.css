@@ -37,6 +37,15 @@
     --color-admin-yellow-light: #fef8f0;
     --color-admin-grey: #6c757d;
     --color-admin-grey-light: #f1f2f3;
+    
+    /* ✨ BIẾN MÀU MỚI CHO NHÂN VIÊN (Bác sĩ/Lễ tân) ✨ */
+    --color-staff-teal: #20c997;
+    --color-staff-teal-light: #e9f9f5;
+    --color-staff-indigo: #6610f2;
+    --color-staff-indigo-light: #f0e7fe;
+    --color-staff-blue: #0d6efd;
+    --color-staff-blue-light: #e7f0ff;
+    /* (Chúng ta sẽ tái sử dụng màu xám của Admin cho "Đổi mật khẩu") */
 }
 
 /* 2. THIẾT KẾ LẠI NỀN VÀ TRANG (Chung) */
@@ -318,3 +327,68 @@ body {
 .function-card.color-admin-security:hover h4 {
     color: var(--color-admin-grey);
 }
+
+/*
+ * ===================================
+ * ✨ NÂNG CẤP: (Phần 4 - Color Coding cho NHÂN VIÊN)
+ * ===================================
+ */
+
+/* Thẻ "Quản lý Lịch hẹn" (Màu Tím Indigo) */
+.function-card.color-staff-lichhen .icon {
+    background-color: var(--color-staff-indigo-light);
+    color: var(--color-staff-indigo);
+}
+.function-card.color-staff-lichhen:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(102, 16, 242, 0.2);
+}
+.function-card.color-staff-lichhen:hover .icon {
+    background-color: var(--color-staff-indigo);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(102, 16, 242, 0.5);
+}
+.function-card.color-staff-lichhen:hover h4 {
+    color: var(--color-staff-indigo);
+}
+
+/* Thẻ "Tạo Phiếu khám" (Màu Xanh Teal) */
+.function-card.color-staff-phieukham .icon {
+    background-color: var(--color-staff-teal-light);
+    color: var(--color-staff-teal);
+}
+.function-card.color-staff-phieukham:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(32, 201, 151, 0.2);
+}
+.function-card.color-staff-phieukham:hover .icon {
+    background-color: var(--color-staff-teal);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(32, 201, 151, 0.5);
+}
+.function-card.color-staff-phieukham:hover h4 {
+    color: var(--color-staff-teal);
+}
+
+/* Thẻ "Danh sách Bệnh nhân" (Màu Xanh dương) */
+.function-card.color-staff-benhnhan .icon {
+    background-color: var(--color-staff-blue-light);
+    color: var(--color-staff-blue);
+}
+.function-card.color-staff-benhnhan:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(13, 110, 253, 0.2);
+}
+.function-card.color-staff-benhnhan:hover .icon {
+    background-color: var(--color-staff-blue);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(13, 110, 253, 0.5);
+}
+.function-card.color-staff-benhnhan:hover h4 {
+    color: var(--color-staff-blue);
+}
+
+/* * Thẻ "Đổi mật khẩu" sẽ tự động dùng class ".color-admin-security"
+ * mà chúng ta đã định nghĩa ở file trước (màu xám),
+ * vì nó đồng bộ với Admin Dashboard.
+ */
