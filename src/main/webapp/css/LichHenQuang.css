@@ -1,41 +1,132 @@
-/* LichHenQuang.css */
-
 /* --- CƠ BẢN VÀ FONT --- */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa; /* Màu nền nhẹ */
+    background-color: #f8f9fa; /* Màu nền xám nhẹ cho TOÀN BỘ trang */
     color: #333;
     margin: 0;
-    padding: 20px;
+    padding: 0;
+}
+
+/* Container chính bọc nội dung */
+.page-container {
+    max-width: 1200px;
+    margin: 20px auto; /* Căn giữa và tạo khoảng cách với header */
+    padding: 30px;
+    background-color: #fff; /* Nền trắng cho khu vực nội dung */
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Đổ bóng nhẹ */
+    box-sizing: border-box;
 }
 
 h2 {
-    color: #007bff; /* Màu xanh dương chủ đạo của bệnh viện */
-    border-bottom: 2px solid #007bff;
+    color: #333; /* Màu tiêu đề chính */
+    border-bottom: 2px solid #eee; /* Đường gạch chân nhẹ nhàng */
     padding-bottom: 10px;
-    margin-bottom: 20px;
+    margin-top: 0; /* Xóa margin top mặc định */
+    margin-bottom: 25px;
+    font-size: 1.75rem; /* Kích thước tiêu đề */
 }
 
-/* --- FORM TÌM KIẾM VÀ ĐẶT LỊCH --- */
-.form-container {
-    background-color: #fff;
-    border: 1px solid #ced4da;
-    border-radius: 8px;
-    padding: 25px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Tạo chiều sâu nhẹ */
-    max-width: 600px;
-    margin: 20px auto;
+/* --- NÚT BẤM (BUTTONS) --- */
+
+/* Nút cơ bản */
+.btn {
+    display: inline-block;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none; /* Cho thẻ <a> */
+    transition: background-color 0.3s, opacity 0.3s;
+    font-size: 1em;
+    text-align: center;
+    vertical-align: middle;
 }
 
+/* Nút chính (Màu chủ đạo MỚI) */
+.btn-primary {
+    background-color: #5d5dff; /* MÀU MỚI */
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #4b4bff; /* MÀU MỚI (đậm hơn) */
+}
+
+/* Nút Link (dùng cho "Xóa lọc") */
+.btn-link {
+    background: none;
+    border: none;
+    color: #5d5dff; /* MÀU MỚI */
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0 5px;
+    font-size: 0.9em;
+    font-weight: normal;
+    font-family: inherit;
+    vertical-align: middle;
+}
+.btn-link:hover {
+    color: #4b4bff; /* MÀU MỚI (đậm hơn) */
+}
+
+/* Nút Hủy (trong bảng) - Dạng link đỏ */
+.btn-danger-link {
+    background: none;
+    border: none;
+    color: #dc3545; /* Màu đỏ (giữ nguyên) */
+    text-decoration: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    font-family: inherit;
+    display: inline-block;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.btn-danger-link:hover {
+    color: #a71d2a;
+    background-color: #f8d7da;
+}
+
+
+/* --- FORM TÌM KIẾM --- */
+.search-controls {
+    display: flex;
+    align-items: center; /* Căn các item theo chiều dọc */
+    flex-wrap: wrap; /* Cho phép xuống dòng trên màn hình nhỏ */
+    gap: 10px; /* Khoảng cách giữa các item */
+    margin-bottom: 25px;
+}
+
+.search-controls label {
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    flex-shrink: 0; /* Không co lại */
+}
+
+.search-controls input[type="text"] {
+    flex-grow: 1; /* Ô input chiếm phần lớn không gian */
+    min-width: 200px; /* Độ rộng tối thiểu */
+}
+
+.search-controls .button-group {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* --- FORM ĐẶT LỊCH (NẾU DÙNG CHUNG) --- */
 .form-group {
     margin-bottom: 18px;
 }
 
-label {
+.form-group label {
     display: block;
     margin-bottom: 5px;
     font-weight: 600;
-    color: #0056b3; /* Xanh đậm hơn cho label */
+    color: #4b4bff; /* MÀU MỚI (đậm) */
 }
 
 input[type="text"],
@@ -46,80 +137,60 @@ textarea {
     padding: 10px;
     border: 1px solid #ced4da;
     border-radius: 4px;
-    box-sizing: border-box;
+    box-sizing: border-box; /* Quan trọng */
     transition: border-color 0.3s;
+    font-family: inherit;
+    font-size: 1em;
 }
 
+/* Hiệu ứng Focus MỚI */
 input[type="text"]:focus,
 input[type="datetime-local"]:focus,
 select:focus,
 textarea:focus {
-    border-color: #007bff;
+    border-color: #5d5dff; /* MÀU MỚI */
     outline: none;
+    box-shadow: 0 0 0 2px rgba(93, 93, 255, 0.25); /* MÀU MỚI (rgba) */
 }
 
-/* --- NÚT BẤM (BUTTONS) --- */
-button, input[type="submit"] {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s, opacity 0.3s;
-}
-
-/* Nút chính (Đặt lịch mới, Tìm) */
-button[type="submit"], button:not(.delete-button) {
-    background-color: #007bff;
-    color: white;
-}
-
-button[type="submit"]:hover, button:not(.delete-button):hover {
-    background-color: #0056b3;
-}
-
-/* Nút Hủy (trong bảng) */
-.delete-button {
-    background: none;
-    border: none;
-    color: #dc3545; /* Màu đỏ cho hành động hủy */
-    text-decoration: none; /* Bỏ gạch chân mặc định */
-    cursor: pointer;
-    padding: 5px 10px;
-    font-size: 0.9em;
-    font-family: inherit;
-    display: inline-block;
-    border-radius: 4px;
-}
-
-.delete-button:hover {
-    color: #a71d2a;
-    background-color: #f8d7da; /* Nền đỏ nhạt khi hover */
-}
 
 /* --- BẢNG (TABLE) --- */
+.table-responsive-wrapper {
+    overflow-x: auto; /* Cho phép cuộn ngang trên màn hình nhỏ */
+    margin-top: 20px;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
     background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #dee2e6; /* Thêm viền ngoài cho bảng */
+    border-radius: 4px; /* Bo góc nhẹ cho bảng */
+    overflow: hidden; /* Giúp bo góc hoạt động */
 }
 
 th, td {
-    padding: 12px;
+    padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #dee2e6;
+    vertical-align: middle; /* Căn giữa nội dung */
 }
 
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Tiêu đề bảng MỚI */
 thead th {
-    background-color: #007bff; /* Header màu xanh dương */
+    background-color: #5d5dff; /* MÀU MỚI */
     color: white;
     font-weight: 600;
+    font-size: 0.9em;
+    text-transform: uppercase; /* Viết hoa tiêu đề */
 }
 
 tbody tr:nth-child(even) {
-    background-color: #f2f2f2; /* Sọc màu xám nhạt */
+    background-color: #f8f9fa; /* Sọc màu xám nhạt */
 }
 
 tbody tr:hover {
@@ -152,7 +223,7 @@ tbody tr:hover {
     border: 1px solid #ffeeba;
 }
 
-/* Màu trạng thái trong bảng */
+/* Màu trạng thái trong bảng (giữ nguyên) */
 .status-CHO_XAC_NHAN {
     color: #ffc107;
     font-weight: bold;

@@ -44,7 +44,7 @@
                                     toàn diện với đội ngũ bác sĩ chuyên nghiệp.
                                 </p>
                                 <div class="hero-buttons">
-                                    <a href="#" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
+                                    <a href="MainController?action=myAppointments" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
                                     <a href="#" class="btn-secondary-outline hero-btn">Xem Dịch Vụ <i class="fas fa-arrow-right"></i></a>
                                 </div>
                             </div>
@@ -61,7 +61,7 @@
                                     và điều trị hiệu quả.
                                 </p>
                                 <div class="hero-buttons">
-                                    <a href="#" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
+                                    <a href="MainController?action=myAppointments" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -77,7 +77,7 @@
                                     cho mọi bệnh nhân.
                                 </p>
                                 <div class="hero-buttons">
-                                    <a href="#" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
+                                    <a href="MainController?action=myAppointments" class="btn-primary hero-btn">Đặt Lịch Hẹn Ngay <i class="fas fa-arrow-right"></i></a>
                                     <a href="#" class="btn-secondary-outline hero-btn">Xem Dịch Vụ <i class="fas fa-arrow-right"></i></a>
                                 </div>
                             </div>
@@ -99,17 +99,19 @@
                         <h3>Đặt Lịch Hẹn Ngay</h3>
                         <div class="form-group">
                             <label for="location"><i class="fa-solid fa-thumbs-up"></i> Chuyên nghiệp</label>
-                           
+
                         </div>
                         <div class="form-group">
                             <label for="department"><i class="fa-solid fa-heart"></i> Tận tình</label>
-                           
+
                         </div>
                         <div class="form-group">
                             <label for="date"><i class="fa-solid fa-check"></i> Chất lượng</label>
-                           
+
                         </div>
-                        <button class="btn-secondary">Đặt Lịch Ngay Để Nhận Tư Vấn</button>
+                        <a href="MainController?action=myAppointments" class="btn-secondary" role="button">
+                            Đặt Lịch Ngay Để Nhận Tư Vấn
+                        </a>
                     </div>
                 </div>
             </section>

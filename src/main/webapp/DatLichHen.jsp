@@ -6,9 +6,12 @@
         <title>Đặt lịch hẹn</title>
         <%-- THÊM CSS MỚI --%>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/LichHenQuang.css">
-        <%-- Xóa thẻ <style> cũ --%>
+        <link rel="stylesheet" href="<c:url value='/css/index.css'/>">
+        <script src="<c:url value='/js/index.js'/>"></script>
     </head>
     <body>
+
+        <jsp:include page="/WEB-INF/headerDat.jsp" />
 
         <div class="form-container">
             <h2>Đặt lịch hẹn mới</h2>

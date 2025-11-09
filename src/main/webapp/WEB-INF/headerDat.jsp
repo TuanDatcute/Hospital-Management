@@ -57,7 +57,7 @@
                             <c:set var="isHome" value="${fn:endsWith(servletPath, '/home.jsp')}" />
                             <li><a href="${pageContext.request.contextPath}/index.jsp#" 
                                    class="${isHome ? 'active' : ''}">Trang chủ</a></li>
-                            <li><a href="${pageContext.request.contextPath}/MainController?action=showLichHenCreateForm" 
+                            <li><a href="${pageContext.request.contextPath}/MainController?action=myAppointments" 
                                    class="${fn:contains(currentAction, 'LichHen') ? 'active' : ''}">Đặt lịch hẹn</a></li>
 
                             <li><a href="${pageContext.request.contextPath}/MainController?action=viewMyHistory">Lịch sử khám bệnh</a></li>
