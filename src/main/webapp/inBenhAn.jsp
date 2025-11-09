@@ -15,7 +15,6 @@
 
         <div class="page-controls">
             <div class="action-buttons">
-                <a href="javascript:history.back()" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay Lại</a>
                 <button onclick="window.print()" class="btn btn-primary"><i class="fas fa-print"></i> In Bệnh Án</button>
             </div>
             <div class="theme-switch-wrapper">

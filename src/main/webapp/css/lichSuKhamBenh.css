@@ -1,0 +1,363 @@
+/* Tệp: css/lichSuKhamBenh.css (v1.5 - Sửa lỗi Logic JS) */
+
+/* --- Bố cục chung --- */
+.page-content .container {
+    padding-top: 40px;
+    padding-bottom: 60px;
+}
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+h3 {
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--text-light);
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+}
+
+/* --- Thông báo (Alerts) --- */
+.alert {
+    padding: 15px 20px;
+    border-radius: var(--border-radius-btn);
+    font-weight: 500;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+}
+.alert-danger {
+    background-color: #fbebee;
+    color: #dc3545;
+    border-color: #f5c6cb;
+}
+.alert-success {
+    background-color: #e0f8e9;
+    color: #1d9a50;
+    border-color: #c3e6cb;
+}
+
+/* --- Bảng Dữ Liệu Chính --- */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-white);
+    border-radius: var(--border-radius-card);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+.data-table thead tr {
+    background-color: var(--primary-light);
+    border-bottom: 2px solid var(--primary-color);
+}
+.data-table th {
+    padding: 15px 20px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+}
+.data-table tbody tr.main-row:hover {
+    background-color: #fcfcfc;
+}
+.data-table td {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-medium);
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.text-center {
+    text-align: center;
+}
+
+/* --- Thẻ Trạng Thái (Status) --- */
+.status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+.status-Đã_Hoàn_Thành {
+    background-color: #e0f8e9;
+    color: #1d9a50;
+}
+.status-Chờ_Kết_Quả {
+    background-color: #fff8e0;
+    color: #b48c00;
+}
+.status-Đã_Hủy {
+    background-color: #fbebee;
+    color: #dc3545;
+}
+.status-Mới_Đăng_Ký {
+    background-color: #e7f5ff;
+    color: #007bff;
+}
+
+/* --- Nút Hành Động --- */
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    margin: 0 4px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+}
+.action-btn:hover {
+    background-color: var(--border-color);
+}
+.action-btn.view:hover {
+    color: var(--primary-color);
+    background-color: var(--primary-light);
+}
+.action-btn.print:hover {
+    color: var(--accent-color);
+    background-color: #e0f7fa;
+}
+
+/* --- HÀNG CHI TIẾT (Container data ẩn) --- */
+.details-row-hidden {
+    display: none !important;
+}
+
+/* CSS cho nội dung gốc (để JS clone) - Chỉ cần layout */
+/* Quan trọng: div.details-content PHẢI CÓ grid-template-columns */
+/* Nếu không, JS sẽ clone 2 div không theo cột */
+.details-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+
+/* ==========================================================================
+   ✨ CSS CHO MODAL (POPUP) - SỬA LỖI LOGIC
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-container {
+    background-color: var(--bg-light); /* Nền xám nhạt */
+    border-radius: var(--border-radius-card);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    border-top: 5px solid var(--primary-color);
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+    transition: all 0.3s ease;
+}
+.modal-overlay.active .modal-container {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-white); /* Header màu trắng */
+}
+.modal-header h4 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+.modal-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.modal-close-btn:hover {
+    color: var(--primary-color);
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 30px; /* Padding cho nền xám */
+    overflow-y: auto;
+    background-color: var(--bg-light);
+
+    /* ✨ SỬA LỖI: ÁP DỤNG GRID TẠI ĐÂY */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+/* Style thanh cuộn */
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+.modal-body::-webkit-scrollbar-track {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: #4a4aff;
+}
+
+
+/* ✨ SỬA LỖI: Style các div con trực tiếp của modal-body */
+#modalBody > div {
+    background-color: var(--bg-white);
+    border-radius: var(--border-radius-card);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+/* ✨ SỬA LỖI: Style các thẻ <strong> bên trong */
+#modalBody > div > strong {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color) !important; /* Màu tím */
+    margin: 0;
+    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--primary-light);
+}
+#modalBody > div > strong::before {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 0.9em;
+    color: var(--primary-color);
+}
+#modalBody > div:nth-child(1) > strong::before {
+    content: "\f470"; /* icon clipboard-list */
+}
+#modalBody > div:nth-child(2) > strong::before {
+    content: "\f484"; /* icon pills */
+}
+
+/* --- Bảng Nhỏ (Thuốc, Dịch vụ) (Style lại cho đẹp) --- */
+.mini-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-white);
+    border: none;
+    border-radius: 0;
+    overflow: hidden;
+    box-shadow: none;
+}
+.mini-table th,
+.mini-table td {
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 20px;
+    font-size: 14px;
+    text-align: left;
+}
+.mini-table tr:last-child td {
+    border-bottom: none;
+}
+.mini-table th {
+    background-color: #fcfcfc;
+    font-weight: 600;
+    color: var(--text-medium);
+}
+.mini-table p {
+    padding: 15px 20px;
+    font-style: italic;
+    color: var(--text-light);
+}
+
+
+/* ==========================================================================
+   RESPONSIVE (Đã cập nhật)
+   ========================================================================== */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+    h3 {
+        font-size: 1rem;
+    }
+    .data-table {
+        box-shadow: none;
+        border-radius: 0;
+    }
+    .data-table td, .data-table th {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive cho Modal */
+    .modal-header {
+        padding: 15px 20px;
+    }
+    .modal-body {
+        padding: 20px;
+        /* ✨ SỬA LỖI: Chuyển 1 cột trên mobile */
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .details-content {
+        /* Chuyển 1 cột trên mobile */
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+}

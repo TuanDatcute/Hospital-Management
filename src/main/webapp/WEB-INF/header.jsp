@@ -52,56 +52,56 @@
                                    class="${fn:contains(currentAction, 'ThongBao') ? 'active' : ''}">Thông Báo</a></li>     
                             </c:when>
 
-                    <%-- 2. NẾU LÀ BỆNH NHÂN --%>
-                    <c:when test="${sessionScope.ROLE == 'BENH_NHAN'}">
-                        <c:set var="isHome" value="${fn:endsWith(servletPath, '/home.jsp')}" />
-                        <li><a href="${pageContext.request.contextPath}/home.jsp" 
-                               class="${isHome ? 'active' : ''}">Bảng điều khiển</a></li>
-                        <li><a href="${pageContext.request.contextPath}/MainController?action=myAppointments" 
-                               class="${fn:contains(currentAction, 'LichHen') ? 'active' : ''}">Đặt lịch hẹn</a></li>
-                        <li><a href="#">Lịch sử khám bệnh</a></li>
-                        <li>
-                            <a href="${pageContext.request.contextPath}/MainController?action=showProfile" 
-                               class="${currentAction == 'showProfile' ? 'active' : ''}">
-                                Hồ sơ của tôi
-                            </a>
-                        </c:when>
-                        <%-- Link cho Nhân viên (BS/LT) --%>
-                        <c:when test="${sessionScope.ROLE == 'BAC_SI' || sessionScope.ROLE == 'LE_TAN'}">
-                            <a href="${pageContext.request.contextPath}/staff/dashboard.jsp" class="btn btn-account">
-                                <i class="fas fa-user-md"></i> ${sessionScope.USER.tenDangNhap}
-                            </a>
-                        </c:when>
-                        <%-- Link cho Bệnh nhân (và vai trò khác) --%>
-                        <c:otherwise>
-                            <a href="${pageContext.request.contextPath}/home.jsp" class="btn btn-account">
-                                <i class="fas fa-user"></i> ${sessionScope.USER.tenDangNhap}
-                            </a>
-                        </c:otherwise>
-                    </c:choose>
+                        <%-- 2. NẾU LÀ BỆNH NHÂN --%>
+                        <c:when test="${sessionScope.ROLE == 'BENH_NHAN'}">
+                            <c:set var="isHome" value="${fn:endsWith(servletPath, '/home.jsp')}" />
+                            <li><a href="${pageContext.request.contextPath}/home.jsp" 
+                                   class="${isHome ? 'active' : ''}">Bảng điều khiển</a></li>
+                            <li><a href="${pageContext.request.contextPath}/MainController?action=myAppointments" 
+                                   class="${fn:contains(currentAction, 'LichHen') ? 'active' : ''}">Đặt lịch hẹn</a></li>
+                            <li><a href="#">Lịch sử khám bệnh</a></li>
+                            <li>
+                                <a href="${pageContext.request.contextPath}/MainController?action=showProfile" 
+                                   class="${currentAction == 'showProfile' ? 'active' : ''}">
+                                    Hồ sơ của tôi
+                                </a>
+                            </c:when>
+                            <%-- Link cho Nhân viên (BS/LT) --%>
+                            <c:when test="${sessionScope.ROLE == 'BAC_SI' || sessionScope.ROLE == 'LE_TAN'}">
+                                <a href="${pageContext.request.contextPath}/staff/dashboard.jsp" class="btn btn-account">
+                                    <i class="fas fa-user-md"></i> ${sessionScope.USER.tenDangNhap}
+                                </a>
+                            </c:when>
+                            <%-- Link cho Bệnh nhân (và vai trò khác) --%>
+                            <c:otherwise>
+                                <a href="${pageContext.request.contextPath}/home.jsp" class="btn btn-account">
+                                    <i class="fas fa-user"></i> ${sessionScope.USER.tenDangNhap}
+                                </a>
+                            </c:otherwise>
+                        </c:choose>
 
-                    <%-- Hiển thị Vai trò --%>
-                    <span style="margin-left: 15px; color: #0056b3; font-weight: 600; font-size: 0.9em;">
-                        (${sessionScope.ROLE})
-                    </span>
+                        <%-- Hiển thị Vai trò --%>
+                        <span style="margin-left: 15px; color: #0056b3; font-weight: 600; font-size: 0.9em;">
+                            (${sessionScope.ROLE})
+                        </span>
 
-                    <%-- Nút Đăng xuất --%>
-                    <a href="${pageContext.request.contextPath}/MainController?action=logout" style="margin-left: 15px; color: #dc3545; font-weight: 600;">Đăng xuất</a>
-                </c:if>
-            </div>
+                        <%-- Nút Đăng xuất --%>
+                        <a href="${pageContext.request.contextPath}/MainController?action=logout" style="margin-left: 15px; color: #dc3545; font-weight: 600;">Đăng xuất</a>
+                    </c:if>
+                    </div>
 
-            <%-- Nút menu cho mobile --%>
-            <button class="mobile-nav-toggle" aria-label="Toggle menu">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
+                    <%-- Nút menu cho mobile --%>
+                    <button class="mobile-nav-toggle" aria-label="Toggle menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    </div>
 
-    </div>
+                    </div>
 
-    <%-- Dòng chữ chạy (Vẫn giữ logic ở đây nhưng CSS sẽ ẩn nó) --%>
-    <div class="marquee-banner">
-        <marquee behavior="scroll" direction="left" scrollamount="5">
-            Hãy liên hệ với chúng tôi qua hotline 1900 0000 để được tư vấn và hỗ trợ một cách tốt nhất! 🏥 Chúc bạn ngày mới tốt lành!
-        </marquee>
-    </div>
-</div>
+                    <%-- Dòng chữ chạy (Vẫn giữ logic ở đây nhưng CSS sẽ ẩn nó) --%>
+                    <div class="marquee-banner">
+                        <marquee behavior="scroll" direction="left" scrollamount="5">
+                            Hãy liên hệ với chúng tôi qua hotline 1900 0000 để được tư vấn và hỗ trợ một cách tốt nhất! 🏥 Chúc bạn ngày mới tốt lành!
+                        </marquee>
+                    </div>
+                    </div>
