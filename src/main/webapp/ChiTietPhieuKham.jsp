@@ -80,7 +80,7 @@
                        target="_blank" class="btn btn-primary">
                         <i class="fas fa-print"></i> In Bệnh Án
                     </a>
-                    <a href="javascript:history.back()" class="btn btn-secondary">
+                    <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
                 </div>

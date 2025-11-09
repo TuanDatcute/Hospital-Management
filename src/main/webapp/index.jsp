@@ -16,19 +16,18 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
         <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-
-        <%-- Tăng version CSS --%>
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css?v=1.2">
+        <%-- ✨ ÉP TẢI LẠI CSS PHIÊN BẢN MỚI NHẤT --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css?v=1.5">
     </head>
     <body>
 
-        <%-- 1. Nhúng Header (Không đổi) --%>
+        <%-- 1. Nhúng Header --%>
         <jsp:include page="/WEB-INF/headerDat.jsp" /> 
 
         <%-- 2. Nội dung riêng của trang Index --%>
         <div class="page-content">
 
-            <%-- ✨ HERO SLIDER - CẤU TRÚC MỚI --%>
+            <%-- HERO SLIDER (Không đổi) --%>
             <section class="swiper-hero-section">
                 <div class="swiper mySwiper">
                     <div class="swiper-wrapper">
@@ -66,7 +65,7 @@
                             </div>
                         </div>
 
-                        <%-- SLIDE 3 (Giống hình ảnh mẫu) --%>
+                        <%-- SLIDE 3 --%>
                         <div class="swiper-slide slide-3">
                             <div class="hero-content">
                                 <p class="hero-subtitle-small">Dịch vụ y tế cao cấp</p>
@@ -92,7 +91,7 @@
             </section>
             <%-- KẾT THÚC SLIDER MỚI --%>
 
-            <%-- Form Đặt Lịch Hẹn Nhanh (Không đổi, nó sẽ tự động đè lên slider) --%>
+            <%-- Form Đặt Lịch Hẹn Nhanh --%>
             <section class="appointment-form-section">
                 <div class="container">
                     <div class="appointment-form-card">
@@ -116,9 +115,9 @@
                 </div>
             </section>
 
-            <%-- Các Đặc Điểm Nổi Bật (Features) (Không đổi) --%>
+            <%-- Các Đặc Điểm Nổi Bật (Features) --%>
             <section class="info-features-section">
-                <div class="container">
+                <div class="container"> <%-- ✨ Container này sẽ được style lại trên mobile --%>
                     <div class="info-feature-item">
                         <i class="fas fa-microscope"></i>
                         <h4>Trang Thiết Bị Hiện Đại</h4>

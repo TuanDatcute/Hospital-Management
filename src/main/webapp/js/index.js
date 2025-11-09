@@ -104,4 +104,34 @@ document.addEventListener('DOMContentLoaded', () => {
         },
     });
 
+    // --- ✨ LOGIC MỚI CHO MENU MOBILE ---
+    const mobileNavToggle = document.getElementById('mobileNavToggle');
+    const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+    const mobileNavClose = document.getElementById('mobileNavClose');
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav ul li a');
+
+    if (mobileNavToggle) {
+        // Mở menu
+        mobileNavToggle.addEventListener('click', () => {
+            mobileNavOverlay.classList.add('active');
+            document.body.classList.add('mobile-nav-active');
+        });
+    }
+
+    if (mobileNavClose) {
+        // Đóng menu bằng nút (X)
+        mobileNavClose.addEventListener('click', () => {
+            mobileNavOverlay.classList.remove('active');
+            document.body.classList.remove('mobile-nav-active');
+        });
+    }
+
+    // Đóng menu khi nhấn vào một link (để chuyển trang)
+    mobileNavLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            mobileNavOverlay.classList.remove('active');
+            document.body.classList.remove('mobile-nav-active');
+        });
+    });
+
 });

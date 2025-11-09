@@ -412,12 +412,12 @@ public class PhieuKhamBenhService {
 
     //====================Dat=============
     // Trong file: service/PhieuKhamBenhService.java
-    public List<PhieuKhamBenhDTO> getHistoryForPatient(int benhNhanId) {
+    public List<PhieuKhamBenhDTO> getHistoryForPatient(int benhNhanId) throws ValidationException {
         List<PhieuKhamBenh> entities = phieuKhamDAO.findByPatientId(benhNhanId);
 
         // Dùng hàm toDTOForListing (gọn nhẹ) để hiển thị danh sách
         return entities.stream()
-                .map(this::toDTOForListing)
+                .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 }
