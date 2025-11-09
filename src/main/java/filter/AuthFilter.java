@@ -1,148 +1,193 @@
-//package filter;
-//
-//import java.io.IOException;
-//import java.util.ArrayList;
-//import java.util.List;
-//import javax.servlet.Filter;
-//import javax.servlet.FilterChain;
-//import javax.servlet.FilterConfig;
-//import javax.servlet.ServletException;
-//import javax.servlet.ServletRequest;
-//import javax.servlet.ServletResponse;
-//import javax.servlet.annotation.WebFilter;
-//import javax.servlet.http.HttpServletRequest;
-//import javax.servlet.http.HttpServletResponse;
-//import javax.servlet.http.HttpSession;
-//import model.dto.BenhNhanDTO; // <-- **THÊM 1: IMPORT DTO BỆNH NHÂN**
-//import model.dto.TaiKhoanDTO; // <-- **THÊM 2: IMPORT DTO TÀI KHOẢN**
-//import service.BenhNhanService; // <-- **THÊM 3: IMPORT SERVICE BỆNH NHÂN**
-//
-///**
-// * Filter này kiểm tra xem người dùng đã đăng nhập (đã xác thực) chưa
-// * VÀ kiểm tra xem Bệnh nhân đã hoàn tất hồ sơ chưa.
-// */
-//@WebFilter(filterName = "AuthFilter", urlPatterns = {"/*"}) // Áp dụng Filter cho TẤT CẢ request
-//public class AuthFilter implements Filter {
-//
-//    // Danh sách các tài nguyên (URL) công khai, không cần đăng nhập (Whitelist)
-//    private List<String> publicUrls;
-//    private BenhNhanService benhNhanService; // <-- **THÊM 4: KHAI BÁO SERVICE**
-//
-//    @Override
-//    public void init(FilterConfig filterConfig) throws ServletException {
-//        // Khởi tạo Service 1 lần khi Filter bắt đầu
-//        benhNhanService = new BenhNhanService();
-//        
-//        // Khởi tạo danh sách các URL công khai
-//        publicUrls = new ArrayList<>();
-//        
-//        // --- CÁC TRANG JSP CÔNG KHAI ---
-//        publicUrls.add("/login.jsp");      
-//        // publicUrls.add("/register.jsp"); // **SỬA 5: Xóa vì đã gộp vào login.jsp**
-//        publicUrls.add("/index.jsp");     
-//        
-//        // --- THƯ MỤC CÔNG KHAI ---
-//        publicUrls.add("/css/");         
-//        publicUrls.add("/images/");     
-//        publicUrls.add("/js/");
-//        
-//        // **THÊM 6: Trang điền hồ sơ (cần cho Bệnh nhân mới)**
-//        publicUrls.add("/user/fillProfile.jsp"); 
-//    }
-//
-//    /**
-//     * Phương thức lọc chính, chạy trên MỌI request.
-//     */
-//    @Override
-//    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-//            throws IOException, ServletException {
-//
-//        HttpServletRequest httpRequest = (HttpServletRequest) request;
-//        HttpServletResponse httpResponse = (HttpServletResponse) response;
-//        HttpSession session = httpRequest.getSession(false); 
-//
-//        String contextPath = httpRequest.getContextPath(); // /Hospital_Managerment
-//        String requestUri = httpRequest.getRequestURI(); 
-//        String path = requestUri.substring(contextPath.length()); // Đường dẫn tương đối (ví dụ: /home.jsp)
-//
-//        // 1. Kiểm tra xem người dùng đã đăng nhập chưa
-//        boolean loggedIn = (session != null && session.getAttribute("USER") != null);
-//
-//        // 2. Kiểm tra xem tài nguyên yêu cầu có phải là "công khai" không
-//        boolean isPublicResource = false;
-//        for (String publicUrl : publicUrls) {
-//            if (path.startsWith(publicUrl)) {
-//                isPublicResource = true;
-//                break;
-//            }
-//        }
-//        
-//        // 3. Xử lý đặc biệt cho MainController
-//        boolean isPublicAction = false;
-//        if (path.equals("/MainController")) {
-//            String action = request.getParameter("action");
-//            if (action != null) {
-//                // Các action công khai (chưa cần login)
-//                if (action.equals("login") || action.equals("register")) {
-//                    isPublicAction = true;
-//                }
-//                
-//                // **THÊM 7: Cho phép action "updateProfile" (để Bệnh nhân mới có thể lưu)**
-//                if (action.equals("updateProfile")) {
-//                    isPublicAction = true;
-//                }
-//            }
-//        }
-//        
-//        // --- BẮT ĐẦU LOGIC LỌC ---
-//
-//        if (loggedIn) {
-//            // --- NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP ---
-//            
-//            TaiKhoanDTO user = (TaiKhoanDTO) session.getAttribute("USER");
-//            
-//            // 4. **LOGIC MỚI (Bước 8): KIỂM TRA HOÀN TẤT HỒ SƠ**
-//            // Chỉ kiểm tra Bệnh nhân
-//            if ("BENH_NHAN".equals(user.getVaiTro())) {
-//                BenhNhanDTO benhNhan = benhNhanService.getBenhNhanByTaiKhoanId(user.getId());
-//                
-//                // Kiểm tra xem hồ sơ đã hoàn tất chưa (ví dụ: cccd là bắt buộc)
-//                if (benhNhan == null || benhNhan.getCccd() == null || benhNhan.getCccd().isEmpty()) {
-//                    
-//                    // Hồ sơ CHƯA hoàn tất.
-//                    // Kiểm tra xem họ có đang cố truy cập trang khác không
-//                    boolean isGoingToFillProfile = path.equals("/user/fillProfile.jsp");
-//                    boolean isSubmittingProfile = path.equals("/MainController") && "updateProfile".equals(request.getParameter("action"));
-//
-//                    if (isGoingToFillProfile || isSubmittingProfile) {
-//                        // OK, họ đang ở đúng trang điền hồ sơ (hoặc đang nhấn nút Lưu)
-//                        chain.doFilter(request, response);
-//                    } else {
-//                        // Nếu họ cố vào home.jsp hoặc trang khác -> Ép quay lại
-//                        System.out.println("AuthFilter: Ép Bệnh nhân (ID: " + user.getId() + ") điền hồ sơ.");
-//                        httpResponse.sendRedirect(contextPath + "/user/fillProfile.jsp");
-//                    }
-//                    return; // Dừng Filter tại đây
-//                }
-//            }
-//            
-//            // Nếu đã đăng nhập VÀ hồ sơ OK (hoặc là Admin/BS), cho đi tiếp
-//            chain.doFilter(request, response);
-//
-//        } else if (isPublicResource || isPublicAction) {
-//            // --- CHƯA ĐĂNG NHẬP, NHƯNG TRUY CẬP TRANG CÔNG KHAI ---
-//            chain.doFilter(request, response); // Cho đi tiếp
-//            
-//        } else {
-//            // --- CHƯA ĐĂNG NHẬP VÀ CỐ GẮNG TRUY CẬP TRANG PRIVATE ---
-//            // (Ví dụ: gõ /home.jsp hoặc /admin/dashboard.jsp)
-//            System.out.println("AuthFilter: Chặn truy cập trái phép (chưa đăng nhập) vào: " + path);
-//            httpResponse.sendRedirect(contextPath + "/login.jsp"); // Đá về trang đăng nhập
-//        }
-//    }
-//
-//    @Override
-//    public void destroy() {
-//        // Không cần làm gì
-//    }
-//}
+package filter; // Hoặc package của bạn
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import model.Entity.TaiKhoan;
+
+/**
+ * Filter này kiểm soát việc xác thực (Authentication) và phân quyền
+ * (Authorization) cho MainController.
+ */
+@WebFilter(filterName = "AuthFilter", urlPatterns = {"/MainController"})
+public class AuthFilter implements Filter {
+
+    // --- Các Set (tập hợp) để chứa các action cho từng vai trò ---
+    private Set<String> publicActions = new HashSet<>();
+    private Set<String> commonActions = new HashSet<>();
+    private Set<String> adminActions = new HashSet<>();
+    private Set<String> doctorActions = new HashSet<>();
+    private Set<String> receptionistActions = new HashSet<>();
+    private Set<String> patientActions = new HashSet<>();
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // --- Định nghĩa các nhóm Action (Copy từ MainController) ---
+
+        // --- 1. Nhóm PUBLIC (Không cần đăng nhập) ---
+        String[] userActions_Public = {"login", "register", "resendVerification"};
+        String[] verifyActions = {"verify"};
+        String[] resetActions = {"requestReset", "performReset"};
+        String[] publicOnlyActions = {"viewDoctors"};
+        publicActions.addAll(Arrays.asList(userActions_Public));
+        publicActions.addAll(Arrays.asList(verifyActions));
+        publicActions.addAll(Arrays.asList(resetActions));
+        publicActions.addAll(Arrays.asList(publicOnlyActions));
+
+        // --- 2. Nhóm COMMON (Chung cho mọi vai trò đã đăng nhập) ---
+        String[] userThongBaoActions = {"viewMyNotifications", "markNotificationAsRead", "deleteMyNotification"};
+        String[] thongBaoActions = {"createThongBao", "listNotifications"};
+        String[] securityActions = {"showConfirmPassword", "confirmPassword", "showEditPhone", "savePhone", "showEditCCCD", "saveCCCD", "showEditName", "saveName", "showEditDOB", "saveDOB"};
+        commonActions.add("logout");
+        commonActions.addAll(Arrays.asList(securityActions)); // Tự quản lý tài khoản
+        commonActions.addAll(Arrays.asList(userThongBaoActions)); // Xem thông báo cá nhân
+        commonActions.addAll(Arrays.asList(thongBaoActions)); // "thông báo là chung"
+
+        // --- 3. Nhóm BỆNH NHÂN (PATIENT) ---
+        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "myAppointments", "bookAppointment", "getBacSiByKhoa", "cancelAppointment"};
+        patientActions.addAll(Arrays.asList(patientLichHenActions)); // Tự đặt lịch hẹn
+        // Các action tự xem/sửa hồ sơ cá nhân
+        patientActions.addAll(Arrays.asList("showProfile", "showEditProfile", "saveProfile", "confirmAndLink", "showEditProfileWithExisting", "updateAndLink", "viewMyHistory"));
+
+        // --- 4. Nhóm LỄ TÂN (RECEPTIONIST) ---
+        String[] hoaDon_GiaoDichThanhToanActions = {"viewInvoice", "payInvoice", "listInvoices", "generateInvoice", "printInvoice"};
+        String[] phongBenhActions = {"createRoom", "listRooms", "updateRoom", "getRoomForUpdate", "deleteRoom", "showCreateRoomForm"};
+        String[] giuongBenhActions = {"assignBed", "releaseBed", "listBeds", "createBed", "deleteBed", "updateBed", "getBedForUpdate", "showCreateBedForm"};
+        String[] NurseLichHenActions = {"showCreateAppointmentForm", "createAppointment", "getDoctorsByKhoa", "listLichHenNurse", "updateAppointmentStatus"};
+        // Lễ tân quản lý thông tin bệnh nhân (thêm mới, sửa)
+        String[] benhNhanActions_Reception = {"listBenhNhan", "showBenhNhanCreateForm", "createBenhNhan", "showBenhNhanEditForm", "updateBenhNhan", "softDeleteBenhNhan"};
+        
+        receptionistActions.addAll(Arrays.asList(hoaDon_GiaoDichThanhToanActions)); // Yêu cầu: "hóa đơn"
+        receptionistActions.addAll(Arrays.asList(phongBenhActions)); // Yêu cầu: "phòng bệnh"
+        receptionistActions.addAll(Arrays.asList(giuongBenhActions)); // Yêu cầu: "giường bệnh"
+        receptionistActions.addAll(Arrays.asList(NurseLichHenActions)); // Lễ tân (hoặc Y tá) tạo lịch hẹn
+        receptionistActions.addAll(Arrays.asList(benhNhanActions_Reception)); // Lễ tân quản lý bệnh nhân
+
+        // --- 5. Nhóm BÁC SĨ (DOCTOR) ---
+        String[] EMRCoreActions = {"printEncounter", "completeEncounter", "createEncounter", "updateEncounterDetails", "getEncounterDetails", "showCreateEncounterForm", "listAllEncounters", "viewEncounterDetails", "addServiceRequest", "updateServiceResult", "showUpdateEncounterForm", "updateEncounter"};
+        String[] DonThuocActions = {"addDetail", "updateDetail", "deleteDetail", "viewDetails", "listAll", "showCreateDonThuocForm", "createPrescription"};
+        String[] CatalogActions = {"createService", "showCreateServiceForm", "createMedication", "showMedicationForm", "showUpdateForm", "updateMedicationInfo", "updateStock", "listMedications", "listAndSearchServices", "updateService", "showUpdateServiceForm", "deactivateService", "activateService", "activateMedication", "deactivateMedication"};
+        String[] lichHenActions = {"listLichHen", "showLichHenCreateForm", "createLichHen", "updateLichHenStatus"};
+        String[] benhNhanActions_Doctor = {"listBenhNhan", "viewMyHistory", "showProfile"}; // Bác sĩ xem DS và lịch sử
+        
+        doctorActions.addAll(Arrays.asList(EMRCoreActions)); // Yêu cầu: "còn lại là của bác sĩ"
+        doctorActions.addAll(Arrays.asList(DonThuocActions)); 
+        doctorActions.addAll(Arrays.asList(CatalogActions)); 
+        doctorActions.addAll(Arrays.asList(lichHenActions)); 
+        doctorActions.addAll(Arrays.asList(benhNhanActions_Doctor)); 
+
+        // --- 6. Nhóm ADMIN ---
+        String[] userActions_Admin = {"listUsers", "showUserCreateForm", "createUser", "showUserEditForm", "updateUserStatus", "showChangePasswordForm", "changePassword"};
+        String[] khoaActions = {"listKhoa", "showKhoaCreateForm", "createKhoa", "showKhoaEditForm", "updateKhoa", "softDeleteKhoa"};
+        String[] nhanVienActions = {"listNhanVien", "showNhanVienCreateForm", "createNhanVien", "showNhanVienEditForm", "updateNhanVien", "softDeleteNhanVien"};
+        
+        adminActions.addAll(Arrays.asList(userActions_Admin)); // Quản lý tài khoản
+        adminActions.addAll(Arrays.asList(khoaActions)); // Quản lý khoa
+        adminActions.addAll(Arrays.asList(nhanVienActions)); // Quản lý nhân viên
+        adminActions.addAll(Arrays.asList(thongBaoActions)); // Admin tạo thông báo
+    }
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        HttpSession session = httpRequest.getSession(false); 
+
+        String action = httpRequest.getParameter("action");
+
+        // 1. Nếu action là null hoặc là action công khai, cho qua.
+        if (action == null || publicActions.contains(action)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // 2. Kiểm tra xem đã đăng nhập chưa
+        TaiKhoan user = null; 
+        if (session != null) {
+            // Lấy "USER" từ session
+            user = (TaiKhoan) session.getAttribute("USER");
+        }
+
+        if (user == null) {
+            // 3. Chưa đăng nhập -> Về trang login
+            httpResponse.sendRedirect(httpRequest.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        // 4. Đã đăng nhập. Kiểm tra các action chung
+        if (commonActions.contains(action)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // 5. Kiểm tra phân quyền (Authorization) dựa trên vai trò
+        // !! THAY ĐỔI: Sử dụng getVaiTro() theo yêu cầu của bạn
+        String role = user.getVaiTro(); 
+        boolean authorized = false;
+
+        // !! QUAN TRỌNG:
+        // Đảm bảo String trả về từ user.getVaiTro() khớp CHÍNH XÁC
+        // với các case dưới đây (ví dụ: "ADMIN", "BÁC SĨ", "LỄ TÂN", "BỆNH NHÂN")
+        switch (role) {
+            case "QUAN_TRI":
+                if (adminActions.contains(action)) {
+                    authorized = true;
+                }
+                // (Tùy chọn) Admin làm được tất cả
+                // else if (doctorActions.contains(action)) authorized = true;
+                // else if (receptionistActions.contains(action)) authorized = true;
+                break;
+            case "BAC_SI":
+                if (doctorActions.contains(action)) {
+                    authorized = true;
+                }
+                break;
+            case "LE_TAN":
+                if (receptionistActions.contains(action)) {
+                    authorized = true;
+                }
+                break;
+            case "BENH_NHAN":
+                if (patientActions.contains(action)) {
+                    authorized = true;
+                }
+                break;
+            default:
+                authorized = false;
+        }
+
+        // 6. Xử lý kết quả phân quyền
+        if (authorized) {
+            // Được phép -> Cho đi tiếp
+            chain.doFilter(request, response);
+        } else {
+            // 7. Không được phép -> Chuyển đến trang lỗi
+            
+            // !! THAY ĐỔI (Dự đoán): Dùng getTenDangNhap() để log. 
+            // Sửa lại nếu tên phương thức là getUsername() hay getEmail()
+            System.out.println("CẢNH BÁO: User '" + user.getTenDangNhap() + "' (Vai trò: " + role + ") "
+                    + "đã cố gắng truy cập action bị cấm: " + action);
+            
+            request.setAttribute("errorMessage", "Bạn không có quyền truy cập chức năng này.");
+            httpRequest.getRequestDispatcher("error.jsp").forward(httpRequest, httpResponse);
+        }
+    }
+
+    @Override
+    public void destroy() {
+        // Dọn dẹp tài nguyên (nếu có)
+    }
+}
