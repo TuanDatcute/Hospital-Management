@@ -2,7 +2,7 @@
     Document    : danhSachLichHen.jsp
     Created on  : Oct 29, 2025
     Author      : ADMIN
-    (ĐÃ NÂNG CẤP: Thêm Phân trang, CRUD Sửa, Sửa lỗi PRG & POST)
+    (ĐÃ NÂNG CẤP: Giao diện V2.1 + Tách file admin-list.css)
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -15,65 +15,25 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Quản lý Lịch hẹn</title>
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-        <%-- Thêm CSS cho các nút phân trang --%>
-        <style>
-            .pagination-container {
-                margin-top: 20px;
-                text-align: center;
-            }
-            .pagination-btn {
-                display: inline-block;
-                padding: 8px 16px;
-                margin: 0 5px;
-                background-color: #007bff;
-                color: white;
-                text-decoration: none;
-                border-radius: 4px;
-                font-weight: bold;
-            }
-            .pagination-btn.disabled {
-                background-color: #cccccc;
-                color: #666666;
-                cursor: not-allowed;
-            }
-            .pagination-info {
-                margin: 0 10px;
-                font-size: 1.1em;
-                vertical-align: middle;
-            }
-            .search-container {
-                margin-top: 15px;
-                margin-bottom: 20px;
-                display: flex;
-                justify-content: flex-end;
-            }
-            .search-container input[type="text"] {
-                padding: 8px;
-                width: 250px;
-                border: 1px solid #ccc;
-                border-radius: 4px 0 0 4px;
-            }
-            .search-container button {
-                padding: 8px 12px;
-                border: none;
-                background-color: #007bff;
-                color: white;
-                cursor: pointer;
-                border-radius: 0 4px 4px 0;
-                margin-left: -1px;
-            }
-            .disabled-input {
-                background-color: #f4f4f4;
-                cursor: not-allowed;
-            }
-        </style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+        <%-- CSS Chung --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css?v=1.5">
+
+        <%-- ✨ SỬ DỤNG CHUNG CSS DANH SÁCH ✨ --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/admin-list.css?v=1.0">
+
+        <%-- Khối <style> ... </style> đã được xóa --%>
     </head>
     <body>
 
-        <jsp:include page="/WEB-INF/header.jsp" /> 
+        <jsp:include page="/WEB-INF/headerDat.jsp" /> 
 
         <div class="container page-content" style="padding-top: 30px;">
 
@@ -90,7 +50,21 @@
             </c:if>
             <%-- === KẾT THÚC SỬA LỖI PRG === --%>
 
-            <%-- (CHƯA THÊM TÌM KIẾM CHO LỊCH HẸN) --%>
+            <%-- ✨ BẮT ĐẦU TOOLBAR MỚI ✨ --%>
+            <div class="toolbar">
+                <%-- Trang này thường không có nút "Thêm mới" từ phía Admin --%>
+                <%-- Bọc thanh tìm kiếm vào div và đẩy sang phải --%>
+                <div class="search-container" style="margin-left: auto;">
+                    <form action="MainController" method="GET">
+                        <input type="hidden" name="action" value="listLichHen" />
+                        <input type="text" name="keyword" 
+                               placeholder="Tìm theo Tên BN, Bác sĩ, Trạng thái..." 
+                               value="<c:out value='${requestScope.searchKeyword}' />" />
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+            </div>
+            <%-- ✨ KẾT THÚC TOOLBAR MỚI ✨ --%>
 
             <table class="data-table">
                 <thead>
@@ -113,11 +87,12 @@
                             <td><c:out value="${lh.tenBenhNhan}" /></td>
                             <td><c:out value="${lh.tenBacSi}" /></td>
                             <td>
+                                <%-- ✨ SỬ DỤNG CLASS THAY CHO STYLE INLINE ✨ --%>
                                 <c:choose>
-                                    <c:when test="${lh.trangThai == 'HOAN_THANH'}"><span style="color: green; font-weight: bold;">Hoàn thành</span></c:when>
-                                    <c:when test="${lh.trangThai == 'DA_XAC_NHAN'}"><span style="color: blue; font-weight: bold;">Đã xác nhận</span></c:when>
-                                    <c:when test="${lh.trangThai == 'DA_HUY'}"><span style="color: red; font-weight: bold;">Đã hủy</span></c:when>
-                                    <c:when test="${lh.trangThai == 'CHO_XAC_NHAN'}"><span style="color: orange; font-weight: bold;">Chờ xác nhận</span></c:when>
+                                    <c:when test="${lh.trangThai == 'HOAN_THANH'}"><span class="status status-completed">Hoàn thành</span></c:when>
+                                    <c:when test="${lh.trangThai == 'DA_XAC_NHAN'}"><span class="status status-confirmed">Đã xác nhận</span></c:when>
+                                    <c:when test="${lh.trangThai == 'DA_HUY'}"><span class="status status-cancelled">Đã hủy</span></c:when>
+                                    <c:when test="${lh.trangThai == 'CHO_XAC_NHAN'}"><span class="status status-pending">Chờ xác nhận</span></c:when>
                                     <c:otherwise><c:out value="${lh.trangThai}"/></c:otherwise>
                                 </c:choose>
                             </td>
@@ -126,42 +101,66 @@
 
                     <c:if test="${empty requestScope.LIST_LICHHEN}">
                         <tr>
-                            <td colspan="7" class="empty-cell">Không có dữ liệu lịch hẹn.</td>
+                            <td colspan="5" class="empty-cell">
+                                <c:if test="${not empty requestScope.searchKeyword}">
+                                    Không tìm thấy lịch hẹn nào với từ khóa "<c:out value='${requestScope.searchKeyword}' />".
+                                </c:if>
+                                <c:if test="${empty requestScope.searchKeyword}">
+                                    Không có dữ liệu lịch hẹn.
+                                </c:if>
+                            </td>
                         </tr>
                     </c:if>
                 </tbody>
             </table>
 
+            <%-- ✨ NÂNG CẤP PHÂN TRANG (Giống hệt 2 file kia) ✨ --%>
             <div class="pagination-container">
                 <c:set var="currentPage" value="${requestScope.currentPage}" />
                 <c:set var="totalPages" value="${requestScope.totalPages}" />
-                <%-- (CHƯA THÊM KEYWORD VÀO PHÂN TRANG) --%>
+                <c:set var="searchKeyword" value="${requestScope.searchKeyword}" />
+
                 <c:if test="${totalPages > 1}">
-                    <c:choose>
-                        <c:when test="${currentPage > 1}">
-                            <a href="MainController?action=listLichHen&page=${currentPage - 1}" class="pagination-btn">&laquo; Trang trước</a>
-                        </c:when>
-                        <c:otherwise>
-                            <span class="pagination-btn disabled">&laquo; Trang trước</span>
-                        </c:otherwise>
-                    </c:choose>
+                    <%-- Nút Trang Trước --%>
+                    <c:url var="prevPageUrl" value="MainController">
+                        <c:param name="action" value="listLichHen" />
+                        <c:param name="page" value="${currentPage - 1}" />
+                        <c:if test="${not empty searchKeyword}"><c:param name="keyword" value="${searchKeyword}" /></c:if>
+                    </c:url>
+                    <a href="${currentPage > 1 ? prevPageUrl : '#'}" 
+                       class="pagination-btn ${currentPage > 1 ? '' : 'disabled'}">&laquo; Trang trước</a>
+
                     <span class="pagination-info">
                         Trang ${currentPage} / ${totalPages}
                     </span>
-                    <c:choose>
-                        <c:when test="${currentPage < totalPages}">
-                            <a href="MainController?action=listLichHen&page=${currentPage + 1}" class="pagination-btn">Trang sau &raquo;</a>
-                        </c:when>
-                        <c:otherwise>
-                            <span class="pagination-btn disabled">Trang sau &raquo;</span>
-                        </c:otherwise>
-                    </c:choose>
+
+                    <%-- Nút Trang Sau --%>
+                    <c:url var="nextPageUrl" value="MainController">
+                        <c:param name="action" value="listLichHen" />
+                        <c:param name="page" value="${currentPage + 1}" />
+                        <c:if test="${not empty searchKeyword}"><c:param name="keyword" value="${searchKeyword}" /></c:if>
+                    </c:url>
+                    <a href="${currentPage < totalPages ? nextPageUrl : '#'}" 
+                       class="pagination-btn ${currentPage < totalPages ? '' : 'disabled'}">Trang sau &raquo;</a>
                 </c:if>
             </div>
 
-        </div>
+        </div> <%-- Kết thúc .container.page-content --%>
 
-        <jsp:include page="/WEB-INF/footer.jsp" /> 
+        <%-- Footer --%>
+        <footer class="main-footer">
+            <div class="container">
+                <jsp:include page="/WEB-INF/footer.jsp" /> 
+            </div>
+        </footer>
+
+        <%-- (Tôi đã xóa bớt 1 thẻ </div> thừa ở đây so với file gốc của bạn) --%>
+
+        <%-- ✨ 3. THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+        <%-- ✨ 4. LINK TỚI FILE JS (Sẽ cập nhật ở Bước 3) --%>
+        <script src="<c:url value='/js/index.js'/>"></script>
 
     </body>
 </html>

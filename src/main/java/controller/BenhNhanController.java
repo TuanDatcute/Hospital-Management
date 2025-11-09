@@ -31,7 +31,7 @@ public class BenhNhanController extends HttpServlet {
     private static final String ERROR_PAGE = "error.jsp";
     private static final String EDIT_PROFILE_PAGE = "user/editProfile.jsp";
     private static final String VIEW_PROFILE_PAGE = "user/viewProfile.jsp";
-    private static final String HOME_PAGE = "home.jsp";
+    private static final String HOME_PAGE = "index.jsp";
     private static final String CONFIRM_PROFILE_PAGE = "user/confirmProfile.jsp";
     private static final int PAGE_SIZE = 10;
     private final BenhNhanService benhNhanService = new BenhNhanService();

@@ -2,7 +2,7 @@
     Document    : danhSachTaiKhoan.jsp
     Created on  : Oct 29, 2025
     Author      : ADMIN
-    (ĐÃ NÂNG CẤP: Thêm Phân trang, Tìm kiếm, Sửa lỗi PRG)
+    (ĐÃ NÂNG CẤP: Giao diện V2.1 + Tách file admin-list.css)
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -14,61 +14,25 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Quản lý Tài khoản</title>
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-        <%-- Thêm CSS cho Phân trang và Tìm kiếm --%>
-        <style>
-            .pagination-container {
-                margin-top: 20px;
-                text-align: center;
-            }
-            .pagination-btn {
-                display: inline-block;
-                padding: 8px 16px;
-                margin: 0 5px;
-                background-color: #007bff;
-                color: white;
-                text-decoration: none;
-                border-radius: 4px;
-                font-weight: bold;
-            }
-            .pagination-btn.disabled {
-                background-color: #cccccc;
-                color: #666666;
-                cursor: not-allowed;
-            }
-            .pagination-info {
-                margin: 0 10px;
-                font-size: 1.1em;
-                vertical-align: middle;
-            }
-            .search-container {
-                margin-top: 15px;
-                margin-bottom: 20px;
-                display: flex;
-                justify-content: flex-end;
-            }
-            .search-container input[type="text"] {
-                padding: 8px;
-                width: 250px;
-                border: 1px solid #ccc;
-                border-radius: 4px 0 0 4px;
-            }
-            .search-container button {
-                padding: 8px 12px;
-                border: none;
-                background-color: #007bff;
-                color: white;
-                cursor: pointer;
-                border-radius: 0 4px 4px 0;
-                margin-left: -1px;
-            }
-        </style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+        <%-- CSS Chung --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css?v=1.5">
+
+        <%-- ✨ SỬ DỤNG CHUNG CSS DANH SÁCH ✨ --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/admin-list.css?v=1.0">
+
+        <%-- Khối <style> ... </style> đã được xóa --%>
     </head>
     <body>
 
-        <jsp:include page="/WEB-INF/header.jsp" /> 
+        <jsp:include page="/WEB-INF/headerDat.jsp" /> 
 
         <div class="container page-content" style="padding-top: 30px;">
 
@@ -85,21 +49,23 @@
             </c:if>
             <%-- === KẾT THÚC SỬA LỖI PRG === --%>
 
-            <a href="${pageContext.request.contextPath}/MainController?action=showUserCreateForm" class="add-new-btn">
-                <i class="fas fa-user-plus"></i> Thêm Tài khoản Mới
-            </a>
+            <%-- ✨ BẮT ĐẦU TOOLBAR MỚI (Đã bọc lại) ✨ --%>
+            <div class="toolbar">
+                <a href="${pageContext.request.contextPath}/MainController?action=showUserCreateForm" class="add-new-btn">
+                    <i class="fas fa-user-plus"></i> Thêm Tài khoản Mới
+                </a>
 
-            <%-- === BẮT ĐẦU THÊM MỚI (FORM TÌM KIẾM) === --%>
-            <div class="search-container">
-                <form action="MainController" method="GET">
-                    <input type="hidden" name="action" value="listUsers" />
-                    <input type="text" name="keyword" 
-                           placeholder="Tìm theo Tên đăng nhập, Email..." 
-                           value="<c:out value='${requestScope.searchKeyword}' />" />
-                    <button type="submit"><i class="fas fa-search"></i></button>
-                </form>
+                <div class="search-container">
+                    <form action="MainController" method="GET">
+                        <input type="hidden" name="action" value="listUsers" />
+                        <input type="text" name="keyword" 
+                               placeholder="Tìm theo Tên đăng nhập, Email..." 
+                               value="<c:out value='${requestScope.searchKeyword}' />" />
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
             </div>
-            <%-- === KẾT THÚC THÊM MỚI (FORM TÌM KIẾM) === --%>
+            <%-- ✨ KẾT THÚC TOOLBAR MỚI ✨ --%>
 
             <table class="data-table">
                 <thead>
@@ -120,21 +86,21 @@
                             <td><c:out value="${tk.email}" /></td>
                             <td><c:out value="${tk.vaiTro}" /></td>
                             <td>
+                                <%-- ✨ SỬ DỤNG CLASS THAY CHO STYLE INLINE ✨ --%>
                                 <c:if test="${tk.trangThai == 'HOAT_DONG'}">
-                                    <span style="color: green; font-weight: bold;">Hoạt động</span>
+                                    <span class="status status-completed">Hoạt động</span>
                                 </c:if>
                                 <c:if test="${tk.trangThai == 'BI_KHOA'}">
-                                    <span style="color: red; font-weight: bold;">Đã khóa</span>
+                                    <span class="status status-cancelled">Đã khóa</span>
                                 </c:if>
                             </td>
 
                             <td class="actions">
                                 <c:if test="${sessionScope.USER.id != tk.id}">
-                                    <%-- (Link Sửa giữ nguyên) --%>
                                     <a href="${pageContext.request.contextPath}/MainController?action=showUserEditForm&id=${tk.id}" class="edit-btn" title="Sửa Trạng thái">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <%-- (Form Khóa/Mở khóa POST của bạn đã rất tốt, giữ nguyên) --%>
+
                                     <c:if test="${tk.trangThai == 'HOAT_DONG'}">
                                         <form action="${pageContext.request.contextPath}/MainController" method="post" class="table-form" 
                                               onsubmit="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản này?');">
@@ -168,14 +134,12 @@
                     <c:if test="${empty requestScope.LIST_TAIKHOAN}">
                         <tr>
                             <td colspan="6" class="empty-cell">
-                                <%-- === SỬA (THÊM THÔNG BÁO TÌM KIẾM) === --%>
                                 <c:if test="${not empty requestScope.searchKeyword}">
                                     Không tìm thấy tài khoản nào với từ khóa "<c:out value='${requestScope.searchKeyword}' />".
                                 </c:if>
                                 <c:if test="${empty requestScope.searchKeyword}">
                                     Không có dữ liệu tài khoản.
                                 </c:if>
-                                <%-- === KẾT THÚC SỬA === --%>
                             </td>
                         </tr>
                     </c:if>
@@ -198,7 +162,6 @@
                     <a href="${currentPage > 1 ? prevPageUrl : '#'}" 
                        class="pagination-btn ${currentPage > 1 ? '' : 'disabled'}">&laquo; Trang trước</a>
 
-                    <%-- Hiển thị số trang --%>
                     <span class="pagination-info">
                         Trang ${currentPage} / ${totalPages}
                     </span>
@@ -217,7 +180,20 @@
 
         </div> 
 
-        <jsp:include page="/WEB-INF/footer.jsp" /> 
+        <%-- Footer --%>
+        <footer class="main-footer">
+            <div class="container">
+                <jsp:include page="/WEB-INF/footer.jsp" /> 
+            </div>
+        </footer>
+
+        <%-- (Tôi đã xóa bớt 1 thẻ </div> thừa ở đây so với file gốc của bạn) --%>
+
+        <%-- ✨ 3. THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+        <%-- ✨ 4. LINK TỚI FILE JS (Sẽ cập nhật ở Bước 3) --%>
+        <script src="<c:url value='/js/index.js'/>"></script> 
 
     </body>
 </html>

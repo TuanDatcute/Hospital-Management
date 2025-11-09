@@ -1,0 +1,172 @@
+/*
+ * =========================================
+ * FILE: admin-form.css (V1.0 - Cho các trang Form)
+ * =Access: Được tải bởi formBenhNhan.jsp, formKhoa.jsp, v.v.
+ * =========================================
+ */
+
+/* 1. BIẾN MÀU (Đồng bộ với các file CSS khác) */
+:root {
+    --primary-color: #5d5dff;
+    --primary-light: #f0f0ff;
+    --text-dark: #333333;
+    --text-medium: #555555;
+    --text-light: #777777;
+    --bg-light: #f8f9fa;
+    --bg-white: #ffffff;
+    --border-color: #eeeeee;
+    --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+    --color-blue: #007bff;
+    --color-blue-light: #e6f2ff;
+    --color-green: #28a745;
+    --color-green-light: #eaf6ec;
+    --color-orange: #fd7e14;
+    --color-orange-light: #fff2e7;
+    --color-red: #dc3545;
+    --color-red-light: #fbebee;
+}
+
+/* 2. LAYOUT TRANG CHUNG */
+body {
+    background-color: var(--bg-light);
+    background-attachment: fixed;
+}
+
+.page-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 15px 60px 15px;
+    min-height: calc(100vh - 150px);
+}
+
+/* 3. TIÊU ĐỀ (Giống trang danh sách) */
+.section-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 30px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--primary-color);
+    display: inline-block;
+    text-align: left;
+}
+
+/* 4. FORM CARD (.data-form) */
+.data-form {
+    max-width: 800px; /* Giới hạn chiều rộng cho form đẹp hơn */
+    margin: 20px auto;
+    padding: 30px 40px;
+    background-color: var(--bg-white);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+/* 5. CÁC TRƯỜNG NHẬP LIỆU (.form-group) */
+.form-group {
+    margin-bottom: 25px; /* Tăng khoảng cách giữa các trường */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+/* Style chung cho Input, Select, Textarea */
+.data-form input[type="text"],
+.data-form input[type="email"],
+.data-form input[type="password"],
+.data-form input[type="date"],
+.data-form input[type="datetime-local"],
+.data-form textarea,
+.data-form select {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1rem;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background-color: var(--bg-white);
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-sizing: border-box; /* Quan trọng */
+}
+
+/* Hiệu ứng "Glow" khi focus */
+.data-form input[type="text"]:focus,
+.data-form input[type="email"]:focus,
+.data-form input[type="password"]:focus,
+.data-form input[type="date"]:focus,
+.data-form input[type="datetime-local"]:focus,
+.data-form textarea:focus,
+.data-form select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+    outline: none;
+}
+
+/* Input bị khóa (readonly hoặc class .disabled-input) */
+.data-form .disabled-input,
+.data-form input:read-only {
+    background-color: var(--bg-light);
+    cursor: not-allowed;
+    color: var(--text-medium);
+}
+
+/* Chữ nhỏ hướng dẫn */
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+/* 6. NÚT BẤM (Actions) */
+.form-actions {
+    margin-top: 30px;
+    padding-top: 25px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end; /* Đẩy nút về bên phải */
+    align-items: center;
+    gap: 15px;
+}
+
+.form-actions .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--primary-color); /* Nút Lưu/Cập nhật màu tím */
+    color: var(--bg-white);
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+.form-actions .btn-submit:hover {
+    background-color: #4a4aff; /* Tím đậm hơn */
+    box-shadow: 0 5px 15px rgba(93, 93, 255, 0.3); /* Glow tím */
+}
+
+.form-actions .btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 20px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-medium);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+.form-actions .btn-cancel:hover {
+    text-decoration: underline;
+}
