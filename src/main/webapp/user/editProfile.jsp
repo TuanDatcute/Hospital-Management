@@ -187,12 +187,11 @@
                             <c:otherwise>Lưu thay đổi</c:otherwise>
                         </c:choose>
                     </button>
-
-                    <a href="${pageContext.request.contextPath}/home.jsp" class="home-link" title="Quay về Trang chủ">
-                        <i class="fas fa-home"></i>
-                    </a> 
                 </div>
             </form>
+<!--            <a href="${pageContext.request.contextPath}/index.jsp" class="home-link" title="Quay về Trang chủ">
+                <i class="fas fa-home"></i>-->
+            </a> 
         </div>
 
 

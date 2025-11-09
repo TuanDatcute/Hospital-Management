@@ -1,7 +1,8 @@
 <%--
-    Document   : dashboard.jsp (Trang chủ Admin)
-    Created on : Oct 29, 2025
-    Author     : ADMIN
+    Document    : dashboard.jsp (Trang chủ Admin)
+    Created on  : Oct 29, 2025
+    Author      : ADMIN
+    (ĐÃ NÂNG CẤP: Giao diện V2.1 - Đồng bộ với home.jsp)
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -14,17 +15,28 @@
         <title>Bảng điều khiển Admin</title>
 
         <%-- Nhúng CSS/Font chung --%>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+        <%-- CSS Chung --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css?v=1.5">
+
+        <%-- ✨ LIÊN KẾT TỚI FILE CSS CỦA TRANG HOME (Rất quan trọng) ✨ --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/home.css?v=2.2">
     </head>
     <body>
 
         <%-- Nhúng Header --%>
-        <jsp:include page="/WEB-INF/header.jsp" /> 
+        <jsp:include page="/WEB-INF/headerDat.jsp" /> 
 
-        <div class="container page-content" style="padding-top: 30px;">
+        <%-- ✨ SỬ DỤNG CLASS "home-content" TỪ home.css ✨ --%>
+        <div class="home-content">
 
-            <h2 class="section-title">Bảng điều khiển Quản trị</h2>
+            <h1 class="section-title">Bảng điều khiển Quản trị</h1>
 
             <%-- Hiển thị thông báo thành công (ví dụ: đổi mật khẩu thành công) --%>
             <c:if test="${not empty sessionScope.SUCCESS_MESSAGE}">
@@ -33,54 +45,71 @@
             </c:if>
 
             <div class="home-welcome-message">
-                <%-- Dòng "Chào mừng Admin !" giống trong ảnh --%>
-                Chào mừng ${sessionScope.USER.tenDangNhap} ! 
+                Chào mừng <strong>${sessionScope.USER.tenDangNhap}</strong>! (Vai trò: ${sessionScope.ROLE})
             </div>
 
-            <%-- Lưới chức năng (Tái sử dụng class từ style.css) --%>
+            <%-- Lưới chức năng (Đã nâng cấp HTML) --%>
             <div class="function-grid">
 
-                <%-- 1. Link đến Quản lý Tài khoản --%>
-                <a href="${pageContext.request.contextPath}/MainController?action=listUsers" class="function-card">
+                <%-- 1. Quản lý Tài khoản --%>
+                <a href="${pageContext.request.contextPath}/MainController?action=listUsers" class="function-card color-admin-user">
                     <div class="icon"><i class="fas fa-users-cog"></i></div>
-                    <span>Quản lý Tài khoản</span>
+                    <h4>Quản lý Tài khoản</h4>
+                    <p>Thêm mới, phân quyền và khóa/mở tài khoản.</p>
                 </a>
 
-                <%-- 2. Link đến Quản lý Khoa --%>
-                <a href="${pageContext.request.contextPath}/MainController?action=listKhoa" class="function-card">
+                <%-- 2. Quản lý Khoa --%>
+                <a href="${pageContext.request.contextPath}/MainController?action=listKhoa" class="function-card color-admin-khoa">
                     <div class="icon"><i class="fas fa-hospital-symbol"></i></div>
-                    <span>Quản lý Khoa</span>
+                    <h4>Quản lý Khoa</h4>
+                    <p>Quản lý danh sách các khoa và phòng ban.</p>
                 </a>
 
-                <%-- 3. Link đến Quản lý Nhân viên --%>
-                <a href="${pageContext.request.contextPath}/MainController?action=listNhanVien" class="function-card">
+                <%-- 3. Quản lý Nhân viên --%>
+                <a href="${pageContext.request.contextPath}/MainController?action=listNhanVien" class="function-card color-admin-nhanvien">
                     <div class="icon"><i class="fas fa-user-nurse"></i></div>
-                    <span>Quản lý Nhân viên</span>
+                    <h4>Quản lý Nhân viên</h4>
+                    <p>Quản lý hồ sơ bác sĩ và các nhân viên khác.</p>
                 </a>
 
-                <%-- 4. Link đến Quản lý Bệnh nhân --%>
-                <a href="${pageContext.request.contextPath}/MainController?action=listBenhNhan" class="function-card">
+                <%-- 4. Quản lý Bệnh nhân --%>
+                <a href="${pageContext.request.contextPath}/MainController?action=listBenhNhan" class="function-card color-admin-benhnhan">
                     <div class="icon"><i class="fas fa-procedures"></i></div>
-                    <span>Quản lý Bệnh nhân</span>
+                    <h4>Quản lý Bệnh nhân</h4>
+                    <p>Tra cứu và quản lý hồ sơ bệnh nhân toàn viện.</p>
                 </a>
 
-                <%-- 5. Link đến Quản lý Lịch hẹn --%>
-                <a href="${pageContext.request.contextPath}/MainController?action=listLichHen" class="function-card">
+                <%-- 5. Quản lý Lịch hẹn --%>
+                <a href="${pageContext.request.contextPath}/MainController?action=listLichHen" class="function-card color-admin-lichhen">
                     <div class="icon"><i class="fas fa-calendar-alt"></i></div>
-                    <span>Quản lý Lịch hẹn</span>
+                    <h4>Quản lý Lịch hẹn</h4>
+                    <p>Xem, xác nhận hoặc hủy các lịch hẹn đã đặt.</p>
                 </a>
 
-                <%-- 6. Link đến Đổi mật khẩu --%>
-                <a href="${pageContext.request.contextPath}/MainController?action=showChangePasswordForm" class="function-card">
+                <%-- 6. Đổi mật khẩu --%>
+                <a href="${pageContext.request.contextPath}/MainController?action=showChangePasswordForm" class="function-card color-admin-security">
                     <div class="icon"><i class="fas fa-key"></i></div>
-                    <span>Đổi mật khẩu</span>
+                    <h4>Đổi mật khẩu</h4>
+                    <p>Thay đổi mật khẩu quản trị của chính bạn.</p>
                 </a>
 
             </div> <%-- End function-grid --%>
-        </div> <%-- End container --%>
+        </div> <%-- End home-content --%>
 
-        <%-- Nhúng Footer --%>
-        <jsp:include page="/WEB-INF/footer.jsp" /> 
+        <%-- Footer --%>
+        <footer class="main-footer">
+            <div class="container">
+                <jsp:include page="/WEB-INF/footer.jsp" /> 
+            </div>
+        </footer>
+
+        <%-- (Tôi đã xóa bớt 1 thẻ </div> thừa ở đây so với file gốc của bạn) --%>
+
+        <%-- ✨ 3. THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+        <%-- ✨ 4. LINK TỚI FILE JS (Sẽ cập nhật ở Bước 3) --%>
+        <script src="<c:url value='/js/index.js'/>"></script>
 
     </body>
 </html>

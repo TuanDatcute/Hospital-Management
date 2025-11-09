@@ -1,0 +1,290 @@
+/*
+ * =========================================
+ * FILE: admin-list.css (V1.0 - Cho các trang danh sách)
+ * (Đã dọn sạch code của Dashboard Admin)
+ * =========================================
+ */
+
+/* 1. BIẾN MÀU (Chung cho các trang danh sách) */
+:root {
+    --primary-color: #5d5dff;
+    --primary-light: #f0f0ff;
+    --text-dark: #333333;
+    --text-medium: #555555;
+    --text-light: #777777;
+    --bg-light: #f8f9fa;
+    --bg-white: #ffffff;
+    --border-color: #eeeeee;
+    --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+    --color-blue: #007bff;
+    --color-blue-light: #e6f2ff;
+    --color-green: #28a745;
+    --color-green-light: #eaf6ec;
+    --color-orange: #fd7e14;
+    --color-orange-light: #fff2e7;
+    --color-red: #dc3545;
+    --color-red-light: #fbebee;
+
+    /* (Code CSS cho Admin Dashboard đã được chuyển sang home.css) */
+}
+
+/* 2. LAYOUT TRANG CHUNG */
+body {
+    background-color: var(--bg-light);
+    background-attachment: fixed;
+}
+
+/* Ghi đè class .page-content từ index.css */
+.page-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 15px 60px 15px;
+    min-height: calc(100vh - 150px); /* Đẩy footer xuống */
+}
+
+/* 3. TIÊU ĐỀ (Giống trang home) */
+.section-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 30px; /* Tăng khoảng cách */
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--primary-color);
+    display: inline-block;
+    text-align: left;
+}
+
+/* 4. THANH CÔNG CỤ (Nút Thêm + Tìm kiếm) */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap; /* Cho responsive */
+    gap: 20px;
+}
+
+/* Nút Thêm mới (dùng màu xanh lá) */
+.add-new-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--color-green);
+    color: var(--bg-white);
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+.add-new-btn:hover {
+    background-color: #218838; /* Xanh lá đậm hơn */
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+/* Ô tìm kiếm */
+.search-container {
+    margin: 0; /* Bỏ margin cũ */
+}
+.search-container form {
+    display: flex;
+    align-items: center;
+}
+.search-container input[type="text"] {
+    font-family: var(--font-primary);
+    font-size: 0.95rem;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px 0 0 8px;
+    width: 300px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.search-container input[type="text"]:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+.search-container button {
+    padding: 12px 15px;
+    border: none;
+    background-color: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    border-radius: 0 8px 8px 0;
+    margin-left: -1px; /* Ghép nút vào input */
+    transition: background-color 0.3s ease;
+}
+.search-container button:hover {
+    background-color: #4a4aff; /* Tím đậm hơn */
+}
+
+/* 5. BẢNG DỮ LIỆU HIỆN ĐẠI */
+.data-table {
+    width: 100%;
+    border-collapse: separate; /* Quan trọng để dùng border-radius */
+    border-spacing: 0;
+    margin-top: 0;
+    background-color: var(--bg-white);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden; /* Giúp bo góc hoạt động */
+    border: 1px solid var(--border-color);
+}
+
+.data-table th,
+.data-table td {
+    padding: 15px 18px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Tiêu đề bảng */
+.data-table th {
+    background-color: var(--bg-light); /* Nền xám nhạt */
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Các dòng dữ liệu */
+.data-table td {
+    font-size: 0.95rem;
+    color: var(--text-medium);
+}
+
+/* Bỏ viền ở dòng cuối */
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Hiệu ứng hover trên dòng */
+.data-table tbody tr:hover {
+    background-color: var(--primary-light);
+}
+
+/* Cột hành động */
+.data-table .actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.data-table .actions a,
+.data-table .actions button {
+    text-decoration: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+.data-table .actions a:hover,
+.data-table .actions button:hover {
+    transform: scale(1.2);
+}
+
+.data-table .actions .edit-btn {
+    color: var(--color-blue);
+}
+.data-table .actions .delete-btn {
+    color: var(--color-red);
+}
+
+/* Thông báo rỗng */
+.data-table .empty-cell {
+    text-align: center;
+    color: var(--text-light);
+    font-style: italic;
+    padding: 30px;
+}
+
+/* 6. PHÂN TRANG (PAGINATION) */
+.pagination-container {
+    margin-top: 30px;
+    text-align: center;
+}
+.pagination-btn {
+    display: inline-block;
+    padding: 10px 18px;
+    margin: 0 5px;
+    background-color: var(--bg-white);
+    color: var(--primary-color);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+.pagination-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 10px rgba(93, 93, 255, 0.3);
+}
+
+/* Nút bị vô hiệu hóa */
+.pagination-btn.disabled {
+    background-color: var(--bg-light);
+    color: #aaa;
+    cursor: not-allowed;
+    border-color: var(--border-color);
+}
+.pagination-btn.disabled:hover {
+    background-color: var(--bg-light);
+    color: #aaa;
+    box-shadow: none;
+}
+
+/* Thông tin trang */
+.pagination-info {
+    margin: 0 10px;
+    font-size: 1rem;
+    color: var(--text-medium);
+    vertical-align: middle;
+}
+
+/*
+ * =========================================
+ * 7. (BỔ SUNG) TAG TRẠNG THÁI (Cho trang Lịch Hẹn & Tài Khoản)
+ * =========================================
+ */
+.status {
+    padding: 5px 12px;
+    border-radius: 20px; /* Bo tròn như viên thuốc */
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Hoàn thành / Hoạt động (Xanh lá) */
+.status-completed {
+    background-color: var(--color-green-light);
+    color: var(--color-green);
+}
+
+/* Đã xác nhận (Xanh dương) */
+.status-confirmed {
+    background-color: var(--color-blue-light);
+    color: var(--color-blue);
+}
+
+/* Chờ xác nhận (Vàng) */
+.status-pending {
+    background-color: var(--color-orange-light);
+    color: var(--color-orange);
+}
+
+/* Đã hủy / Đã khóa (Đỏ) */
+.status-cancelled {
+    background-color: var(--color-red-light);
+    color: var(--color-red);
+}
+

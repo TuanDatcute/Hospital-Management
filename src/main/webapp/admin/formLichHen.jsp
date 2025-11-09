@@ -13,14 +13,22 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Tạo Lịch hẹn Mới</title>
 
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+        <%-- ✨ ÉP TẢI LẠI CSS PHIÊN BẢN MỚI NHẤT --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css?v=1.5">
 
         <%-- Trang này sử dụng các class: .data-form, .form-group, .btn-submit, .btn-cancel --%>
     </head>
     <body>
 
-        <jsp:include page="/WEB-INF/header.jsp" /> 
+        <jsp:include page="/WEB-INF/headerDat.jsp" /> 
 
         <div class="container page-content" style="padding-top: 30px;">
 
@@ -49,7 +57,7 @@
                         <%-- Lặp qua danh sách bệnh nhân (do LichHenController tải) --%>
                         <c:forEach var="bn" items="${requestScope.LIST_BENHNHAN}">
                             <option value="${bn.id}" ${requestScope.LICHHEN_DATA.benhNhanId == bn.id ? 'selected' : ''}>
-                            <c:out value="${bn.hoTen}" /> (Mã: ${bn.maBenhNhan})
+                                <c:out value="${bn.hoTen}" /> (Mã: ${bn.maBenhNhan})
                             </option>
                         </c:forEach>
                     </select>
@@ -65,7 +73,7 @@
                         <%-- Lặp qua danh sách bác sĩ (do LichHenController tải) --%>
                         <c:forEach var="bs" items="${requestScope.LIST_BACSI}">
                             <option value="${bs.id}" ${requestScope.LICHHEN_DATA.bacSiId == bs.id ? 'selected' : ''}>
-                            <c:out value="${bs.hoTen}" /> (Chuyên môn: ${bs.chuyenMon})
+                                <c:out value="${bs.hoTen}" /> (Chuyên môn: ${bs.chuyenMon})
                             </option>
                         </c:forEach>
                     </select>
@@ -104,7 +112,19 @@
 
         </div>
 
-        <jsp:include page="/WEB-INF/footer.jsp" /> 
+        <%-- Footer --%>
+        <footer class="main-footer">
+            <div class="container">
+                <jsp:include page="/WEB-INF/footer.jsp" /> 
+            </div>
+        </footer>
+    </div> 
 
-    </body>
+    <%-- ✨ 3. THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <%-- ✨ 4. LINK TỚI FILE JS (Sẽ cập nhật ở Bước 3) --%>
+    <script src="<c:url value='/js/index.js'/>"></script>
+
+</body>
 </html>

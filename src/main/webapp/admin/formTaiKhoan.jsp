@@ -1,8 +1,8 @@
 <%--
-    Document   : formTaiKhoan.jsp (Đã đơn giản hóa cho Admin)
-    Created on : Oct 29, 2025
-    Author     : ADMIN
-    (Đã merge/gỡ rối logic 'hidden fields' và 'removed fields')
+    Document    : formTaiKhoan.jsp (Đã đơn giản hóa cho Admin)
+    Created on  : Oct 29, 2025
+    Author      : ADMIN
+    (ĐÃ NÂNG CẤP: Giao diện V2.1 - Tách file admin-form.css)
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -16,19 +16,30 @@
         <c:set var="isCreating" value="${requestScope.formAction == 'createUser'}" />
         <title>${isCreating ? 'Thêm Tài khoản' : 'Cập nhật Tài khoản'}</title>
 
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+        <%-- CSS Chung --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css?v=1.5">
+
+        <%-- ✨ LIÊN KẾT TỚI FILE CSS CHO FORM MỚI ✨ --%>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/admin-form.css?v=1.0">
     </head>
     <body>
 
-        <jsp:include page="/WEB-INF/header.jsp" /> 
+        <jsp:include page="/WEB-INF/headerDat.jsp" /> 
 
         <div class="container page-content" style="padding-top: 30px;">
 
             <h2 class="section-title">
                 <c:if test="${isCreating}">Thêm Tài khoản Nhân viên</c:if>
                 <c:if test="${!isCreating}">Cập nhật Trạng thái Tài khoản</c:if>
-            </h2>
+                </h2>
 
             <c:if test="${not empty requestScope.ERROR_MESSAGE}">
                 <p class="error-message">${requestScope.ERROR_MESSAGE}</p>
@@ -47,18 +58,18 @@
                     <label for="tenDangNhap">Tên đăng nhập:</label>
                     <input type="text" id="tenDangNhap" name="tenDangNhap" 
                            value="<c:out value="${requestScope.USER_DATA.tenDangNhap}"/>" 
-                           ${!isCreating ? 'readonly' : ''} 
+                           ${!isCreating ? 'readonly class="disabled-input"' : ''} 
                            required="required">
                 </div>
-                
+
                 <%-- **MERGE:** Giữ lại ô Email (Tùy chọn) --%>
                 <div class="form-group">
                     <label for="email">Email (Tùy chọn):</label>
                     <input type="email" id="email" name="email" 
                            value="<c:out value="${requestScope.USER_DATA.email}"/>" 
-                           ${!isCreating ? 'readonly' : ''}>
+                           ${!isCreating ? 'readonly class="disabled-input"' : ''}>
                 </div>
-                
+
                 <%-- Chỉ hiển thị ô nhập mật khẩu KHI TẠO MỚI --%>
                 <c:if test="${isCreating}">
                     <div class="form-group">
@@ -70,7 +81,7 @@
                 <div class="form-group">
                     <label for="vaiTro">Vai trò:</label>
                     <%-- **MERGE:** Giữ logic 'disabled' khi CẬP NHẬT --%>
-                    <select id="vaiTro" name="vaiTro" ${!isCreating ? 'disabled' : ''}>
+                    <select id="vaiTro" name="vaiTro" ${!isCreating ? 'disabled' : ''} class="${!isCreating ? 'disabled-input' : ''}">
                         <%-- Giới hạn lại vai trò --%>
                         <option value="BAC_SI" ${requestScope.USER_DATA.vaiTro == 'BAC_SI' ? 'selected' : ''}>Bác sĩ</option>
                         <option value="LE_TAN" ${requestScope.USER_DATA.vaiTro == 'LE_TAN' ? 'selected' : ''}>Lễ tân</option>
@@ -99,7 +110,18 @@
 
         </div>
 
-        <jsp:include page="/WEB-INF/footer.jsp" /> 
+        <%-- Footer --%>
+        <footer class="main-footer">
+            <div class="container">
+                <jsp:include page="/WEB-INF/footer.jsp" /> 
+            </div>
+        </footer>
+
+        <%-- ✨ 3. THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+        <%-- ✨ 4. LINK TỚI FILE JS (Sẽ cập nhật ở Bước 3) --%>
+        <script src="<c:url value='/js/index.js'/>"></script>
 
     </body>
 </html>

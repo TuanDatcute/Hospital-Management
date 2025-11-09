@@ -35,7 +35,7 @@
                     </a>
                 </c:when>
                 <c:when test="${sessionScope.ROLE == 'BENH_NHAN'}">
-                    <a href="${pageContext.request.contextPath}/home.jsp" class="home-link" title="Quay về Trang chủ">
+                    <a href="${pageContext.request.contextPath}/index.jsp" class="home-link" title="Quay về Trang chủ">
                         <i class="fas fa-home"></i>
                     </a>
                 </c:when>
@@ -45,6 +45,7 @@
                     </a>
                 </c:otherwise>
             </c:choose>
+            
 
             <%-- **SỬA LẠI: Dùng <h1> thay vì <h2>.section-title** --%>
             <h1>Đổi mật khẩu</h1>

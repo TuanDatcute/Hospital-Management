@@ -1,0 +1,394 @@
+/*
+ * =========================================
+ * FILE: home.css (V2.2 - Gộp Dashboard User & Admin)
+ * =========================================
+ */
+
+/* 1. BIẾN MÀU (Chung cho cả 2 Dashboard) */
+:root {
+    /* (Biến màu của User) */
+    --primary-color: #5d5dff; /* Xanh tím đậm */
+    --primary-light: #f0f0ff; /* Xanh tím nhạt cho nền */
+    --text-dark: #333333;
+    --text-medium: #555555;
+    --text-light: #777777;
+    --bg-light: #f8f9fa; /* Nền trang (thay vì #ffffff) */
+    --bg-white: #ffffff;
+    --border-color: #eeeeee;
+    --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+    --color-blue: #007bff;
+    --color-blue-light: #e6f2ff;
+    --color-green: #28a745;
+    --color-green-light: #eaf6ec;
+    --color-orange: #fd7e14;
+    --color-orange-light: #fff2e7;
+    --color-red: #dc3545;
+    --color-red-light: #fbebee;
+
+    /* ✨ BIẾN MÀU MỚI CHO ADMIN (ĐÃ THÊM VÀO ĐÂY) ✨ */
+    --color-admin-red: #d9534f;
+    --color-admin-red-light: #fcf0f0;
+    --color-admin-blue: #0275d8;
+    --color-admin-blue-light: #e6f1fc;
+    --color-admin-teal: #5bc0de;
+    --color-admin-teal-light: #f0f9fc;
+    --color-admin-yellow: #f0ad4e;
+    --color-admin-yellow-light: #fef8f0;
+    --color-admin-grey: #6c757d;
+    --color-admin-grey-light: #f1f2f3;
+    
+    /* ✨ BIẾN MÀU MỚI CHO NHÂN VIÊN (Bác sĩ/Lễ tân) ✨ */
+    --color-staff-teal: #20c997;
+    --color-staff-teal-light: #e9f9f5;
+    --color-staff-indigo: #6610f2;
+    --color-staff-indigo-light: #f0e7fe;
+    --color-staff-blue: #0d6efd;
+    --color-staff-blue-light: #e7f0ff;
+    /* (Chúng ta sẽ tái sử dụng màu xám của Admin cho "Đổi mật khẩu") */
+}
+
+/* 2. THIẾT KẾ LẠI NỀN VÀ TRANG (Chung) */
+body {
+    background-color: var(--bg-light);
+    background-attachment: fixed;
+}
+
+.home-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 15px 60px 15px;
+}
+
+/* 3. LỜI CHÀO (Chung) */
+.section-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--primary-color);
+    display: inline-block;
+    text-align: left;
+}
+
+.home-welcome-message {
+    font-size: 1.1rem;
+    color: var(--text-medium);
+    margin-bottom: 40px;
+    background-color: var(--bg-white);
+    padding: 20px 25px;
+    border-radius: 12px;
+    border-left: 5px solid var(--primary-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.home-welcome-message strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* 4. LƯỚI CHỨC NĂNG (Chung) */
+.function-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+/* 5. THẺ CHỨC NĂNG (Style chung) */
+.function-card {
+    background-color: var(--bg-white);
+    border-radius: 16px;
+    padding: 30px 25px;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 6. ICON BÊN TRONG THẺ (Style chung) */
+.function-card .icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+}
+
+/* 7. CHỮ (Style chung) */
+.function-card h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0 0 10px 0;
+    transition: color 0.3s ease;
+}
+
+.function-card p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* * ===================================
+ * ✨ NÂNG CẤP: (Phần 1 & 2 - Color Coding cho USER)
+ * ===================================
+ */
+
+/* Thẻ "Hồ sơ" (Màu Tím - Mặc định) */
+.function-card.color-profile .icon {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+}
+.function-card.color-profile:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(93, 93, 255, 0.2);
+}
+.function-card.color-profile:hover .icon {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(93, 93, 255, 0.5);
+}
+.function-card.color-profile:hover h4 {
+    color: var(--primary-color);
+}
+
+/* Thẻ "Lịch sử" (Màu Xanh dương) */
+.function-card.color-history .icon {
+    background-color: var(--color-blue-light);
+    color: var(--color-blue);
+}
+.function-card.color-history:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(0, 123, 255, 0.2);
+}
+.function-card.color-history:hover .icon {
+    background-color: var(--color-blue);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(0, 123, 255, 0.5);
+}
+.function-card.color-history:hover h4 {
+    color: var(--color-blue);
+}
+
+/* Thẻ "Đặt lịch" (Màu Xanh lá) */
+.function-card.color-appoint .icon {
+    background-color: var(--color-green-light);
+    color: var(--color-green);
+}
+.function-card.color-appoint:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(40, 167, 69, 0.2);
+}
+.function-card.color-appoint:hover .icon {
+    background-color: var(--color-green);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(40, 167, 69, 0.5);
+}
+.function-card.color-appoint:hover h4 {
+    color: var(--color-green);
+}
+
+/* Thẻ "Bảo mật" (Màu Cam) */
+.function-card.color-security .icon {
+    background-color: var(--color-orange-light);
+    color: var(--color-orange);
+}
+.function-card.color-security:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(253, 126, 20, 0.2);
+}
+.function-card.color-security:hover .icon {
+    background-color: var(--color-orange);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(253, 126, 20, 0.5);
+}
+.function-card.color-security:hover h4 {
+    color: var(--color-orange);
+}
+
+
+/*
+ * ===================================
+ * ✨ NÂNG CẤP: (Phần 3 - Color Coding cho ADMIN - ĐÃ DÁN VÀO ĐÂY)
+ * ===================================
+ */
+
+/* Thẻ "Quản lý Tài khoản" (Màu Đỏ) */
+.function-card.color-admin-user .icon {
+    background-color: var(--color-admin-red-light);
+    color: var(--color-admin-red);
+}
+.function-card.color-admin-user:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(217, 83, 79, 0.2);
+}
+.function-card.color-admin-user:hover .icon {
+    background-color: var(--color-admin-red);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(217, 83, 79, 0.5);
+}
+.function-card.color-admin-user:hover h4 {
+    color: var(--color-admin-red);
+}
+
+/* Thẻ "Quản lý Khoa" (Màu Vàng) */
+.function-card.color-admin-khoa .icon {
+    background-color: var(--color-admin-yellow-light);
+    color: var(--color-admin-yellow);
+}
+.function-card.color-admin-khoa:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(240, 173, 78, 0.2);
+}
+.function-card.color-admin-khoa:hover .icon {
+    background-color: var(--color-admin-yellow);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(240, 173, 78, 0.5);
+}
+.function-card.color-admin-khoa:hover h4 {
+    color: var(--color-admin-yellow);
+}
+
+/* Thẻ "Quản lý Nhân viên" (Màu Teal) */
+.function-card.color-admin-nhanvien .icon {
+    background-color: var(--color-admin-teal-light);
+    color: var(--color-admin-teal);
+}
+.function-card.color-admin-nhanvien:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(91, 192, 222, 0.2);
+}
+.function-card.color-admin-nhanvien:hover .icon {
+    background-color: var(--color-admin-teal);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(91, 192, 222, 0.5);
+}
+.function-card.color-admin-nhanvien:hover h4 {
+    color: var(--color-admin-teal);
+}
+
+/* Thẻ "Quản lý Bệnh nhân" (Màu Xanh dương) */
+.function-card.color-admin-benhnhan .icon {
+    background-color: var(--color-admin-blue-light);
+    color: var(--color-admin-blue);
+}
+.function-card.color-admin-benhnhan:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(2, 117, 216, 0.2);
+}
+.function-card.color-admin-benhnhan:hover .icon {
+    background-color: var(--color-admin-blue);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(2, 117, 216, 0.5);
+}
+.function-card.color-admin-benhnhan:hover h4 {
+    color: var(--color-admin-blue);
+}
+
+/* Thẻ "Quản lý Lịch hẹn" (Màu Xanh lá - Lấy từ Bệnh nhân) */
+.function-card.color-admin-lichhen .icon {
+    background-color: var(--color-green-light);
+    color: var(--color-green);
+}
+.function-card.color-admin-lichhen:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(40, 167, 69, 0.2);
+}
+.function-card.color-admin-lichhen:hover .icon {
+    background-color: var(--color-green);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(40, 167, 69, 0.5);
+}
+.function-card.color-admin-lichhen:hover h4 {
+    color: var(--color-green);
+}
+
+/* Thẻ "Đổi mật khẩu" (Màu Xám) */
+.function-card.color-admin-security .icon {
+    background-color: var(--color-admin-grey-light);
+    color: var(--color-admin-grey);
+}
+.function-card.color-admin-security:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(108, 117, 125, 0.2);
+}
+.function-card.color-admin-security:hover .icon {
+    background-color: var(--color-admin-grey);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(108, 117, 125, 0.5);
+}
+.function-card.color-admin-security:hover h4 {
+    color: var(--color-admin-grey);
+}
+
+/*
+ * ===================================
+ * ✨ NÂNG CẤP: (Phần 4 - Color Coding cho NHÂN VIÊN)
+ * ===================================
+ */
+
+/* Thẻ "Quản lý Lịch hẹn" (Màu Tím Indigo) */
+.function-card.color-staff-lichhen .icon {
+    background-color: var(--color-staff-indigo-light);
+    color: var(--color-staff-indigo);
+}
+.function-card.color-staff-lichhen:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(102, 16, 242, 0.2);
+}
+.function-card.color-staff-lichhen:hover .icon {
+    background-color: var(--color-staff-indigo);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(102, 16, 242, 0.5);
+}
+.function-card.color-staff-lichhen:hover h4 {
+    color: var(--color-staff-indigo);
+}
+
+/* Thẻ "Tạo Phiếu khám" (Màu Xanh Teal) */
+.function-card.color-staff-phieukham .icon {
+    background-color: var(--color-staff-teal-light);
+    color: var(--color-staff-teal);
+}
+.function-card.color-staff-phieukham:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(32, 201, 151, 0.2);
+}
+.function-card.color-staff-phieukham:hover .icon {
+    background-color: var(--color-staff-teal);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(32, 201, 151, 0.5);
+}
+.function-card.color-staff-phieukham:hover h4 {
+    color: var(--color-staff-teal);
+}
+
+/* Thẻ "Danh sách Bệnh nhân" (Màu Xanh dương) */
+.function-card.color-staff-benhnhan .icon {
+    background-color: var(--color-staff-blue-light);
+    color: var(--color-staff-blue);
+}
+.function-card.color-staff-benhnhan:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px -5px rgba(13, 110, 253, 0.2);
+}
+.function-card.color-staff-benhnhan:hover .icon {
+    background-color: var(--color-staff-blue);
+    color: var(--bg-white);
+    box-shadow: 0 0 25px 0 rgba(13, 110, 253, 0.5);
+}
+.function-card.color-staff-benhnhan:hover h4 {
+    color: var(--color-staff-blue);
+}
+
+/* * Thẻ "Đổi mật khẩu" sẽ tự động dùng class ".color-admin-security"
+ * mà chúng ta đã định nghĩa ở file trước (màu xám),
+ * vì nó đồng bộ với Admin Dashboard.
+ */
