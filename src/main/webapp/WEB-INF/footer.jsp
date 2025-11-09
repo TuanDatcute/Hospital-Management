@@ -2,10 +2,10 @@
 <%@ page pageEncoding="UTF-8" %>
 
 <div class="footer-column">
-    <h4>Bệnh viện HQĐ</h4>
+    <h4>Bệnh viện HQD</h4>
     <p>Chăm sóc sức khỏe toàn diện với đội ngũ chuyên gia hàng đầu và trang thiết bị y tế hiện đại.</p>
     <div class="social-links">
-        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://www.facebook.com/quang.tran.284839" title="Facebook"><i class="fab fa-facebook-f"></i></a>
         <a href="#" title="Tiktok"><i class="fab fa-tiktok"></i></a>
         <a href="#" title="Youtube"><i class="fab fa-youtube"></i></a>
     </div>
@@ -23,7 +23,7 @@
 <div class="footer-column">
     <h4>Liên hệ</h4>
     <div class="contact-info">
-        <p><i class="fas fa-map-marker-alt"></i> 123 Đường ABC, Quận 1, TP. HCM</p>
+        <p><i class="fas fa-map-marker-alt"></i> Đường Đến Tương Lai, Quận Hiện Tại, TP. HCM</p>
         <p><i class="fas fa-phone-alt"></i> Hotline: 1900 0000</p>
         <p><i class="fas fa-envelope"></i> Email: contact@hqd.com</p>
     </div>

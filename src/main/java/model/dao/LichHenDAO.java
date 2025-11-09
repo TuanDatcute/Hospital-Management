@@ -398,6 +398,47 @@ public class LichHenDAO {
         }
     }
 
+    /**
+     *  Lấy các lịch hẹn CHƯA HOÀN THÀNH, lọc theo NGÀY HẸN và
+     * BÁC SĨ.
+     *
+     * @param date Ngày hẹn (ví dụ: 2025-11-09).
+     * @param bacSiId ID của bác sĩ cần lọc.
+     * @return Danh sách LichHen khớp với cả hai điều kiện.
+     */
+    public List<LichHen> getPendingAppointmentsByDateAndDoctor(LocalDate date, int bacSiId) {
+
+        // 1. Logic tính toán ngày (từ hàm cũ)
+        ZoneOffset zoneOffset = ZoneOffset.of("+07:00");
+        OffsetDateTime startOfDay = date.atStartOfDay().atOffset(zoneOffset);
+        OffsetDateTime endOfDay = date.plusDays(1).atStartOfDay().atOffset(zoneOffset);
+
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+
+            // 2. Logic HQL (đã gộp)
+            Query<LichHen> query = session.createQuery(
+                    "SELECT DISTINCT lh FROM LichHen lh "
+                    + "JOIN FETCH lh.benhNhan "
+                    + "JOIN FETCH lh.bacSi "
+                    // ✨ Gộp 2 điều kiện WHERE lại ✨
+                    + "WHERE lh.bacSi.id = :bacSiId " // Lọc theo bác sĩ
+                    + "AND lh.thoiGianHen >= :start AND lh.thoiGianHen < :end " // Lọc theo ngày
+                    + "AND lh.trangThai NOT IN ('HOAN_THANH', 'DA_DEN_KHAM', 'DA_HUY')", // Lọc trạng thái
+                    LichHen.class
+            );
+
+            // 3. Set cả 3 tham số
+            query.setParameter("bacSiId", bacSiId);
+            query.setParameter("start", startOfDay);
+            query.setParameter("end", endOfDay);
+
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
     public LichHen getByIdAndBenhNhanIdWithRelations(int lichHenId, int benhNhanId) {
         try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "FROM LichHen lh "

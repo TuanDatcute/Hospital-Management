@@ -30,6 +30,7 @@
             })();
         </script>
 
+
     </head>
     <body>
         <c:if test="${not empty LOGIN_USER_INFO and not empty LOGIN_ACCOUNT}">
@@ -74,25 +75,45 @@
                     </c:otherwise>
                 </c:choose>
 
-                <div class="form-grid">
+                <div class="form-grid"
+                     data-lichhen-url="<c:url value='/MainController?action=getAppointmentsByDate&date='/>"
+                     data-patient-url="<c:url value='/MainController?action=searchPatients&keyword='/>">
+
                     <div class="form-group">
                         <label for="maPhieuKham">Mã Phiếu Khám</label>
                         <input type="text" id="maPhieuKham" name="maPhieuKham" class="form-control readonly-input" 
                                value="${empty phieuKham.maPhieuKham ? 'Tự động tạo' : phieuKham.maPhieuKham}" readonly>
+                    </div><div class="form-group">
+                        <label for="bacSiId">Bác sĩ</label>
+                        <c:choose>
+                            <c:when test="${not empty LOGIN_ACCOUNT and LOGIN_ACCOUNT.vaiTro == 'BAC_SI'}">
+                                <input type="text" value="${LOGIN_USER_INFO.hoTen}" class="form-control readonly-input" readonly>
+                                <input type="hidden" name="bacSiId" value="${LOGIN_USER_INFO.id}">
+                            </c:when>
+                            <c:otherwise>
+                                <select id="bacSiId" name="bacSiId" class="form-control" required>
+                                    <option value="">-- Chọn bác sĩ --</option>
+                                    <c:forEach var="bs" items="${danhSachBacSi}">
+                                        <option value="${bs.id}" ${phieuKham.bacSiId == bs.id ? 'selected' : ''}>
+                                            ${bs.hoTen} (${bs.chuyenMon})
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
 
-                    <div class="form-group">
-                        <label for="lichHenId">Lịch Hẹn (nếu có)</label>
-                        <select id="lichHenId" name="lichHenId" class="form-control">
-                            <option value="">-- Chọn từ lịch hẹn chờ --</option>
-                            <c:forEach var="lichHen" items="${danhSachLichHen}">
-                                <option value="${lichHen.id}" 
-                                        ${phieuKham.lichHenId == lichHen.id ? 'selected' : ''}
-                                        data-patient-id="${lichHen.benhNhanId}">
-                                    STT ${lichHen.stt} - ${lichHen.tenBenhNhan} (${lichHen.lyDoKham})
-                                </option>
-                            </c:forEach>
-                        </select>
+                    <div class="form-group appointment-group">
+                        <div class="form-group-inner">
+                            <label for="appointmentDate">Lọc lịch hẹn theo ngày</label>
+                            <input type="date" id="appointmentDate" class="form-control">
+                        </div>
+                        <div class="form-group-inner">
+                            <label for="lichHenId">Lịch Hẹn (nếu có)</label>
+                            <select id="lichHenId" name="lichHenId" class="form-control">
+                                <option value="">-- Chọn ngày để lọc lịch hẹn --</option>
+                            </select>
+                        </div>
                     </div>
 
                     <jsp:useBean id="now" class="java.util.Date" />
@@ -113,17 +134,17 @@
 
 
                     <div class="form-group">
-                        <label for="benhNhanId_select">Bệnh Nhân</label>
+                        <label for="benhNhanDisplay">Bệnh Nhân (*)</label>
                         <c:choose>
-                            <c:when test="${empty phieuKham.id}">                              
-                                <select id="benhNhanId_select" name="benhNhanId_select" class="form-control" required>
-                                    <option value="">-- Chọn bệnh nhân --</option>
-                                    <c:forEach var="bn" items="${danhSachBenhNhan}">
-                                        <option value="${bn.id}" ${phieuKham.benhNhanId == bn.id ? 'selected' : ''}>${bn.hoTen}</option>
-                                    </c:forEach>
-                                </select>
-                                <input type="hidden" id="benhNhanId_hidden" name="benhNhanId" value="${phieuKham.benhNhanId}">
+                            <%-- Cho phép tìm kiếm --%>
+                            <c:when test="${empty phieuKham.id or phieuKham.id == 0}">
+                                <div class="patient-search-trigger">
+                                    <input type="text" id="benhNhanDisplay" class="form-control readonly-input" placeholder="Tìm kiếm bệnh nhân" readonly required>
+                                    <input type="hidden" id="benhNhanId_hidden" name="benhNhanId">
+                                    <button type="button" class="btn btn-primary" id="openPatientSearchModal"><i class="fas fa-search"></i></button>
+                                </div>
                             </c:when>
+                            <%-- CHẾ ĐỘ SỬA: Khóa bệnh nhân --%>
                             <c:otherwise>
                                 <input type="text" value="${phieuKham.tenBenhNhan}" readonly class="form-control readonly-input">
                                 <input type="hidden" name="benhNhanId" value="${phieuKham.benhNhanId}">
@@ -131,25 +152,7 @@
                         </c:choose>
                     </div>
 
-                    <div class="form-group">
-                        <label for="bacSiId">Bác sĩ</label>
-                        <c:choose>
-                            <c:when test="${not empty LOGIN_ACCOUNT and LOGIN_ACCOUNT.vaiTro == 'BAC_SI'}">
-                                <input type="text" value="${LOGIN_USER_INFO.hoTen}" class="form-control readonly-input" readonly>
-                                <input type="hidden" name="bacSiId" value="${LOGIN_USER_INFO.id}">
-                            </c:when>
-                            <c:otherwise>
-                                <select id="bacSiId" name="bacSiId" class="form-control" required>
-                                    <option value="">-- Chọn bác sĩ --</option>
-                                    <c:forEach var="bs" items="${danhSachBacSi}">
-                                        <option value="${bs.id}" ${phieuKham.bacSiId == bs.id ? 'selected' : ''}>
-                                            ${bs.hoTen} (${bs.chuyenMon})
-                                        </option>
-                                    </c:forEach>
-                                </select>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
+
 
                     <div class="form-group">
                         <label for="ngayTaiKham">Ngày Tái Khám</label>
@@ -200,6 +203,27 @@
                     </c:choose>
                 </div>
             </form>
+
+            <div id="patient-modal-overlay" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Tìm Bệnh Nhân</h2>
+                        <button type="button" class="close-button" id="patient-close-button" aria-label="Đóng">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="patientSearchInput">Nhập tên hoặc Mã Bệnh Nhân</label>
+                            <input type="text" id="patientSearchInput" class="form-control" placeholder="Tìm kiếm...">
+                        </div>
+                        <div id="patient-search-results">
+                            <%-- JavaScript sẽ điền kết quả vào đây --%>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="patient-cancel-button" class="btn btn-secondary">Hủy</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <script src="<c:url value='/js/darkmode.js'/>"></script>

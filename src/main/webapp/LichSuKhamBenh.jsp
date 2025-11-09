@@ -8,7 +8,7 @@
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
-        <title>Lịch Sử Khám Bệnh - Bệnh viện HQĐ</title>
+        <title>Lịch Sử Khám Bệnh - Bệnh viện HQD</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

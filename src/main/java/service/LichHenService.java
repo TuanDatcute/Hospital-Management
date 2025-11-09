@@ -410,6 +410,18 @@ public class LichHenService {
         return toDTO(existingLichHen);
     }
 
+    /**
+     * Lấy danh sách lịch hẹn đang chờ của một bác sĩ trong một ngày cụ thể.
+     */
+    public List<LichHenDTO> getPendingAppointments(LocalDate date, int bacSiId) {
+
+        List<LichHen> entities = lichHenDAO.getPendingAppointmentsByDateAndDoctor(date, bacSiId);
+
+        return entities.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
     //===================================================Quang=======================================
     // (KHỐI CODE NÀY ĐƯỢC SAO CHÉP NGUYÊN BẢN TỪ FILE 1 THEO YÊU CẦU)
     // ===================================================
@@ -567,5 +579,6 @@ public class LichHenService {
         }
         return dtos;
     }
+
     // (KẾT THÚC KHỐI CODE CỦA QUANG)
 } // Kết thúc class

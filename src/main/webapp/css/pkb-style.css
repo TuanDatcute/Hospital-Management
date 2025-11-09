@@ -1,12 +1,12 @@
 /* ==========================================================================
    BIẾN TOÀN CỤC & KIỂU DÁNG CHUNG (ĐỒNG BỘ)
    ========================================================================== */
-
 /* 🎨 Chế độ SÁNG */
 :root {
     --primary-color: #4a90e2;
     --success-color: #28a745;
     --danger-color: #dc3545;
+    --edit-color: #8B5CF6;
 
     --bg-color: #f4f7f9;
     --surface-color: #ffffff;
@@ -15,12 +15,12 @@
     --text-secondary: #6c757d;
     --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
 }
-
 /* 🎨 Chế độ TỐI "BẠC ĐEN" */
 html.dark-mode {
     --primary-color: #77A5D9;
     --success-color: #3d8c5a;
     --danger-color: #e57373;
+    --edit-color: #a78bfa;
 
     --bg-color: #121212;
     --surface-color: #1E1E1E;
@@ -29,16 +29,14 @@ html.dark-mode {
     --text-secondary: #888888;
     --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
-
 body {
     font-family: 'Roboto', sans-serif;
     background-color: var(--bg-color);
     margin: 0;
-    padding-top: 60px; /* Khoảng trống cho thanh user bar */
+    /* padding-top: 60px; /* Khoảng trống cho thanh user bar */
     color: var(--text-primary);
     transition: background-color 0.3s, color 0.3s;
 }
-
 /* ==========================================================================
    THANH THÔNG TIN USER (ĐẦU TRANG)
    ========================================================================== */
@@ -56,7 +54,7 @@ body {
     padding: 0 30px;
     z-index: 1001;
 }
-body.dark-mode .user-info-bar {
+html.dark-mode .user-info-bar {
     box-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
 .user-details {
@@ -81,13 +79,13 @@ body.dark-mode .user-info-bar {
     font-size: 0.85rem;
     text-transform: capitalize;
 }
-
 /* ==========================================================================
    LAYOUT FORM CHÍNH
    ========================================================================== */
 .container {
     max-width: 900px;
     margin: 30px auto;
+    margin-top: 80px; /* Thêm margin-top để không bị thanh user-info-bar che */
     padding: 30px 40px;
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
@@ -149,6 +147,37 @@ textarea.form-control {
     color: var(--text-secondary);
 }
 
+/* ✨ CSS MỚI: Khối lọc lịch hẹn */
+.appointment-group {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 25px;
+    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 0;
+}
+.form-group-inner {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ✨ CSS MỚI: Khối tìm kiếm bệnh nhân */
+.patient-search-trigger {
+    display: flex;
+    gap: 10px;
+}
+.patient-search-trigger .readonly-input {
+    cursor: pointer; /* Cho người dùng biết có thể nhấn vào */
+}
+.patient-search-trigger .readonly-input:hover {
+    border-color: var(--primary-color);
+}
+.patient-search-trigger .btn {
+    flex-shrink: 0; /* Không co nút lại */
+}
+
 /* ==========================================================================
    NÚT BẤM
    ========================================================================== */
@@ -159,6 +188,7 @@ textarea.form-control {
     display: flex;
     justify-content: flex-end;
     gap: 15px;
+    grid-column: 1 / -1; /* Đảm bảo nhóm nút luôn ở dưới cùng */
 }
 .btn {
     padding: 10px 20px;
@@ -198,19 +228,17 @@ textarea.form-control {
     background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
     color: var(--danger-color);
 }
-body.dark-mode .alert-danger {
+html.dark-mode .alert-danger {
     color: #f79494;
 }
+
 /* ==========================================================================
-   NÚT GẠT CHUYỂN CHẾ ĐỘ (ĐÃ SỬA LỖI)
+   NÚT GẠT CHUYỂN CHẾ ĐỘ
    ========================================================================== */
 .theme-switch-wrapper {
     position: absolute;
-    top: 25px;
-    right: 30px;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
+    top: 30px;
+    right: 40px;
 }
 .theme-switch {
     display: inline-block;
@@ -238,32 +266,31 @@ body.dark-mode .alert-danger {
 }
 .slider:before {
     background-color: #fff;
-    bottom: 4px;
     content: "";
     height: 22px;
-    left: 4px;
-    position: absolute;
-    transition: .4s;
     width: 22px;
     border-radius: 50%;
-    z-index: 1; /* SỬA 1: Giảm z-index của nút tròn xuống 1 */
+    position: absolute;
+    left: 4px;
+    bottom: 4px;
+    transition: .4s;
+    z-index: 1;
 }
-.sun-icon,
-.moon-icon {
+.sun-icon, .moon-icon {
     font-size: 14px;
-    color: #f39c12;
     transition: opacity 0.4s ease;
-    z-index: 2; /* SỬA 2: Tăng z-index của icon lên 2 để nó nổi lên trên */
-}
-.moon-icon {
-    color: var(--primary-color); /* SỬA 3: Đổi màu icon mặt trăng để thấy được trên nền trắng */
-    opacity: 0;
+    z-index: 2;
 }
 .sun-icon {
+    color: #f39c12;
     opacity: 1;
 }
+.moon-icon {
+    color: #4a90e2;
+    opacity: 0;
+}
 input:checked + .slider {
-    background-color: var(--primary-color);
+    background-color: #555;
 }
 input:checked + .slider:before {
     transform: translateX(30px);
@@ -273,16 +300,133 @@ input:checked + .slider .sun-icon {
 }
 input:checked + .slider .moon-icon {
     opacity: 1;
+    color: #77A5D9;
 }
+
+/* ==========================================================================
+   ✨ CSS MỚI: POPUP TÌM KIẾM BỆNH NHÂN
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(17, 24, 39, 0.6);
+    backdrop-filter: blur(5px);
+    display: none; /* Ẩn mặc định */
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+}
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+    visibility: visible;
+}
+.modal-content {
+    background-color: var(--surface-color);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px; /* Rộng hơn 1 chút để chứa bảng */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+    border: 1px solid var(--border-color);
+    display: flex; /* Cho phép co giãn */
+    flex-direction: column;
+    max-height: 80vh; /* Giới hạn chiều cao */
+}
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+.close-button {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    border: none;
+    background: none;
+}
+.modal-body {
+    padding: 25px;
+    overflow-y: auto; /* Cho phép cuộn nếu kết quả dài */
+}
+.modal-body p {
+    margin-top: 0;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px 20px;
+    border-top: 1px solid var(--border-color);
+    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
+    flex-shrink: 0;
+}
+#patient-search-results {
+    margin-top: 20px;
+    max-height: 300px; /* Giới hạn chiều cao kết quả */
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+/* CSS cho bảng kết quả tìm kiếm */
+.patient-result-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.patient-result-table th, .patient-result-table td {
+    padding: 10px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+.patient-result-table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.patient-result-table tbody tr:hover {
+    background-color: color-mix(in srgb, var(--bg-color) 70%, var(--surface-color));
+}
+.patient-result-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.no-patient-results {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+
 /* ==========================================================================
    RESPONSIVE
    ========================================================================== */
 @media (max-width: 768px) {
     .form-grid {
-        grid-template-columns: 1fr; /* Stack các cột */
+        grid-template-columns: 1fr;
+    }
+    .appointment-group {
+        grid-template-columns: 1fr;
     }
     .container {
         padding: 20px;
+        margin-top: 70px;
     }
     .theme-switch-wrapper {
         top: 20px;

@@ -20,10 +20,23 @@
     flex-direction: column;
     z-index: 1000;
 }
+/* --- 2. Định nghĩa Sidebar (Mở rộng) --- */
+.sidebar-nav {
+    width: 260px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    background-color: var(--surface-color);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
 .sidebar-header {
     padding: 0 15px 0 20px; /* Căn lề cho logo và nút */
     border-bottom: 1px solid var(--border-color);
-    height: 60px;
+    height: 60px; /* Chiều cao cố định cho header */
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -32,17 +45,46 @@
 .sidebar-logo {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px; /* Giảm khoảng cách 1 chút */
     text-decoration: none;
     color: var(--text-primary);
-    font-size: 1.2rem;
+    font-size: 1.1rem; /* Giảm cỡ chữ 1 chút */
     font-weight: 700;
     white-space: nowrap;
     overflow: hidden;
+
+    /* ✨ HIỆU ỨNG KHI HOVER VÀO LOGO ✨ */
+    transition: opacity 0.2s;
 }
-.sidebar-logo i {
+.sidebar-logo:hover {
+    opacity: 0.8;
+}
+
+/* ✨ CSS MỚI CHO THẺ <img> LOGO ✨ */
+.sidebar-logo img {
+    height: 50px; /* Đặt chiều cao cố định cho logo */
+    width: 50px;  /* Đặt chiều rộng cố định */
+    object-fit: contain; /* Đảm bảo ảnh vừa vặn */
+    border-radius: 50%; /* (Tùy chọn) Bo tròn logo */
+}
+
+/* Nút gạt (giữ nguyên) */
+.sidebar-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.sidebar-toggle-btn:hover {
+    background-color: color-mix(in srgb, var(--bg-color) 50%, var(--surface-color));
     color: var(--primary-color);
-    font-size: 1.5rem;
+}
+.sidebar-toggle-btn i {
+    transition: transform 0.3s ease-in-out;
 }
 .sidebar-toggle-btn {
     background: none;

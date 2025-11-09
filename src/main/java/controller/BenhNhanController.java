@@ -66,7 +66,7 @@ public class BenhNhanController extends HttpServlet {
                     url = showBenhNhanEditForm(request);
                     break;
 
-                // --- Logic Bệnh nhân (Giữ nguyên) ---
+                // --- Logic Bệnh nhân ---
                 //=====================Dat===============
                 case "viewMyHistory":
                     url = viewMyHistory(request);
