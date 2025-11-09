@@ -89,22 +89,10 @@ h3 {
     font-size: 0.8rem;
     white-space: nowrap;
 }
-.status-Đã_Hoàn_Thành {
-    background-color: #e0f8e9;
-    color: #1d9a50;
-}
-.status-Chờ_Kết_Quả {
-    background-color: #fff8e0;
-    color: #b48c00;
-}
-.status-Đã_Hủy {
-    background-color: #fbebee;
-    color: #dc3545;
-}
-.status-Mới_Đăng_Ký {
-    background-color: #e7f5ff;
-    color: #007bff;
-}
+.status-Đã_Hoàn_Thành { background-color: #e0f8e9; color: #1d9a50; }
+.status-Chờ_Kết_Quả { background-color: #fff8e0; color: #b48c00; }
+.status-Đã_Hủy { background-color: #fbebee; color: #dc3545; }
+.status-Mới_Đăng_Ký { background-color: #e7f5ff; color: #007bff; }
 
 /* --- Nút Hành Động --- */
 .action-btn {
@@ -123,17 +111,9 @@ h3 {
     width: 32px;
     height: 32px;
 }
-.action-btn:hover {
-    background-color: var(--border-color);
-}
-.action-btn.view:hover {
-    color: var(--primary-color);
-    background-color: var(--primary-light);
-}
-.action-btn.print:hover {
-    color: var(--accent-color);
-    background-color: #e0f7fa;
-}
+.action-btn:hover { background-color: var(--border-color); }
+.action-btn.view:hover { color: var(--primary-color); background-color: var(--primary-light); }
+.action-btn.print:hover { color: var(--accent-color); background-color: #e0f7fa; }
 
 /* --- HÀNG CHI TIẾT (Container data ẩn) --- */
 .details-row-hidden {
@@ -233,27 +213,17 @@ h3 {
     padding: 30px; /* Padding cho nền xám */
     overflow-y: auto;
     background-color: var(--bg-light);
-
+    
     /* ✨ SỬA LỖI: ÁP DỤNG GRID TẠI ĐÂY */
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 25px;
+    gap: 25px; 
 }
 /* Style thanh cuộn */
-.modal-body::-webkit-scrollbar {
-    width: 8px;
-}
-.modal-body::-webkit-scrollbar-track {
-    background: var(--border-color);
-    border-radius: 10px;
-}
-.modal-body::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 10px;
-}
-.modal-body::-webkit-scrollbar-thumb:hover {
-    background: #4a4aff;
-}
+.modal-body::-webkit-scrollbar { width: 8px; }
+.modal-body::-webkit-scrollbar-track { background: var(--border-color); border-radius: 10px; }
+.modal-body::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
+.modal-body::-webkit-scrollbar-thumb:hover { background: #4a4aff; }
 
 
 /* ✨ SỬA LỖI: Style các div con trực tiếp của modal-body */
@@ -262,22 +232,22 @@ h3 {
     border-radius: var(--border-radius-card);
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border-color);
-    overflow: hidden;
+    overflow: hidden; 
 }
 
 /* ✨ SỬA LỖI: Style các thẻ <strong> bên trong */
 #modalBody > div > strong {
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 600; 
     color: var(--primary-color) !important; /* Màu tím */
-    margin: 0;
+    margin: 0; 
     display: block;
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 15px 20px;
+    padding: 15px 20px; 
     border-bottom: 1px solid var(--border-color);
-    background-color: var(--primary-light);
+    background-color: var(--primary-light); 
 }
 #modalBody > div > strong::before {
     font-family: "Font Awesome 6 Free";
@@ -302,7 +272,7 @@ h3 {
     overflow: hidden;
     box-shadow: none;
 }
-.mini-table th,
+.mini-table th, 
 .mini-table td {
     border: none;
     border-bottom: 1px solid var(--border-color);
@@ -329,12 +299,8 @@ h3 {
    RESPONSIVE (Đã cập nhật)
    ========================================================================== */
 @media (max-width: 768px) {
-    h1 {
-        font-size: 2rem;
-    }
-    h3 {
-        font-size: 1rem;
-    }
+    h1 { font-size: 2rem; }
+    h3 { font-size: 1rem; }
     .data-table {
         box-shadow: none;
         border-radius: 0;
@@ -343,7 +309,7 @@ h3 {
         padding: 10px 12px;
         font-size: 0.9rem;
     }
-
+    
     /* Responsive cho Modal */
     .modal-header {
         padding: 15px 20px;
@@ -352,12 +318,12 @@ h3 {
         padding: 20px;
         /* ✨ SỬA LỖI: Chuyển 1 cột trên mobile */
         grid-template-columns: 1fr;
-        gap: 25px;
+        gap: 25px; 
     }
-
+    
     .details-content {
         /* Chuyển 1 cột trên mobile */
         grid-template-columns: 1fr;
-        gap: 25px;
+        gap: 25px; 
     }
 }

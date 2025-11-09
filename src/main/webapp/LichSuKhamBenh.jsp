@@ -12,12 +12,13 @@
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css?v=1.2">
-        <link rel="stylesheet" type="text/css" href="<c:url value='/css/lichSuKhamBenh.css'/>?v=1.4">    </head>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="<c:url value='/css/index.css'/>?v=1.4">
+        <link rel="stylesheet" type="text/css" href="<c:url value='/css/lichSuKhamBenh.css'/>?v=1.4">
+    </head>
     <body>
 
         <%-- 1. Thêm Header --%>
@@ -207,5 +208,10 @@
 
             });
         </script>
+        <%-- ✨ 3. THÊM THƯ VIỆN SWIPER.JS (Bắt buộc) --%>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+        <%-- ✨ 4. LINK TỚI FILE JS (Sẽ cập nhật ở Bước 3) --%>
+        <script src="<c:url value='/js/index.js'/>"></script>
     </body>
 </html>
