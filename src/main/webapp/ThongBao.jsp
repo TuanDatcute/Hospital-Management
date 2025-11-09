@@ -18,13 +18,21 @@
         <link rel="stylesheet" href="<c:url value='/css/StyleChungCuaQuang.css'/>"> 
         <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+       
+        <link rel="stylesheet" href="<c:url value='/css/index.css'/>">
+        <script src="<c:url value='/js/index.js'/>"></script>
+
+
         <%-- (MỚI) Nhúng file CSS cụ thể cho trang này SAU --%>
         <link rel="stylesheet" href="<c:url value='/css/ThongBao.css'/>">
 
         <script src="<c:url value='/js/darkmodeQuang.js'/>" defer></script>
     </head>
     <body>
-        <jsp:include page="/WEB-INF/header.jsp" /> 
+        <jsp:include page="/WEB-INF/headerDat.jsp" />
 
         <%-- Bọc toàn bộ trang trong .container --%>
         <div class="container">
@@ -178,6 +186,5 @@
         <%-- Bước 2: Tải file JS logic (defer để chạy sau khi DOM tải) --%>
         <script src="<c:url value='/js/ThongBao.js'/>" defer></script>
 
-        <jsp:include page="/WEB-INF/footer.jsp" /> 
     </body>
 </html>
