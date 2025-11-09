@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import model.Entity.TaiKhoan;
+import model.dto.TaiKhoanDTO;
 
 /**
  * Filter này kiểm soát việc xác thực (Authentication) và phân quyền
@@ -115,10 +116,10 @@ public class AuthFilter implements Filter {
         }
 
         // 2. Kiểm tra xem đã đăng nhập chưa
-        TaiKhoan user = null; 
+        TaiKhoanDTO user = null; 
         if (session != null) {
             // Lấy "USER" từ session
-            user = (TaiKhoan) session.getAttribute("USER");
+            user = (TaiKhoanDTO) session.getAttribute("USER");
         }
 
         if (user == null) {
