@@ -5,12 +5,13 @@ body {
     color: #333;
     margin: 0;
     padding: 0;
+    padding-top: 70px;
 }
 
 /* Container chính bọc nội dung */
 .page-container {
     max-width: 1200px;
-    margin: 20px auto; /* Căn giữa và tạo khoảng cách với header */
+    margin: 0 auto 20px auto;
     padding: 30px;
     background-color: #fff; /* Nền trắng cho khu vực nội dung */
     border-radius: 8px;

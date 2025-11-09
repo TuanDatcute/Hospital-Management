@@ -28,7 +28,7 @@ public class UserController extends HttpServlet {
 
     // (Các hằng số JSP giữ nguyên từ Bản 1)
     private static final String LOGIN_PAGE = "login.jsp";
-    private static final String HOME_PAGE = "home.jsp";
+    private static final String HOME_PAGE = "index.jsp";
     private static final String ADMIN_DASHBOARD_PAGE = "admin/dashboard.jsp";
     private static final String STAFF_DASHBOARD_PAGE = "staff/dashboard.jsp";
     private static final String USER_LIST_PAGE = "admin/danhSachTaiKhoan.jsp";
@@ -359,7 +359,7 @@ public class UserController extends HttpServlet {
         if (session != null) {
             session.invalidate();
         }
-        return LOGIN_PAGE;
+        return "index.jsp";
     }
 
     private String showUserEditForm(HttpServletRequest request) throws Exception {
