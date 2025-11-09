@@ -1,0 +1,147 @@
+/*
+ * =========================================
+ * FILE: home.css (V2 - Thiết kế Dashboard dọc)
+ * =========================================
+ */
+
+/* 1. BIẾN MÀU (Lấy từ file MEDIKEL của bạn)
+ * (Nếu bạn chưa import, hãy copy :root từ file style.css
+ * hoặc thay thế các biến --var() bên dưới bằng mã màu)
+ */
+:root {
+    /* (Giả sử các màu này đã có từ file style.css) */
+    --primary-color: #5d5dff; /* Xanh tím đậm */
+    --primary-light: #f0f0ff; /* Xanh tím nhạt cho nền */
+    --text-dark: #333333;
+    --text-medium: #555555;
+    --text-light: #777777;
+    --bg-light: #f8f9fa; /* Nền trang (thay vì #ffffff) */
+    --bg-white: #ffffff;
+    --border-color: #eeeeee;
+    --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.05);
+    --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* 2. THIẾT KẾ LẠI NỀN VÀ TRANG */
+body {
+    /* Nền màu xám siêu nhạt, sạch sẽ */
+    background-color: var(--bg-light);
+    background-attachment: fixed;
+}
+
+.home-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 15px 60px 15px; /* Thêm padding dưới */
+}
+
+/* 3. LỜI CHÀO (Giống ảnh 2) */
+.section-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--primary-color);
+    display: inline-block;
+    text-align: left; /* Tiêu đề căn trái */
+}
+
+.home-welcome-message {
+    font-size: 1.1rem;
+    color: var(--text-medium);
+    margin-bottom: 40px;
+    background-color: var(--bg-white);
+    padding: 20px 25px;
+    border-radius: 12px;
+    border-left: 5px solid var(--primary-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.home-welcome-message strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* 4. LƯỚI CHỨC NĂNG (GRID) */
+.function-grid {
+    display: grid;
+    /* * Tự động chia cột:
+     * - Tối thiểu 300px
+     * - Tối đa 1fr (chia đều)
+     * -> Tự động 3 cột trên PC, 2 cột trên Tablet, 1 cột trên Mobile
+    */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px; /* Khoảng cách giữa các thẻ */
+}
+
+/* 5. THẺ CHỨC NĂNG (PHẦN "LỘT XÁC")
+ * Đây là CSS cho layout dọc giống ảnh 1
+ */
+.function-card {
+    background-color: var(--bg-white);
+    border-radius: 16px; /* Bo tròn nhiều hơn */
+    padding: 30px 25px;
+    text-align: center; /* Căn giữa mọi thứ */
+    text-decoration: none;
+
+    border: 1px solid var(--border-color); /* Viền mỏng tinh tế */
+    box-shadow: var(--shadow-sm); /* Bóng đổ nhẹ */
+
+    /* Hiệu ứng "Độc đáo" */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 6. ICON BÊN TRONG THẺ (Giống ảnh 1) */
+.function-card .icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+
+    background-color: var(--primary-light); /* Nền tím nhạt */
+    color: var(--primary-color); /* Icon màu tím đậm */
+
+    display: inline-flex; /* Dùng để căn icon vào giữa vòng tròn */
+    align-items: center;
+    justify-content: center;
+
+    font-size: 2.5rem; /* Kích thước icon */
+    margin-bottom: 25px; /* Khoảng cách tới chữ */
+
+    transition: all 0.3s ease;
+}
+
+/* 7. CHỮ (TIÊU ĐỀ VÀ MÔ TẢ) (Giống ảnh 1) */
+.function-card h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0 0 10px 0;
+    transition: color 0.3s ease;
+}
+
+.function-card p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* 8. HIỆU ỨNG "ĐỘC ĐÁO" KHI DI CHUỘT (HOVER) */
+.function-card:hover {
+    transform: translateY(-8px); /* Nhấc thẻ lên */
+    box-shadow: var(--shadow); /* Bóng đổ đậm hơn (từ MEDIKEL) */
+}
+
+.function-card:hover .icon {
+    /* Đảo màu icon */
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+
+    /* Hiệu ứng "Glow" (Phát sáng) độc đáo */
+    box-shadow: 0 0 25px 0 rgba(93, 93, 255, 0.5); /* (Đây là màu --primary-color) */
+}
+
+.function-card:hover h4 {
+    color: var(--primary-color); /* Đổi màu tiêu đề khi hover */
+}
