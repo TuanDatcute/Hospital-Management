@@ -7,6 +7,7 @@
         <title>Chi tiết Hóa đơn ${invoice.maHoaDon}</title>
         <%-- THÊM: Liên kết đến tệp CSS chi tiết --%>
         <link rel="stylesheet" href="css/ChiTietHoaDon.css">
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
         <%-- THÊM: Liên kết đến tệp js chi tiết --%>
         <script src="js/ChiTietHoaDon.js"></script>
         <%-- TÙY CHỌN: Bạn cũng có thể liên kết CSS chung ở đây

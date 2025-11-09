@@ -16,6 +16,7 @@
         <link rel="stylesheet" href="<c:url value='/css/_sidebar.css'/>">
         <link rel="stylesheet" href="css/GiuongBenh.css">
         <link rel="stylesheet" href="css/StyleChungCuaQuang.css">
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
         <script src="<c:url value='/js/darkmodeQuang.js'/>" defer></script>
         <script src="<c:url value='/js/theme.js'/>"></script>
     </head>

@@ -18,16 +18,28 @@
 
         <%-- (MỚI) Nhúng file CSS cụ thể cho trang này SAU --%>
         <link rel="stylesheet" href="<c:url value='/css/UserThongBao.css'/>">
-        <link rel="stylesheet" href="<c:url value='/css/_sidebar.css'/>">
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+        
 
         <script src="<c:url value='/js/darkmodeQuang.js'/>" defer></script>
         <script src="<c:url value='/js/theme.js'/>"></script>
     </head>
     <body>
-        <c:if test="${sessionScope.account.vaiTro != 'Bệnh nhân'}">
-                        <jsp:include page="_sidebar.jsp" />
-        </c:if>
-            <div class="main-content">
+        <c:choose>
+            <%-- 1. Nếu là Bệnh nhân, chỉ hiện Header --%>
+            <c:when test="${sessionScope.USER.vaiTro == 'BENH_NHAN'}">
+                <link rel="stylesheet" href="<c:url value='/css/index.css'/>">
+                <script src="<c:url value='/js/index.js'/>"></script>
+                <jsp:include page="/WEB-INF/headerDat.jsp" />
+            </c:when>
+
+            <%-- 2. Ngược lại (Bác sĩ, Lễ tân, Admin...), chỉ hiện Sidebar --%>
+            <c:otherwise>
+                <link rel="stylesheet" href="<c:url value='/css/_sidebar.css'/>">
+                <jsp:include page="_sidebar.jsp" />
+            </c:otherwise>
+        </c:choose>
+        <div class="main-content">
             <%-- (SỬA) Bọc toàn bộ trang trong .container --%>
             <div class="container" style="max-width: 900px;"> <%-- Container hẹp hơn cho giao diện hộp thư --%>
 

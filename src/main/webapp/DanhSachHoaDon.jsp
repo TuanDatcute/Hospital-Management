@@ -10,7 +10,7 @@
         <%-- Sử dụng chung file CSS với trang danh sách phiếu khám --%>
         <link rel="stylesheet" href="<c:url value='/css/StyleChungCuaQuang.css'/>">
         <link rel="stylesheet" href="<c:url value='/css/_sidebar.css'/>">
-
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
         <%-- Thêm Font Awesome (cần cho các icon) --%>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">    
@@ -177,7 +177,10 @@
                                         <form action="MainController" method="POST">
                                             <input type="hidden" name="action" value="generateInvoice">
                                             <input type="hidden" name="phieuKhamId" value="${pk.id}">
-                                            <button type="submit">Lập Hóa đơn</button>
+                                            <%-- (THÊM CLASS VÀO ĐÂY) --%>
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                <i class="fa-solid fa-file-invoice"></i> Lập Hóa đơn
+                                            </button>
                                         </form>
                                     </td>
                                 </tr>

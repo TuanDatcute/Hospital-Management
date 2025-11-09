@@ -5,79 +5,97 @@
 <html>
     <head>
         <title>Lịch hẹn của tôi</title>
-        <%-- THÊM CSS MỚI --%>
+        <%-- Đảm bảo đường dẫn CSS chính xác --%>
+
+
+        <%-- CẢNH BÁO: file index.css này có thể GHI ĐÈ style của LichHenQuang.css nếu nó được tải sau --%>
+        <link rel="stylesheet" href="<c:url value='/css/index.css'/>">
+        <script src="<c:url value='/js/index.js'/>"></script>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/LichHenQuang.css">
-        <%-- Xóa thẻ <style> cũ --%>
     </head>
     <body>
-        <h2>Lịch hẹn của tôi</h2>
 
-        <%-- Thông báo (Giữ nguyên) --%>
-        <c:if test="${not empty param.bookSuccess}"><p class="success">Bạn đã đặt lịch hẹn thành công!</p></c:if>
-        <c:if test="${not empty param.cancelSuccess}"><p class="success">Bạn đã hủy lịch hẹn thành công.</p></c:if>
-        <c:if test="${not empty ERROR_MESSAGE}"><p class="error"><c:out value="${ERROR_MESSAGE}"/></p></c:if>
-        <c:if test="${not empty param.error}"><p class="error"><c:out value="${param.error}"/></p></c:if>
+        <jsp:include page="/WEB-INF/headerDat.jsp" />
 
+        <div class="page-container">
+            <h2>Lịch hẹn của tôi</h2>
+
+            <%-- Thông báo --%>
+            <c:if test="${not empty param.bookSuccess}"><p class="success">Bạn đã đặt lịch hẹn thành công!</p></c:if>
+            <c:if test="${not empty param.cancelSuccess}"><p class="success">Bạn đã hủy lịch hẹn thành công.</p></c:if>
+            <c:if test="${not empty ERROR_MESSAGE}"><p class="error"><c:out value="${ERROR_MESSAGE}"/></p></c:if>
+            <c:if test="${not empty param.error}"><p class="error"><c:out value="${param.error}"/></p></c:if>
+
+            <%-- SỬA 1: Nút Đặt lịch hẹn mới --%>
             <p>
-                <a href="${pageContext.request.contextPath}/MainController?action=showPatientBookingForm">
-                <button type="button">+ Đặt lịch hẹn mới</button>
-            </a>
-        </p>
+                <a href="${pageContext.request.contextPath}/MainController?action=showPatientBookingForm" 
+                   class="btn btn-primary">
+                    + Đặt lịch hẹn mới
+                </a>
+            </p>
 
-        <%-- Form Tìm kiếm (Giữ nguyên) --%>
-        <form action="${pageContext.request.contextPath}/MainController" method="GET">
-            <input type="hidden" name="action" value="myAppointments">
-            Tìm kiếm:
-            <input type="text" name="searchKeyword" value="<c:out value='${param.searchKeyword}'/>" 
-                   placeholder="Nhập tên bác sĩ, lý do, trạng thái...">
-            <button type="submit">Tìm</button>
-            <a href="${pageContext.request.contextPath}/MainController?action=myAppointments">Xóa lọc</a>
-        </form>
-        <br>
+            <%-- SỬA 2: Form Tìm kiếm --%>
+            <form action="${pageContext.request.contextPath}/MainController" method="GET" class="search-controls">
+                <input type="hidden" name="action" value="myAppointments">
 
-        <table border="1" style="width:100%">
-            <thead>
-                <tr>
-                    <th>STT</th>
-                    <th>Thời gian hẹn</th>
-                    <th>Bác sĩ</th>
-                    <th>Lý do khám</th>
-                    <th>Trạng thái</th>
-                    <th>Hành động</th> 
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="lich" items="${lichHenList}">
-                    <tr>
-                        <td>${lich.stt}</td>
-                        <td>
-                            <c:out value="${lich.thoiGianHen.toInstant()}"/>
-                        </td>
-                        <td>
-                            <c:out value="${lich.tenBacSi}"/>
-                        </td>
-                        <td><c:out value="${lich.lyDoKham}"/></td>
-                        <td>
-                            <%-- SỬ DỤNG CLASS MỚI ĐỂ ĐỊNH DẠNG MÀU TRẠNG THÁI --%>
-                            <span class="status-${lich.trangThai}">
-                                <c:out value="${lich.trangThai}"/>
-                            </span>
-                        </td>
-                        <td>
-                            <%-- Nút Hủy (Giữ nguyên) --%>
-                            <c:if test="${lich.trangThai == 'CHO_XAC_NHAN' || lich.trangThai == 'DA_XAC_NHAN'}">
-                                <form action="${pageContext.request.contextPath}/MainController" method="POST"
-                                      onsubmit="return confirm('Bạn có chắc chắn muốn hủy lịch hẹn này?');">
-                                    <input type="hidden" name="action" value="cancelAppointment">
-                                    <input type="hidden" name="id" value="${lich.id}">
-                                    <button type="submit" class="delete-button">Hủy lịch</button>
-                                </form>
-                            </c:if>
-                        </td>
-                    </tr>
-                </c:forEach>
-            </tbody>
-        </table>
+                <label for="search">Tìm kiếm:</label>
+                <input type="text" id="search" name="searchKeyword" value="<c:out value='${param.searchKeyword}'/>"
+                       placeholder="Nhập tên bác sĩ, lý do, trạng thái...">
 
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Tìm</button>
+                    <a href="${pageContext.request.contextPath}/MainController?action=myAppointments" class="btn-link">Xóa lọc</a>
+                </div>
+            </form>
+            <br>
+
+            <%-- SỬA 3: Bảng (Table) --%>
+            <div class="table-responsive-wrapper">
+                <table> <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Thời gian hẹn</th>
+                            <th>Bác sĩ</th>
+                            <th>Lý do khám</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th> 
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="lich" items="${lichHenList}">
+                            <tr>
+                                <td>${lich.stt}</td>
+                                <td>
+                                    <%-- CẢI TIẾN: Format lại ngày giờ cho đẹp --%>
+                                    <fmt:timeZone value="Asia/Ho_Chi_Minh" />
+                                    <fmt:formatDate value="${lich.thoiGianHen}" pattern="HH:mm 'ngày' dd/MM/yyyy" />
+                                </td>
+                                <td>
+                                    <c:out value="${lich.tenBacSi}"/>
+                                </td>
+                                <td><c:out value="${lich.lyDoKham}"/></td>
+                                <td>
+                                    <span class="status-${lich.trangThai}">
+                                        <c:out value="${lich.trangThai}"/>
+                                    </span>
+                                </td>
+                                <td>
+                                    <c:if test="${lich.trangThai == 'CHO_XAC_NHAN' || lich.trangThai == 'DA_XAC_NHAN'}">
+                                        <form action="${pageContext.request.contextPath}/MainController" method="POST"
+                                              onsubmit="return confirm('Bạn có chắc chắn muốn hủy lịch hẹn này?');">
+                                            <input type="hidden" name="action" value="cancelAppointment">
+                                            <input type="hidden" name="id" value="${lich.id}">
+
+                                            <%-- SỬA 4: Nút Hủy lịch --%>
+                                            <button type="submit" class="btn-danger-link">Hủy lịch</button>
+                                        </form>
+                                    </c:if>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </body>
 </html>

@@ -15,6 +15,7 @@
         <%-- BƯỚC 2: LIÊN KẾT CSS VÀ JS CỦA BẠN --%>
         <link rel="stylesheet" href="css/PhongBenh.css">
         <link rel="stylesheet" href="<c:url value='/css/_sidebar.css'/>">
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 
         <%-- defer: Giúp trang tải nhanh hơn, JS chạy sau khi HTML tải xong --%>
         <script src="<c:url value='/js/darkmodeQuang.js'/>" defer></script>

@@ -87,21 +87,20 @@
 
                         <%-- Nút Đăng xuất --%>
                         <a href="${pageContext.request.contextPath}/MainController?action=logout" style="margin-left: 15px; color: #dc3545; font-weight: 600;">Đăng xuất</a>
-                    </c:if>
-                    </div>
+                        </div>
 
-                    <%-- Nút menu cho mobile --%>
-                    <button class="mobile-nav-toggle" aria-label="Toggle menu">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    </div>
+                        <%-- Nút menu cho mobile --%>
+                        <button class="mobile-nav-toggle" aria-label="Toggle menu">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        </div>
 
-                    </div>
+                        </div>
 
-                    <%-- Dòng chữ chạy (Vẫn giữ logic ở đây nhưng CSS sẽ ẩn nó) --%>
-                    <div class="marquee-banner">
-                        <marquee behavior="scroll" direction="left" scrollamount="5">
-                            Hãy liên hệ với chúng tôi qua hotline 1900 0000 để được tư vấn và hỗ trợ một cách tốt nhất! 🏥 Chúc bạn ngày mới tốt lành!
-                        </marquee>
-                    </div>
-                    </div>
+                        <%-- Dòng chữ chạy (Vẫn giữ logic ở đây nhưng CSS sẽ ẩn nó) --%>
+                        <div class="marquee-banner">
+                            <marquee behavior="scroll" direction="left" scrollamount="5">
+                                Hãy liên hệ với chúng tôi qua hotline 1900 0000 để được tư vấn và hỗ trợ một cách tốt nhất! 🏥 Chúc bạn ngày mới tốt lành!
+                            </marquee>
+                        </div>
+                        </div>

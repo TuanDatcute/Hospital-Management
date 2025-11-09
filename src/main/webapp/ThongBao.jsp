@@ -16,6 +16,7 @@
         <%-- BẮT BUỘC: Nhúng file CSS chung TRƯỚC --%>
         <%-- (Đây là file DanhSachHoaDon.css đã được gộp, hoặc file base.css) --%>
         <link rel="stylesheet" href="<c:url value='/css/StyleChungCuaQuang.css'/>"> 
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 
         <%-- (MỚI) Nhúng file CSS cụ thể cho trang này SAU --%>
         <link rel="stylesheet" href="<c:url value='/css/ThongBao.css'/>">
