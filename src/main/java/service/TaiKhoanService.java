@@ -398,10 +398,13 @@ public class TaiKhoanService {
         return updateTrangThaiTaiKhoan(id, TRANG_THAI_HOAT_DONG);
     }
 
-    public List<TaiKhoanDTO> getActiveAndUnassignedAccounts(String role) {
-        List<TaiKhoan> entities = taiKhoanDAO.findActiveAndUnassignedAccounts(role);
+    public List<TaiKhoanDTO> getAllActiveAndUnassignedStaffAccounts() {
+        // 1. Gọi hàm DAO mới bạn đã thêm ở Bước 1
+        List<TaiKhoan> entities = taiKhoanDAO.findAllActiveAndUnassignedStaffAccounts();
+
+        // 2. Chuyển sang DTO (giống hệt các hàm khác)
         return entities.stream()
-                .map(this::toDTO)
+                .map(this::toDTO) // 'this::toDTO' là hàm mapper đã có ở cuối file
                 .collect(Collectors.toList());
     }
 

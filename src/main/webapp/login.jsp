@@ -55,10 +55,6 @@
                     <h1>Tạo tài khoản</h1>
 
                     <%-- **THÊM MỚI: ICON SOCIAL** --%>
-                    <div class="social-icons">
-                        <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
-                        <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
-                    </div>
                     <span>hoặc dùng email của bạn để đăng ký</span>
 
                     <%-- Hiển thị lỗi nếu action là 'register' --%>
@@ -87,9 +83,6 @@
                     <h1>Đăng nhập</h1>
 
                     <%-- **THÊM MỚI: ICON SOCIAL** --%>
-                    <div class="social-icons">
-                        <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
-                    </div>
                     <span>hoặc dùng Tên đăng nhập của bạn</span>
 
                     <%-- Hiển thị lỗi nếu action là 'login' (hoặc không có action) --%>

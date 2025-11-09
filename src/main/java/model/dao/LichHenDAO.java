@@ -258,6 +258,66 @@ public class LichHenDAO {
             return new ArrayList<>();
         }
     }
+    
+    public List<LichHen> searchLichHenPaginated(String keyword, int page, int pageSize) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            
+            // Dùng SELECT DISTINCT để tránh trùng lặp khi JOIN
+            // Dùng LEFT JOIN FETCH để tải luôn dữ liệu, tránh lỗi N+1
+            String hql = "SELECT DISTINCT lh FROM LichHen lh "
+                    + "LEFT JOIN FETCH lh.benhNhan bn "
+                    + "LEFT JOIN FETCH lh.bacSi bs " // 'bacSi' là tên trường NhanVien trong LichHen
+                    + "WHERE (bn.hoTen LIKE :keyword "
+                    + "OR bs.hoTen LIKE :keyword "
+                    + "OR lh.lyDoKham LIKE :keyword "
+                    + "OR lh.trangThai LIKE :keyword) "
+                    + "ORDER BY lh.thoiGianHen DESC"; // Sắp xếp theo thời gian hẹn mới nhất
+
+            Query<LichHen> query = session.createQuery(hql, LichHen.class);
+            query.setParameter("keyword", "%" + keyword + "%");
+
+            // Logic phân trang
+            int offset = (page - 1) * pageSize;
+            query.setFirstResult(offset);
+            query.setMaxResults(pageSize);
+
+            return query.list();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList(); // Trả về danh sách rỗng nếu có lỗi
+        }
+    }
+
+    /**
+     * Đếm tổng số kết quả Lịch hẹn khớp với từ khóa tìm kiếm.
+     *
+     * @param keyword Từ khóa tìm kiếm
+     * @return Tổng số lịch hẹn
+     */
+    public long getLichHenSearchCount(String keyword) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            
+            // Câu HQL này phải JOIN và WHERE giống hệt như hàm search
+            String hql = "SELECT count(DISTINCT lh.id) FROM LichHen lh "
+                    + "LEFT JOIN lh.benhNhan bn "
+                    + "LEFT JOIN lh.bacSi bs "
+                    + "WHERE (bn.hoTen LIKE :keyword "
+                    + "OR bs.hoTen LIKE :keyword "
+                    + "OR lh.lyDoKham LIKE :keyword "
+                    + "OR lh.trangThai LIKE :keyword)";
+
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("keyword", "%" + keyword + "%");
+            
+            return query.uniqueResult();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0; // Trả về 0 nếu có lỗi
+        }
+    }
+
 
     //============================================DẠT===================================================
     /**
