@@ -273,7 +273,7 @@ public class BenhNhanService {
     }
 
     public void linkAccountToPatient(int benhNhanId, int taiKhoanId) throws ValidationException, Exception {
-        BenhNhan benhNhanEntity = benhNhanDAO.getById(benhNhanId);
+        BenhNhan benhNhanEntity = benhNhanDAO.getById2(benhNhanId);
         if (benhNhanEntity == null) {
             throw new ValidationException("Không tìm thấy hồ sơ bệnh nhân (ID: " + benhNhanId + ") để liên kết.");
         }

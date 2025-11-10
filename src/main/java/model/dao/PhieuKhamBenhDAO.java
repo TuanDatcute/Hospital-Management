@@ -28,23 +28,47 @@ public class PhieuKhamBenhDAO {
     }
 
     //Tạo một phiếu khám bệnh mới khi bệnh nhân đến khám.
-    public PhieuKhamBenh create(PhieuKhamBenh phieuKham) {
+    public PhieuKhamBenh create(PhieuKhamBenh entity) {
+        Session session = null;
         Transaction transaction = null;
-        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // Bắt đầu một transaction
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
-            // Lưu đối tượng entity
-            session.save(phieuKham);
-            // Commit transaction
+            session.save(entity);
             transaction.commit();
-            // Trả về đối tượng đã được lưu (lúc này đã có ID)
-            return phieuKham;
+            return entity;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
             e.printStackTrace();
-            return null;
+            // Ném lại lỗi để Service biết
+            throw new RuntimeException("Lỗi khi tạo phiếu khám: " + e.getMessage(), e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+    /**
+     * Đếm số phiếu khám có mã được tạo trong ngày hôm nay.
+     *
+     * @param maPhieuKhamPrefix Ví dụ: "PK20251110"
+     * @return Số lượng phiếu đã tồn tại.
+     */
+    public long countByMaPhieuKhamPrefix(String maPhieuKhamPrefix) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<Long> query = session.createQuery(
+                    // Đếm dựa trên mã, không phải thời gian
+                    "SELECT count(p.id) FROM PhieuKhamBenh p WHERE p.maPhieuKham LIKE :prefix",
+                    Long.class
+            );
+            query.setParameter("prefix", maPhieuKhamPrefix + "%");
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
         }
     }
 

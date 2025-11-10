@@ -250,3 +250,55 @@ body {
         justify-content: center;
     }
 }
+
+/* ==========================================================================
+   CSS CHO SIDEBAR FOOTER (NÚT ĐĂNG XUẤT)
+   ========================================================================== */
+
+.sidebar-footer {
+    padding: 10px;
+    border-top: 1px solid var(--border-color);
+    /* Đảm bảo nó luôn ở dưới cùng */
+    margin-top: auto;
+}
+
+.sidebar-footer .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sidebar-footer .nav-link i {
+    width: 20px;
+    font-size: 1rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* ✨ Thêm hiệu ứng màu đỏ khi hover */
+.sidebar-footer .logout-link:hover {
+    background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
+    color: var(--danger-color);
+}
+
+/* ✨ Căn chỉnh khi sidebar thu gọn */
+.sidebar-nav.sidebar-collapsed .sidebar-footer {
+    padding: 10px 0;
+}
+.sidebar-nav.sidebar-collapsed .sidebar-footer .nav-link {
+    justify-content: center;
+    gap: 0;
+}
+.sidebar-nav.sidebar-collapsed .sidebar-footer .nav-text {
+    opacity: 0;
+    width: 0;
+    visibility: hidden;
+}

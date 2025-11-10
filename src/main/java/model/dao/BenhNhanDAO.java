@@ -84,6 +84,17 @@ public class BenhNhanDAO {
             return null;
         }
     }
+      public BenhNhan getById2(int id) {
+        try ( Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "FROM BenhNhan bn  WHERE bn.id = :id AND bn.trangThai = 'HOAT_DONG'";
+            Query<BenhNhan> query = session.createQuery(hql, BenhNhan.class);
+            query.setParameter("id", id);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     /**
      * SỬA (XÓA MỀM): Lấy bằng ID (chỉ HOAT_DONG BenhNhan và HOAT_DONG TaiKhoan)

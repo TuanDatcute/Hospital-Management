@@ -56,7 +56,7 @@ public class AuthFilter implements Filter {
         commonActions.addAll(Arrays.asList(thongBaoActions)); // "thông báo là chung"
 
         // --- 3. Nhóm BỆNH NHÂN (PATIENT) ---
-        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "myAppointments", "bookAppointment", "getBacSiByKhoa", "cancelAppointment"};
+        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "myAppointments", "bookAppointment", "getBacSiByKhoa", "cancelAppointment","printEncounter"};
         patientActions.addAll(Arrays.asList(patientLichHenActions)); // Tự đặt lịch hẹn
         // Các action tự xem/sửa hồ sơ cá nhân
         patientActions.addAll(Arrays.asList("showProfile", "showEditProfile", "saveProfile", "confirmAndLink", "showEditProfileWithExisting", "updateAndLink", "viewMyHistory"));

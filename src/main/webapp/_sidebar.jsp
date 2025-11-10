@@ -22,7 +22,7 @@
         <%-- Logo link cho Lễ Tân (quay về trang Hóa đơn) --%>
         <c:if test="${sessionScope.USER.vaiTro  == 'LE_TAN'}">
             <a href="<c:url value='/MainController?action=listInvoices'/>" class="sidebar-logo">
-               <img src="images/logo.png" alt="alt"/>
+                <img src="images/logo.png" alt="alt"/>
                 <span>Hospital MIS</span>
             </a>
         </c:if>
@@ -42,7 +42,7 @@
                     <span class="nav-text">Tạo Phiếu Khám</span>
                 </a>
             </li>
-            
+
         </c:if>
 
         <li class="menu-divider"><span class="nav-text">Quản lý</span></li>
@@ -79,7 +79,7 @@
                     <span class="nav-text">Dịch Vụ</span>
                 </a>
             </li>    
-            
+
         </c:if>
 
         <%-- ===== CHỨC NĂNG CỦA LỄ TÂN (QUẢN LÝ) ===== --%>
@@ -108,7 +108,7 @@
                     <span class="nav-text">Giường bệnh</span>
                 </a>
             </li>
-            
+
         </c:if>
 
         <%-- ===== CHỨC NĂNG CHUNG (CHO CẢ HAI) ===== --%>
@@ -118,5 +118,10 @@
                 <span class="nav-text">Thông báo</span>
             </a>
         </li>
-    </ul>
+    </ul> <div class="sidebar-footer">
+        <a href="<c:url value='/MainController?action=logout'/>" class="nav-link logout-link">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="nav-text">Đăng xuất</span>
+        </a>
+    </div>
 </nav>
