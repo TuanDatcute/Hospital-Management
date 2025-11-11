@@ -1,4 +1,3 @@
-// Nội dung cho file: /js/pkb-form.js
 document.addEventListener('DOMContentLoaded', function () {
 
     const formGrid = document.querySelector('.form-grid');
@@ -15,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const benhNhanDisplay = document.getElementById('benhNhanDisplay');
     const benhNhanHidden = document.getElementById('benhNhanId_hidden');
     const bacSiHiddenInput = document.querySelector('input[name="bacSiId"]');
-    const bacSiSelect = document.getElementById('bacSiId'); // Thêm dropdown bác sĩ (nếu là Y tá)
+    const bacSiSelect = document.getElementById('bacSiId');
 
     if (appointmentDateInput && lichHenSelect) {
 
@@ -127,7 +126,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 searchResults.innerHTML = '<p class="no-patient-results">Nhập ít nhất 2 ký tự để tìm...</p>';
                 return;
             }
-
+            
+            //Debounce
             searchTimer = setTimeout(async () => {
                 try {
                     const response = await fetch(`${PATIENT_SEARCH_URL}${keyword}`);
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const tr = document.createElement('tr');
                 tr.dataset.patientId = p.id;
                 tr.dataset.patientName = p.hoTen;
-                tr.dataset.patientMa = p.maBenhNhan; // Thêm mã BN
+                tr.dataset.patientMa = p.maBenhNhan;
                 tr.innerHTML = `
                     <td>${p.maBenhNhan}</td>
                     <td>${p.hoTen}</td>

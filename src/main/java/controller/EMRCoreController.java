@@ -22,7 +22,7 @@ import model.dto.LichHenDTO;
 import model.dto.NhanVienDTO;
 import model.dto.PhieuKhamBenhDTO;
 import model.dto.TaiKhoanDTO;
-import service.BenhNhanService;   // Import các Service cần thiết
+import service.BenhNhanService;   
 import service.ChiDinhDichVuService;
 import service.DichVuService;
 import service.DonThuocService;
@@ -30,16 +30,12 @@ import service.LichHenService;
 import service.NhanVienService;
 import service.PhieuKhamBenhService;
 
-/**
- * Servlet đóng vai trò là Front Controller cho các nghiệp vụ của Bệnh án điện
- * tử (EMR).
- */
+
 @WebServlet(name = "EMRCoreController", urlPatterns = {"/EMRCoreController"})
 public class EMRCoreController extends HttpServlet {
 
     // Khai báo URL cho các trang JSP 
     private static final String ERROR_PAGE = "error.jsp";
-    private static final String SUCCESS_PAGE = "DanhSachPhieuKham.jsp";
     private static final String CREATE_ENCOUNTER_PAGE = "PhieuKhamBenh.jsp";
     private static final String ENCOUNTER_LIST_PAGE = "DanhSachPhieuKham.jsp";
     private static final String ENCOUNTER_DETAIL_PAGE = "ChiTietPhieuKham.jsp";
@@ -66,8 +62,6 @@ public class EMRCoreController extends HttpServlet {
 
         try {
             if (action == null || action.isEmpty()) {
-                // Nếu không có action, có thể chuyển về trang chủ
-                // url = "home.jsp";
                 throw new Exception("Hành động không được chỉ định.");
             }
 
@@ -223,11 +217,9 @@ public class EMRCoreController extends HttpServlet {
                 throw new ValidationException("Không tìm thấy phiếu khám với ID: " + id);
             }
 
-            // 2. Lấy danh sách dịch vụ cho dropdown 
             List<DichVuDTO> danhSachDichVu = dv.getAllServicesActive();
             List<ChiTietDonThuocDTO> danhSachDonThuoc = donThuocService.getChiTietByPhieuKhamId(id);
 
-            // 3. Gửi các đối tượng cần thiết cho JSP
             request.setAttribute("phieuKham", phieuKham);
             request.setAttribute("danhSachDichVu", danhSachDichVu);
             request.setAttribute("danhSachDonThuoc", danhSachDonThuoc);
@@ -282,14 +274,13 @@ public class EMRCoreController extends HttpServlet {
             newEncounterDTO.setBenhNhanId(Integer.parseInt(request.getParameter("benhNhanId")));
             newEncounterDTO.setBacSiId(Integer.parseInt(request.getParameter("bacSiId")));
             newEncounterDTO.setTrangThai("CHUA_HOAN_THANH");
-            // 2. Gọi tầng Service để thực hiện logic nghiệp vụ
+            
+            //  Gọi tầng Service để thực hiện logic nghiệp vụ
             PhieuKhamBenhDTO result = phieuKhamService.createEncounter(newEncounterDTO);
 
             String keyword = result.getMaPhieuKham();
-//            // Cần mã hóa keyword để đảm bảo URL hợp lệ
             String encodedKeyword = java.net.URLEncoder.encode(keyword, "UTF-8");
 
-            // 3. Xử lý kết quả thành công
             request.getSession().setAttribute("SUCCESS_MESSAGE", "Tạo phiếu khám thành công! ID: " + result.getId());
             return "redirect:/MainController?action=listAllEncounters&keyword=" + encodedKeyword;
 
@@ -297,8 +288,8 @@ public class EMRCoreController extends HttpServlet {
             // Bắt lỗi nghiệp vụ (do người dùng nhập sai)
             log("Lỗi nghiệp vụ khi tạo phiếu khám: " + e.getMessage());
             request.setAttribute("ERROR_MESSAGE", e.getMessage());
-            request.setAttribute("ENCOUNTER_DATA", newEncounterDTO); // Gửi lại dữ liệu đã nhập
-            loadCreateFormDependencies(request); // Tải lại dữ liệu cho dropdown
+            request.setAttribute("ENCOUNTER_DATA", newEncounterDTO); 
+            loadCreateFormDependencies(request);            
             return CREATE_ENCOUNTER_PAGE;
         } catch (DateTimeParseException e) {
             // Bắt lỗi định dạng
@@ -345,7 +336,6 @@ public class EMRCoreController extends HttpServlet {
         }
     }
 
-    // Trong file controller/EMRCoreController.java
     private void handleGetAppointmentsByDate(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         response.setContentType("application/json");
@@ -372,7 +362,7 @@ public class EMRCoreController extends HttpServlet {
             }
 
             // --- BƯỚC 3: LẤY THAM SỐ VÀ GỌI SERVICE ---
-            int bacSiId = currentUserInfo.getId(); // Lấy ID bác sĩ từ NhanVienDTO
+            int bacSiId = currentUserInfo.getId();
             LocalDate date = LocalDate.parse(request.getParameter("date"));
 
             List<LichHenDTO> lichHens = lichHenService.getPendingAppointments(date, bacSiId);
@@ -381,7 +371,7 @@ public class EMRCoreController extends HttpServlet {
             response.getWriter().write(gson.toJson(lichHens));
 
         } catch (Exception e) {
-            e.printStackTrace(); // In lỗi ra log server
+            e.printStackTrace(); 
             response.setStatus(500);
             response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
         }
