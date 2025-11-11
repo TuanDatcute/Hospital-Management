@@ -451,19 +451,15 @@ public class TaiKhoanService {
         return entity;
     }
 
-    // --- **MERGE:** Lấy hàm 'getTaiKhoanByBenhNhanId' từ nhánh 'main' ---
+   
     public TaiKhoanDTO getTaiKhoanByBenhNhanId(int benhNhanId) {
-        // 1. Gọi BenhNhanDAO để tìm bệnh nhân và tài khoản của họ
-        // (Giả sử BenhNhanDAO có hàm getByIdWithRelations)
-        // BenhNhan benhNhan = benhNhanDAO.getByIdWithRelations(benhNhanId); 
-
-        // if (benhNhan == null || benhNhan.getTaiKhoan() == null) {
-        //     return null; 
-        // }
-        // return toDTO(benhNhan.getTaiKhoan());
-        return null; // Trả về null vì logic này cần BenhNhanDAO, giữ logic ban đầu
+        BenhNhan benhNhan = benhNhanDAO.getByIdWithRelations(benhNhanId);
+        if (benhNhan == null || benhNhan.getTaiKhoan() == null) {
+            return null;
+        }
+        return toDTO(benhNhan.getTaiKhoan());
     }
-    // --- **KẾT THÚC MERGE** ---
+   
 
     public List<TaiKhoanDTO> getAllTaiKhoanPaginated(int page, int pageSize) {
         // Gọi hàm DAO mới

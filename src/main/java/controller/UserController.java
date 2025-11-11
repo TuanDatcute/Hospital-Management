@@ -209,12 +209,14 @@ public class UserController extends HttpServlet {
         }
         if ("QUAN_TRI".equals(user.getVaiTro())) {
             return getRedirectUrl(request, ADMIN_DASHBOARD_PAGE);
-        } else if ("BAC_SI".equals(user.getVaiTro())
-                || "LE_TAN".equals(user.getVaiTro())
-                || "DUOC_SI".equals(user.getVaiTro())
+        } else if ("DUOC_SI".equals(user.getVaiTro())
                 || "Y_TA".equals(user.getVaiTro())
                 || "KY_THUAT_VIEN".equals(user.getVaiTro())) {
             return getRedirectUrl(request, STAFF_DASHBOARD_PAGE);
+        } else if ("BAC_SI".equals(user.getVaiTro())) {
+            return getRedirectUrl(request, "/MainController?action=listAllEncounters");
+        } else if ("LE_TAN".equals(user.getVaiTro())) {
+            return getRedirectUrl(request, "/MainController?action=listInvoices");
         } else {
             BenhNhanDTO profile = null;
             try {
@@ -273,14 +275,16 @@ public class UserController extends HttpServlet {
 
         if ("QUAN_TRI".equals(vaiTro)) {
             redirectJSP = ADMIN_DASHBOARD_PAGE;
-        } else if ("BAC_SI".equals(vaiTro)
-                || "LE_TAN".equals(vaiTro)
-                || "DUOC_SI".equals(vaiTro)
+        } else if ("DUOC_SI".equals(vaiTro)
                 || "Y_TA".equals(vaiTro)
                 || "KY_THUAT_VIEN".equals(vaiTro)) {
             redirectJSP = STAFF_DASHBOARD_PAGE;
         } else if ("BENH_NHAN".equals(vaiTro)) {
             redirectJSP = HOME_PAGE;
+        } else if ("BAC_SI".equals(vaiTro)) {
+            redirectJSP = "/MainController?action=listAllEncounters";
+        } else if ("LE_TAN".equals(vaiTro)) {
+           redirectJSP = "/MainController?action=listInvoices";
         } else {
             log("Vai trò không xác định khi đổi mật khẩu: " + vaiTro);
             redirectJSP = STAFF_DASHBOARD_PAGE;

@@ -34,7 +34,9 @@ public class PasswordHasher {
     // Thêm đoạn này vào cuối file PasswordHasher.java
     public static void main(String[] args) {
         // Đặt mật khẩu admin bạn muốn dùng
-        String adminPassword = "colen123";
+
+        String adminPassword = "123456cup";
+
 
         // Tạo chuỗi hash
         String hashedPassword = hashPassword(adminPassword);

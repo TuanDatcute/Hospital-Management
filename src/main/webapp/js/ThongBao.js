@@ -59,7 +59,7 @@ function toggleTargetValue() {
 
         if (targetType === 'ROLE') {
             // Điền dữ liệu cho Vai trò (dùng biến 'roles' toàn cục từ JSP)
-            targetValueLabel.textContent = 'Chọn vai trò:';
+            targetValueLabel.textContent = 'For Role:';
             roles.forEach(role => {
                 const option = document.createElement('option');
                 option.value = role;
@@ -68,12 +68,12 @@ function toggleTargetValue() {
             });
         } else if (targetType === 'USER') {
             // Điền dữ liệu cho Tài khoản (dùng biến 'accounts' toàn cục từ JSP)
-            targetValueLabel.textContent = 'Chọn tài khoản:';
+            targetValueLabel.textContent = 'For User:';
 
             // Thêm option mặc định
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
-            defaultOption.textContent = '-- Chọn tài khoản --';
+            defaultOption.textContent = '-- For User --';
             targetValueInput.appendChild(defaultOption);
 
             accounts.forEach(acc => {

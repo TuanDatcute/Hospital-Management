@@ -49,20 +49,15 @@ public class PhieuKhamBenhService {
     public PhieuKhamBenhDTO createEncounter(PhieuKhamBenhDTO dto) throws ValidationException {
         // --- BƯỚC 1: TẠO MÃ PHIẾU KHÁM TỰ ĐỘNG ---
         LocalDate today = LocalDate.now();
-        // Định dạng ngày, ví dụ: 20251027
         String dateStr = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String maPhieuKhamPrefix = "PK" + dateStr; // Ví dụ: "PK20251110"
 
-        // Đếm số phiếu đã tạo trong ngày hôm nay
-        LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
-        long count = phieuKhamDAO.countByDateRange(startOfDay, endOfDay);
+        // ✨ SỬA LỖI: Đếm dựa trên MÃ PHIẾU KHÁM, không phải THỜI GIAN KHÁM
+        long count = phieuKhamDAO.countByMaPhieuKhamPrefix(maPhieuKhamPrefix);
 
-        // Tạo số thứ tự mới (ví dụ: 001, 002, 010)
         String sequenceStr = String.format("%03d", count + 1);
-
-        // Ghép lại thành mã hoàn chỉnh
-        String newMaPhieuKham = "PK" + dateStr + sequenceStr;
-        dto.setMaPhieuKham(newMaPhieuKham); // Gán mã mới vào DTO
+        String newMaPhieuKham = maPhieuKhamPrefix + sequenceStr; // Ví dụ: "PK20251110004"
+        dto.setMaPhieuKham(newMaPhieuKham);
 
         BenhNhan benhNhanEntity = benhNhanDAO.getById(dto.getBenhNhanId());
         if (benhNhanEntity == null) {

@@ -238,6 +238,6 @@
         </div>
         <script src="<c:url value='/js/darkmode.js'/>"></script>
         <script src="<c:url value='/js/theme.js'/>"></script>
-        <script src="<c:url value='/js/pkb-form.js'/>"></script>
+        <script src="js/pkb-form.js" charset="UTF-8"></script>
     </body>
 </html>

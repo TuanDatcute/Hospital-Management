@@ -1,4 +1,3 @@
-// Nội dung cho file: /js/pkb-form.js
 document.addEventListener('DOMContentLoaded', function () {
 
     const formGrid = document.querySelector('.form-grid');
@@ -15,14 +14,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const benhNhanDisplay = document.getElementById('benhNhanDisplay');
     const benhNhanHidden = document.getElementById('benhNhanId_hidden');
     const bacSiHiddenInput = document.querySelector('input[name="bacSiId"]');
-    const bacSiSelect = document.getElementById('bacSiId'); // Thêm dropdown bác sĩ (nếu là Y tá)
+    const bacSiSelect = document.getElementById('bacSiId');
 
     if (appointmentDateInput && lichHenSelect) {
 
         async function fetchAppointments() {
             const selectedDate = appointmentDateInput.value;
             if (!selectedDate) {
-                lichHenSelect.innerHTML = '<option value="">-- Chọn ngày để lọc lịch hẹn --</option>';
+                lichHenSelect.innerHTML = '<option value="">-- Select Date --</option>';
                 return;
             }
 
@@ -35,11 +34,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             if (!bacSiId) {
-                lichHenSelect.innerHTML = '<option value="">-- Vui lòng chọn bác sĩ trước --</option>';
+                lichHenSelect.innerHTML = '<option value="">-- Select Doctor First --</option>';
                 return;
             }
 
-            lichHenSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+            lichHenSelect.innerHTML = '<option value="">-- Loading... --</option>';
 
             let url = `${APPOINTMENT_URL}${selectedDate}&bacSiId=${bacSiId}`;
 
@@ -50,9 +49,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const appointments = await response.json();
 
-                lichHenSelect.innerHTML = '<option value="">-- Chọn từ lịch hẹn --</option>';
+                lichHenSelect.innerHTML = '<option value="">-- Get Appointments By Date --</option>';
                 if (appointments.length === 0) {
-                    lichHenSelect.innerHTML = '<option value="">-- Bác sĩ không có lịch hẹn ngày này --</option>';
+                    lichHenSelect.innerHTML = '<option value="">-- Don have any Appointments in this date --</option>';
                 }
 
                 appointments.forEach(app => {
@@ -127,7 +126,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 searchResults.innerHTML = '<p class="no-patient-results">Nhập ít nhất 2 ký tự để tìm...</p>';
                 return;
             }
-
+            
+            //Debounce
             searchTimer = setTimeout(async () => {
                 try {
                     const response = await fetch(`${PATIENT_SEARCH_URL}${keyword}`);
@@ -144,20 +144,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function displayPatientResults(patients) {
             if (!patients || patients.length === 0) {
-                searchResults.innerHTML = '<p class="no-patient-results">Không tìm thấy bệnh nhân nào.</p>';
+                searchResults.innerHTML = '<p class="no-patient-results">dont have any patients </p>';
                 return;
             }
 
             const table = document.createElement('table');
             table.className = 'patient-result-table';
-            table.innerHTML = `<thead><tr><th>Mã BN</th><th>Họ Tên</th><th>CCCD</th></tr></thead>`;
+            table.innerHTML = `<thead><tr><th>Id</th><th>Name</th><th>CCCD</th></tr></thead>`;
             const tbody = document.createElement('tbody');
 
             patients.forEach(p => {
                 const tr = document.createElement('tr');
                 tr.dataset.patientId = p.id;
                 tr.dataset.patientName = p.hoTen;
-                tr.dataset.patientMa = p.maBenhNhan; // Thêm mã BN
+                tr.dataset.patientMa = p.maBenhNhan;
                 tr.innerHTML = `
                     <td>${p.maBenhNhan}</td>
                     <td>${p.hoTen}</td>

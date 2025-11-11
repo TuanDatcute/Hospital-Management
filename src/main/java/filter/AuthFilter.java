@@ -21,7 +21,7 @@ import model.dto.TaiKhoanDTO;
  * Filter này kiểm soát việc xác thực (Authentication) và phân quyền
  * (Authorization) cho MainController.
  */
-@WebFilter(filterName = "AuthFilter", urlPatterns = {"/MainController"})
+//@WebFilter(filterName = "AuthFilter", urlPatterns = {"/MainController"})
 public class AuthFilter implements Filter {
 
     // --- Các Set (tập hợp) để chứa các action cho từng vai trò ---
@@ -56,7 +56,7 @@ public class AuthFilter implements Filter {
         commonActions.addAll(Arrays.asList(thongBaoActions)); // "thông báo là chung"
 
         // --- 3. Nhóm BỆNH NHÂN (PATIENT) ---
-        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "myAppointments", "bookAppointment", "getBacSiByKhoa", "cancelAppointment"};
+        String[] patientLichHenActions = {"myAppointments", "showPatientBookingForm", "myAppointments", "bookAppointment", "getBacSiByKhoa", "cancelAppointment","printEncounter"};
         patientActions.addAll(Arrays.asList(patientLichHenActions)); // Tự đặt lịch hẹn
         // Các action tự xem/sửa hồ sơ cá nhân
         patientActions.addAll(Arrays.asList("showProfile", "showEditProfile", "saveProfile", "confirmAndLink", "showEditProfileWithExisting", "updateAndLink", "viewMyHistory"));
@@ -189,3 +189,4 @@ public class AuthFilter implements Filter {
         // Dọn dẹp tài nguyên (nếu có)
     }
 }
+

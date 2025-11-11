@@ -2,16 +2,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <head>
-    <%-- Đảm bảo bạn đã thêm Font Awesome (cho icon 'fas') --%>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
-    <%-- Link cho Bootstrap Icons (cho icon 'bi') --%>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
 <nav class="sidebar-nav" id="sidebar-nav">
     <div class="sidebar-header">
 
-        <%-- Logo link cho Bác Sĩ (quay về trang DS Phiếu Khám) --%>
         <c:if test="${sessionScope.USER.vaiTro == 'BAC_SI'}">
             <a href="<c:url value='/MainController?action=listAllEncounters'/>" class="sidebar-logo">
                 <img src="images/logo.png" alt="alt"/>
@@ -19,10 +15,9 @@
             </a>
         </c:if>
 
-        <%-- Logo link cho Lễ Tân (quay về trang Hóa đơn) --%>
         <c:if test="${sessionScope.USER.vaiTro  == 'LE_TAN'}">
             <a href="<c:url value='/MainController?action=listInvoices'/>" class="sidebar-logo">
-               <img src="images/logo.png" alt="alt"/>
+                <img src="images/logo.png" alt="alt"/>
                 <span>Hospital MIS</span>
             </a>
         </c:if>
@@ -42,12 +37,7 @@
                     <span class="nav-text">Tạo Phiếu Khám</span>
                 </a>
             </li>
-            <li>
-                <a href="<c:url value='/MainController?action=showCreateAppointmentForm'/>" class="nav-link" data-link="showCreateAppointmentForm">
-                    <i class="bi bi-file-earmark-plus"></i>
-                    <span class="nav-text">Tạo Lịch Hẹn</span>
-                </a>
-            </li>
+
         </c:if>
 
         <li class="menu-divider"><span class="nav-text">Quản lý</span></li>
@@ -66,12 +56,7 @@
                     <span class="nav-text">DS. Đơn Thuốc</span>
                 </a>
             </li>
-            <li>
-                <a href="<c:url value='/MainController?action=listLichHenNurse'/>" class="nav-link" data-link="listLichHenNurse">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span class="nav-text">Lịch Hẹn</span>
-                </a>
-            </li>
+            
             <li>
                 <a href="<c:url value='/MainController?action=listMedications'/>" class="nav-link" data-link="listMedications">
                     <i class="fas fa-pills"></i>
@@ -84,7 +69,7 @@
                     <span class="nav-text">Dịch Vụ</span>
                 </a>
             </li>    
-            
+
         </c:if>
 
         <%-- ===== CHỨC NĂNG CỦA LỄ TÂN (QUẢN LÝ) ===== --%>
@@ -113,7 +98,7 @@
                     <span class="nav-text">Giường bệnh</span>
                 </a>
             </li>
-            
+
         </c:if>
 
         <%-- ===== CHỨC NĂNG CHUNG (CHO CẢ HAI) ===== --%>
@@ -123,5 +108,10 @@
                 <span class="nav-text">Thông báo</span>
             </a>
         </li>
-    </ul>
+    </ul> <div class="sidebar-footer">
+        <a href="<c:url value='/MainController?action=logout'/>" class="nav-link logout-link">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="nav-text">Đăng xuất</span>
+        </a>
+    </div>
 </nav>
